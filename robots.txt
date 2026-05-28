@@ -1,0 +1,13 @@
+# robots.txt — Yunok Tech
+# https://www.yunoktech.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.yunoktech.com/sitemap.xml
+
+# Disallow any future admin or staging paths
+Disallow: /admin/
+Disallow: /staging/
+Disallow: /test/
