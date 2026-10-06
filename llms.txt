@@ -1,0 +1,37 @@
+# Yunok Tech
+
+> Yunok Tech is an Android app studio and training centre in Kharar, Mohali (Punjab, India), serving the Chandigarh Tricity (Chandigarh, Mohali, Panchkula, Kharar, Zirakpur). It has published 13 Android apps on Google Play (https://play.google.com/store/apps/dev?id=5044394667021493760), including Walzi, NotiVault and Hanuman Dham, builds custom Android apps and websites for businesses, and teaches Android development with Kotlin and Jetpack Compose.
+
+Founder: Kamal Kakkar, Senior Android Developer with 10+ years of experience at Nagarro and KareXpert, working in the healthcare and banking domains.
+Address: #28 Anand Villas, Kharar, Mohali, Punjab 140301, India
+Phone / WhatsApp: +91 99882 00178
+Email: yunoktech@gmail.com
+LinkedIn: https://www.linkedin.com/in/kamal-kakkar-13ab2773/
+Medium: https://medium.com/@kamaldeepkakkar
+
+## Android Training (Chandigarh, Mohali, Tricity)
+
+- [Android Training in Chandigarh, Mohali & Tricity](https://yunoktech.com/android-training-chandigarh-mohali.html): Classroom training in Kharar, Mohali, plus live online batches. Kotlin + Jetpack Compose, 6-week / 6-month industrial training with a live project for B.Tech, BCA and MCA students.
+- [Android Kotlin & Jetpack Compose Course](https://yunoktech.com/course.html): 8 modules covering Kotlin, Compose, Material 3, MVVM, Hilt, Coroutines/Flow, Retrofit, Room, Firebase, testing and Play Store publishing. Online live, classroom (Kharar) and 1:1 mentorship options.
+
+## App & Website Development Services
+
+- [Services](https://yunoktech.com/#services): Custom Android apps and websites: spiritual/devotional, food delivery, wallpaper and content, astrology and horoscope, healthcare, banking and fintech, e-commerce and local business, business websites.
+- [Contact](https://yunoktech.com/contact.html): Call or WhatsApp +91 99882 00178.
+
+## Apps (free on Google Play)
+
+- [Walzi Wallpapers](https://yunoktech.com/apps/walzi.html): 4K and HD wallpapers, matching lock + home "Duo" sets, Surprise me shuffle, Top 10 this week, daily auto changer and widget.
+- [NotiVault](https://yunoktech.com/apps/notivault.html): Notification history app. Recover deleted notifications, global search, auto clean. All data stays on the device.
+- [Hanuman Dham](https://yunoktech.com/apps/hanuman-chalisa.html): Hanuman Chalisa with Hindi meaning, Aarti, Bajrang Baan, Sankat Mochan, Sundarkand, Mantra Jaap counter, bhajans and wallpapers. Works offline.
+- [Hanuman Dham lyrics hub](https://yunoktech.com/hanuman-dham/index.html): Hanuman Chalisa, Aarti, Bajrang Baan, Sankat Mochan, Sundarkand and Hanuman Katha lyrics online.
+
+## Blog
+
+- [How to Recover Deleted Notifications on Android](https://yunoktech.com/blog/how-to-recover-deleted-notifications-android/)
+- [See Deleted Chat Messages Using Notification History](https://yunoktech.com/blog/see-deleted-messages-notification-history-android/)
+- [Best Notification History App for Android in 2026](https://yunoktech.com/blog/best-notification-history-app-android-2026/)
+- [11 Benefits of Reading Hanuman Chalisa Daily](https://yunoktech.com/blog/benefits-of-reading-hanuman-chalisa-daily/)
+- [Hanuman Puja Vidhi at Home on Tuesday & Saturday](https://yunoktech.com/blog/hanuman-puja-vidhi-tuesday-saturday/)
+- [Best 4K Wallpaper App for Android in 2026](https://yunoktech.com/blog/best-4k-wallpaper-app-android-2026/)
+- [How to Set Matching Lock & Home Screen Wallpapers](https://yunoktech.com/blog/matching-lock-home-screen-wallpapers-android/)

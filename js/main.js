@@ -197,11 +197,35 @@ function openLightbox(src) {
 (function initContactForm() {
   const form = document.getElementById('contact-form');
   if (!form) return;
+  // Preselect the subject from ?type=project|course links
+  const type = new URLSearchParams(location.search).get('type');
+  const subjectSel = form.querySelector('#subject');
+  if (type && subjectSel && subjectSel.querySelector(`option[value="${type}"]`)) subjectSel.value = type;
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    // Static site — no backend, so hand the message to WhatsApp
+    const val = (id) => {
+      const el = form.querySelector('#' + id);
+      if (!el) return '';
+      return el.tagName === 'SELECT' ? (el.value ? el.options[el.selectedIndex].text : '') : el.value.trim();
+    };
+    const lines = [
+      'Hi Yunok Tech,',
+      '',
+      `Name: ${val('name')}`,
+      `Email: ${val('email')}`,
+      `Topic: ${val('subject')}`,
+      val('app') ? `App: ${val('app')}` : '',
+      '',
+      val('message'),
+    ].filter((l, i, a) => l !== '' || a[i - 1] !== '');
+    window.open('https://wa.me/919988200178?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
+
     const btn = form.querySelector('[type=submit]');
     const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Message Sent!';
+    btn.innerHTML = '✓ Opening WhatsApp…';
     btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
     btn.disabled = true;
     setTimeout(() => {

@@ -6,15 +6,15 @@
 
   <!-- Home Page -->
   <url>
-    <loc>https://www.yunoktech.com/</loc>
-    <lastmod>2026-05-30</lastmod>
+    <loc>https://yunoktech.com/</loc>
+    <lastmod>2026-10-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Apps Page -->
   <url>
-    <loc>https://www.yunoktech.com/apps.html</loc>
+    <loc>https://yunoktech.com/apps.html</loc>
     <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- NotiVault Detail Page -->
   <url>
-    <loc>https://www.yunoktech.com/apps/notivault.html</loc>
+    <loc>https://yunoktech.com/apps/notivault.html</loc>
     <lastmod>2026-05-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -30,31 +30,39 @@
 
   <!-- Hanuman Chalisa Detail Page -->
   <url>
-    <loc>https://www.yunoktech.com/apps/hanuman-chalisa.html</loc>
+    <loc>https://yunoktech.com/apps/hanuman-chalisa.html</loc>
     <lastmod>2026-05-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Walzi Detail Page -->
+  <url>
+    <loc>https://yunoktech.com/apps/walzi.html</loc>
+    <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Blog Page -->
   <url>
-    <loc>https://www.yunoktech.com/blog.html</loc>
-    <lastmod>2026-05-30</lastmod>
+    <loc>https://yunoktech.com/blog.html</loc>
+    <lastmod>2026-10-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Contact Page -->
   <url>
-    <loc>https://www.yunoktech.com/contact.html</loc>
-    <lastmod>2026-05-30</lastmod>
+    <loc>https://yunoktech.com/contact.html</loc>
+    <lastmod>2026-10-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Privacy Policy Page -->
   <url>
-    <loc>https://www.yunoktech.com/privacy-policy.html</loc>
+    <loc>https://yunoktech.com/privacy-policy.html</loc>
     <lastmod>2026-05-30</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -68,4 +76,131 @@
     <priority>0.8</priority>
   </url>       
 
+  <!-- Hanuman Dham: Hanuman Dham Hub -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Hanuman Chalisa Lyrics -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/hanuman-chalisa-lyrics.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Hanuman Aarti Lyrics + Video -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/hanuman-aarti-lyrics.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Bajrang Baan Lyrics -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/bajrang-baan-lyrics.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Sankat Mochan Hanuman Ashtak -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/sankat-mochan-hanuman-ashtak.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Hanuman Katha -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/hanuman-katha.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Hanuman Dham: Sundarkand Path Lyrics -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/sundarkand-path-lyrics.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Hanuman Dham: Hanuman Dham App Features -->
+  <url>
+    <loc>https://yunoktech.com/hanuman-dham/features.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Android Kotlin & Jetpack Compose Course -->
+  <url>
+    <loc>https://yunoktech.com/course.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Blog Article: how-to-recover-deleted-notifications-android -->
+  <url>
+    <loc>https://yunoktech.com/blog/how-to-recover-deleted-notifications-android/</loc>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Article: see-deleted-messages-notification-history-android -->
+  <url>
+    <loc>https://yunoktech.com/blog/see-deleted-messages-notification-history-android/</loc>
+    <lastmod>2026-09-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Article: benefits-of-reading-hanuman-chalisa-daily -->
+  <url>
+    <loc>https://yunoktech.com/blog/benefits-of-reading-hanuman-chalisa-daily/</loc>
+    <lastmod>2026-09-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Article: hanuman-puja-vidhi-tuesday-saturday -->
+  <url>
+    <loc>https://yunoktech.com/blog/hanuman-puja-vidhi-tuesday-saturday/</loc>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Article: best-4k-wallpaper-app-android-2026 -->
+  <url>
+    <loc>https://yunoktech.com/blog/best-4k-wallpaper-app-android-2026/</loc>
+    <lastmod>2026-09-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog Article: matching-lock-home-screen-wallpapers-android -->
+  <url>
+    <loc>https://yunoktech.com/blog/matching-lock-home-screen-wallpapers-android/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Local landing page: Android Training in Chandigarh / Mohali / Tricity -->
+  <url>
+    <loc>https://yunoktech.com/android-training-chandigarh-mohali.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>
