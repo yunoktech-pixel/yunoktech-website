@@ -140,6 +140,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- App & Website Development Services -->
+  <url>
+    <loc>https://yunoktech.com/services.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- Android Kotlin & Jetpack Compose Course -->
   <url>
     <loc>https://yunoktech.com/course.html</loc>

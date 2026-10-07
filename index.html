@@ -25,10 +25,11 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"Yunok Tech","url":"https://yunoktech.com","logo":"https://yunoktech.com/assets/logo.png","description":"Yunok Tech builds Android apps, custom mobile apps and websites, and teaches Kotlin and Jetpack Compose.","areaServed":["Chandigarh","Mohali","Kharar","Panchkula","Zirakpur","India"],"knowsAbout":["Android app development","Website development","Kotlin","Jetpack Compose","Android training"],"founder":{"@type":"Person","name":"Kamal Kakkar","image":"https://yunoktech.com/assets/kamal-kakkar.jpg","jobTitle":"Founder & Senior Android Developer","alumniOf":[{"@type":"Organization","name":"Nagarro"},{"@type":"Organization","name":"KareXpert"}],"sameAs":["https://www.linkedin.com/in/kamal-kakkar-13ab2773/","https://medium.com/@kamaldeepkakkar"]},"address":{"@type":"PostalAddress","streetAddress":"#28 Anand Villas","addressLocality":"Kharar","addressRegion":"Punjab","postalCode":"140301","addressCountry":"IN"},"contactPoint":{"@type":"ContactPoint","contactType":"customer support","telephone":"+91-9988200178","email":"yunoktech@gmail.com"},"sameAs":["https://www.linkedin.com/in/kamal-kakkar-13ab2773/","https://medium.com/@kamaldeepkakkar","https://play.google.com/store/apps/dev?id=5044394667021493760"]}
   </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/yt.css">
 </head>
-<body>
-
-<!-- NAVBAR -->
+<body class="yt yt-home">
+<div class="yt-progress" aria-hidden="true"></div>
 <nav id="navbar" role="navigation" aria-label="Main Navigation">
   <div class="container">
     <div class="nav-inner">
@@ -36,205 +37,161 @@
         <img src="assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
         <span class="nav-logo-text">Yunok<span>Tech</span></span>
       </a>
-      <ul class="nav-links" role="list">
-        <li><a href="index.html" class="active">Home</a></li>
-        <li><a href="apps.html">Apps</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="course.html">Course</a></li>
-        <li><a href="blog.html">Blog</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a href="contact.html" class="btn btn-primary btn-sm">Get a Quote</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+      <ul class="nav-links" role="list"><li><a href="index.html" class="active">Home</a></li><li><a href="apps.html">Apps</a></li><li><a href="services.html">Services</a></li><li><a href="course.html">Course</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="services.html" class="btn btn-primary btn-sm">Get a Quote</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
-  <a href="index.html">Home</a>
-  <a href="apps.html">Apps</a>
-  <a href="#services">Services</a>
-  <a href="course.html">Android Course</a>
-  <a href="blog.html">Blog</a>
-  <a href="contact.html">Contact</a>
-  <div class="mobile-cta">
-    <a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;justify-content:center;margin-top:4px">WhatsApp +91 99882 00178</a>
-  </div>
+  <a href="index.html">🏠 Home</a><a href="apps.html">📱 Apps</a><a href="services.html">💼 App for Your Business</a><a href="course.html">🎓 Android Course</a><a href="blog.html">📝 Blog</a><a href="contact.html">✉️ Contact</a>
+  <div class="mobile-cta"><a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;justify-content:center;margin-top:4px">WhatsApp +91 99882 00178</a></div>
 </nav>
 
-<!-- HERO — apps first -->
-<section id="hero" class="hero-v3" aria-label="Hero Section">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
-  <div class="hero-particles" aria-hidden="true"></div>
+<!-- HERO -->
+<header id="hero" class="yt-hero" aria-labelledby="home-heading">
+  <div class="yt-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="yt-gridbg" aria-hidden="true"></div>
   <div class="container">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <div class="hero-badge"><div class="hero-badge-dot"></div>Android App Studio · Mohali, India</div>
-        <h1 class="hero-title">Apps People Love.<br><span class="accent">Built by Experts.</span></h1>
-        <p class="hero-tagline">We have 13 Android apps on Google Play, including <strong>Walzi</strong>, <strong>NotiVault</strong> &amp; <strong>Hanuman Dham</strong>. We also build custom apps &amp; websites for your business, and teach Kotlin + Jetpack Compose.</p>
-        <div class="hero-actions">
-          <a href="#apps-showcase" class="btn btn-primary btn-lg">Explore Our Apps</a>
-          <a href="course.html" class="btn btn-violet btn-lg">🎓 Jetpack Compose Course</a>
+    <div class="yt-hero-grid">
+      <div class="yt-hero-in">
+        <div class="yt-badge"><i></i>Android App Studio · 13 apps on Google Play</div>
+        <h1 id="home-heading" class="yt-h1" aria-label="Apps people love. Built by experts.">Apps people<br><span class="yt-rotate" aria-hidden="true"><span class="yt-grad">love.</span><span class="yt-grad">use daily.</span><span class="yt-grad">pray with.</span><span class="yt-grad">can't lose.</span></span><br>Built by experts.</h1>
+        <p class="yt-lead">We have 13 Android apps on Google Play, including <strong>Walzi</strong>, <strong>NotiVault</strong> &amp; <strong>Hanuman Dham</strong>. We also build custom apps &amp; websites for your business, and teach Kotlin + Jetpack Compose.</p>
+        <div class="yt-actions">
+          <a href="apps.html" class="yt-btn primary">📱 Explore Our Apps</a>
+          <a href="services.html" class="yt-btn ghost">💼 Build My App</a>
+          <a href="course.html" class="yt-btn ghost">🎓 Join the Course</a>
         </div>
-        <div class="hero-stats">
-          <div><strong>10+ yrs</strong><span>Android experience</span></div>
-          <div><strong>13</strong><span>Apps on Play Store</span></div>
-          <div><strong>4.7★</strong><span>Top app rating</span></div>
+        <div class="yt-stats">
+          <div class="yt-stat"><b><span data-count="13">0</span></b><span>Apps on Play Store</span></div>
+          <div class="yt-stat"><b><span data-count="4.7">0</span>★</b><span>Top app rating</span></div>
+          <div class="yt-stat"><b>₹0</b><span>Free to download</span></div>
         </div>
       </div>
-      <div class="hero-app-stack">
-        <a href="apps/walzi.html" class="hero-app-tile">
-          <img src="assets/walzi-icon.jpg" alt="Walzi icon" width="58" height="58">
-          <div><h3>Walzi Wallpapers</h3><p>4K &amp; HD wallpapers, Duo lock + home sets, daily auto changer</p></div>
-          <span class="tile-cta">View →</span>
-        </a>
-        <a href="apps/notivault.html" class="hero-app-tile">
-          <img src="assets/notivault-icon.jpg" alt="NotiVault icon" width="58" height="58">
-          <div><h3>NotiVault</h3><p>Recover deleted notifications &amp; save notification history</p></div>
-          <span class="tile-cta">View →</span>
-        </a>
-        <a href="apps/hanuman-chalisa.html" class="hero-app-tile">
-          <img src="assets/hanuman-dham/logo-192.png" alt="Hanuman Dham icon" width="58" height="58">
-          <div><h3>Hanuman Dham</h3><p>Hanuman Chalisa with meaning, Aarti, Mantra Jaap &amp; bhajans</p></div>
-          <span class="tile-cta">View →</span>
-        </a>
-        <a href="course.html" class="hero-app-tile course-tile">
-          <div class="tile-icon">🎓</div>
-          <div><h3>Android Course — Enrolling Now</h3><p>Kotlin + Jetpack Compose, from basics to Play Store</p></div>
-          <span class="tile-cta">Join →</span>
-        </a>
+      <div class="yt-show" style="--ac:#c34cff" aria-label="Our apps" aria-roledescription="carousel">
+        <div class="yt-show-glow" aria-hidden="true"></div>
+        <div class="yt-phone yt-show-phone">
+          <a href="apps/walzi.html" class="yt-show-screen on" data-ac="#c34cff" tabindex="0"><img src="assets/home/screen-walzi.jpg" alt="Walzi app home screen with today's wallpaper picks"></a>
+          <a href="apps/notivault.html" class="yt-show-screen" data-ac="#5ad1ff" tabindex="-1"><img src="assets/home/screen-notivault.jpg" alt="NotiVault app showing saved notification history" loading="lazy"></a>
+          <a href="apps/hanuman-chalisa.html" class="yt-show-screen" data-ac="#f6c453" tabindex="-1"><img src="assets/home/screen-hanuman.jpg" alt="Hanuman Dham app home screen with Aarti, Chalisa and Jaap" loading="lazy"></a>
+        </div>
+        <div class="yt-show-label" aria-live="polite">
+          <span class="yt-show-item on"><img src="assets/walzi-icon.jpg" alt="" width="40" height="40"><span><b>Walzi Wallpapers</b><small>4K &amp; HD · Duo lock + home</small></span></span>
+          <span class="yt-show-item"><img src="assets/notivault-icon.jpg" alt="" width="40" height="40"><span><b>NotiVault</b><small>Notification history · 4.5★</small></span></span>
+          <span class="yt-show-item"><img src="assets/hanuman-dham/logo-192.png" alt="" width="40" height="40"><span><b>Hanuman Dham</b><small>Chalisa &amp; bhakti · 4.7★</small></span></span>
+        </div>
+        <div class="yt-show-dots"><button type="button" class="on" aria-label="Show Walzi Wallpapers"><i></i></button><button type="button" class="" aria-label="Show NotiVault"><i></i></button><button type="button" class="" aria-label="Show Hanuman Dham"><i></i></button></div>
       </div>
+    </div>
+  </div>
+</header>
+
+<div class="yt-marquee" aria-hidden="true"><div class="yt-marquee-track"><span>13 apps on Google Play <em>✦</em> <span class="o">Kotlin</span> <em>✦</em> Jetpack Compose <em>✦</em> <span class="o">Material 3</span> <em>✦</em> Custom apps &amp; websites <em>✦</em> <span class="o">Privacy first</span> <em>✦</em> Free on Google Play <em>✦</em> <span class="o">Android &amp; iOS</span> <em>✦</em> Made in India <em>✦</em> </span><span>13 apps on Google Play <em>✦</em> <span class="o">Kotlin</span> <em>✦</em> Jetpack Compose <em>✦</em> <span class="o">Material 3</span> <em>✦</em> Custom apps &amp; websites <em>✦</em> <span class="o">Privacy first</span> <em>✦</em> Free on Google Play <em>✦</em> <span class="o">Android &amp; iOS</span> <em>✦</em> Made in India <em>✦</em> </span></div></div>
+
+<!-- THREE PATHS -->
+<section class="yt-sec yt-center" aria-labelledby="paths-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">How can we help?</div>
+    <h2 id="paths-heading" class="yt-h2" data-anim="blur">One Studio. <span class="yt-grad">Three Ways</span> to Work With Us.</h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Download our apps, get an app built for your business, or learn to build them yourself.</p>
+    <div class="yt-paths">
+      <a href="apps.html" class="yt-path" data-anim="flip" style="--pg:linear-gradient(160deg,#6366f1,#22d3ee)"><span class="num">01 · FOR EVERYONE</span><span class="emoji">📱</span><h3>Use Our Apps</h3><p>Free, lightweight apps for wallpapers, notification history and daily bhakti — loved on Google Play.</p><span class="go">Explore all apps</span></a>
+      <a href="services.html" class="yt-path" data-anim="flip" style="--d:.12s;--pg:linear-gradient(160deg,#10b981,#0ea5e9)"><span class="num">02 · FOR BUSINESSES</span><span class="emoji">💼</span><h3>Get an App for Your Business</h3><p>Food delivery, healthcare, astrology, e-commerce, spiritual and more — Android apps &amp; websites built for you.</p><span class="go">Plan my app</span></a>
+      <a href="course.html" class="yt-path" data-anim="flip" style="--d:.24s;--pg:linear-gradient(160deg,#8b5cf6,#ec4899)"><span class="num">03 · FOR LEARNERS</span><span class="emoji">🎓</span><h3>Learn Android Development</h3><p>Kotlin + Jetpack Compose course — classroom in Kharar and live online. Build real apps and publish them.</p><span class="go">See the course</span></a>
     </div>
   </div>
 </section>
 
-<!-- APPS SHOWCASE -->
-<section id="apps-showcase" class="section-py" aria-labelledby="apps-heading">
-  <div class="container text-center">
-    <div class="section-tag">Our Apps</div>
-    <h2 id="apps-heading" class="section-title">Apps You'll Love</h2>
-    <p class="section-desc">Our most popular apps from <strong style="color:var(--clr-text)">13 apps on Google Play</strong>: lightweight, privacy-focused and built with modern Android.</p>
-    <div class="apps-grid apps-grid-3">
-      <!-- Walzi -->
-      <article class="app-card reveal">
-        <div class="app-card-top">
-          <div class="app-icon-wrap"><img src="assets/walzi-icon.jpg" alt="Walzi Wallpapers App Icon" loading="lazy" width="68" height="68"></div>
-          <div class="app-meta">
-            <h3>Walzi Wallpapers</h3>
-            <div class="app-rating"><span class="count">New · Free on Google Play</span></div>
-            <p class="app-desc">Aesthetic 4K &amp; HD wallpapers with matching lock + home Duo sets, Surprise me shuffle &amp; a daily auto changer.</p>
-          </div>
-        </div>
-        <div class="app-screenshots-mini" aria-label="Walzi screenshots">
-          <img src="screenshots/wz-1.jpg" alt="Walzi fresh wallpapers" loading="lazy">
-          <img src="screenshots/wz-2.jpg" alt="Walzi Surprise me shuffle" loading="lazy">
-          <img src="screenshots/wz-3.jpg" alt="Walzi Top 10 this week" loading="lazy">
-          <img src="screenshots/wz-4.jpg" alt="Walzi Duo lock and home wallpapers" loading="lazy">
-          <img src="screenshots/wz-6.jpg" alt="Walzi lock screen preview" loading="lazy">
-        </div>
-        <div class="app-card-bottom">
-          <div class="app-card-btns">
-            <a href="apps/walzi.html" class="btn btn-outline btn-sm">View Details</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:8px 14px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Play Store" style="width:20px;height:20px">
-              <div class="ps-text"><span>GET IT ON</span><span style="font-size:.82rem">Google Play</span></div>
-            </a>
-          </div>
-        </div>
+<!-- APPS -->
+<section id="apps-showcase" class="yt-sec alt yt-center" aria-labelledby="apps-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Our Apps</div>
+    <h2 id="apps-heading" class="yt-h2" data-anim="blur">Apps You'll <span class="yt-grad">Love</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Our most popular apps from <strong style="color:#fff">13 apps on Google Play</strong>: lightweight, privacy-focused and built with modern Android.</p>
+    <div class="yt-apps">
+      <article class="yt-app" data-anim="up" style="--ac:#c34cff;--bgm:radial-gradient(circle at 50% 120%,#7c5cff,#140c26 70%)">
+        <div class="yt-app-media peek"><div class="peek-phone"><img src="assets/home/screen-walzi.jpg" alt="Walzi app home screen" loading="lazy"></div></div>
+        <div class="yt-app-body"><div class="yt-app-title"><img src="assets/walzi-icon.jpg" alt="Walzi Wallpapers App Icon" width="44" height="44" loading="lazy"><div><h3>Walzi Wallpapers</h3><div class="meta">New · Free on Google Play</div></div></div><p>Aesthetic 4K &amp; HD wallpapers with matching lock + home Duo sets, Surprise me shuffle &amp; a daily auto changer.</p>
+          <div class="yt-app-btns"><a href="apps/walzi.html" class="yt-play">View Details</a><a href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dhome" target="_blank" rel="noopener" class="yt-play"><img src="assets/playstore-icon.png" alt="" width="18" height="18">Google Play</a></div></div>
       </article>
-      <!-- NotiVault -->
-      <article class="app-card reveal reveal-delay-1">
-        <div class="app-card-top">
-          <div class="app-icon-wrap"><img src="assets/notivault-icon.jpg" alt="NotiVault App Icon" loading="lazy" width="68" height="68"></div>
-          <div class="app-meta">
-            <h3>NotiVault</h3>
-            <div class="app-rating">★★★★★ <span class="count">(4.5 · 500+ reviews)</span></div>
-            <p class="app-desc">Recover deleted notifications, save notification history &amp; never miss an important message again.</p>
-          </div>
-        </div>
-        <div class="app-screenshots-mini" aria-label="NotiVault screenshots">
-          <img src="screenshots/nv-1.png" alt="NotiVault theme selection" loading="lazy">
-          <img src="screenshots/nv-2.png" alt="NotiVault auto clean" loading="lazy">
-          <img src="screenshots/nv-3.png" alt="NotiVault language settings" loading="lazy">
-          <img src="screenshots/nv-4.png" alt="NotiVault global search" loading="lazy">
-          <img src="screenshots/nv-5.png" alt="NotiVault notification list" loading="lazy">
-        </div>
-        <div class="app-card-bottom">
-          <div class="app-card-btns">
-            <a href="apps/notivault.html" class="btn btn-outline btn-sm">View Details</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:8px 14px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Play Store" style="width:20px;height:20px">
-              <div class="ps-text"><span>GET IT ON</span><span style="font-size:.82rem">Google Play</span></div>
-            </a>
-          </div>
-        </div>
+      <article class="yt-app" data-anim="up" style="--d:.1s;--ac:#5ad1ff;--bgm:radial-gradient(circle at 50% 120%,#4f7cff,#0b1430 70%)">
+        <div class="yt-app-media peek"><div class="peek-phone"><img src="assets/home/screen-notivault.jpg" alt="NotiVault notification history screen" loading="lazy"></div></div>
+        <div class="yt-app-body"><div class="yt-app-title"><img src="assets/notivault-icon.jpg" alt="NotiVault App Icon" width="44" height="44" loading="lazy"><div><h3>NotiVault</h3><div class="meta">★★★★★ 4.5 · 500+ reviews</div></div></div><p>Recover deleted notifications, save notification history &amp; never miss an important message again.</p>
+          <div class="yt-app-btns"><a href="apps/notivault.html" class="yt-play">Try the Demo</a><a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dhome" target="_blank" rel="noopener" class="yt-play"><img src="assets/playstore-icon.png" alt="" width="18" height="18">Google Play</a></div></div>
       </article>
-      <!-- Hanuman Dham -->
-      <article class="app-card reveal reveal-delay-2">
-        <div class="app-card-top">
-          <div class="app-icon-wrap"><img src="assets/hanuman-dham/logo-192.png" alt="Hanuman Dham App Icon" loading="lazy" width="68" height="68"></div>
-          <div class="app-meta">
-            <h3>Hanuman Dham</h3>
-            <div class="app-rating">★★★★★ <span class="count">(4.7 · 1000+ reviews)</span></div>
-            <p class="app-desc">Hanuman Chalisa with meaning, Aarti, Bajrang Baan, Sundarkand, Mantra Jaap, bhajans &amp; wallpapers.</p>
-          </div>
-        </div>
-        <div class="app-screenshots-mini" aria-label="Hanuman Dham screenshots">
-          <img src="assets/hanuman-dham/app-home.jpg" alt="Hanuman Dham home screen" loading="lazy">
-          <img src="assets/hanuman-dham/app-chalisa.jpg" alt="Hanuman Chalisa with meaning" loading="lazy">
-          <img src="assets/hanuman-dham/app-aarti.jpg" alt="Hanuman Aarti puja" loading="lazy">
-          <img src="assets/hanuman-dham/app-mantra-jaap.jpg" alt="Mantra Jaap mala counter" loading="lazy">
-          <img src="assets/hanuman-dham/app-bhajan.jpg" alt="Bhajan Sangrah" loading="lazy">
-        </div>
-        <div class="app-card-bottom">
-          <div class="app-card-btns">
-            <a href="apps/hanuman-chalisa.html" class="btn btn-outline btn-sm">View Details</a>
-            <a href="hanuman-dham/index.html" class="btn btn-outline btn-sm">Read Lyrics</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunok.hanuman.app" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:8px 14px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Play Store" style="width:20px;height:20px">
-              <div class="ps-text"><span>GET IT ON</span><span style="font-size:.82rem">Google Play</span></div>
-            </a>
-          </div>
-        </div>
+      <article class="yt-app" data-anim="up" style="--d:.2s;--ac:#f6c453;--bgm:radial-gradient(circle at 50% 120%,#ff8a1f,#2a0f02 70%)">
+        <div class="yt-app-media peek"><div class="peek-phone"><img src="assets/home/screen-hanuman.jpg" alt="Hanuman Dham app home screen" loading="lazy"></div></div>
+        <div class="yt-app-body"><div class="yt-app-title"><img src="assets/hanuman-dham/logo-192.png" alt="Hanuman Dham App Icon" width="44" height="44" loading="lazy"><div><h3>Hanuman Dham</h3><div class="meta">★★★★★ 4.7 · 1000+ reviews</div></div></div><p>Hanuman Chalisa with meaning, Aarti, Bajrang Baan, Sundarkand, Mantra Jaap, bhajans &amp; wallpapers.</p>
+          <div class="yt-app-btns"><a href="apps/hanuman-chalisa.html" class="yt-play">View Details</a><a href="hanuman-dham/index.html" class="yt-play">Read Lyrics</a><a href="https://play.google.com/store/apps/details?id=com.yunok.hanuman.app" target="_blank" rel="noopener" class="yt-play"><img src="assets/playstore-icon.png" alt="" width="18" height="18">Google Play</a></div></div>
       </article>
     </div>
-    <div style="margin-top:36px"><a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="btn btn-outline btn-lg">▶ See All 13 Apps on Google Play</a></div>
+    <div class="yt-actions" style="margin-top:40px" data-anim="up">
+      <a href="apps.html" class="yt-btn primary">View All Apps →</a>
+      <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="yt-btn ghost">▶ See All 13 on Google Play</a>
+    </div>
   </div>
 </section>
 
-<!-- COURSE HIGHLIGHT -->
-<section id="course-highlight" class="section-py" aria-labelledby="course-heading">
+<!-- BUSINESS TEASER -->
+<section id="services" class="yt-sec" aria-labelledby="services-heading" style="--a1:#10b981;--a2:#22d3ee">
   <div class="container">
-    <div class="course-banner reveal">
+    <div class="yt-split">
       <div>
-        <div class="course-badge-new">🎓 New Batch · Enrolling Now</div>
-        <h2 id="course-heading">Become an Android Developer with <span class="grad-violet">Kotlin &amp; Jetpack Compose</span></h2>
-        <p>Classroom training in Kharar, Mohali for the Chandigarh Tricity, plus live online batches. Learn from a developer with 10+ years of industry experience at Nagarro and KareXpert. Build real apps, follow modern architecture, and publish your own app on Google Play.</p>
-        <ul class="course-points">
-          <li>Kotlin from zero to advanced</li>
-          <li>Jetpack Compose &amp; Material 3</li>
-          <li>MVVM, Hilt, Room, Retrofit</li>
-          <li>Coroutines &amp; Flow</li>
-          <li>Live projects + code reviews</li>
-          <li>Play Store publishing &amp; interview prep</li>
+        <div class="yt-tag" data-anim="up">For Businesses</div>
+        <h2 id="services-heading" class="yt-h2" data-anim="left">Need an App or Website?<br><span class="yt-grad">We Build It.</span></h2>
+        <p class="yt-sub" data-anim="left" style="--d:.08s">From idea to Play Store — we design and develop Android apps and websites for businesses of every kind. Tell us what you need.</p>
+        <ul class="yt-check cols" data-anim="up" style="--d:.16s">
+          <li>Food delivery &amp; restaurants</li><li>Healthcare &amp; clinics</li><li>Astrology &amp; horoscope</li><li>Spiritual &amp; temples</li>
+          <li>E-commerce &amp; local shops</li><li>Banking &amp; fintech</li><li>Wallpaper &amp; content</li><li>Business websites</li>
         </ul>
-        <div class="course-actions">
-          <a href="course.html" class="btn btn-violet btn-lg">View Full Course →</a>
-          <a href="android-training-chandigarh-mohali.html" class="btn btn-ghost btn-lg">📍 Training in Chandigarh &amp; Mohali</a>
-          <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20know%20about%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="btn btn-whatsapp btn-lg">WhatsApp to Enroll</a>
+        <div class="yt-actions" data-anim="up" style="--d:.22s">
+          <a href="services.html" class="yt-btn primary">Plan Your App →</a>
+          <a href="https://wa.me/919988200178?text=Hi%2C%20I%20need%20an%20app%2Fwebsite%20for%20my%20business" target="_blank" rel="noopener" class="yt-btn wa">💬 WhatsApp Us</a>
         </div>
       </div>
-      <div class="code-card" aria-hidden="true">
-        <div class="code-card-bar"><i></i><i></i><i></i><span>MainScreen.kt</span></div>
+      <div data-anim="right">
+        <div class="yt-build" aria-hidden="true">
+          <div class="yt-build-screen">
+            <div class="yt-b-head" style="--bc:#10b981;--bd:0s"></div>
+            <div class="yt-b-hero" style="--bc:linear-gradient(135deg,#0ea5e9,#22d3ee);--bd:.3s"></div>
+            <div class="yt-b-row" style="--bd:.6s"><i style="--bc:#fde68a"></i><i style="--bc:#fecaca"></i><i style="--bc:#c7d2fe"></i></div>
+            <div class="yt-b-line" style="--bc:#334155;--bd:.9s"></div>
+            <div class="yt-b-line s" style="--bc:#94a3b8;--bd:1.1s"></div>
+            <div class="yt-b-row" style="--bd:1.3s"><i style="--bc:#bbf7d0"></i><i style="--bc:#fbcfe8"></i></div>
+            <div class="yt-b-btn" style="--bc:linear-gradient(110deg,#10b981,#22d3ee);--bd:1.6s"></div>
+          </div>
+          <span class="yt-build-label">⚙️ Your app, built screen by screen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSE TEASER -->
+<section id="course-highlight" class="yt-sec alt" aria-labelledby="course-heading" style="--a1:#8b5cf6;--a2:#ec4899;--a3:#22d3ee">
+  <div class="container">
+    <div class="yt-split rev">
+      <div>
+        <div class="yt-tag" data-anim="up">🎓 New Batch · Enrolling Now</div>
+        <h2 id="course-heading" class="yt-h2" data-anim="right">Become an Android Developer with <span class="yt-grad">Kotlin &amp; Jetpack Compose</span></h2>
+        <p class="yt-sub" data-anim="right" style="--d:.08s">Classroom training in Kharar, Mohali for the Chandigarh Tricity, plus live online batches. Learn from a developer with 10+ years of industry experience at Nagarro and KareXpert.</p>
+        <ul class="yt-check cols" data-anim="up" style="--d:.16s">
+          <li>Kotlin from zero to advanced</li><li>Jetpack Compose &amp; Material 3</li><li>MVVM, Hilt, Room, Retrofit</li>
+          <li>Coroutines &amp; Flow</li><li>Live projects + code reviews</li><li>Play Store publishing &amp; interview prep</li>
+        </ul>
+        <div class="yt-actions" data-anim="up" style="--d:.22s">
+          <a href="course.html" class="yt-btn violet">View Full Course →</a>
+          <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20know%20about%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="yt-btn wa">💬 WhatsApp to Enroll</a>
+        </div>
+      </div>
+      <div class="yt-code" data-anim="left" aria-hidden="true">
+        <div class="yt-code-bar"><i></i><i></i><i></i><span>MainScreen.kt</span></div>
 <pre><span class="a">@Composable</span>
 <span class="k">fun</span> <span class="f">Greeting</span>(name: String) {
-    <span class="k">var</span> count <span class="k">by</span> <span class="f">remember</span> { <span class="f">mutableIntStateOf</span>(0) }
+    <span class="k">var</span> count <span class="k">by</span> <span class="f">remember</span> { <span class="f">mutableIntStateOf</span>(<span class="n">0</span>) }
     <span class="f">Column</span>(
-        modifier = Modifier.<span class="f">padding</span>(16.dp)
+        modifier = Modifier.<span class="f">padding</span>(<span class="n">16</span>.dp)
     ) {
         <span class="f">Text</span>(<span class="s">"Hello, $name 👋"</span>)
         <span class="f">Button</span>(onClick = { count++ }) {
@@ -248,107 +205,34 @@
   </div>
 </section>
 
-<!-- SERVICES -->
-<section id="services" class="section-py" aria-labelledby="services-heading">
-  <div class="container text-center">
-    <div class="section-tag">Services</div>
-    <h2 id="services-heading" class="section-title">Need an App or Website?<br>We Build It.</h2>
-    <p class="section-desc">From idea to Play Store — we design and develop Android apps and websites for businesses of every kind. Tell us what you need.</p>
-    <div class="services-grid">
-      <div class="service-card reveal">
-        <div class="service-icon" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">🕉️</div>
-        <h3>Spiritual &amp; Devotional</h3>
-        <p>Chalisa, aarti, path, mantra jaap and bhajan apps — plus temple and trust websites with donations and events.</p>
-        <div class="service-tags"><span>Audio</span><span>Offline</span><span>Temple sites</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-1">
-        <div class="service-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">🍔</div>
-        <h3>Food Delivery</h3>
-        <p>Customer, restaurant and delivery-partner apps with menus, cart, online payments and live order tracking.</p>
-        <div class="service-tags"><span>Payments</span><span>Live tracking</span><span>Admin panel</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-2">
-        <div class="service-icon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">🖼️</div>
-        <h3>Wallpaper &amp; Content</h3>
-        <p>Wallpaper, ringtone, status and quotes apps with categories, favourites, auto-changer and ad monetisation.</p>
-        <div class="service-tags"><span>4K images</span><span>AdMob</span><span>Widgets</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-3">
-        <div class="service-icon" style="background:linear-gradient(135deg,#4338ca,#7c3aed)">🔮</div>
-        <h3>Astrology &amp; Horoscope</h3>
-        <p>Kundli, daily horoscope, panchang and astrologer consultation apps with chat, call and wallet.</p>
-        <div class="service-tags"><span>Kundli</span><span>Chat / Call</span><span>Wallet</span></div>
-      </div>
-      <div class="service-card reveal">
-        <div class="service-icon" style="background:linear-gradient(135deg,#10b981,#0ea5e9)">🏥</div>
-        <h3>Healthcare</h3>
-        <p>Doctor appointment, clinic and patient apps — built with deep experience from the hospital-software domain.</p>
-        <div class="service-tags"><span>Appointments</span><span>Records</span><span>Secure</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-1">
-        <div class="service-icon" style="background:linear-gradient(135deg,#0284c7,#22d3ee)">🏦</div>
-        <h3>Banking &amp; Fintech</h3>
-        <p>Secure finance, wallet, expense and loan apps following banking-grade security practices.</p>
-        <div class="service-tags"><span>Security</span><span>UPI</span><span>Biometrics</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-2">
-        <div class="service-icon" style="background:linear-gradient(135deg,#db2777,#f43f5e)">🛍️</div>
-        <h3>E-commerce &amp; Local Business</h3>
-        <p>Online stores, grocery, salon and booking apps — help your local shop take orders on mobile.</p>
-        <div class="service-tags"><span>Catalogue</span><span>Orders</span><span>Booking</span></div>
-      </div>
-      <div class="service-card reveal reveal-delay-3">
-        <div class="service-icon" style="background:linear-gradient(135deg,#0ea5e9,#6366f1)">🌐</div>
-        <h3>Business Websites</h3>
-        <p>Fast, SEO-friendly websites and landing pages for schools, coaching, clinics, shops and startups.</p>
-        <div class="service-tags"><span>SEO</span><span>Mobile-first</span><span>Domain setup</span></div>
-      </div>
-    </div>
-    <div class="services-cta">
-      <a href="contact.html?type=project" class="btn btn-primary btn-lg">Discuss Your Project →</a>
-      <a href="https://wa.me/919988200178?text=Hi%2C%20I%20need%20an%20app%2Fwebsite%20for%20my%20business" target="_blank" rel="noopener" class="btn btn-whatsapp btn-lg">WhatsApp Us</a>
-      <a href="tel:+919988200178" class="btn btn-ghost btn-lg">📞 +91 99882 00178</a>
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT ME / FOUNDER -->
-<section id="founder" class="section-py" aria-labelledby="founder-heading">
+<!-- FOUNDER -->
+<section id="founder" class="yt-sec" aria-labelledby="founder-heading">
   <div class="container">
-    <div class="founder-grid">
-      <div class="founder-card reveal">
-        <div class="founder-avatar"><img src="assets/kamal-kakkar.jpg" alt="Kamal Kakkar — Founder of Yunok Tech, Android developer and trainer in Mohali" width="128" height="128"></div>
+    <div class="yt-founder">
+      <div class="yt-founder-card" data-anim="zoom">
+        <div class="yt-avatar"><img src="assets/kamal-kakkar.jpg" alt="Kamal Kakkar — Founder of Yunok Tech, Android developer and trainer in Mohali" width="168" height="168"></div>
         <h3>Kamal Kakkar</h3>
         <div class="role">Founder, Yunok Tech · Senior Android Developer</div>
         <div class="loc">📍 Kharar, Mohali, Punjab</div>
-        <div class="founder-links">
+        <div class="yt-founder-links">
           <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener">LinkedIn</a>
           <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener">Medium</a>
           <a href="tel:+919988200178">Call</a>
         </div>
       </div>
-      <div class="reveal reveal-delay-2">
-        <div class="section-tag" id="about">About Me</div>
-        <h2 id="founder-heading" class="section-title">10+ Years Building Android Apps That Matter</h2>
-        <p style="color:var(--clr-muted);line-height:1.8">Hi, I'm Kamal. I've spent over a decade building Android apps for large enterprises in the <strong style="color:var(--clr-text)">healthcare</strong> and <strong style="color:var(--clr-text)">banking</strong> domains — products where security, performance and reliability are non-negotiable. Yunok Tech is where I bring that same quality to everyday apps, to client projects and to developers who want to learn modern Android.</p>
-        <div class="founder-stats">
-          <div><strong>10+</strong><span>Years experience</span></div>
-          <div><strong>2</strong><span>Industry domains</span></div>
-          <div><strong>13</strong><span>Apps on Play Store</span></div>
+      <div>
+        <div class="yt-tag" id="about" data-anim="up">About Me</div>
+        <h2 id="founder-heading" class="yt-h2" data-anim="up" style="--d:.06s">11+ Years Building Android Apps <span class="yt-grad">That Matter</span></h2>
+        <p class="yt-sub" data-anim="up" style="--d:.12s">Hi, I'm Kamal. I've spent 11+ years building Android apps for large enterprises in the <strong style="color:#fff">healthcare</strong> and <strong style="color:#fff">banking</strong> domains — products where security, performance and reliability are non-negotiable. Yunok Tech is where I bring that same quality to everyday apps, to client projects and to developers who want to learn modern Android.</p>
+        <div class="yt-nums" data-anim="up" style="--d:.18s">
+          <div><b><span data-count="11">0</span>+</b><span>Years experience</span></div>
+          <div><b><span data-count="2">0</span></b><span>Industry domains</span></div>
+          <div><b><span data-count="13">0</span></b><span>Apps on Play Store</span></div>
         </div>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="ti-icon">🏢</div>
-            <div><h4>Nagarro</h4><p>Android development for enterprise clients, including banking &amp; financial apps — secure, scalable, high-traffic.</p></div>
-          </div>
-          <div class="timeline-item">
-            <div class="ti-icon" style="background:linear-gradient(135deg,#10b981,#059669)">🏥</div>
-            <div><h4>KareXpert</h4><p>Android apps for the healthcare domain — hospital and patient-facing solutions used by doctors and clinics.</p></div>
-          </div>
-          <div class="timeline-item">
-            <div class="ti-icon" style="background:linear-gradient(135deg,#7c3aed,#0ea5e9)">🚀</div>
-            <div><h4>Yunok Tech</h4><p>Founder — 13 apps published on Google Play, including Walzi, NotiVault &amp; Hanuman Dham, delivering client apps and teaching Kotlin + Jetpack Compose.</p></div>
-          </div>
+        <div class="yt-timeline">
+          <div class="yt-tl" data-anim="left" style="--d:.1s"><h4>🚀 Yunok Tech</h4><p>Founder — 13 apps published on Google Play, including Walzi, NotiVault &amp; Hanuman Dham, delivering client apps and teaching Kotlin + Jetpack Compose.</p></div>
+          <div class="yt-tl" data-anim="left" style="--d:.2s"><h4>🏢 Nagarro</h4><p>Android development for enterprise clients, including banking &amp; financial apps — secure, scalable, high-traffic.</p></div>
+          <div class="yt-tl" data-anim="left" style="--d:.3s"><h4>🏥 KareXpert</h4><p>Android apps for the healthcare domain — hospital and patient-facing solutions used by doctors and clinics.</p></div>
         </div>
       </div>
     </div>
@@ -356,90 +240,54 @@
 </section>
 
 <!-- WHY US -->
-<section id="features" class="section-py" aria-labelledby="features-heading">
-  <div class="container text-center">
-    <div class="section-tag">Why Yunok Tech</div>
-    <h2 id="features-heading" class="section-title">Built Different. Built Better.</h2>
-    <p class="section-desc">The principles behind every app we ship — for ourselves and for our clients.</p>
-    <div class="features-grid">
-      <div class="feature-card reveal reveal-delay-1"><div class="feature-icon">⚡</div><h3>Lightweight &amp; Fast</h3><p>Small app sizes, instant launch and smooth animations.</p></div>
-      <div class="feature-card reveal reveal-delay-2"><div class="feature-icon">🔒</div><h3>Privacy First</h3><p>Data stays on device wherever possible. No unnecessary tracking.</p></div>
-      <div class="feature-card reveal reveal-delay-3"><div class="feature-icon">🎨</div><h3>Modern UI</h3><p>Jetpack Compose &amp; Material 3 interfaces that feel native.</p></div>
-      <div class="feature-card reveal reveal-delay-4"><div class="feature-icon">🏗️</div><h3>Clean Architecture</h3><p>Enterprise-grade code that is easy to maintain and scale.</p></div>
+<section id="features" class="yt-sec alt yt-center" aria-labelledby="features-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Why Yunok Tech</div>
+    <h2 id="features-heading" class="yt-h2" data-anim="blur">Built Different. <span class="yt-grad">Built Better.</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">The principles behind every app we ship — for ourselves and for our clients.</p>
+    <div class="yt-grid g4">
+      <div class="yt-card" data-anim="up"><div class="ico">⚡</div><h3>Lightweight &amp; Fast</h3><p>Small app sizes, instant launch and smooth animations.</p></div>
+      <div class="yt-card" data-anim="up" style="--d:.08s"><div class="ico">🔒</div><h3>Privacy First</h3><p>Data stays on device wherever possible. No unnecessary tracking.</p></div>
+      <div class="yt-card" data-anim="up" style="--d:.16s"><div class="ico">🎨</div><h3>Modern UI</h3><p>Jetpack Compose &amp; Material 3 interfaces that feel native.</p></div>
+      <div class="yt-card" data-anim="up" style="--d:.24s"><div class="ico">🏗️</div><h3>Clean Architecture</h3><p>Enterprise-grade code that is easy to maintain and scale.</p></div>
     </div>
   </div>
 </section>
 
-<!-- BLOG PREVIEW -->
-<section id="blog-preview" class="section-py" aria-labelledby="blog-heading">
-  <div class="container text-center">
-    <div class="section-tag">Latest Reads</div>
-    <h2 id="blog-heading" class="section-title">From Our Blog</h2>
-    <p class="section-desc">Guides and tips about our apps, Android and daily devotion.</p>
-    <div class="blog-grid" style="text-align:left">
-      <article class="blog-card reveal">
-        <div class="blog-thumb"><img src="assets/walzi-duo-poster.jpg" alt="Matching lock and home screen wallpapers" loading="lazy"><span class="blog-cat" style="background:#8b5cf6">Walzi</span></div>
-        <div class="blog-body">
-          <div class="blog-meta"><span>📅 Oct 6, 2026</span><span>⏱ 5 min</span></div>
-          <h3>How to Set Matching Lock &amp; Home Screen Wallpapers</h3>
-          <p>Set Duo wallpapers that continue from your lock screen to your home screen.</p>
-          <a href="blog/matching-lock-home-screen-wallpapers-android/index.html" class="blog-link">Read Article →</a>
-        </div>
-      </article>
-      <article class="blog-card reveal reveal-delay-1">
-        <div class="blog-thumb" style="background:linear-gradient(135deg,#92400e,#b45309)"><img src="assets/hanuman-dham/og-hanuman-aarti.jpg" alt="Hanuman puja vidhi" loading="lazy"><span class="blog-cat" style="background:var(--clr-gold);color:#000">Spiritual</span></div>
-        <div class="blog-body">
-          <div class="blog-meta"><span>📅 Oct 3, 2026</span><span>⏱ 6 min</span></div>
-          <h3>Hanuman Puja Vidhi at Home on Tuesday &amp; Saturday</h3>
-          <p>A simple step-by-step puja with samagri, mantras, Chalisa and Aarti.</p>
-          <a href="blog/hanuman-puja-vidhi-tuesday-saturday/index.html" class="blog-link">Read Article →</a>
-        </div>
-      </article>
-      <article class="blog-card reveal reveal-delay-2">
-        <div class="blog-thumb"><img src="screenshots/nv-4.png" alt="See deleted messages" loading="lazy"><span class="blog-cat">NotiVault</span></div>
-        <div class="blog-body">
-          <div class="blog-meta"><span>📅 Sep 29, 2026</span><span>⏱ 5 min</span></div>
-          <h3>See Deleted Chat Messages Using Notification History</h3>
-          <p>How notification history lets you read "This message was deleted" messages.</p>
-          <a href="blog/see-deleted-messages-notification-history-android/index.html" class="blog-link">Read Article →</a>
-        </div>
-      </article>
+<!-- BLOG -->
+<section id="blog-preview" class="yt-sec yt-center" aria-labelledby="blog-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Latest Reads</div>
+    <h2 id="blog-heading" class="yt-h2" data-anim="blur">From Our <span class="yt-grad">Blog</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Guides and tips about our apps, Android and daily devotion.</p>
+    <div class="yt-grid g3">
+      <a href="blog/matching-lock-home-screen-wallpapers-android/index.html" class="yt-blog" data-anim="up"><div class="yt-blog-img"><img src="assets/walzi/reel-duo.jpg" alt="Matching lock and home screen wallpapers" loading="lazy"><span style="--cat:#8b5cf6">Walzi</span></div><div class="yt-blog-body"><small>📅 Oct 6, 2026 · ⏱ 5 min</small><h3>How to Set Matching Lock &amp; Home Screen Wallpapers</h3><p>Set Duo wallpapers that continue from your lock screen to your home screen.</p></div></a>
+      <a href="blog/hanuman-puja-vidhi-tuesday-saturday/index.html" class="yt-blog" data-anim="up" style="--d:.1s"><div class="yt-blog-img"><img src="assets/hanuman-dham/og-hanuman-aarti.jpg" alt="Hanuman puja vidhi" loading="lazy"><span style="--cat:#d97706">Spiritual</span></div><div class="yt-blog-body"><small>📅 Oct 3, 2026 · ⏱ 6 min</small><h3>Hanuman Puja Vidhi at Home on Tuesday &amp; Saturday</h3><p>A simple step-by-step puja with samagri, mantras, Chalisa and Aarti.</p></div></a>
+      <a href="blog/see-deleted-messages-notification-history-android/index.html" class="yt-blog" data-anim="up" style="--d:.2s"><div class="yt-blog-img"><img src="assets/notivault/nv-4.jpg" alt="See deleted messages" loading="lazy"><span style="--cat:#4f7cff">NotiVault</span></div><div class="yt-blog-body"><small>📅 Sep 29, 2026 · ⏱ 5 min</small><h3>See Deleted Chat Messages Using Notification History</h3><p>How notification history lets you read "This message was deleted" messages.</p></div></a>
     </div>
-    <div style="margin-top:36px"><a href="blog.html" class="btn btn-outline btn-lg">View All Articles →</a></div>
+    <div class="yt-actions" style="margin-top:36px" data-anim="up"><a href="blog.html" class="yt-btn ghost">View All Articles →</a></div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section id="testimonials" class="section-py" aria-labelledby="testimonials-heading">
-  <div class="container text-center">
-    <div class="section-tag">User Reviews</div>
-    <h2 id="testimonials-heading" class="section-title">What Our Users Say</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial-card reveal">
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">"NotiVault saved me so many times! I missed a bank OTP and found it right here. Best notification manager for Android, period."</p>
-        <div class="t-author"><div class="t-avatar">RK</div><div><div class="t-name">Rahul Kumar</div><div class="t-app">NotiVault User</div></div></div>
-      </div>
-      <div class="testimonial-card reveal reveal-delay-2">
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">"The Hanuman Chalisa app is beautiful. The offline feature means I can read it in the morning without Wi-Fi. Jai Bajrang Bali!"</p>
-        <div class="t-author"><div class="t-avatar" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">PS</div><div><div class="t-name">Priya Sharma</div><div class="t-app">Hanuman Dham User</div></div></div>
-      </div>
-      <div class="testimonial-card reveal reveal-delay-3">
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">"Super lightweight app that doesn't slow down my phone. The UI is clean and modern. Yunok Tech really understands what users want."</p>
-        <div class="t-author"><div class="t-avatar">AV</div><div><div class="t-name">Arjun Verma</div><div class="t-app">NotiVault User</div></div></div>
-      </div>
+<section id="testimonials" class="yt-sec alt yt-center" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">User Reviews</div>
+    <h2 id="testimonials-heading" class="yt-h2" data-anim="blur">What Our <span class="yt-grad">Users Say</span></h2>
+    <div class="yt-grid g3">
+      <div class="yt-quote" data-anim="left"><div class="stars">★★★★★</div><p>"NotiVault saved me so many times! I missed a bank OTP and found it right here. Best notification manager for Android, period."</p><div class="yt-who"><i>RK</i><div><b>Rahul Kumar</b><span>NotiVault User</span></div></div></div>
+      <div class="yt-quote" data-anim="up" style="--d:.12s"><div class="stars">★★★★★</div><p>"The Hanuman Chalisa app is beautiful. The offline feature means I can read it in the morning without Wi-Fi. Jai Bajrang Bali!"</p><div class="yt-who"><i style="background:linear-gradient(135deg,#f59e0b,#ea580c)">PS</i><div><b>Priya Sharma</b><span>Hanuman Dham User</span></div></div></div>
+      <div class="yt-quote" data-anim="right" style="--d:.24s"><div class="stars">★★★★★</div><p>"Super lightweight app that doesn't slow down my phone. The UI is clean and modern. Yunok Tech really understands what users want."</p><div class="yt-who"><i>AV</i><div><b>Arjun Verma</b><span>NotiVault User</span></div></div></div>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="section-py" aria-labelledby="faq-heading">
-  <div class="container text-center">
-    <div class="section-tag">FAQ</div>
-    <h2 id="faq-heading" class="section-title">Frequently Asked Questions</h2>
-    <p class="section-desc">Quick answers about our apps, services and course.</p>
+<section id="faq" class="yt-sec yt-center" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">FAQ</div>
+    <h2 id="faq-heading" class="yt-h2" data-anim="blur">Frequently Asked <span class="yt-grad">Questions</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Quick answers about our apps, services and course.</p>
     <div class="faq-list">
       <div class="faq-item"><button class="faq-question">Do you build apps and websites for clients? <span class="faq-icon">+</span></button><div class="faq-answer"><p>Yes. We build Android apps and websites for businesses — spiritual, food delivery, wallpaper, astrology, healthcare, fintech, e-commerce and more. Call or WhatsApp +91 99882 00178 or use the contact form for a free consultation.</p></div></div>
       <div class="faq-item"><button class="faq-question">Who can join the Jetpack Compose course? <span class="faq-icon">+</span></button><div class="faq-answer"><p>Students, freshers, working professionals and anyone who wants to build Android apps. Basic programming knowledge helps, but we start Kotlin from the basics.</p></div></div>
@@ -450,38 +298,27 @@
   </div>
 </section>
 
-<!-- CONTACT CTA -->
-<section id="cta" class="section-py" aria-label="Contact">
-  <div class="container text-center">
-    <div class="section-tag">Get In Touch</div>
-    <h2 class="section-title">Let's Build Something Together</h2>
-    <p class="section-desc">Have an app idea, need a website, or want to join the course? Reach out — we usually reply within a few hours.</p>
-    <div class="contact-strip">
-      <a href="tel:+919988200178" class="contact-tile">
-        <div class="ct-icon" style="background:linear-gradient(135deg,var(--clr-blue),var(--clr-cyan))">📞</div>
-        <div><small>Call</small><span>+91 99882 00178</span></div>
-      </a>
-      <a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="contact-tile">
-        <div class="ct-icon" style="background:#16a34a">💬</div>
-        <div><small>WhatsApp</small><span>Chat with us</span></div>
-      </a>
-      <a href="mailto:yunoktech@gmail.com" class="contact-tile">
-        <div class="ct-icon" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)">✉️</div>
-        <div><small>Email</small><span>yunoktech@gmail.com</span></div>
-      </a>
-      <a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener" class="contact-tile">
-        <div class="ct-icon" style="background:linear-gradient(135deg,#f59e0b,#ea580c)">📍</div>
-        <div><small>Address</small><span>#28 Anand Villas, Kharar, Mohali</span></div>
-      </a>
+<!-- CONTACT -->
+<section id="cta" class="yt-final" aria-label="Contact">
+  <div class="yt-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Get In Touch</div>
+    <h2 class="yt-h2" data-anim="zoom">Let's Build <span class="yt-grad">Something Together</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Have an app idea, need a website, or want to join the course? Reach out — we usually reply within a few hours.</p>
+    <div class="yt-contact" data-anim="up">
+      <a href="tel:+919988200178" class="yt-ct"><span class="i">📞</span><div><small>Call</small><span>+91 99882 00178</span></div></a>
+      <a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="yt-ct"><span class="i" style="--ib:#16a34a">💬</span><div><small>WhatsApp</small><span>Chat with us</span></div></a>
+      <a href="mailto:yunoktech@gmail.com" class="yt-ct"><span class="i" style="--ib:linear-gradient(135deg,#8b5cf6,#6366f1)">✉️</span><div><small>Email</small><span>yunoktech@gmail.com</span></div></a>
+      <a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener" class="yt-ct"><span class="i" style="--ib:linear-gradient(135deg,#f59e0b,#ea580c)">📍</span><div><small>Address</small><span>#28 Anand Villas, Kharar, Mohali</span></div></a>
     </div>
-    <div class="cta-actions">
-      <a href="contact.html" class="btn btn-primary btn-lg">Send a Message →</a>
-      <a href="course.html" class="btn btn-violet btn-lg">🎓 Explore the Course</a>
+    <div class="yt-actions" data-anim="up">
+      <a href="contact.html" class="yt-btn primary">Send a Message →</a>
+      <a href="services.html" class="yt-btn ghost">💼 Plan Your App</a>
+      <a href="course.html" class="yt-btn violet">🎓 Explore the Course</a>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer id="footer" role="contentinfo">
   <div class="container">
     <div class="footer-grid">
@@ -496,9 +333,9 @@
           <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
         </div>
       </div>
-      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="course.html">Android Course</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="index.html#founder">About Me</a></li><li><a href="index.html#services">Services</a></li><li><a href="blog.html">Blog</a></li><li><a href="privacy-policy.html">Privacy Policy</a></li></ul></div>
-      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li></ul></div>
+      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps.html">All Apps</a></li><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="hanuman-dham/index.html">Hanuman Lyrics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="services.html">App for Your Business</a></li><li><a href="course.html">Android Course</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="index.html#founder">About Me</a></li><li><a href="blog.html">Blog</a></li><li><a href="privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="contact.html">Submit a Request</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 Yunok Tech. All rights reserved.</span>
@@ -506,8 +343,9 @@
     </div>
   </div>
 </footer>
-
+<div class="yt-sticky" role="complementary" aria-label="Yunok Tech"><div><b>Yunok Tech</b><span>Apps · Websites · Android course</span></div><a class="wa" href="https://wa.me/919988200178" target="_blank" rel="noopener">WhatsApp</a><a class="pr" href="services.html">Plan my app</a></div>
 <button id="back-top" aria-label="Back to top">↑</button>
 <script src="js/main.js" defer></script>
+<script src="js/yt.js" defer></script>
 </body>
 </html>

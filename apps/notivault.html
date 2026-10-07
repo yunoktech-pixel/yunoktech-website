@@ -18,15 +18,18 @@
   <link rel="stylesheet" href="../css/style.css">
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "MobileApplication", "name": "NotiVault - Notification History", "description": "Recover deleted notifications and manage notification history on Android.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Android", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "aggregateRating": {"@type": "AggregateRating", "ratingValue": "4.5", "ratingCount": "500"}, "author": {"@type": "Person", "name": "Kamal Kakkar", "url": "https://www.linkedin.com/in/kamal-kakkar-13ab2773/"}, "installUrl": "https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory", "url": "https://yunoktech.com/apps/notivault.html", "downloadUrl": "https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory", "screenshot": ["https://yunoktech.com/screenshots/nv-5.png", "https://yunoktech.com/screenshots/nv-4.png", "https://yunoktech.com/screenshots/nv-2.png"], "inLanguage": ["en", "hi", "pa", "mr", "ta", "te"], "keywords": "notification history app, notification history app android, recover deleted notifications, see deleted messages android, notification saver app, notification log app, NotiVault, NotiVault app download, best notification history app", "publisher": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com", "sameAs": ["https://play.google.com/store/apps/dev?id=5044394667021493760"]}}</script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does NotiVault recover deleted notifications?", "acceptedAnswer": {"@type": "Answer", "text": "NotiVault uses Android's Notification Listener Service. Once granted, it saves every notification as it arrives — before you can dismiss it. Even after swiping it away, it's safely stored in local database on your device."}}, {"@type": "Question", "name": "Does NotiVault store my data on the cloud?", "acceptedAnswer": {"@type": "Answer", "text": "No. All notification data is stored exclusively on your device using local SQLite storage. NotiVault has no servers, no cloud sync, and no account system. Your data never leaves your phone."}}, {"@type": "Question", "name": "Does it work with WhatsApp and banking apps?", "acceptedAnswer": {"@type": "Answer", "text": "Yes! NotiVault captures notifications from all apps including WhatsApp, Gmail, banking apps, delivery apps, and more. Any app that sends a notification to your status bar will be captured."}}, {"@type": "Question", "name": "Will it slow down my phone or drain battery?", "acceptedAnswer": {"@type": "Answer", "text": "NotiVault is built to be extremely efficient. It listens for notifications passively using Android's built-in service framework, consuming virtually no extra CPU or battery. App size is under 10MB."}}, {"@type": "Question", "name": "Is it compatible with Android 14/15?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, fully compatible with Android 5.0 through Android 15. We test on all major versions and release updates promptly when new Android versions launch."}}]}</script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="../css/notivault-app.css">
 </head>
-<body>
+<body class="nv">
+<div class="nv-progress" aria-hidden="true"></div>
 <nav id="navbar" role="navigation">
   <div class="container">
     <div class="nav-inner">
       <a href="../index.html" class="nav-logo"><img src="../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
-      <ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../apps.html" class="active">Apps</a></li><li><a href="../course.html">Course</a></li><li><a href="../blog.html">Blog</a></li><li><a href="../contact.html">Contact</a></li></ul>
+      <ul class="nav-links"><li><a href="../index.html">Home</a></li><li><a href="../apps.html" class="active">Apps</a></li><li><a href="../services.html">Services</a></li><li><a href="../course.html">Course</a></li><li><a href="../blog.html">Blog</a></li><li><a href="../contact.html">Contact</a></li></ul>
       <div class="nav-cta">
-        <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory" target="_blank" rel="noopener" class="btn-playstore-badge btn-sm" style="padding:7px 14px">
+        <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dnav" target="_blank" rel="noopener" class="btn-playstore-badge btn-sm" style="padding:7px 14px">
           <img src="../assets/playstore-icon.png" class="ps-icon" alt="Play Store" style="width:18px;height:18px">
           <div class="ps-text"><span>GET ON</span><span style="font-size:.82rem">Google Play</span></div>
         </a>
@@ -37,97 +40,160 @@
 </nav>
 <nav class="mobile-nav" id="mobile-nav">
   <a href="../index.html">Home</a>
-  <a href="../course.html">🎓 Android Course</a><a href="../apps.html">Apps</a><a href="../blog.html">Blog</a><a href="../contact.html">Contact</a>
+  <a href="../course.html">🎓 Android Course</a><a href="../apps.html">Apps</a>
+  <a href="../services.html">💼 App for Your Business</a><a href="../blog.html">Blog</a><a href="../contact.html">Contact</a>
 </nav>
 
 <!-- HERO -->
-<section class="noti-hero" aria-labelledby="nv-hero-heading">
+<header class="nv-hero" aria-labelledby="nv-hero-heading">
+  <div class="nv-hero-bg" aria-hidden="true"></div>
+  <div class="nv-dots" aria-hidden="true"></div>
   <div class="container">
-    <div class="breadcrumb"><a href="../index.html">Home</a><span>/</span><a href="../apps.html">Apps</a><span>/</span><span>NotiVault</span></div>
-    <div class="noti-hero-grid">
-      <div class="hero-content" style="padding:0">
-        <div class="hero-badge"><div class="hero-badge-dot"></div>Productivity · Utilities</div>
-        <h1 id="nv-hero-heading" class="hero-title">Never Miss a<br><span class="accent">Notification Again</span></h1>
-        <p class="hero-tagline">NotiVault automatically saves all your Android notifications. Recover deleted notifications, search history and manage everything in one place.</p>
-        <div class="hero-actions">
-          <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:12px 22px">
-            <img src="../assets/playstore-icon.png" class="ps-icon" alt="Google Play">
-            <div class="ps-text"><span>GET IT ON</span><span>Google Play</span></div>
-          </a>
-          <a href="#nv-features" class="btn btn-ghost btn-lg">See Features ↓</a>
+    <div class="nv-hero-grid">
+      <div class="nv-hero-in">
+        <div class="breadcrumb"><a href="../index.html">Home</a><span>/</span><a href="../apps.html">Apps</a><span>/</span><span>NotiVault</span></div>
+        <div class="nv-logo-row"><img src="../assets/notivault-icon.jpg" alt="NotiVault app icon" width="58" height="58"><span>NotiVault<em>Notification History for Android</em></span></div>
+        <h1 id="nv-hero-heading" class="nv-h1">Never <span class="nv-strike">Miss</span> a<br><span class="nv-grad">Notification Again</span></h1>
+        <span class="nv-typed" aria-hidden="true" data-lines='["Swiped it away? NotiVault saved it.","Lost a bank OTP? Find it in seconds.","Deleted message? Read it again.","100% private. Stays on your phone."]'></span>
+        <p class="nv-lead">NotiVault automatically saves all your Android notifications. Recover deleted notifications, search history and manage everything in one place.</p>
+        <div class="nv-actions">
+          <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dhero" target="_blank" rel="noopener" class="nv-play"><img src="../assets/playstore-icon.png" alt="" width="26" height="26"><span><small>Get it on</small><b>Google Play</b></span></a>
+          <a href="#nv-try" class="nv-ghost">👆 Try the live demo</a>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:28px">
-          <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Free App</span>
-          <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">4.5★ Rated</span>
-          <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Android 5+</span>
-          <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:5px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Privacy First</span>
-        </div>
+        <div class="nv-trust"><span>Free App</span><span>4.5★ Rated</span><span>Android 5+</span><span>Privacy First</span></div>
       </div>
-      <div class="noti-hero-phone animate-float">
-        <img src="../screenshots/nv-hero.png" alt="NotiVault Android App Screenshot" loading="lazy" width="260">
+      <div class="nv-stage" aria-hidden="true">
+        <span class="nv-orbit-icon a">💬</span><span class="nv-orbit-icon b">🏦</span><span class="nv-orbit-icon c">📦</span><span class="nv-orbit-icon d">✉️</span>
+        <div class="nv-phone">
+          <div class="nv-screen">
+            <div class="nv-island"></div>
+            <div class="nv-status"><span>10:07</span><span>▂▄▆ 85%</span></div>
+            <div class="nv-headsup"></div>
+            <div class="nv-apphead"><span class="bell">🔔</span>NotiVault</div>
+            <div class="nv-count"><b>45</b> notifications saved</div>
+            <div class="nv-filters"><span class="on">All</span><span>Unread</span><span>Read</span></div>
+            <div class="nv-feed"></div>
+          </div>
+        </div>
+        <span class="nv-saved-pill">✓ Saved — even if deleted</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="nv-ticker" aria-hidden="true"><div class="nv-ticker-track"><span>Recover deleted notifications <em>●</em> Global search <em>●</em> 100% offline &amp; private <em>●</em> Auto clean <em>●</em> Light &amp; dark <em>●</em> 6+ languages <em>●</em> Android 5 – 15 <em>●</em></span><span>Recover deleted notifications <em>●</em> Global search <em>●</em> 100% offline &amp; private <em>●</em> Auto clean <em>●</em> Light &amp; dark <em>●</em> 6+ languages <em>●</em> Android 5 – 15 <em>●</em></span></div></div>
+
+<!-- SWIPE DEMO -->
+<section id="nv-try" class="nv-sec nv-center" aria-labelledby="nv-try-heading">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>👆</i>Try it yourself</div>
+    <h2 id="nv-try-heading" class="nv-h2" data-anim="up" style="--d:.06s">Swipe it away.<br><span class="nv-grad">NotiVault keeps it.</span></h2>
+    <p class="nv-sub" data-anim="up" style="--d:.12s">Dismiss these sample notifications — swipe them or tap ✕. Watch every one land safely in your vault.</p>
+    <div class="nv-demo">
+      <div class="nv-pane" data-anim="slide">
+        <div class="nv-pane-head"><span>📱 Your notification shade</span><small>Swipe →</small></div>
+        <span class="nv-hand" aria-hidden="true">👆</span>
+        <div class="nv-shade"></div>
+        <div class="nv-empty"><span style="font-size:2.4rem">🎉</span><b>Shade is empty — nothing was lost.</b><span>Every notification is in your vault.</span><button type="button">Send more notifications</button></div>
+      </div>
+      <div class="nv-arrow" aria-hidden="true"><div>🔒</div></div>
+      <div class="nv-pane" data-anim="scale" style="--d:.15s">
+        <div class="nv-pane-head"><span>🔔 NotiVault history</span><span class="badge" data-recovered>0 recovered</span></div>
+        <div class="nv-vault-list" aria-live="polite"></div>
+        <div class="nv-vault-empty">Dismissed notifications appear here.<br>Go on — swipe one away.</div>
+      </div>
+    </div>
+    <div class="nv-demo-cta" data-anim="up"><a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Ddemo" target="_blank" rel="noopener" class="nv-play"><img src="../assets/playstore-icon.png" alt="" width="26" height="26"><span><small>Protect your notifications</small><b>Get NotiVault free</b></span></a></div>
+  </div>
+</section>
+
+<!-- SEARCH DEMO -->
+<section class="nv-sec alt" aria-labelledby="nv-search-heading">
+  <div class="container">
+    <div class="nv-search-grid">
+      <div>
+        <div class="nv-tag" data-anim="up"><i>🔍</i>Global search</div>
+        <h2 id="nv-search-heading" class="nv-h2" data-anim="up" style="--d:.06s">Find any notification<br><span class="nv-grad">in seconds</span></h2>
+        <p class="nv-sub" data-anim="up" style="--d:.12s">That OTP from this morning, the delivery update from last week, the meeting time someone texted — type a word and it's there. Try it.</p>
+      </div>
+      <div class="nv-search-box" data-anim="flip">
+        <label class="nv-input"><span aria-hidden="true">🔍</span><input type="search" placeholder="Search notifications…" aria-label="Search sample notifications" autocomplete="off"><span>10 found</span></label>
+        <div class="nv-chips"><button type="button">OTP</button><button type="button">meeting</button><button type="button">delivered</button><button type="button">Bankly</button><button type="button">sale</button></div>
+        <div class="nv-results"></div>
+        <div class="nv-noresult">No notifications match — try "OTP" or "order".</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SCREENSHOTS SLIDER -->
-<section class="section-py" aria-label="NotiVault Screenshots" style="background:var(--clr-surface)">
-  <div class="container text-center">
-    <div class="section-tag">App Screenshots</div>
-    <h2 class="section-title">See NotiVault in Action</h2>
-    <div class="screenshot-slider-wrap">
-      <div class="screenshot-slider" id="nv-slider">
-        <div class="screenshot-slide"><img src="../screenshots/nv-5.png" alt="NotiVault — All Notifications Organized" loading="lazy"></div>
-        <div class="screenshot-slide"><img src="../screenshots/nv-1.png" alt="NotiVault — Select Theme" loading="lazy"></div>
-        <div class="screenshot-slide"><img src="../screenshots/nv-2.png" alt="NotiVault — Auto Clean" loading="lazy"></div>
-        <div class="screenshot-slide"><img src="../screenshots/nv-3.png" alt="NotiVault — Language Settings" loading="lazy"></div>
-        <div class="screenshot-slide"><img src="../screenshots/nv-4.png" alt="NotiVault — Global Search" loading="lazy"></div>
-      </div>
-    </div>
-    <div class="slider-controls">
-      <button class="slider-btn slider-prev" aria-label="Previous">←</button>
-      <div class="slider-dots"></div>
-      <button class="slider-btn slider-next" aria-label="Next">→</button>
+<!-- SCREENSHOTS -->
+<section class="nv-sec nv-center" aria-label="NotiVault Screenshots">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>📱</i>App Screenshots</div>
+    <h2 class="nv-h2" data-anim="up" style="--d:.06s">See NotiVault <span class="nv-grad">in Action</span></h2>
+    <div class="nv-fan">
+      <img src="../assets/notivault/nv-1.jpg" alt="NotiVault — Select Theme" loading="lazy">
+      <img src="../assets/notivault/nv-4.jpg" alt="NotiVault — Global Search" loading="lazy">
+      <img src="../assets/notivault/nv-5.jpg" alt="NotiVault — All Notifications Organized" loading="lazy">
+      <img src="../assets/notivault/nv-3.jpg" alt="NotiVault — Language Settings" loading="lazy">
+      <img src="../assets/notivault/nv-2.jpg" alt="NotiVault — Auto Clean" loading="lazy">
     </div>
   </div>
 </section>
 
 <!-- FEATURES -->
-<section id="nv-features" class="section-py" aria-labelledby="nv-features-heading">
-  <div class="container text-center">
-    <div class="section-tag">Features</div>
-    <h2 id="nv-features-heading" class="section-title">Everything You Need to Stay Notified</h2>
-    <div class="features-grid">
-      <div class="feature-card reveal reveal-delay-1"><div class="feature-icon">🔔</div><h3>Recover Deleted Notifications</h3><p>Instantly access any notification you accidentally dismissed — from any app.</p></div>
-      <div class="feature-card reveal reveal-delay-2"><div class="feature-icon">📚</div><h3>Notification History</h3><p>Complete history of all past notifications organized by app, time &amp; date.</p></div>
-      <div class="feature-card reveal reveal-delay-3"><div class="feature-icon">🔍</div><h3>Global Search</h3><p>Find any notification instantly with fast full-text search across all apps.</p></div>
-      <div class="feature-card reveal reveal-delay-4"><div class="feature-icon">🌙</div><h3>Light &amp; Dark Theme</h3><p>Beautiful light, dark or system-default themes — switch any time.</p></div>
-      <div class="feature-card reveal reveal-delay-1"><div class="feature-icon">🗑️</div><h3>Auto Clean</h3><p>Automatically remove old notifications after 7, 15, 30 or 60 days.</p></div>
-      <div class="feature-card reveal reveal-delay-2"><div class="feature-icon">🌍</div><h3>Multi-Language</h3><p>Supports English, Hindi, Punjabi, Marathi, Tamil, Telugu &amp; more.</p></div>
-      <div class="feature-card reveal reveal-delay-3"><div class="feature-icon">🔒</div><h3>Private &amp; Secure</h3><p>100% local storage. No data ever leaves your device.</p></div>
-      <div class="feature-card reveal reveal-delay-4"><div class="feature-icon">⚡</div><h3>Lightweight</h3><p>Tiny app size with minimal battery and memory usage.</p></div>
+<section id="nv-features" class="nv-sec alt nv-center" aria-labelledby="nv-features-heading">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>✨</i>Features</div>
+    <h2 id="nv-features-heading" class="nv-h2" data-anim="up" style="--d:.06s">Everything You Need to <span class="nv-grad">Stay Notified</span></h2>
+    <div class="nv-bento">
+      <div class="nv-card span2" data-anim="up">
+        <div class="nv-recover-anim" aria-hidden="true"><div class="nv-note"><span class="ic ic-bank">🏦</span><div class="bd"><div class="ap"><span>Bankly</span><span>now</span></div><div class="tt">Your OTP is 482913</div><div class="tx">Valid for 10 minutes. Do not share.</div></div></div></div>
+        <h3>Recover Deleted Notifications</h3><p>Instantly access any notification you accidentally dismissed — from any app.</p>
+      </div>
+      <div class="nv-card" data-anim="up" style="--d:.08s"><div class="ico">📚</div><h3>Notification History</h3><p>Complete history of all past notifications organized by app, time &amp; date.</p></div>
+      <div class="nv-card" data-anim="up" style="--d:.16s"><div class="ico">🔍</div><h3>Global Search</h3><p>Find any notification instantly with fast full-text search across all apps.</p></div>
+      <div class="nv-card" data-anim="up" style="--d:.08s"><button type="button" class="nv-toggle" aria-label="Switch this card between dark and light theme" aria-pressed="false"></button><div class="ico">🌙</div><h3>Light &amp; Dark Theme</h3><p>Beautiful light, dark or system-default themes — switch any time. Tap the toggle.</p></div>
+      <div class="nv-card" data-anim="up" style="--d:.16s"><div class="ico"><span class="nv-trash">🗑️</span></div><h3>Auto Clean</h3><div class="nv-days" aria-hidden="true"><span>7d</span><span>15d</span><span>30d</span><span>60d</span></div><p>Automatically remove old notifications after 7, 15, 30 or 60 days.</p></div>
+      <div class="nv-card span2" data-anim="up" style="--d:.24s"><div class="ico">🌍</div><h3>Multi-Language</h3><div class="nv-lang" aria-hidden="true"><span>Notifications</span><span lang="hi">सूचनाएं</span><span lang="pa">ਸੂਚਨਾਵਾਂ</span><span lang="mr">सूचना</span><span lang="ta">அறிவிப்புகள்</span><span lang="te">నోటిఫికేషన్లు</span></div><p>Supports English, Hindi, Punjabi, Marathi, Tamil, Telugu &amp; more.</p></div>
+      <div class="nv-card span2" data-anim="up" style="--d:.08s"><span class="nv-shield" aria-hidden="true">🛡️</span><div class="ico">🔒</div><h3>Private &amp; Secure</h3><div class="big nv-grad">0 servers</div><p>100% local storage. No data ever leaves your device.</p></div>
+      <div class="nv-card span2" data-anim="up" style="--d:.16s"><div class="ico">⚡</div><h3>Lightweight</h3><div class="nv-battery" aria-hidden="true"><i></i><b></b></div><p>Tiny app size with minimal battery and memory usage.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="nv-sec nv-center" aria-labelledby="nv-how-heading">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>⚙️</i>How it works</div>
+    <h2 id="nv-how-heading" class="nv-h2" data-anim="up" style="--d:.06s">Set Up Once. <span class="nv-grad">Protected Forever.</span></h2>
+    <div class="nv-steps">
+      <div class="nv-step" data-anim="flip"><span class="ico">📲</span><h3>Install NotiVault</h3><p>Free on Google Play. No account, no sign-up.</p></div>
+      <div class="nv-step" data-anim="flip" style="--d:.15s"><span class="ico">✅</span><h3>Allow notification access</h3><p>One Android permission lets NotiVault save each notification as it arrives.</p></div>
+      <div class="nv-step" data-anim="flip" style="--d:.3s"><span class="ico">🔔</span><h3>Never lose one again</h3><p>Swipe freely — every notification stays in your private history.</p></div>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section id="testimonials" class="section-py" style="background:var(--clr-surface)" aria-labelledby="nv-reviews-heading">
-  <div class="container text-center">
-    <div class="section-tag">User Reviews</div>
-    <h2 id="nv-reviews-heading" class="section-title">What Users Are Saying</h2>
-    <div class="testimonials-grid">
-      <div class="testimonial-card reveal"><div class="t-stars">★★★★★</div><p class="t-text">"Best notification history app on Play Store. I recovered a bank OTP that I accidentally deleted. This app is a lifesaver!"</p><div class="t-author"><div class="t-avatar">RK</div><div><div class="t-name">Rahul K.</div><div class="t-app">★★★★★ Play Store</div></div></div></div>
-      <div class="testimonial-card reveal reveal-delay-2"><div class="t-stars">★★★★★</div><p class="t-text">"The global search is amazing — I can find any notification from weeks ago in seconds. And it's completely free!"</p><div class="t-author"><div class="t-avatar">AT</div><div><div class="t-name">Asha T.</div><div class="t-app">★★★★★ Play Store</div></div></div></div>
-      <div class="testimonial-card reveal reveal-delay-3"><div class="t-stars">★★★★★</div><p class="t-text">"Very lightweight and no ads that interrupt my experience. The dark mode is gorgeous. Highly recommend!"</p><div class="t-author"><div class="t-avatar">VP</div><div><div class="t-name">Vijay P.</div><div class="t-app">★★★★★ Play Store</div></div></div></div>
+<section id="testimonials" class="nv-sec alt nv-center" aria-labelledby="nv-reviews-heading">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>⭐</i>User Reviews</div>
+    <h2 id="nv-reviews-heading" class="nv-h2" data-anim="up" style="--d:.06s">What Users <span class="nv-grad">Are Saying</span></h2>
+    <div class="nv-reviews">
+      <div class="nv-note nv-review" data-anim="notif"><div class="ap"><span>⭐ Play Store review</span><span>Rahul K.</span></div><div class="stars">★★★★★</div><div class="tx">"Best notification history app on Play Store. I recovered a bank OTP that I accidentally deleted. This app is a lifesaver!"</div></div>
+      <div class="nv-note nv-review" data-anim="notif" style="--d:.2s"><div class="ap"><span>⭐ Play Store review</span><span>Asha T.</span></div><div class="stars">★★★★★</div><div class="tx">"The global search is amazing — I can find any notification from weeks ago in seconds. And it's completely free!"</div></div>
+      <div class="nv-note nv-review" data-anim="notif" style="--d:.4s"><div class="ap"><span>⭐ Play Store review</span><span>Vijay P.</span></div><div class="stars">★★★★★</div><div class="tx">"Very lightweight and no ads that interrupt my experience. The dark mode is gorgeous. Highly recommend!"</div></div>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="section-py" aria-labelledby="nv-faq-heading">
-  <div class="container text-center">
-    <div class="section-tag">FAQ</div>
-    <h2 id="nv-faq-heading" class="section-title">Common Questions</h2>
+<section id="faq" class="nv-sec nv-center" aria-labelledby="nv-faq-heading">
+  <div class="container">
+    <div class="nv-tag" data-anim="up"><i>❓</i>FAQ</div>
+    <h2 id="nv-faq-heading" class="nv-h2" data-anim="up" style="--d:.06s">Common <span class="nv-grad">Questions</span></h2>
     <div class="faq-list">
       <div class="faq-item"><button class="faq-question">How does NotiVault recover deleted notifications? <span class="faq-icon">+</span></button><div class="faq-answer"><p>NotiVault uses Android's Notification Listener Service. Once granted, it saves every notification as it arrives — before you can dismiss it. Even after swiping it away, it's safely stored in local database on your device.</p></div></div>
       <div class="faq-item"><button class="faq-question">Does NotiVault store my data on the cloud? <span class="faq-icon">+</span></button><div class="faq-answer"><p>No. All notification data is stored exclusively on your device using local SQLite storage. NotiVault has no servers, no cloud sync, and no account system. Your data never leaves your phone.</p></div></div>
@@ -138,18 +204,23 @@
   </div>
 </section>
 
-<!-- CTA -->
-<section id="cta" class="section-py" aria-label="Download NotiVault">
-  <div class="container text-center">
-    <div class="section-tag">Download Free</div>
-    <h2 class="section-title">Start Recovering Your<br>Deleted Notifications</h2>
-    <p class="section-desc">Join thousands of users who never miss an important notification. Free on Google Play.</p>
-    <div class="cta-actions">
-      <!-- <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory" target="_blank" rel="noopener" class="btn-playstore-badge animate-glow" style="padding:14px 28px">
-        <img src="../assets/playstore-badge.png" alt="Get it on Google Play" style="height:38px;width:auto;object-fit:contain">
-      </a> -->
-      <a href="../contact.html" class="btn btn-ghost btn-lg">Contact Support →</a>
+<!-- FINAL CTA -->
+<section id="cta" class="nv-final" aria-label="Download NotiVault">
+  <div class="nv-final-notes" aria-hidden="true">
+    <div class="nv-note" style="left:4%;top:16%;--r:-8deg"><span class="ic ic-chat">💬</span><div class="bd"><div class="ap"><span>ChatNova</span><span>now</span></div><div class="tt">Michelle</div><div class="tx">Can we reschedule?</div></div></div>
+    <div class="nv-note" style="right:4%;top:22%;--r:7deg;animation-delay:-2s"><span class="ic ic-bank">🏦</span><div class="bd"><div class="ap"><span>Bankly</span><span>2m</span></div><div class="tt">Your OTP is 482913</div><div class="tx">Valid for 10 minutes</div></div></div>
+    <div class="nv-note" style="left:8%;bottom:14%;--r:5deg;animation-delay:-4s"><span class="ic ic-shop">📦</span><div class="bd"><div class="ap"><span>ShopEasy</span><span>1h</span></div><div class="tt">Order Delivered</div><div class="tx">Your package has arrived</div></div></div>
+  </div>
+  <div class="container">
+    <div class="nv-bigbell" aria-hidden="true"><i></i><i></i><i></i><span>🔔</span></div>
+    <div><div class="nv-tag" data-anim="up"><i>⬇️</i>Download Free</div></div>
+    <h2 class="nv-h2" data-anim="up" style="--d:.06s">Start Recovering Your<br><span class="nv-grad">Deleted Notifications</span></h2>
+    <p class="nv-sub" data-anim="up" style="--d:.12s">Join thousands of users who never miss an important notification. Free on Google Play.</p>
+    <div class="nv-actions" data-anim="up" style="--d:.2s">
+      <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dfinal" target="_blank" rel="noopener" class="nv-play lg"><img src="../assets/playstore-icon.png" alt="" width="26" height="26"><span><small>Get it on</small><b>Google Play</b></span></a>
+      <a href="../contact.html" class="nv-ghost">Contact Support →</a>
     </div>
+    <div data-anim="up" style="--d:.3s"><div class="nv-qr"><img src="../assets/notivault/qr-playstore.svg" alt="QR code to download NotiVault on Google Play" width="108" height="108" loading="lazy"><div><b>On a computer?</b><span>Scan with your phone camera<br>to install NotiVault instantly.</span></div></div></div>
   </div>
 </section>
 
@@ -164,7 +235,13 @@
     <div class="footer-bottom"><span>© 2025 Yunok Tech.</span><span><a href="../privacy-policy.html">Privacy Policy</a></span></div>
   </div>
 </footer>
+<div class="nv-sticky" role="complementary" aria-label="Download NotiVault">
+  <img src="../assets/notivault-icon.jpg" alt="" width="44" height="44">
+  <div><b>NotiVault</b><span>Free · Private · Android 5+</span></div>
+  <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dsticky" target="_blank" rel="noopener">Get it free</a>
+</div>
 <button id="back-top" aria-label="Back to top">↑</button>
 <script src="../js/main.js" defer></script>
+<script src="../js/notivault-app.js" defer></script>
 </body>
 </html>

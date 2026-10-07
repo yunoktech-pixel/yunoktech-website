@@ -21,9 +21,11 @@
   {"@context":"https://schema.org","@type":"Course","name":"Android Development with Kotlin & Jetpack Compose","description":"Hands-on Android course covering Kotlin, Jetpack Compose, Material 3, MVVM, Hilt, Room, Retrofit, Coroutines, Flow, testing and Play Store publishing.","provider":{"@type":"Organization","name":"Yunok Tech","sameAs":"https://yunoktech.com"},"instructor":{"@type":"Person","name":"Kamal Kakkar","image":"https://yunoktech.com/assets/kamal-kakkar.jpg","sameAs":["https://www.linkedin.com/in/kamal-kakkar-13ab2773/","https://medium.com/@kamaldeepkakkar"]},"hasCourseInstance":[{"@type":"CourseInstance","courseMode":"online"},{"@type":"CourseInstance","courseMode":"onsite","instructor":{"@type":"Person","name":"Kamal Kakkar","image":"https://yunoktech.com/assets/kamal-kakkar.jpg"},"location":{"@type":"Place","name":"Yunok Tech","address":"#28 Anand Villas, Kharar, Mohali, Punjab, India"}}]}
   </script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need to know programming before joining?", "acceptedAnswer": {"@type": "Answer", "text": "No. We start Kotlin from the basics. Knowing any language (C, Java, Python) makes it faster, but it is not required."}}, {"@type": "Question", "name": "What laptop do I need?", "acceptedAnswer": {"@type": "Answer", "text": "A Windows, Mac or Linux laptop with at least 8GB RAM (16GB recommended) to run Android Studio smoothly. An Android phone helps for testing."}}, {"@type": "Question", "name": "Is Jetpack Compose worth learning in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Jetpack Compose is Google's recommended toolkit for building Android UI, and most new Android apps and job openings now use it."}}, {"@type": "Question", "name": "Can I attend a demo class first?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. WhatsApp or call +91 99882 00178 to book a free demo class, online or at our Kharar centre."}}, {"@type": "Question", "name": "Will I get job help?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You finish with a GitHub portfolio of real projects, and we help with resume review and mock interviews."}}]}</script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/yt.css">
 </head>
-<body>
-
+<body class="yt yt-course">
+<div class="yt-progress" aria-hidden="true"></div>
 <nav id="navbar" role="navigation" aria-label="Main Navigation">
   <div class="container">
     <div class="nav-inner">
@@ -31,177 +33,180 @@
         <img src="assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
         <span class="nav-logo-text">Yunok<span>Tech</span></span>
       </a>
-      <ul class="nav-links" role="list">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="apps.html">Apps</a></li>
-        <li><a href="index.html#services">Services</a></li>
-        <li><a href="course.html" class="active">Course</a></li>
-        <li><a href="blog.html">Blog</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
+      <ul class="nav-links" role="list"><li><a href="index.html">Home</a></li><li><a href="apps.html">Apps</a></li><li><a href="services.html">Services</a></li><li><a href="course.html" class="active">Course</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li></ul>
       <div class="nav-cta"><a href="#enroll" class="btn btn-violet btn-sm">Enroll Now</a></div>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
-  <a href="index.html">Home</a>
-  <a href="apps.html">Apps</a>
-  <a href="index.html#services">Services</a>
-  <a href="course.html">Android Course</a>
-  <a href="blog.html">Blog</a>
-  <a href="contact.html">Contact</a>
+  <a href="index.html">🏠 Home</a><a href="apps.html">📱 Apps</a><a href="services.html">💼 App for Your Business</a><a href="course.html">🎓 Android Course</a><a href="blog.html">📝 Blog</a><a href="contact.html">✉️ Contact</a>
+  <div class="mobile-cta"><a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;justify-content:center;margin-top:4px">WhatsApp +91 99882 00178</a></div>
 </nav>
 
 <!-- HERO -->
-<section class="course-hero" aria-label="Course Header">
+<header class="yt-hero" aria-labelledby="course-heading">
+  <div class="yt-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="yt-gridbg" aria-hidden="true"></div>
   <div class="container">
-    <div class="course-hero-grid">
-      <div>
-        <nav class="breadcrumb" aria-label="Breadcrumb" style="justify-content:flex-start"><a href="index.html">Home</a><span>/</span><span>Android Course</span></nav>
-        <div class="course-badge-new">🎓 New Batch · Enrolling Now</div>
-        <h1>Android Development with <span class="grad-violet">Kotlin &amp; Jetpack Compose</span></h1>
-        <p class="lead">A practical, project-based course taught by a developer with 10+ years building Android apps for healthcare and banking at Nagarro and KareXpert. You won't just watch — you'll build, get your code reviewed and publish a real app.</p>
-        <div class="course-facts">
-          <span>⏱ 8–10 weeks</span>
-          <span>💻 Online live &amp; classroom (Kharar, Mohali)</span>
-          <span>🧑‍💻 2 real projects</span>
-          <span>🗣 Hindi / English / Punjabi</span>
+    <div class="yt-hero-grid">
+      <div class="yt-hero-in">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span>Android Course</span></nav>
+        <div class="yt-badge"><i></i>🎓 New Batch · Enrolling Now</div>
+        <h1 id="course-heading" class="yt-h1">Android Development with <span class="yt-grad">Kotlin &amp; Jetpack Compose</span></h1>
+        <p class="yt-lead">A practical, project-based course taught by a developer with 10+ years building Android apps for healthcare and banking at Nagarro and KareXpert. You won't just watch — you'll build, get your code reviewed and publish a real app.</p>
+        <div class="yt-actions">
+          <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20enroll%20in%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="yt-btn wa">💬 WhatsApp to Enroll</a>
+          <a href="#enroll" class="yt-btn primary">Book a Free Demo</a>
+          <a href="tel:+919988200178" class="yt-btn ghost">📞 +91 99882 00178</a>
         </div>
-        <div class="course-actions">
-          <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20enroll%20in%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="btn btn-whatsapp btn-lg">WhatsApp to Enroll</a>
-          <a href="tel:+919988200178" class="btn btn-ghost btn-lg">📞 +91 99882 00178</a>
+        <div class="yt-stats">
+          <div class="yt-stat"><b>8–10 wks</b><span>Duration</span></div>
+          <div class="yt-stat"><b><span data-count="2">0</span> apps</b><span>Real projects</span></div>
+          <div class="yt-stat"><b>Online + 📍</b><span>Live &amp; Kharar classroom</span></div>
+          <div class="yt-stat"><b>हि · EN · ਪੰ</b><span>Hindi / English / Punjabi</span></div>
         </div>
       </div>
-      <div class="code-card" aria-hidden="true">
-        <div class="code-card-bar"><i></i><i></i><i></i><span>WallpaperViewModel.kt</span></div>
-<pre><span class="a">@HiltViewModel</span>
-<span class="k">class</span> <span class="f">WallpaperViewModel</span> <span class="a">@Inject</span> <span class="k">constructor</span>(
-    <span class="k">private val</span> repo: WallpaperRepository
-) : ViewModel() {
-
-    <span class="k">val</span> state = repo.<span class="f">wallpapers</span>()
-        .<span class="f">map</span> { UiState.<span class="f">Success</span>(it) }
-        .<span class="f">stateIn</span>(
-            viewModelScope,
-            SharingStarted.<span class="f">WhileSubscribed</span>(5_000),
-            UiState.Loading
-        )
-}
-<span class="c">// Real code from real apps — Week 6</span></pre>
+      <div class="yt-ide" aria-label="Kotlin code and a live phone preview">
+        <div class="yt-code">
+          <div class="yt-code-bar"><i></i><i></i><i></i><span>MainScreen.kt — Week 1</span></div>
+<pre data-typecode="#code-src"></pre>
+        </div>
+        <div>
+          <div class="yt-mini-phone"><div class="yt-mini-screen"><div class="hello">Hello, Student 👋</div><button type="button">Clicked 0 times</button><small>Tap the button — it really works</small></div></div>
+        </div>
       </div>
     </div>
   </div>
-</section>
+</header>
+<template id="code-src"><span class="a">@Composable</span>
+<span class="k">fun</span> <span class="f">Greeting</span>(name: String) {
+    <span class="k">var</span> count <span class="k">by</span> <span class="f">remember</span> {
+        <span class="f">mutableIntStateOf</span>(<span class="n">0</span>)
+    }
+    <span class="f">Column</span>(Modifier.<span class="f">padding</span>(<span class="n">16</span>.dp)) {
+        <span class="f">Text</span>(<span class="s">"Hello, $name 👋"</span>)
+        <span class="f">Button</span>(onClick = { count++ }) {
+            <span class="f">Text</span>(<span class="s">"Clicked $count times"</span>)
+        }
+    }
+}
+<span class="c">// ▶ Run — your first app 🚀</span></template>
 
-<!-- WHO IS IT FOR -->
-<section class="section-py" aria-labelledby="who-heading" style="background:var(--clr-surface)">
-  <div class="container text-center">
-    <div class="section-tag">Who It's For</div>
-    <h2 id="who-heading" class="section-title">This Course Is For You If…</h2>
-    <p class="section-desc">No prior Android experience required — just curiosity and a laptop.</p>
-    <div class="audience-grid">
-      <div class="feature-card reveal"><div class="feature-icon">🎓</div><h3>Students</h3><p>B.Tech, BCA, MCA students who want job-ready Android skills.</p></div>
-      <div class="feature-card reveal reveal-delay-1"><div class="feature-icon">🌱</div><h3>Freshers</h3><p>Graduates preparing for their first Android developer role.</p></div>
-      <div class="feature-card reveal reveal-delay-2"><div class="feature-icon">💼</div><h3>Working Professionals</h3><p>IT and non-IT professionals switching their career to Android development.</p></div>
-      <div class="feature-card reveal reveal-delay-3"><div class="feature-icon">💡</div><h3>Founders &amp; Freelancers</h3><p>Build and publish your own app idea on Google Play.</p></div>
+<div class="yt-marquee" aria-hidden="true"><div class="yt-marquee-track"><span>Kotlin <em>✦</em> <span class="o">Jetpack Compose</span> <em>✦</em> Material 3 <em>✦</em> <span class="o">MVVM</span> <em>✦</em> Hilt <em>✦</em> <span class="o">Room</span> <em>✦</em> Retrofit <em>✦</em> <span class="o">Coroutines &amp; Flow</span> <em>✦</em> Firebase <em>✦</em> <span class="o">Play Store publishing</span> <em>✦</em> </span><span>Kotlin <em>✦</em> <span class="o">Jetpack Compose</span> <em>✦</em> Material 3 <em>✦</em> <span class="o">MVVM</span> <em>✦</em> Hilt <em>✦</em> <span class="o">Room</span> <em>✦</em> Retrofit <em>✦</em> <span class="o">Coroutines &amp; Flow</span> <em>✦</em> Firebase <em>✦</em> <span class="o">Play Store publishing</span> <em>✦</em> </span></div></div>
+
+<!-- WHO -->
+<section class="yt-sec yt-center" aria-labelledby="who-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Who It's For</div>
+    <h2 id="who-heading" class="yt-h2" data-anim="blur">This Course Is <span class="yt-grad">For You If…</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">No prior Android experience required — just curiosity and a laptop.</p>
+    <div class="yt-grid g4">
+      <div class="yt-card" data-anim="flip"><div class="ico">🎓</div><h3>Students</h3><p>B.Tech, BCA, MCA students who want job-ready Android skills.</p></div>
+      <div class="yt-card" data-anim="flip" style="--d:.08s"><div class="ico">🌱</div><h3>Freshers</h3><p>Graduates preparing for their first Android developer role.</p></div>
+      <div class="yt-card" data-anim="flip" style="--d:.16s"><div class="ico">💼</div><h3>Working Professionals</h3><p>IT and non-IT professionals switching their career to Android development.</p></div>
+      <div class="yt-card" data-anim="flip" style="--d:.24s"><div class="ico">💡</div><h3>Founders &amp; Freelancers</h3><p>Build and publish your own app idea on Google Play.</p></div>
     </div>
   </div>
 </section>
 
 <!-- CURRICULUM -->
-<section class="section-py" aria-labelledby="curriculum-heading">
-  <div class="container text-center">
-    <div class="section-tag">Curriculum</div>
-    <h2 id="curriculum-heading" class="section-title">What You'll Learn</h2>
-    <p class="section-desc">Eight modules that take you from your first line of Kotlin to an app on the Play Store.</p>
-    <div class="module-grid">
-      <div class="module-card reveal"><div class="m-num">Module 01</div><h3>Kotlin Fundamentals</h3><ul><li>Variables, types, null safety</li><li>Functions, lambdas &amp; higher-order functions</li><li>Classes, data classes, sealed classes, enums</li><li>Collections &amp; extension functions</li></ul></div>
-      <div class="module-card reveal reveal-delay-1"><div class="m-num">Module 02</div><h3>Jetpack Compose Basics</h3><ul><li>Composables, modifiers &amp; previews</li><li>Rows, Columns, Box &amp; LazyColumn</li><li>State, remember &amp; recomposition</li><li>State hoisting &amp; unidirectional data flow</li></ul></div>
-      <div class="module-card reveal"><div class="m-num">Module 03</div><h3>Material 3 &amp; Beautiful UI</h3><ul><li>Theming, typography, dark mode, dynamic colour</li><li>Scaffold, TopAppBar, BottomSheet, Dialogs</li><li>Animations &amp; transitions</li><li>Responsive layouts for phones &amp; tablets</li></ul></div>
-      <div class="module-card reveal reveal-delay-1"><div class="m-num">Module 04</div><h3>Navigation &amp; Architecture</h3><ul><li>Navigation Compose with type-safe routes</li><li>MVVM &amp; Clean Architecture</li><li>ViewModel, UiState &amp; events</li><li>Dependency injection with Hilt</li></ul></div>
-      <div class="module-card reveal"><div class="m-num">Module 05</div><h3>Coroutines &amp; Flow</h3><ul><li>suspend functions, scopes &amp; dispatchers</li><li>Flow, StateFlow &amp; SharedFlow</li><li>Error handling &amp; cancellation</li><li>collectAsStateWithLifecycle</li></ul></div>
-      <div class="module-card reveal reveal-delay-1"><div class="m-num">Module 06</div><h3>Networking &amp; Data</h3><ul><li>REST APIs with Retrofit &amp; Kotlinx Serialization</li><li>Room database &amp; DataStore</li><li>Offline-first repository pattern</li><li>Image loading with Coil, Paging 3</li></ul></div>
-      <div class="module-card reveal"><div class="m-num">Module 07</div><h3>Firebase, Security &amp; Testing</h3><ul><li>Firebase Auth, Firestore, FCM push notifications</li><li>Secure storage — lessons from banking apps</li><li>Unit tests, Compose UI tests</li><li>Crashlytics &amp; performance</li></ul></div>
-      <div class="module-card reveal reveal-delay-1"><div class="m-num">Module 08</div><h3>Publish &amp; Get Hired</h3><ul><li>Signing, App Bundles &amp; Play Console</li><li>AdMob &amp; in-app monetisation</li><li>GitHub portfolio &amp; resume review</li><li>Mock interviews &amp; common Android questions</li></ul></div>
+<section class="yt-sec alt yt-center" aria-labelledby="curriculum-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Curriculum</div>
+    <h2 id="curriculum-heading" class="yt-h2" data-anim="blur">What You'll <span class="yt-grad">Learn</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Eight modules that take you from your first line of Kotlin to an app on the Play Store.</p>
+    <div class="yt-modules">
+      <div class="yt-module" data-anim="left"><span class="wk">01</span><div class="m">MODULE 01</div><h3>Kotlin Fundamentals</h3><ul><li>Variables, types, null safety</li><li>Functions, lambdas &amp; higher-order functions</li><li>Classes, data classes, sealed classes, enums</li><li>Collections &amp; extension functions</li></ul></div>
+      <div class="yt-module" data-anim="right"><span class="wk">02</span><div class="m">MODULE 02</div><h3>Jetpack Compose Basics</h3><ul><li>Composables, modifiers &amp; previews</li><li>Rows, Columns, Box &amp; LazyColumn</li><li>State, remember &amp; recomposition</li><li>State hoisting &amp; unidirectional data flow</li></ul></div>
+      <div class="yt-module" data-anim="left"><span class="wk">03</span><div class="m">MODULE 03</div><h3>Material 3 &amp; Beautiful UI</h3><ul><li>Theming, typography, dark mode, dynamic colour</li><li>Scaffold, TopAppBar, BottomSheet, Dialogs</li><li>Animations &amp; transitions</li><li>Responsive layouts for phones &amp; tablets</li></ul></div>
+      <div class="yt-module" data-anim="right"><span class="wk">04</span><div class="m">MODULE 04</div><h3>Navigation &amp; Architecture</h3><ul><li>Navigation Compose with type-safe routes</li><li>MVVM &amp; Clean Architecture</li><li>ViewModel, UiState &amp; events</li><li>Dependency injection with Hilt</li></ul></div>
+      <div class="yt-module" data-anim="left"><span class="wk">05</span><div class="m">MODULE 05</div><h3>Coroutines &amp; Flow</h3><ul><li>suspend functions, scopes &amp; dispatchers</li><li>Flow, StateFlow &amp; SharedFlow</li><li>Error handling &amp; cancellation</li><li>collectAsStateWithLifecycle</li></ul></div>
+      <div class="yt-module" data-anim="right"><span class="wk">06</span><div class="m">MODULE 06</div><h3>Networking &amp; Data</h3><ul><li>REST APIs with Retrofit &amp; Kotlinx Serialization</li><li>Room database &amp; DataStore</li><li>Offline-first repository pattern</li><li>Image loading with Coil, Paging 3</li></ul></div>
+      <div class="yt-module" data-anim="left"><span class="wk">07</span><div class="m">MODULE 07</div><h3>Firebase, Security &amp; Testing</h3><ul><li>Firebase Auth, Firestore, FCM push notifications</li><li>Secure storage — lessons from banking apps</li><li>Unit tests, Compose UI tests</li><li>Crashlytics &amp; performance</li></ul></div>
+      <div class="yt-module" data-anim="right"><span class="wk">08</span><div class="m">MODULE 08</div><h3>Publish &amp; Get Hired</h3><ul><li>Signing, App Bundles &amp; Play Console</li><li>AdMob &amp; in-app monetisation</li><li>GitHub portfolio &amp; resume review</li><li>Mock interviews &amp; common Android questions</li></ul></div>
     </div>
   </div>
 </section>
 
 <!-- PROJECTS -->
-<section class="section-py" aria-labelledby="projects-heading" style="background:var(--clr-surface)">
-  <div class="container text-center">
-    <div class="section-tag">Projects</div>
-    <h2 id="projects-heading" class="section-title">Build 2 Real Apps</h2>
-    <p class="section-desc">Inspired by the apps we've shipped to thousands of users.</p>
-    <div class="services-grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));max-width:760px;margin:0 auto">
-      <div class="service-card reveal reveal-delay-1"><div class="service-icon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">🖼️</div><h3>Wallpaper App</h3><p>Retrofit, Paging, Coil, favourites and set-as-wallpaper — like Walzi.</p></div>
-      <div class="service-card reveal reveal-delay-2"><div class="service-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">🍔</div><h3>Food Ordering App</h3><p>Navigation, cart, Firebase auth, Firestore and push notifications.</p></div>
+<section class="yt-sec yt-center" aria-labelledby="projects-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Projects</div>
+    <h2 id="projects-heading" class="yt-h2" data-anim="blur">Build <span class="yt-grad">2 Real Apps</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Inspired by the apps we've shipped to thousands of users.</p>
+    <div class="yt-apps" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));max-width:860px;margin-inline:auto">
+      <div class="yt-app" data-anim="up" style="--ac:#c34cff;--bgm:#140c26">
+        <div class="yt-app-media"><video data-auto muted loop playsinline preload="none" poster="assets/walzi/reel-cars.jpg" aria-hidden="true"><source src="assets/walzi/reel-cars.mp4" type="video/mp4"></video></div>
+        <div class="yt-app-body"><h3>🖼️ Wallpaper App</h3><div class="meta">Like Walzi</div><p>Retrofit, Paging, Coil, favourites and set-as-wallpaper — like Walzi.</p></div>
+      </div>
+      <div class="yt-app" data-anim="up" style="--d:.12s;--ac:#f97316;--bgm:linear-gradient(135deg,#7c2d12,#ef4444)">
+        <div class="yt-app-media" style="display:grid;place-items:center;font-size:7rem">🍔</div>
+        <div class="yt-app-body"><h3>🍔 Food Ordering App</h3><div class="meta">Full-featured</div><p>Navigation, cart, Firebase auth, Firestore and push notifications.</p></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- PLANS -->
-<section id="enroll" class="section-py" aria-labelledby="plans-heading">
-  <div class="container text-center">
-    <div class="section-tag">Enroll</div>
-    <h2 id="plans-heading" class="section-title">Choose How You Learn</h2>
-    <p class="section-desc">Small batches so everyone gets attention. Call or WhatsApp for fees, batch timings and the next start date.</p>
-    <div class="plan-grid">
-      <div class="plan-card reveal">
-        <h3>Online Live Batch</h3>
-        <div class="plan-sub">Learn from anywhere in India</div>
-        <ul><li>Live interactive classes</li><li>Class recordings</li><li>Assignments &amp; code reviews</li><li>Doubt-solving group</li></ul>
-        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%20the%20Online%20Live%20Batch%20of%20the%20Android%20course" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:center">Ask for Fees →</a>
+<section id="enroll" class="yt-sec alt yt-center" aria-labelledby="plans-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Enroll</div>
+    <h2 id="plans-heading" class="yt-h2" data-anim="blur">Choose <span class="yt-grad">How You Learn</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Small batches so everyone gets attention. Call or WhatsApp for fees, batch timings and the next start date.</p>
+    <div class="yt-plans">
+      <div class="yt-plan" data-anim="up">
+        <h3>Online Live Batch</h3><div class="sub">Learn from anywhere in India</div>
+        <ul class="yt-check"><li>Live interactive classes</li><li>Class recordings</li><li>Assignments &amp; code reviews</li><li>Doubt-solving group</li></ul>
+        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%20the%20Online%20Live%20Batch%20of%20the%20Android%20course" target="_blank" rel="noopener" class="yt-btn ghost">Ask for Fees →</a>
       </div>
-      <div class="plan-card featured reveal reveal-delay-1">
-        <h3>Classroom — Kharar</h3>
-        <div class="plan-sub">#28 Anand Villas, Kharar, Mohali</div>
-        <ul><li>Everything in Online</li><li>In-person, hands-on lab sessions</li><li>2 real projects</li><li>Play Store publishing support</li><li>Interview preparation</li></ul>
-        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%20the%20Classroom%20batch%20of%20the%20Android%20course%20in%20Kharar" target="_blank" rel="noopener" class="btn btn-violet" style="justify-content:center">Book a Free Demo →</a>
+      <div class="yt-plan featured" data-anim="zoom" style="--d:.1s">
+        <span class="pop">⭐ Most hands-on</span>
+        <h3>Classroom — Kharar</h3><div class="sub">#28 Anand Villas, Kharar, Mohali</div>
+        <ul class="yt-check"><li>Everything in Online</li><li>In-person, hands-on lab sessions</li><li>2 real projects</li><li>Play Store publishing support</li><li>Interview preparation</li></ul>
+        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%20the%20Classroom%20batch%20of%20the%20Android%20course%20in%20Kharar" target="_blank" rel="noopener" class="yt-btn primary">Book a Free Demo →</a>
       </div>
-      <div class="plan-card reveal reveal-delay-2">
-        <h3>1:1 Mentorship</h3>
-        <div class="plan-sub">For professionals &amp; founders</div>
-        <ul><li>Personal learning plan</li><li>Flexible timings</li><li>Your own project, reviewed</li><li>Architecture &amp; code reviews</li><li>Career guidance</li></ul>
-        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%201%3A1%20Android%20mentorship" target="_blank" rel="noopener" class="btn btn-outline" style="justify-content:center">Ask for Fees →</a>
+      <div class="yt-plan" data-anim="up" style="--d:.2s">
+        <h3>1:1 Mentorship</h3><div class="sub">For professionals &amp; founders</div>
+        <ul class="yt-check"><li>Personal learning plan</li><li>Flexible timings</li><li>Your own project, reviewed</li><li>Architecture &amp; code reviews</li><li>Career guidance</li></ul>
+        <a href="https://wa.me/919988200178?text=Hi%2C%20I%27m%20interested%20in%201%3A1%20Android%20mentorship" target="_blank" rel="noopener" class="yt-btn ghost">Ask for Fees →</a>
       </div>
     </div>
   </div>
 </section>
 
 <!-- LOCAL -->
-<section class="section-py" aria-label="Android training in Chandigarh Tricity">
-  <div class="container text-center">
-    <div class="section-tag">📍 Chandigarh · Mohali · Panchkula</div>
-    <h2 class="section-title">Android Training for the Chandigarh Tricity</h2>
-    <p class="section-desc">Classroom batches at our Kharar centre, close to Chandigarh, Mohali, Landran and Chandigarh University, plus live online batches for Panchkula, Zirakpur and the rest of India.</p>
-    <a href="android-training-chandigarh-mohali.html" class="btn btn-outline btn-lg">Android Training in Chandigarh &amp; Mohali →</a>
+<section class="yt-sec tight yt-center" aria-label="Android training in Chandigarh Tricity">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">📍 Chandigarh · Mohali · Panchkula</div>
+    <h2 class="yt-h2" data-anim="blur">Android Training for the <span class="yt-grad">Chandigarh Tricity</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Classroom batches at our Kharar centre, close to Chandigarh, Mohali, Landran and Chandigarh University, plus live online batches for Panchkula, Zirakpur and the rest of India.</p>
+    <div class="yt-actions" style="margin-top:26px" data-anim="up"><a href="android-training-chandigarh-mohali.html" class="yt-btn ghost">Android Training in Chandigarh &amp; Mohali →</a></div>
   </div>
 </section>
 
 <!-- INSTRUCTOR -->
-<section id="founder" class="section-py" aria-labelledby="instructor-heading" style="background:var(--clr-surface)">
+<section id="founder" class="yt-sec alt" aria-labelledby="instructor-heading">
   <div class="container">
-    <div class="founder-grid">
-      <div class="founder-card reveal">
-        <div class="founder-avatar"><img src="assets/kamal-kakkar.jpg" alt="Kamal Kakkar — Founder of Yunok Tech, Android developer and trainer in Mohali" width="128" height="128"></div>
+    <div class="yt-founder">
+      <div class="yt-founder-card" data-anim="zoom">
+        <div class="yt-avatar"><img src="assets/kamal-kakkar.jpg" alt="Kamal Kakkar — Founder of Yunok Tech, Android developer and trainer in Mohali" width="168" height="168"></div>
         <h3>Kamal Kakkar</h3>
         <div class="role">Your Instructor · Founder, Yunok Tech</div>
         <div class="loc">📍 Kharar, Mohali, Punjab</div>
-        <div class="founder-links">
+        <div class="yt-founder-links">
           <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener">LinkedIn</a>
           <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener">Medium</a>
         </div>
       </div>
-      <div class="reveal reveal-delay-2">
-        <div class="section-tag">Your Instructor</div>
-        <h2 id="instructor-heading" class="section-title">Learn From Someone Who Ships</h2>
-        <p style="color:var(--clr-muted);line-height:1.8;margin-bottom:20px">Kamal has 10+ years of Android experience at <strong style="color:var(--clr-text)">Nagarro</strong> and <strong style="color:var(--clr-text)">KareXpert</strong>, building apps for the <strong style="color:var(--clr-text)">healthcare</strong> and <strong style="color:var(--clr-text)">banking</strong> domains. He has built and published 13 apps on Google Play, including Walzi, NotiVault and Hanuman Dham, and writes about Android on Medium. You'll learn the patterns used in real production apps — not just tutorials.</p>
-        <div class="founder-stats">
-          <div><strong>10+</strong><span>Years Android</span></div>
-          <div><strong>13</strong><span>Apps on Play Store</span></div>
-          <div><strong>2</strong><span>Enterprise domains</span></div>
+      <div>
+        <div class="yt-tag" data-anim="up">Your Instructor</div>
+        <h2 id="instructor-heading" class="yt-h2" data-anim="up" style="--d:.06s">Learn From Someone <span class="yt-grad">Who Ships</span></h2>
+        <p class="yt-sub" data-anim="up" style="--d:.12s">Kamal has 10+ years of Android experience at <strong style="color:#fff">Nagarro</strong> and <strong style="color:#fff">KareXpert</strong>, building apps for the <strong style="color:#fff">healthcare</strong> and <strong style="color:#fff">banking</strong> domains. He has built and published 13 apps on Google Play, including Walzi, NotiVault and Hanuman Dham, and writes about Android on Medium. You'll learn the patterns used in real production apps — not just tutorials.</p>
+        <div class="yt-nums" data-anim="up" style="--d:.18s">
+          <div><b><span data-count="10">0</span>+</b><span>Years Android</span></div>
+          <div><b><span data-count="13">0</span></b><span>Apps on Play Store</span></div>
+          <div><b><span data-count="2">0</span></b><span>Enterprise domains</span></div>
         </div>
       </div>
     </div>
@@ -209,11 +214,11 @@
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="section-py" aria-labelledby="faq-heading">
-  <div class="container text-center">
-    <div class="section-tag">FAQ</div>
-    <h2 id="faq-heading" class="section-title">Course Questions</h2>
-    <div class="faq-list" style="margin-top:28px">
+<section id="faq" class="yt-sec yt-center" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="yt-tag" data-anim="up">FAQ</div>
+    <h2 id="faq-heading" class="yt-h2" data-anim="blur">Course <span class="yt-grad">Questions</span></h2>
+    <div class="faq-list">
       <div class="faq-item"><button class="faq-question">Do I need to know programming before joining? <span class="faq-icon">+</span></button><div class="faq-answer"><p>No. We start Kotlin from the basics. Knowing any language (C, Java, Python) makes it faster, but it is not required.</p></div></div>
       <div class="faq-item"><button class="faq-question">What laptop do I need? <span class="faq-icon">+</span></button><div class="faq-answer"><p>A Windows, Mac or Linux laptop with at least 8GB RAM (16GB recommended) to run Android Studio smoothly. An Android phone helps for testing.</p></div></div>
       <div class="faq-item"><button class="faq-question">Is Jetpack Compose worth learning in 2026? <span class="faq-icon">+</span></button><div class="faq-answer"><p>Yes. Jetpack Compose is Google's recommended toolkit for building Android UI, and most new Android apps and job openings now use it.</p></div></div>
@@ -224,15 +229,16 @@
 </section>
 
 <!-- CTA -->
-<section id="cta" class="section-py" aria-label="Enroll">
-  <div class="container text-center">
-    <div class="section-tag">Start Learning</div>
-    <h2 class="section-title">Ready to Build Your First App?</h2>
-    <p class="section-desc">Seats are limited per batch. Message us to reserve yours or book a free demo.</p>
-    <div class="cta-actions">
-      <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20enroll%20in%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="btn btn-whatsapp btn-lg">WhatsApp to Enroll</a>
-      <a href="tel:+919988200178" class="btn btn-primary btn-lg">📞 Call +91 99882 00178</a>
-      <a href="contact.html?type=course" class="btn btn-ghost btn-lg">Send a Message</a>
+<section id="cta" class="yt-final" aria-label="Enroll">
+  <div class="yt-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="container">
+    <div class="yt-tag" data-anim="up">Start Learning</div>
+    <h2 class="yt-h2" data-anim="zoom">Ready to Build <span class="yt-grad">Your First App?</span></h2>
+    <p class="yt-sub" data-anim="up" style="--d:.08s">Seats are limited per batch. Message us to reserve yours or book a free demo.</p>
+    <div class="yt-actions" style="margin-top:30px" data-anim="up">
+      <a href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20enroll%20in%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener" class="yt-btn wa">💬 WhatsApp to Enroll</a>
+      <a href="tel:+919988200178" class="yt-btn primary">📞 Call +91 99882 00178</a>
+      <a href="contact.html?type=course" class="yt-btn ghost">Send a Message</a>
     </div>
   </div>
 </section>
@@ -251,9 +257,9 @@
           <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
         </div>
       </div>
-      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="course.html">Android Course</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="index.html#founder">About Me</a></li><li><a href="index.html#services">Services</a></li><li><a href="blog.html">Blog</a></li><li><a href="privacy-policy.html">Privacy Policy</a></li></ul></div>
-      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li></ul></div>
+      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps.html">All Apps</a></li><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="hanuman-dham/index.html">Hanuman Lyrics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="services.html">App for Your Business</a></li><li><a href="course.html">Android Course</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="index.html#founder">About Me</a></li><li><a href="blog.html">Blog</a></li><li><a href="privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="contact.html">Submit a Request</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <span>© 2026 Yunok Tech. All rights reserved.</span>
@@ -261,8 +267,9 @@
     </div>
   </div>
 </footer>
-
+<div class="yt-sticky" role="complementary" aria-label="New batch · Enrolling now"><div><b>New batch · Enrolling now</b><span>Kotlin + Jetpack Compose</span></div><a class="wa" href="https://wa.me/919988200178?text=Hi%2C%20I%20want%20to%20enroll%20in%20the%20Android%20Jetpack%20Compose%20course" target="_blank" rel="noopener">WhatsApp to Enroll</a></div>
 <button id="back-top" aria-label="Back to top">↑</button>
 <script src="js/main.js" defer></script>
+<script src="js/yt.js" defer></script>
 </body>
 </html>

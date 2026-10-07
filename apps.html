@@ -15,204 +15,148 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="css/style.css">
-  <!-- Google Analytics placeholder: replace G-XXXXXXXXXX -->
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "name": "Android apps by Yunok Tech", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Hanuman Dham — Hanuman Chalisa App", "url": "https://yunoktech.com/apps/hanuman-chalisa.html"}, {"@type": "ListItem", "position": 2, "name": "Walzi — 4K Wallpaper App", "url": "https://yunoktech.com/apps/walzi.html"}, {"@type": "ListItem", "position": 3, "name": "NotiVault — Notification History App", "url": "https://yunoktech.com/apps/notivault.html"}]}</script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/yt.css">
 </head>
-<body>
-
+<body class="yt yt-page-apps">
+<div class="yt-progress" aria-hidden="true"></div>
 <nav id="navbar" role="navigation" aria-label="Main Navigation">
   <div class="container">
     <div class="nav-inner">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.png" alt="Yunok Tech Logo" width="42" height="42">
+      <a href="index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
         <span class="nav-logo-text">Yunok<span>Tech</span></span>
       </a>
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="apps.html" class="active">Apps</a></li>
-        <li><a href="course.html">Course</a></li>
-        <li><a href="blog.html">Blog</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="btn btn-primary btn-sm">All on Play Store</a>
-      </div>
-      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
+      <ul class="nav-links" role="list"><li><a href="index.html">Home</a></li><li><a href="apps.html" class="active">Apps</a></li><li><a href="services.html">Services</a></li><li><a href="course.html">Course</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="btn btn-primary btn-sm">All on Play Store</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
-<nav class="mobile-nav" id="mobile-nav">
-  <a href="index.html">🏠 Home</a>
-  <a href="apps.html">📱 Apps</a>
-  <a href="course.html">🎓 Android Course</a>
-  <a href="blog.html">📝 Blog</a>
-  <a href="contact.html">✉️ Contact</a>
-  <a href="privacy-policy.html">🔒 Privacy Policy</a>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="index.html">🏠 Home</a><a href="apps.html">📱 Apps</a><a href="services.html">💼 App for Your Business</a><a href="course.html">🎓 Android Course</a><a href="blog.html">📝 Blog</a><a href="contact.html">✉️ Contact</a>
+  <div class="mobile-cta"><a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;justify-content:center;margin-top:4px">WhatsApp +91 99882 00178</a></div>
 </nav>
 
-<!-- PAGE HERO -->
-<section class="page-hero" aria-label="Apps Page Header">
-  <div class="container">
-    <div class="section-tag">Our Portfolio</div>
-    <h1>Android Apps by Yunok Tech</h1>
-    <p>13 free, lightweight and privacy-focused apps on Google Play. Here are our most popular ones.</p>
-    <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top:22px">▶ See All 13 Apps on Google Play</a>
+<!-- HERO -->
+<header class="yt-hero" aria-labelledby="apps-heading" style="min-height:auto;padding:140px 0 60px">
+  <div class="yt-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="yt-gridbg" aria-hidden="true"></div>
+  <div class="container yt-center">
+    <div class="yt-hero-in">
+      <div class="breadcrumb" style="justify-content:center"><a href="index.html">Home</a><span>/</span><span>Apps</span></div>
+      <div class="yt-tag">Our Portfolio</div>
+      <h1 id="apps-heading" class="yt-h1">Android Apps by <span class="yt-grad">Yunok Tech</span></h1>
+      <p class="yt-sub">13 free, lightweight and privacy-focused apps on Google Play. Here are our most popular ones.</p>
+      <div><div class="yt-filter" role="group" aria-label="Filter apps by category">
+        <button type="button" class="on" data-cat="all">All apps</button>
+        <button type="button" data-cat="personal">🖼️ Personalisation</button>
+        <button type="button" data-cat="utility">🔔 Utilities</button>
+        <button type="button" data-cat="spiritual">🕉️ Spiritual</button>
+      </div></div>
+    </div>
   </div>
-</section>
+</header>
 
-<!-- APPS LISTING -->
-<section class="section-py" aria-label="Apps List">
+<section class="yt-sec" style="padding-top:20px" aria-label="Apps List">
   <div class="container">
 
     <!-- Walzi -->
-    <article style="background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(10,10,14,.92) 55%);border:1px solid rgba(195,76,255,.25);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:40px;transition:var(--transition)" class="reveal">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-        <div style="padding:40px">
-          <div class="section-tag" style="color:#C34CFF;background:rgba(195,76,255,.1);border-color:rgba(195,76,255,.28);margin-bottom:20px">Personalization · Wallpapers</div>
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
-            <img src="assets/walzi-icon.jpg" alt="Walzi icon" width="72" height="72" style="border-radius:16px;border:2px solid rgba(195,76,255,.3)">
-            <div>
-              <h2 style="font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:#fff">Walzi Wallpapers</h2>
-              <div class="app-rating" style="color:#C34CFF"><span class="count" style="color:var(--clr-muted)">New · Free on Google Play</span></div>
-            </div>
-          </div>
-          <p style="color:var(--clr-muted);line-height:1.8;margin-bottom:24px">Aesthetic 4K &amp; HD wallpapers for your lock screen and home screen, hand-picked every day. Set matching lock + home Duo pairs in one tap, shuffle a random pick with Surprise me, preview before you set and get a new wallpaper automatically every day.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
-            <span style="background:rgba(195,76,255,.1);border:1px solid rgba(195,76,255,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:#d9c8ff;font-weight:600">4K &amp; HD</span>
-            <span style="background:rgba(195,76,255,.1);border:1px solid rgba(195,76,255,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:#d9c8ff;font-weight:600">Duo Lock + Home</span>
-            <span style="background:rgba(195,76,255,.1);border:1px solid rgba(195,76,255,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:#d9c8ff;font-weight:600">Surprise Me</span>
-            <span style="background:rgba(195,76,255,.1);border:1px solid rgba(195,76,255,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:#d9c8ff;font-weight:600">Auto Changer</span>
-            <span style="background:rgba(195,76,255,.1);border:1px solid rgba(195,76,255,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:#d9c8ff;font-weight:600">Widget</span>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <a href="apps/walzi.html" class="btn btn-ghost">View Details</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:10px 18px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Google Play">
-              <div class="ps-text"><span>GET IT ON</span><span>Google Play</span></div>
-            </a>
+    <article class="yt-showcase" data-cat="personal" data-anim="up" style="--ac:#c34cff;--line:rgba(195,76,255,.3);--glow:#7c5cff;--bg:linear-gradient(135deg,#140c26,#0a0a12 60%)">
+      <div class="yt-split">
+        <div>
+          <div class="yt-app-head"><img src="assets/walzi-icon.jpg" alt="Walzi icon" width="76" height="76"><div><h2>Walzi Wallpapers</h2><div class="meta">Personalisation · New · Free on Google Play</div></div></div>
+          <p>Aesthetic 4K &amp; HD wallpapers for your lock screen and home screen, hand-picked every day. Set matching lock + home Duo pairs in one tap, shuffle a random pick with Surprise me, preview before you set and get a new wallpaper automatically every day.</p>
+          <div class="yt-tags"><span>4K &amp; HD</span><span>Duo Lock + Home</span><span>Surprise Me</span><span>Auto Changer</span><span>Widget</span></div>
+          <div class="yt-actions" style="margin-top:26px">
+            <a href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dapps-page" target="_blank" rel="noopener" class="yt-btn" style="background:linear-gradient(110deg,#7c5cff,#c34cff,#ff5c9e)"><img src="assets/playstore-icon.png" alt="" width="20" height="20">Get it on Google Play</a>
+            <a href="apps/walzi.html" class="yt-btn ghost">View Details →</a>
           </div>
         </div>
-        <div style="background:linear-gradient(135deg,#120c24,#1c0f2e);padding:32px;display:flex;gap:12px;align-items:center;justify-content:center;overflow-x:auto">
-          <img src="screenshots/wz-1.jpg" alt="Walzi screenshot — fresh wallpapers" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(195,76,255,.25);flex-shrink:0">
-          <img src="screenshots/wz-2.jpg" alt="Walzi screenshot — Surprise me shuffle" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(195,76,255,.25);flex-shrink:0">
-          <img src="screenshots/wz-4.jpg" alt="Walzi screenshot — Duo wallpapers" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(195,76,255,.25);flex-shrink:0">
+        <div class="yt-showcase-media" aria-hidden="true">
+          <div class="yt-phone l"><video data-auto="desktop" muted loop playsinline preload="none" poster="assets/walzi/reel-cars.jpg"><source src="assets/walzi/reel-cars.mp4" type="video/mp4"></video></div>
+          <div class="yt-phone r"><video data-auto="desktop" muted loop playsinline preload="none" poster="assets/walzi/reel-animals.jpg"><source src="assets/walzi/reel-animals.mp4" type="video/mp4"></video></div>
+          <div class="yt-phone c"><video data-auto muted loop playsinline preload="none" poster="assets/walzi/reel-anime.jpg"><source src="assets/walzi/reel-anime.mp4" type="video/mp4"></video></div>
         </div>
       </div>
     </article>
 
     <!-- NotiVault -->
-    <article style="background:var(--clr-card);border:1px solid var(--clr-border);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:40px;transition:var(--transition)" class="reveal">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-        <div style="padding:40px">
-          <div class="section-tag" style="margin-bottom:20px">Productivity · Utilities</div>
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
-            <img src="assets/notivault-icon.jpg" alt="NotiVault icon" width="72" height="72" style="border-radius:16px;border:2px solid var(--clr-border)">
-            <div>
-              <h2 style="font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:#fff">NotiVault</h2>
-              <div class="app-rating">★★★★★ <span class="count">4.5 · 500+ reviews · 10K+ downloads</span></div>
-            </div>
-          </div>
-          <p style="color:var(--clr-muted);line-height:1.8;margin-bottom:24px">NotiVault is the most reliable notification history and recovery app for Android. Automatically saves all incoming notifications so you can access them anytime — even after you've dismissed them. Never lose an important bank OTP, message, or reminder again.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
-            <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Recover Notifications</span>
-            <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Global Search</span>
-            <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Multi-Language</span>
-            <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Auto Clean</span>
-            <span style="background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-blue);font-weight:600">Privacy First</span>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <a href="apps/notivault.html" class="btn btn-outline">View Details</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:10px 18px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Google Play">
-              <div class="ps-text"><span>GET IT ON</span><span>Google Play</span></div>
-            </a>
+    <article class="yt-showcase" data-cat="utility" data-anim="up" style="--ac:#5ad1ff;--line:rgba(110,140,255,.3);--glow:#4f7cff;--bg:linear-gradient(135deg,#0b1430,#070b1f 60%)">
+      <div class="yt-split rev">
+        <div>
+          <div class="yt-app-head"><img src="assets/notivault-icon.jpg" alt="NotiVault icon" width="76" height="76"><div><h2>NotiVault</h2><div class="meta">Utilities · ★★★★★ 4.5 · 500+ reviews · 10K+ downloads</div></div></div>
+          <p>NotiVault is the most reliable notification history and recovery app for Android. Automatically saves all incoming notifications so you can access them anytime — even after you've dismissed them. Never lose an important bank OTP, message, or reminder again.</p>
+          <div class="yt-tags"><span>Recover Notifications</span><span>Global Search</span><span>Multi-Language</span><span>Auto Clean</span><span>Privacy First</span></div>
+          <div class="yt-actions" style="margin-top:26px">
+            <a href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dwebsite%26utm_content%3Dapps-page" target="_blank" rel="noopener" class="yt-btn" style="background:linear-gradient(110deg,#4f7cff,#5ad1ff)"><img src="assets/playstore-icon.png" alt="" width="20" height="20">Get it on Google Play</a>
+            <a href="apps/notivault.html" class="yt-btn ghost">Try the Live Demo →</a>
           </div>
         </div>
-        <div style="background:linear-gradient(135deg,#0a1628,#0e1e38);padding:32px;display:flex;gap:12px;align-items:center;justify-content:center;overflow-x:auto">
-          <img src="screenshots/nv-5.png" alt="NotiVault screenshot 1" loading="lazy" style="width:120px;border-radius:12px;border:1px solid var(--clr-border);flex-shrink:0">
-          <img src="screenshots/nv-1.png" alt="NotiVault screenshot 2" loading="lazy" style="width:120px;border-radius:12px;border:1px solid var(--clr-border);flex-shrink:0">
-          <img src="screenshots/nv-4.png" alt="NotiVault screenshot 3" loading="lazy" style="width:120px;border-radius:12px;border:1px solid var(--clr-border);flex-shrink:0">
+        <div class="yt-showcase-media yt-shot-fan" data-zoom>
+          <img src="assets/notivault/nv-4.jpg" alt="NotiVault — Global Search" loading="lazy">
+          <img src="assets/notivault/nv-5.jpg" alt="NotiVault — All Notifications Organized" loading="lazy">
+          <img src="assets/notivault/nv-2.jpg" alt="NotiVault — Auto Clean" loading="lazy">
         </div>
       </div>
     </article>
 
     <!-- Hanuman Dham -->
-    <article style="background:rgba(42,16,0,.8);border:1px solid rgba(245,158,11,.2);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:40px;transition:var(--transition)" class="reveal">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
-        <div style="padding:40px">
-          <div class="section-tag" style="color:var(--clr-gold);background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25);margin-bottom:20px">Devotional · Spiritual</div>
-          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
-            <img src="assets/hanuman-dham/logo-192.png" alt="Hanuman Dham icon" width="72" height="72" style="border-radius:16px;border:2px solid rgba(245,158,11,.3)">
-            <div>
-              <h2 style="font-family:var(--font-head);font-size:1.8rem;font-weight:800;color:#fff">Hanuman Dham</h2>
-              <div class="app-rating" style="color:var(--clr-gold)">★★★★★ <span class="count" style="color:var(--clr-muted)">4.7 · 1000+ reviews · 40K+ downloads</span></div>
-            </div>
-          </div>
-          <p style="color:var(--clr-muted);line-height:1.8;margin-bottom:24px">Hanuman Dham (formerly Hanuman Chalisa) is the complete Hanuman bhakti app for Android. Read the Chalisa with Hindi &amp; English meaning, Aarti, Bajrang Baan, Sankat Mochan and the full Sundarkand, chant with the Mantra Jaap mala, listen to bhajans and set puja reminders — all paths work offline.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
-            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-gold);font-weight:600">100% Offline</span>
-            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-gold);font-weight:600">Bajrang Baan</span>
-            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-gold);font-weight:600">Mantra Jap Mala</span>
-            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-gold);font-weight:600">Hindi Meaning</span>
-            <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:99px;padding:4px 14px;font-size:.78rem;color:var(--clr-gold);font-weight:600">Aarti Sangrah</span>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
-            <a href="apps/hanuman-chalisa.html" class="btn btn-ghost">View Details</a>
-            <a href="hanuman-dham/index.html" class="btn btn-ghost">Read Lyrics</a>
-            <a href="https://play.google.com/store/apps/details?id=com.yunok.hanuman.app" target="_blank" rel="noopener" class="btn-playstore-badge" style="padding:10px 18px">
-              <img src="assets/playstore-icon.png" class="ps-icon" alt="Google Play">
-              <div class="ps-text"><span>GET IT ON</span><span>Google Play</span></div>
-            </a>
+    <article class="yt-showcase" data-cat="spiritual" data-anim="up" style="--ac:#f6c453;--line:rgba(246,196,83,.3);--glow:#ff8a1f;--bg:linear-gradient(135deg,#2a0f02,#0c0402 60%)">
+      <div class="yt-split">
+        <div>
+          <div class="yt-app-head"><img src="assets/hanuman-dham/logo-192.png" alt="Hanuman Dham icon" width="76" height="76"><div><h2>Hanuman Dham</h2><div class="meta">Spiritual · ★★★★★ 4.7 · 1000+ reviews · 40K+ downloads</div></div></div>
+          <p>Hanuman Dham (formerly Hanuman Chalisa) is the complete Hanuman bhakti app for Android. Read the Chalisa with Hindi &amp; English meaning, Aarti, Bajrang Baan, Sankat Mochan and the full Sundarkand, chant with the Mantra Jaap mala, listen to bhajans and set puja reminders — all paths work offline.</p>
+          <div class="yt-tags"><span>100% Offline</span><span>Bajrang Baan</span><span>Mantra Jap Mala</span><span>Hindi Meaning</span><span>Aarti Sangrah</span></div>
+          <div class="yt-actions" style="margin-top:26px">
+            <a href="https://play.google.com/store/apps/details?id=com.yunok.hanuman.app" target="_blank" rel="noopener" class="yt-btn" style="background:linear-gradient(110deg,#f6c453,#ff8a1f);color:#2a0d00"><img src="assets/playstore-icon.png" alt="" width="20" height="20">Get it on Google Play</a>
+            <a href="apps/hanuman-chalisa.html" class="yt-btn ghost">View Details →</a>
+            <a href="hanuman-dham/index.html" class="yt-btn ghost">📿 Read Lyrics</a>
           </div>
         </div>
-        <div style="background:linear-gradient(135deg,#2a1000,#3d1500);padding:32px;display:flex;gap:12px;align-items:center;justify-content:center;overflow-x:auto">
-          <img src="assets/hanuman-dham/app-home.jpg" alt="Hanuman Dham home" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(245,158,11,.2);flex-shrink:0">
-          <img src="assets/hanuman-dham/app-chalisa.jpg" alt="Hanuman Chalisa with meaning" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(245,158,11,.2);flex-shrink:0">
-          <img src="assets/hanuman-dham/app-mantra-jaap.jpg" alt="Mantra Jaap counter" loading="lazy" style="width:120px;border-radius:12px;border:1px solid rgba(245,158,11,.2);flex-shrink:0">
+        <div class="yt-showcase-media" aria-hidden="true">
+          <div class="yt-phone l"><img src="assets/hanuman-dham/app-chalisa.jpg" alt=""></div>
+          <div class="yt-phone r"><img src="assets/hanuman-dham/app-mantra-jaap.jpg" alt=""></div>
+          <div class="yt-phone c"><video data-auto muted loop playsinline preload="none" poster="assets/hanuman-dham/hanuman-hero-poster.jpg"><source src="assets/hanuman-dham/hanuman-hero.mp4" type="video/mp4"></video></div>
         </div>
       </div>
     </article>
 
-    <!-- Coming Soon -->
-    <div style="background:var(--clr-card);border:1px dashed var(--clr-border);border-radius:var(--radius-xl);padding:48px;text-align:center" class="reveal">
-      <div style="font-size:3rem;margin-bottom:16px">🚀</div>
-      <h3 style="font-family:var(--font-head);font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:12px">More Apps Coming Soon</h3>
-      <p style="color:var(--clr-muted);max-width:480px;margin:0 auto 24px">We're working on exciting new Android apps. Follow us or subscribe to be notified when we launch.</p>
-      <a href="contact.html" class="btn btn-outline">Get Notified →</a>
+    <!-- More -->
+    <div class="yt-grid g2" style="margin-top:50px">
+      <div class="yt-card" data-anim="up"><div class="ico">🚀</div><h3>10 More Apps on Google Play</h3><p>We're working on exciting new Android apps too. See everything we've published in one place.</p><a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" class="yt-link">See all 13 apps on Google Play</a></div>
+      <div class="yt-card" data-anim="up" style="--d:.1s;--a1:#10b981;--a2:#22d3ee"><div class="ico">💼</div><h3>Want an App Like These for Your Business?</h3><p>We build Android apps and websites for food delivery, healthcare, astrology, spiritual, e-commerce and more.</p><a href="services.html" class="yt-link">Plan your app with us</a></div>
     </div>
-
   </div>
 </section>
-
-
 
 <footer id="footer" role="contentinfo">
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="index.html" class="nav-logo">
-          <img src="assets/logo.png" alt="Yunok Tech" width="40" height="40">
-          <span class="nav-logo-text">Yunok<span>Tech</span></span>
-        </a>
-        <p>Lightweight, private and beautiful Android apps for everyone.</p>
-        <div class="footer-social"><a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a><a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a><a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+        <a href="index.html" class="nav-logo"><img src="assets/logo.png" alt="Yunok Tech" width="40" height="40"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
           <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
-          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Play Store">▶</a>
         </div>
       </div>
-      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="index.html">Home</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li><li><a href="privacy-policy.html">Privacy</a></li></ul></div>
-      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="contact.html">Submit a Request</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li></ul></div>
+      <div class="footer-col"><h4>Apps</h4><ul><li><a href="apps.html">All Apps</a></li><li><a href="apps/walzi.html">Walzi</a></li><li><a href="apps/notivault.html">NotiVault</a></li><li><a href="apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="hanuman-dham/index.html">Hanuman Lyrics</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="services.html">App for Your Business</a></li><li><a href="course.html">Android Course</a></li><li><a href="android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="index.html#founder">About Me</a></li><li><a href="blog.html">Blog</a></li><li><a href="privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="contact.html">Submit a Request</a></li></ul></div>
     </div>
     <div class="footer-bottom">
-      <span>© 2025 Yunok Tech. All rights reserved.</span>
-      <span><a href="privacy-policy.html">Privacy Policy</a></span>
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="privacy-policy.html">Privacy Policy</a></span>
     </div>
   </div>
 </footer>
 <button id="back-top" aria-label="Back to top">↑</button>
 <script src="js/main.js" defer></script>
+<script src="js/yt.js" defer></script>
 </body>
 </html>

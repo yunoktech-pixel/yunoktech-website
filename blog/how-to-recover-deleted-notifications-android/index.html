@@ -28,9 +28,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="../../css/yt.css">
   <link rel="stylesheet" href="../../css/article.css">
 </head>
-<body>
+<body class="yt yt-article art-notivault">
+<div class="yt-progress" aria-hidden="true"></div>
 
 <nav id="navbar" role="navigation" aria-label="Main Navigation">
   <div class="container">
@@ -41,7 +44,7 @@
       </a>
       <ul class="nav-links" role="list">
         <li><a href="../../index.html">Home</a></li>
-        <li><a href="../../apps.html">Apps</a></li>
+        <li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li>
         <li><a href="../../course.html">Course</a></li>
         <li><a href="../../blog.html" class="active">Blog</a></li>
         <li><a href="../../contact.html">Contact</a></li>
@@ -54,6 +57,7 @@
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
   <a href="../../index.html">Home</a>
   <a href="../../apps.html">Apps</a>
+  <a href="../../services.html">💼 App for Your Business</a>
   <a href="../../course.html">Android Course</a>
   <a href="../../blog.html">Blog</a>
   <a href="../../contact.html">Contact</a>
@@ -81,9 +85,10 @@
       <div class="meta-pill">⏱ <strong>6 min</strong> read</div>
     </div>
   </div>
+  <figure class="art-cover fan" style="--cg:radial-gradient(circle at 50% 120%,#4f7cff,#0b1430 70%)" aria-hidden="true"><img src="../../assets/notivault/nv-2.jpg" alt="" loading="lazy"><img src="../../assets/notivault/nv-1.jpg" alt="" loading="lazy"><img src="../../assets/notivault/nv-4.jpg" alt="" loading="lazy"></figure>
 </header>
 
-<main>
+<main class="art-layout">
   <article class="article-wrap">
     <div class="article-app-promo">
       <div class="promo-app-icon"><img src="../../assets/notivault-icon.jpg" alt="NotiVault — Notification History App icon" loading="lazy"></div>
@@ -219,6 +224,9 @@
       </div>
     </div>
   </article>
+  <aside class="art-aside" aria-label="On this page">
+    <nav class="art-toc" aria-label="Table of contents"><h4>On this page</h4><ol></ol><div class="art-progress-ring"><i><b></b></i><span>0% read</span></div></nav>
+  </aside>
 </main>
 
 <footer id="footer" role="contentinfo">
@@ -236,7 +244,7 @@
         </div>
       </div>
       <div class="footer-col"><h4>Apps</h4><ul><li><a href="../../apps/walzi.html">Walzi</a></li><li><a href="../../apps/notivault.html">NotiVault</a></li><li><a href="../../apps/hanuman-chalisa.html">Hanuman Dham</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../index.html#founder">About Me</a></li><li><a href="../../index.html#services">Services</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../index.html#founder">About Me</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
       <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li></ul></div>
     </div>
     <div class="footer-bottom">
@@ -247,5 +255,7 @@
 </footer>
 <button id="back-top" aria-label="Back to top">↑</button>
 <script src="../../js/main.js" defer></script>
+<script src="../../js/yt.js" defer></script>
+<script src="../../js/article.js" defer></script>
 </body>
 </html>

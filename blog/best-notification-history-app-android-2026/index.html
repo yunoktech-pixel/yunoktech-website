@@ -42,263 +42,14 @@
 
   <!-- Shared stylesheet — same as all other pages -->
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="../../css/yt.css">
+  <link rel="stylesheet" href="../../css/article.css">
 
   <!-- Blog-article only styles — small additions not in main CSS -->
-  <style>
-    /* Article layout wrapper */
-    .article-wrap {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
-
-    /* Breadcrumb reuse from shared CSS — already defined */
-
-    /* Article hero banner */
-    .article-hero-section {
-      padding: 110px 0 0;
-      background: linear-gradient(180deg, var(--clr-surface) 0%, var(--clr-bg) 100%);
-      position: relative;
-      overflow: hidden;
-    }
-    .article-hero-section::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 700px; height: 350px;
-      background: radial-gradient(ellipse, rgba(14,165,233,.09), transparent 70%);
-      pointer-events: none;
-    }
-    .article-hero-inner {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 0 24px 44px;
-      position: relative;
-      z-index: 1;
-    }
-    .article-hero-section h1 {
-      font-family: var(--font-head);
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 900;
-      line-height: 1.18;
-      letter-spacing: -.025em;
-      color: var(--clr-white);
-      margin-bottom: 16px;
-    }
-    .article-hero-section h1 em {
-      font-style: normal;
-      background: linear-gradient(90deg, var(--clr-blue), var(--clr-cyan));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .article-intro-text {
-      font-size: 1.06rem;
-      color: var(--clr-muted);
-      line-height: 1.78;
-      margin-bottom: 24px;
-      max-width: 640px;
-    }
-    .article-meta-bar {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--clr-border);
-    }
-    .meta-author-wrap { display: flex; align-items: center; gap: 10px; }
-    .meta-avatar-circle {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--clr-blue), var(--clr-cyan));
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-head); font-size: .82rem; font-weight: 800; color: #fff;
-    }
-    .meta-author-name { font-family: var(--font-head); font-size: .86rem; font-weight: 700; color: var(--clr-white); }
-    .meta-author-role { font-size: .74rem; color: var(--clr-muted); }
-    .meta-divider { width: 1px; height: 26px; background: var(--clr-border); }
-    .meta-pill { font-size: .78rem; color: var(--clr-muted); display: flex; align-items: center; gap: 4px; }
-    .meta-pill strong { color: var(--clr-white); font-weight: 600; }
-
-    /* App promo banner at top of article */
-    .article-app-promo {
-      background: rgba(14,165,233,.07);
-      border: 1px solid rgba(14,165,233,.2);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 36px;
-      flex-wrap: wrap;
-    }
-    .promo-app-icon { width: 50px; height: 50px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
-    .promo-app-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .promo-app-info { flex: 1; min-width: 160px; }
-    .promo-app-info h4 { font-family: var(--font-head); font-size: .93rem; font-weight: 800; color: var(--clr-white); margin-bottom: 2px; }
-    .promo-app-info p { font-size: .78rem; color: var(--clr-muted); }
-
-    /* Article body typography */
-    .article-body h2 {
-      font-family: var(--font-head);
-      font-size: clamp(1.25rem, 3vw, 1.6rem);
-      font-weight: 800;
-      letter-spacing: -.02em;
-      color: var(--clr-white);
-      margin: 44px 0 14px;
-      padding-left: 14px;
-      border-left: 3px solid var(--clr-blue);
-      line-height: 1.3;
-    }
-    .article-body h3 {
-      font-family: var(--font-head);
-      font-size: 1.1rem; font-weight: 700; letter-spacing: -.01em;
-      color: var(--clr-white); margin: 28px 0 10px;
-    }
-    .article-body p {
-      font-size: .97rem; color: #b0bec5;
-      line-height: 1.85; margin-bottom: 16px;
-    }
-    .article-body strong { color: var(--clr-text); font-weight: 700; }
-    .article-body a { color: var(--clr-blue); text-decoration: underline; text-underline-offset: 3px; }
-
-    /* Lead paragraph */
-    .article-lead { font-size: 1.06rem !important; color: #cdd8e4 !important; line-height: 1.88 !important; }
-
-    /* Highlight callout box */
-    .callout-box {
-      background: rgba(14,165,233,.06);
-      border: 1px solid rgba(14,165,233,.18);
-      border-left: 3px solid var(--clr-blue);
-      border-radius: 0 var(--radius-md) var(--radius-md) 0;
-      padding: 16px 20px;
-      margin: 22px 0;
-    }
-    .callout-box p { margin: 0; color: #cdd8e4 !important; font-size: .95rem !important; }
-
-    /* Problem list (red tint) */
-    .list-problems { display: flex; flex-direction: column; gap: 7px; margin: 14px 0 22px; }
-    .list-problems li {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px;
-      background: rgba(248,113,113,.05);
-      border: 1px solid rgba(248,113,113,.12);
-      border-radius: 9px;
-      font-size: .89rem; color: #b0bec5; list-style: none;
-    }
-    .list-problems li::before { content: '✕'; color: #f87171; font-size: .78rem; font-weight: 700; flex-shrink: 0; }
-
-    /* Solution list (blue tint) */
-    .list-solutions { display: flex; flex-direction: column; gap: 7px; margin: 14px 0 22px; }
-    .list-solutions li {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px;
-      background: rgba(14,165,233,.04);
-      border: 1px solid rgba(14,165,233,.13);
-      border-radius: 9px;
-      font-size: .89rem; color: #b0bec5; list-style: none;
-    }
-    .list-solutions li::before { content: '✓'; color: var(--clr-cyan); font-size: .82rem; font-weight: 700; flex-shrink: 0; }
-
-    /* Check list (cards) */
-    .list-checks { display: flex; flex-direction: column; gap: 10px; margin: 14px 0 22px; }
-    .list-checks li {
-      display: flex; align-items: flex-start; gap: 12px;
-      background: var(--clr-card); border: 1px solid var(--clr-border);
-      border-radius: 10px; padding: 13px 16px;
-      font-size: .89rem; color: #b0bec5; list-style: none;
-      line-height: 1.6;
-    }
-    .list-checks li .ci { font-size: .95rem; flex-shrink: 0; margin-top: 1px; }
-
-    /* Notification type pills */
-    .notif-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
-    .notif-pill {
-      background: var(--clr-card); border: 1px solid var(--clr-border);
-      border-radius: 99px; padding: 6px 14px;
-      font-size: .81rem; color: #b0bec5;
-      display: flex; align-items: center; gap: 5px;
-    }
-
-    /* Features 2-col grid */
-    .article-feat-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px; margin: 20px 0;
-    }
-
-    /* Mid-article & final CTA card */
-    .article-cta-card {
-      background: linear-gradient(135deg, rgba(14,165,233,.1), rgba(34,211,238,.05));
-      border: 1px solid rgba(14,165,233,.22);
-      border-radius: var(--radius-lg);
-      padding: 28px 24px;
-      text-align: center;
-      margin: 36px 0;
-    }
-    .article-cta-card h3 {
-      font-family: var(--font-head);
-      font-size: 1.35rem; font-weight: 800;
-      color: var(--clr-white); margin-bottom: 7px;
-      letter-spacing: -.02em;
-    }
-    .article-cta-card p { font-size: .88rem; color: var(--clr-muted); margin-bottom: 20px; }
-    .article-cta-card .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-
-    /* Divider */
-    .article-divider { height: 1px; background: var(--clr-border); margin: 36px 0; }
-
-    /* Tags row */
-    .article-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; }
-    .article-tag {
-      background: rgba(255,255,255,.05); border: 1px solid var(--clr-border);
-      border-radius: 6px; padding: 4px 11px;
-      font-size: .74rem; color: var(--clr-muted); font-weight: 600;
-    }
-
-    /* Share bar */
-    .article-share {
-      background: var(--clr-card); border: 1px solid var(--clr-border);
-      border-radius: var(--radius-md); padding: 18px 20px;
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      margin: 24px 0 0;
-    }
-    .article-share-label { font-family: var(--font-head); font-size: .86rem; font-weight: 700; color: var(--clr-white); }
-    .share-btn {
-      padding: 7px 15px; border-radius: 8px;
-      border: 1px solid var(--clr-border);
-      font-size: .78rem; font-weight: 700;
-      color: var(--clr-muted);
-      background: rgba(255,255,255,.04);
-      cursor: pointer; transition: var(--transition);
-    }
-    .share-btn:hover { background: rgba(255,255,255,.08); color: var(--clr-white); }
-
-    /* Related articles */
-    .related-posts { margin: 40px 0 0; }
-    .related-posts h3 {
-      font-family: var(--font-head); font-size: 1.1rem;
-      font-weight: 800; color: var(--clr-white);
-      margin-bottom: 14px; letter-spacing: -.01em;
-    }
-    .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .related-card {
-      background: var(--clr-card); border: 1px solid var(--clr-border);
-      border-radius: var(--radius-md); padding: 16px 18px;
-      transition: var(--transition); text-decoration: none;
-      display: block;
-    }
-    .related-card:hover { border-color: rgba(14,165,233,.3); transform: translateY(-2px); }
-    .related-card-cat { font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--clr-blue); margin-bottom: 5px; }
-    .related-card h4 { font-family: var(--font-head); font-size: .86rem; font-weight: 700; color: var(--clr-white); line-height: 1.4; margin-bottom: 7px; }
-    .related-card span { font-size: .74rem; color: var(--clr-muted); }
-
-    @media (max-width: 640px) {
-      .article-feat-grid { grid-template-columns: 1fr; }
-      .related-grid { grid-template-columns: 1fr; }
-      .article-wrap { padding: 32px 20px 60px; }
-    }
-  </style>
 </head>
-<body>
+<body class="yt yt-article art-notivault">
+<div class="yt-progress" aria-hidden="true"></div>
 
 <!-- ═══ NAVBAR — same shared markup as all pages ═══ -->
 <nav id="navbar" role="navigation" aria-label="Main Navigation">
@@ -310,7 +61,7 @@
       </a>
       <ul class="nav-links" role="list">
         <li><a href="../../index.html">Home</a></li>
-        <li><a href="../../apps.html">Apps</a></li>
+        <li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li>
         <li><a href="../../course.html">Course</a></li>
         <li><a href="../../blog.html" class="active">Blog</a></li>
         <li><a href="../../contact.html">Contact</a></li>
@@ -332,6 +83,7 @@
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
   <a href="../../index.html">Home</a>
   <a href="../../apps.html">Apps</a>
+  <a href="../../services.html">💼 App for Your Business</a>
   <a href="../../course.html">🎓 Android Course</a>
   <a href="../../blog.html">Blog</a>
   <a href="../../contact.html">Contact</a>
@@ -375,10 +127,11 @@
     </div>
 
   </div>
+  <figure class="art-cover fan" style="--cg:radial-gradient(circle at 50% 120%,#4f7cff,#0b1430 70%)" aria-hidden="true"><img src="../../assets/notivault/nv-4.jpg" alt="" loading="lazy"><img src="../../assets/notivault/nv-1.jpg" alt="" loading="lazy"><img src="../../assets/notivault/nv-5.jpg" alt="" loading="lazy"></figure>
 </header>
 
 <!-- ═══ ARTICLE BODY ═══ -->
-<main>
+<main class="art-layout">
   <article class="article-wrap" itemscope itemtype="https://schema.org/Article">
 
     <!-- App Promo Top -->
@@ -592,6 +345,9 @@
 
     </div><!-- /.article-body -->
   </article>
+  <aside class="art-aside" aria-label="On this page">
+    <nav class="art-toc" aria-label="Table of contents"><h4>On this page</h4><ol></ol><div class="art-progress-ring"><i><b></b></i><span>0% read</span></div></nav>
+  </aside>
 </main>
 
 <!-- ═══ FOOTER — same shared markup as all pages ═══ -->
@@ -641,5 +397,7 @@
 
 <!-- Shared JS — same file as all other pages -->
 <script src="../../js/main.js" defer></script>
+<script src="../../js/yt.js" defer></script>
+<script src="../../js/article.js" defer></script>
 </body>
 </html>
