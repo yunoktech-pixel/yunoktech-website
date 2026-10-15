@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tokens, Latency and Cost Optimization for Mobile | Yunok Tech</title>
+  <meta name="description" content="Optimise AI features in mobile apps: how tokens drive cost, measuring time to first token, streaming, model tiering, prompt and history trimming, caching, rate limits, retries and budgets.">
+  <meta name="keywords" content="ai cost optimization mobile app, llm token cost, reduce ai latency android, time to first token, context caching llm, rate limits retries ai api, model tiering llm">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-tokens-latency-cost-mobile/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-tokens-latency-cost-mobile/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="AI Tokens, Latency and Cost Optimization for Mobile">
+  <meta property="og:description" content="Optimise AI features in mobile apps: how tokens drive cost, measuring time to first token, streaming, model tiering, prompt and history trimming, caching, rate limits, retries and budgets.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="AI Tokens, Latency and Cost Optimization for Mobile">
+  <meta name="twitter:description" content="Optimise AI features in mobile apps: how tokens drive cost, measuring time to first token, streaming, model tiering, prompt and history trimming, caching, rate limits, retries and budgets.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AI Tokens, Latency, and Cost Optimization for Mobile Apps", "description": "Optimise AI features in mobile apps: how tokens drive cost, measuring time to first token, streaming, model tiering, prompt and history trimming, caching, rate limits, retries and budgets.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android AI and Generative AI", "keywords": "llm token cost, reduce ai latency android, time to first token, context caching llm, rate limits retries ai api, model tiering llm", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-tokens-latency-cost-mobile/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "AI Tokens, Latency, and Cost Optimization for Mobile Apps", "item": "https://yunoktech.com/android/ai-tokens-latency-cost-mobile/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">AI Tokens, Latency, and Cost Optimization for Mobile Apps</h1>
+    <p class="ad-lede">AI features have a running cost per request and a latency users feel on every tap. Both are driven mostly by tokens: how many you send, how many you generate, and which model processes them. Here's how to measure and reduce them without hurting quality.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#tokens">Tokens 101</a></li><li><a href="#anatomy">Where the tokens go in a chat</a></li><li><a href="#cost-levers">Cost levers, in order of impact</a></li><li><a href="#latency">Latency: what users feel</a></li><li><a href="#history">Trimming chat history</a></li><li><a href="#rate-limits">Rate limits and retries</a></li><li><a href="#budget">Budgets and limits</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A chat feature costs almost nothing in testing with five users. At 50,000 daily users, each sending ten messages with growing conversation history, the bill becomes a product decision. Meanwhile, users judge the feature by how quickly the first words appear. Tokens connect both problems.</p>
+
+<h2 id="tokens">Tokens 101</h2>
+<ul>
+  <li>Models process text as <strong>tokens</strong>: chunks of characters. In English, a token averages a few characters. Other scripts, such as Hindi, may use more tokens per word.</li>
+  <li>You pay for <strong>input tokens</strong> (system instruction + context + history + user message) and <strong>output tokens</strong>, often at different rates.</li>
+  <li>Images, audio and documents also consume tokens.</li>
+  <li>Latency grows with input size (processing) and output length (generation).</li>
+</ul>
+<figure class="code"><figcaption><span class="file">Measure before optimising</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> tokens = model.countTokens(prompt)              <span class="tk-c">// Firebase AI Logic: count tokens for a request</span>
+<span class="tk-t">Log</span>.d(<span class="tk-s">"AI"</span>, <span class="tk-s">"input tokens=${tokens.totalTokens}"</span>)
+<span class="tk-c">// Response usage metadata reports prompt/candidate token counts when available:</span>
+<span class="tk-c">// response.usageMetadata?.promptTokenCount, response.usageMetadata?.candidatesTokenCount</span></code></pre></figure>
+
+<h2 id="anatomy">Where the tokens go in a chat</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tk-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-tk-t fig-tk-d">
+    <title id="fig-tk-t">Token growth in multi-turn chat</title>
+    <desc id="fig-tk-d">Each turn resends the system instruction and the entire history. Bars for turns one to five grow longer as history accumulates, so input tokens per request grow over the conversation. Trimming or summarizing history caps the growth.</desc>
+    <text class="d-s" x="20" y="30">turn 1</text><g class="d-step" style="--i:0"><rect class="d-violet" x="80" y="18" width="60" height="18" rx="3"/><rect class="d-blue" x="140" y="18" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="60">turn 2</text><g class="d-step" style="--i:1"><rect class="d-violet" x="80" y="48" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="48" width="90" height="18" rx="3"/><rect class="d-blue" x="230" y="48" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="90">turn 3</text><g class="d-step" style="--i:2"><rect class="d-violet" x="80" y="78" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="78" width="180" height="18" rx="3"/><rect class="d-blue" x="320" y="78" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="120">turn 5</text><g class="d-step" style="--i:3"><rect class="d-violet" x="80" y="108" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="108" width="360" height="18" rx="3"/><rect class="d-blue" x="500" y="108" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="150">trimmed</text><g class="d-step" style="--i:4"><rect class="d-violet" x="80" y="138" width="60" height="18" rx="3"/><rect class="d-green" x="140" y="138" width="120" height="18" rx="3"/><rect class="d-blue" x="260" y="138" width="40" height="18" rx="3"/></g>
+    <rect class="d-violet" x="80" y="176" width="14" height="12"/><text class="d-s" x="100" y="186">system</text>
+    <rect class="d-amber" x="160" y="176" width="14" height="12"/><text class="d-s" x="180" y="186">history</text>
+    <rect class="d-blue" x="240" y="176" width="14" height="12"/><text class="d-s" x="260" y="186">new message</text>
+    <rect class="d-green" x="360" y="176" width="14" height="12"/><text class="d-s" x="380" y="186">summary + recent turns</text>
+  </svg>
+  <figcaption id="fig-tk-cap">In chat, history dominates input cost. Capping it is usually the single biggest saving.</figcaption>
+</figure>
+
+<h2 id="cost-levers">Cost levers, in order of impact</h2>
+<ol class="steps">
+  <li><strong>Model tiering:</strong> use the smallest model that passes your evaluation, such as a Flash-Lite-class model for classification, short rewrites and extraction, and reserve larger models for hard reasoning.</li>
+  <li><strong>Trim context:</strong> keep the last N turns, and summarise older ones into a short memory. Send only relevant retrieved passages, not whole documents.</li>
+  <li><strong>Cap output:</strong> set <code>maxOutputTokens</code>, and ask for concise formats ("3 bullets").</li>
+  <li><strong>Cache:</strong> deduplicate identical requests (hash of prompt version + input). Use provider-side context caching for large repeated prefixes where supported.</li>
+  <li><strong>Move work on-device:</strong> Gemini Nano for supported tasks and devices costs nothing per request.</li>
+  <li><strong>Avoid accidental calls:</strong> no AI on every keystroke, scroll or screen open without user intent.</li>
+</ol>
+
+<h2 id="latency">Latency: what users feel</h2>
+<ul>
+  <li><strong>Time to first token (TTFT)</strong> matters most for perceived speed. <strong>Stream</strong> responses so text appears immediately. See <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Compose</a>.</li>
+  <li>Smaller prompts and smaller models reduce TTFT.</li>
+  <li>Show progress states ("Thinking…") and allow cancelling.</li>
+  <li>Prefetch or precompute where the action is predictable, for example summaries of items the user is likely to open, but only within budget.</li>
+</ul>
+
+<h2 id="history">Trimming chat history</h2>
+<figure class="code"><figcaption><span class="file">HistoryTrimmer.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Turn</span>(<span class="tk-k">val</span> role: <span class="tk-t">String</span>, <span class="tk-k">val</span> text: <span class="tk-t">String</span>)
+
+<span class="tk-k">class</span> <span class="tk-t">HistoryTrimmer</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> maxTurns: <span class="tk-t">Int</span> = <span class="tk-n">10</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> maxChars: <span class="tk-t">Int</span> = <span class="tk-n">8_000</span>) {
+    <span class="tk-k">fun</span> trim(history: <span class="tk-t">List</span>&lt;<span class="tk-t">Turn</span>&gt;, memorySummary: <span class="tk-t">String</span>?): <span class="tk-t">List</span>&lt;<span class="tk-t">Turn</span>&gt; {
+        <span class="tk-k">val</span> recent = history.takeLast(maxTurns).toMutableList()
+        <span class="tk-c">// Drop oldest until under the character budget (rough token proxy)</span>
+        <span class="tk-k">while</span> (recent.sumOf { it.text.length } &gt; maxChars &amp;&amp; recent.size &gt; <span class="tk-n">2</span>) recent.removeAt(<span class="tk-n">0</span>)
+        <span class="tk-k">return</span> buildList {
+            memorySummary?.let { add(<span class="tk-t">Turn</span>(<span class="tk-s">"user"</span>, <span class="tk-s">"Summary of earlier conversation: $it"</span>)) }
+            addAll(recent)
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="rate-limits">Rate limits and retries</h2>
+<figure class="code"><figcaption><span class="file">Retry only what&#x27;s retryable</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; withAiRetry(maxAttempts: <span class="tk-t">Int</span> = <span class="tk-n">3</span>, block: <span class="tk-k">suspend</span> () -&gt; <span class="tk-t">T</span>): <span class="tk-t">T</span> {
+    <span class="tk-k">var</span> delayMs = <span class="tk-n">500L</span>
+    repeat(maxAttempts - <span class="tk-n">1</span>) {
+        <span class="tk-k">try</span> { <span class="tk-k">return</span> block() }
+        <span class="tk-k">catch</span> (e: <span class="tk-t">Exception</span>) {
+            <span class="tk-k">if</span> (e <span class="tk-k">is</span> <span class="tk-t">CancellationException</span>) <span class="tk-k">throw</span> e
+            <span class="tk-k">val</span> retryable = e <span class="tk-k">is</span> <span class="tk-t">IOException</span> || e <span class="tk-k">is</span> <span class="tk-t">QuotaExceededException</span> || e <span class="tk-k">is</span> <span class="tk-t">ServerException</span>
+            <span class="tk-k">if</span> (!retryable) <span class="tk-k">throw</span> e
+            delay(delayMs + <span class="tk-t">Random</span>.nextLong(<span class="tk-n">0</span>, <span class="tk-n">250</span>))        <span class="tk-c">// backoff + jitter</span>
+            delayMs *= <span class="tk-n">2</span>
+        }
+    }
+    <span class="tk-k">return</span> block()
+}</code></pre></figure>
+<p><code>QuotaExceededException</code> and <code>ServerException</code> are Firebase AI Logic types. Adapt the check to your SDK or backend errors. Don't retry invalid requests or safety blocks.</p>
+
+<h2 id="budget">Budgets and limits</h2>
+<ul>
+  <li>Per-user daily request or token caps (server-side, or at least client-side for Firebase setups).</li>
+  <li>Budget alerts in your cloud billing.</li>
+  <li>Track cost per feature and per active user. See <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI</a>.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Support chat</h3><p>A small model for intent classification, a larger model only for complex answers, history summarisation and cached FAQ answers.</p></div>
+  <div class="card usecase"><h3>Summaries</h3><p>A cache keyed by content hash and on-demand generation: the same article is never summarised twice.</p></div>
+  <div class="card usecase"><h3>Smart replies</h3><p>On-device where possible, with zero per-request cost and instant responses.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does a lower temperature reduce cost?</summary><div><p>No. Temperature affects randomness, not token count. Output length limits and concise instructions reduce cost.</p></div></details>
+  <details><summary>Are images expensive?</summary><div><p>They consume tokens depending on resolution and provider rules. Downscale images to what the task needs.</p></div></details>
+  <details><summary>How do I estimate monthly cost?</summary><div><p>Multiply requests per user × users × (input tokens × input price + output tokens × output price), using current provider pricing. See <a href="../choose-ai-model-android-app/index.html">Choosing an AI Model</a> for a Kotlin helper.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Tokens drive both <strong>cost and latency</strong>. Measure them, pick the <strong>smallest adequate model</strong>, <strong>trim history and context</strong>, <strong>cap outputs</strong>, <strong>cache</strong>, move suitable tasks <strong>on-device</strong>, <strong>stream</strong> for perceived speed, and enforce <strong>budgets and retries</strong> deliberately.</p>
+<p>Next step: get better results from fewer tokens with <a href="../prompt-engineering-android-developers/index.html">Prompt Engineering for Android Developers</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Gemini API pricing</a></li><li><a href="https://ai.google.dev/gemini-api/docs/tokens" target="_blank" rel="noopener">Gemini API: tokens</a></li><li><a href="https://ai.google.dev/gemini-api/docs/caching" target="_blank" rel="noopener">Gemini API: context caching</a></li><li><a href="https://ai.google.dev/gemini-api/docs/rate-limits" target="_blank" rel="noopener">Gemini API rate limits</a></li><li><a href="https://firebase.google.com/docs/ai-logic/count-tokens?platform=android" target="_blank" rel="noopener">Firebase AI Logic: count tokens</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-tokens-latency-cost-mobile-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-tokens-latency-cost-mobile-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/choose-ai-model-android-app/index.html"><small>Android AI and Generative AI</small>How to Choose the Right AI Model for an Android App</a></li><li><a href="../../android/monitor-ai-latency-errors-costs/index.html"><small>Android AI Projects and Production</small>Monitoring AI Latency, Errors, and Inference Costs</a></li><li><a href="../../android/streaming-ai-responses-compose/index.html"><small>Android AI Projects and Production</small>Streaming AI Responses in Jetpack Compose</a></li><li><a href="../../android/ai-chatbot-jetpack-compose/index.html"><small>Android AI and Generative AI</small>Build an AI Chatbot Using Kotlin and Jetpack Compose</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-tokens-latency-cost-mobile/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-tokens-latency-cost-mobile/&amp;text=AI Tokens, Latency, and Cost Optimization for Mobile Apps" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-tokens-latency-cost-mobile/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#tokens">Tokens 101</a></li><li><a href="#anatomy">Where the tokens go in a chat</a></li><li><a href="#cost-levers">Cost levers, in order of impact</a></li><li><a href="#latency">Latency: what users feel</a></li><li><a href="#history">Trimming chat history</a></li><li><a href="#rate-limits">Rate limits and retries</a></li><li><a href="#budget">Budgets and limits</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-tokens-latency-cost-mobile-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-tokens-latency-cost-mobile-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

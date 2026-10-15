@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compose UI Testing and Screenshot Testing Guide | Yunok Tech</title>
+  <meta name="description" content="Test Jetpack Compose UIs: semantics-based UI tests with createComposeRule, finders and assertions, testing stateless screens, plus screenshot testing to catch visual regressions.">
+  <meta name="keywords" content="compose screenshot testing, compose ui test, createComposeRule, compose testTag, compose preview screenshot testing, visual regression android, roborazzi paparazzi">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/compose-ui-screenshot-testing/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/compose-ui-screenshot-testing/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Compose UI Testing and Screenshot Testing Guide">
+  <meta property="og:description" content="Test Jetpack Compose UIs: semantics-based UI tests with createComposeRule, finders and assertions, testing stateless screens, plus screenshot testing to catch visual regressions.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Compose UI Testing and Screenshot Testing Guide">
+  <meta name="twitter:description" content="Test Jetpack Compose UIs: semantics-based UI tests with createComposeRule, finders and assertions, testing stateless screens, plus screenshot testing to catch visual regressions.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Compose UI Testing and Screenshot Testing", "description": "Test Jetpack Compose UIs: semantics-based UI tests with createComposeRule, finders and assertions, testing stateless screens, plus screenshot testing to catch visual regressions.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Jetpack Compose", "keywords": "compose ui test, createComposeRule, compose testTag, compose preview screenshot testing, visual regression android, roborazzi paparazzi", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/compose-ui-screenshot-testing/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Compose UI Testing and Screenshot Testing", "item": "https://yunoktech.com/android/compose-ui-screenshot-testing/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Compose UI Testing and Screenshot Testing</h1>
+    <p class="ad-lede">Functional UI tests check that a screen behaves correctly. Screenshot tests check that it still looks correct. Compose makes both practical. This guide covers semantics-based UI tests and screenshot testing, and shows how to structure screens so tests stay simple.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#pyramid">Where UI and screenshot tests fit</a></li><li><a href="#testable">Make screens testable first</a></li><li><a href="#ui-tests">Compose UI tests</a></li><li><a href="#screenshot">Screenshot testing</a></li><li><a href="#ci">Running in CI</a></li><li><a href="#use-cases">What to screenshot</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A refactor changes padding in a shared component, and twenty screens shift by 8dp. A colour token is renamed, and the error state becomes unreadable in dark mode. Unit tests won't catch either. UI tests catch broken behaviour, and screenshot tests catch broken visuals.</p>
+
+<h2 id="pyramid">Where UI and screenshot tests fit</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-tp-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-tp-t fig-tp-d">
+    <title id="fig-tp-t">Android testing pyramid with screenshot tests</title>
+    <desc id="fig-tp-d">Many fast unit tests at the base for ViewModels and logic; screenshot tests of components and screens in several states; Compose UI tests for interactions; a few end-to-end tests at the top.</desc>
+    <polygon points="360,10 700,200 20,200" class="d-box"/>
+    <rect class="d-red" x="300" y="30" width="120" height="30" rx="6"/><text class="d-s" x="360" y="50" text-anchor="middle">few E2E tests</text>
+    <rect class="d-amber" x="240" y="72" width="240" height="32" rx="6"/><text class="d-s" x="360" y="93" text-anchor="middle">Compose UI tests: interactions</text>
+    <rect class="d-violet" x="170" y="116" width="380" height="32" rx="6"/><text class="d-s" x="360" y="137" text-anchor="middle">Screenshot tests: components × states × themes</text>
+    <rect class="d-green" x="90" y="160" width="540" height="32" rx="6"/><text class="d-s" x="360" y="181" text-anchor="middle">Unit tests: ViewModels, reducers, mappers (most tests)</text>
+  </svg>
+  <figcaption id="fig-tp-cap">Most confidence should come from fast unit tests. UI and screenshot tests cover what unit tests can't see.</figcaption>
+</figure>
+
+<h2 id="testable">Make screens testable first</h2>
+<p>Split each screen into a <strong>Route</strong> (connects to the ViewModel) and a stateless <strong>Screen</strong> (renders a UiState and emits events). Tests and previews then drive the Screen directly with any state. See <a href="../compose-state-hoisting/index.html">State Hoisting</a>.</p>
+
+<h2 id="ui-tests">Compose UI tests</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    androidTestImplementation(platform(<span class="tk-s">"androidx.compose:compose-bom:&lt;latest&gt;"</span>))
+    androidTestImplementation(<span class="tk-s">"androidx.compose.ui:ui-test-junit4"</span>)
+    debugImplementation(<span class="tk-s">"androidx.compose.ui:ui-test-manifest"</span>)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">LoginScreenTest.kt (androidTest)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">LoginScreenTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> compose = createComposeRule()
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> signInDisabledUntilEmailValid_thenEmitsEvent() {
+        <span class="tk-k">var</span> signInClicked = <span class="tk-k">false</span>
+        <span class="tk-k">var</span> state <span class="tk-k">by</span> mutableStateOf(<span class="tk-t">LoginUiState</span>())
+
+        compose.setContent {
+            <span class="tk-t">AppTheme</span> {
+                <span class="tk-t">LoginContent</span>(
+                    state = state,
+                    onEmailChange = { state = state.copy(email = it, canSubmit = it.contains(<span class="tk-s">"@"</span>)) },
+                    onSignIn = { signInClicked = <span class="tk-k">true</span> },
+                )
+            }
+        }
+
+        compose.onNodeWithText(<span class="tk-s">"Sign in"</span>).assertIsNotEnabled()
+        compose.onNodeWithText(<span class="tk-s">"Email"</span>).performTextInput(<span class="tk-s">"dev@example.com"</span>)
+        compose.onNodeWithText(<span class="tk-s">"Sign in"</span>).assertIsEnabled().performClick()
+        assertTrue(signInClicked)
+    }
+}</code></pre></figure>
+<ul>
+  <li><strong>Finders</strong> (<code>onNodeWithText</code>, <code>onNodeWithContentDescription</code>, <code>onNodeWithTag</code>) query the <strong>semantics tree</strong>, the same information accessibility services use. Good semantics make tests easier too.</li>
+  <li>Use <code>Modifier.testTag("…")</code> only when no user-visible text or description identifies a node.</li>
+  <li>Compose tests synchronise with the UI automatically, waiting for recomposition and animations to idle. For async work, use <code>waitUntil { }</code>.</li>
+</ul>
+<p>More patterns: <a href="../compose-ui-testing/index.html">UI Testing in Jetpack Compose</a>.</p>
+
+<h2 id="screenshot">Screenshot testing</h2>
+<p>A screenshot test renders a composable, saves a <strong>reference image</strong>, and on later runs compares the new rendering against it, failing on visual differences.</p>
+<h3 id="options">Your options</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tool</th><th>How it renders</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Compose Preview Screenshot Testing (Google)</td><td>Turns <code>@Preview</code> functions into screenshot tests, run on the JVM</td><td>Alpha at the time of writing; setup is moving to AGP test suites. Check the current docs.</td></tr>
+    <tr><td>Roborazzi</td><td>JVM via Robolectric</td><td>Popular open-source option; integrates with Robolectric tests</td></tr>
+    <tr><td>Paparazzi</td><td>JVM using layoutlib</td><td>Open source; no device needed</td></tr>
+    <tr><td>Device/emulator-based</td><td>On real rendering stack</td><td>Most realistic, slower and noisier in CI</td></tr>
+  </tbody>
+</table>
+</div>
+<h3 id="preview-tests">Previews as screenshot tests</h3>
+<p>With Google's tool, previews placed in the screenshot test source set become tests. A multi-preview annotation makes each component render in several configurations:</p>
+<figure class="code"><figcaption><span class="file">Multi-preview annotation (shared)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Preview</span>(name = <span class="tk-s">"Light"</span>, showBackground = <span class="tk-k">true</span>)
+<span class="tk-a">@Preview</span>(name = <span class="tk-s">"Dark"</span>, showBackground = <span class="tk-k">true</span>, uiMode = <span class="tk-t">Configuration</span>.<span class="tk-t">UI_MODE_NIGHT_YES</span>)
+<span class="tk-a">@Preview</span>(name = <span class="tk-s">"Large font"</span>, showBackground = <span class="tk-k">true</span>, fontScale = <span class="tk-n">1.5f</span>)
+<span class="tk-k">annotation</span> <span class="tk-k">class</span> <span class="tk-t">ThemePreviews</span></code></pre></figure>
+<figure class="code"><figcaption><span class="file">src/screenshotTest/.../OrderCardScreenshots.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@ThemePreviews</span>
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">OrderCardDelivered</span>() = <span class="tk-t">AppTheme</span> { <span class="tk-t">OrderCard</span>(sampleOrder(status = <span class="tk-t">Delivered</span>)) }
+
+<span class="tk-a">@ThemePreviews</span>
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">OrderCardFailedPayment</span>() = <span class="tk-t">AppTheme</span> { <span class="tk-t">OrderCard</span>(sampleOrder(status = <span class="tk-t">PaymentFailed</span>)) }</code></pre></figure>
+<p>You then run a Gradle task to <em>update</em> reference images and another to <em>validate</em> against them. The exact task names depend on the plugin version and whether you use the newer test-suite setup, so follow the current documentation.</p>
+
+<h2 id="ci">Running in CI</h2>
+<ol class="steps">
+  <li>Commit reference images to the repository (or Git LFS).</li>
+  <li>Run validation on every pull request, and publish the diff report as a CI artifact.</li>
+  <li>When a change is intentional, regenerate references in the same PR so reviewers see the visual diff.</li>
+  <li>Pin fonts, locale and rendering settings so images are deterministic.</li>
+</ol>
+
+<h2 id="use-cases">What to screenshot</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design-system components</h3><p>Buttons, cards and inputs in every state (enabled, disabled, error, loading), in light and dark, at large font scale.</p></div>
+  <div class="card usecase"><h3>Key screens</h3><p>Empty, loading, error and populated states of high-traffic screens.</p></div>
+  <div class="card usecase"><h3>Localisation</h3><p>Long-text languages and RTL layouts, where truncation and alignment bugs hide.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Screenshotting screens that load live data or show the current time. Inject fixed data and clocks.</li>
+  <li>Hundreds of near-duplicate screenshots that nobody reviews.</li>
+  <li>Using test tags everywhere instead of improving semantics.</li>
+  <li>Blindly accepting regenerated references without looking at diffs.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do Compose UI tests need a device?</summary><div><p>Instrumented tests run on a device or emulator. Compose UI tests can also run on the JVM with Robolectric for faster feedback.</p></div></details>
+  <details><summary>Are screenshot tests flaky?</summary><div><p>JVM-rendered screenshots are generally stable when inputs are deterministic. Device-based screenshots can vary with GPU and OS differences, so use tolerances.</p></div></details>
+  <details><summary>Should I replace UI tests with screenshot tests?</summary><div><p>No. They complement each other: screenshots verify appearance, and UI tests verify behaviour and interaction.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Structure screens as <strong>stateless, previewable composables</strong>, then use <strong>semantics-based UI tests</strong> for behaviour and <strong>screenshot tests</strong> for appearance across states, themes and font sizes. Run both in CI, and review visual diffs like code.</p>
+<p>Next step: make those screens work beautifully on every form factor with <a href="../compose-adaptive-ui-tablets-foldables/index.html">Adaptive UI for Tablets and Foldables</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/testing" target="_blank" rel="noopener">Testing your Compose layout</a></li><li><a href="https://developer.android.com/develop/ui/compose/testing/testing-cheatsheet" target="_blank" rel="noopener">Compose testing cheatsheet</a></li><li><a href="https://developer.android.com/studio/preview/compose-screenshot-testing" target="_blank" rel="noopener">Compose Preview Screenshot Testing</a></li><li><a href="https://developer.android.com/training/testing/ui-tests/screenshot" target="_blank" rel="noopener">Screenshot testing overview</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-screenshot-testing-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-screenshot-testing-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-ui-testing/index.html"><small>Testing, Debugging, and Performance</small>UI Testing in Jetpack Compose</a></li><li><a href="../../android/compose-state-hoisting/index.html"><small>Jetpack Compose</small>State Hoisting Explained with Examples</a></li><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/android-ci-cd-github-actions/index.html"><small>Testing, Debugging, and Performance</small>CI/CD for Android with GitHub Actions</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/compose-ui-screenshot-testing/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/compose-ui-screenshot-testing/&amp;text=Compose UI Testing and Screenshot Testing" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/compose-ui-screenshot-testing/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#pyramid">Where UI and screenshot tests fit</a></li><li><a href="#testable">Make screens testable first</a></li><li><a href="#ui-tests">Compose UI tests</a></li><li><a href="#screenshot">Screenshot testing</a></li><li><a href="#ci">Running in CI</a></li><li><a href="#use-cases">What to screenshot</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-screenshot-testing-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-screenshot-testing-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!--meta
+{
+  "seo_title": "Evaluating AI Responses and Reducing Hallucinations",
+  "description": "Evaluate LLM features in Android apps and reduce hallucinations: golden datasets, automated checks, LLM-as-judge with care, grounding, citations, refusals, user feedback and regression testing.",
+  "primary_keyword": "evaluate ai responses hallucinations",
+  "keywords": ["llm evaluation mobile app", "reduce ai hallucinations", "golden dataset llm", "llm as a judge", "ai quality testing android", "grounded generation citations"],
+  "lede": "AI features fail differently from normal code: the same input can produce different outputs, and wrong answers look confident. You can't unit-test your way to quality alone. You need evaluation datasets, layered checks and techniques that reduce hallucinations in the first place.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["rag-android-apps", "prompt-engineering-android-developers", "monitor-ai-latency-errors-costs", "responsible-ai-ux-android"],
+  "refs": [
+    ["Gemini API: prompting strategies", "https://ai.google.dev/gemini-api/docs/prompting-strategies"],
+    ["Google's Responsible Generative AI Toolkit", "https://ai.google.dev/responsible"],
+    ["People + AI Guidebook", "https://pair.withgoogle.com/guidebook/"],
+    ["NIST AI Risk Management Framework", "https://www.nist.gov/itl/ai-risk-management-framework"]
+  ]
+}
+-->
+<p class="ad-lead">A <strong>hallucination</strong> is output that's fluent but unsupported or false: a made-up refund policy, an invented API method, a wrong date. Models can't be made hallucination-free, but systems can make hallucinations rarer, easier to detect, and less harmful.</p>
+
+<h2 id="reduce">Reducing hallucinations by design</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-hl-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-hl-t fig-hl-d">
+    <title id="fig-hl-t">Layers that reduce and contain hallucinations</title>
+    <desc id="fig-hl-d">Five layers: ground answers in retrieved data; constrain the task and output with schemas and low temperature; allow and encourage I don't know; verify outputs with validation and citations; and design the UI so users can check sources and report problems.</desc>
+    <rect class="d-green" x="20" y="30" width="128" height="140" rx="12"/><text class="d-t" x="84" y="60" text-anchor="middle">Ground</text><text class="d-s" x="84" y="86" text-anchor="middle">RAG, tools,</text><text class="d-s" x="84" y="102" text-anchor="middle">real data</text>
+    <rect class="d-blue" x="158" y="30" width="128" height="140" rx="12"/><text class="d-t" x="222" y="60" text-anchor="middle">Constrain</text><text class="d-s" x="222" y="86" text-anchor="middle">narrow task,</text><text class="d-s" x="222" y="102" text-anchor="middle">schema, low temp</text>
+    <rect class="d-violet" x="296" y="30" width="128" height="140" rx="12"/><text class="d-t" x="360" y="60" text-anchor="middle">Allow "I don't</text><text class="d-t" x="360" y="78" text-anchor="middle">know"</text><text class="d-s" x="360" y="102" text-anchor="middle">explicit refusal</text>
+    <rect class="d-amber" x="434" y="30" width="128" height="140" rx="12"/><text class="d-t" x="498" y="60" text-anchor="middle">Verify</text><text class="d-s" x="498" y="86" text-anchor="middle">validation,</text><text class="d-s" x="498" y="102" text-anchor="middle">citation checks</text>
+    <rect class="d-red" x="572" y="30" width="128" height="140" rx="12"/><text class="d-t" x="636" y="60" text-anchor="middle">Contain</text><text class="d-s" x="636" y="86" text-anchor="middle">UX: sources,</text><text class="d-s" x="636" y="102" text-anchor="middle">edit, report</text>
+  </svg>
+  <figcaption id="fig-hl-cap">Each layer catches what the previous one missed. No single technique is enough.</figcaption>
+</figure>
+<ul>
+  <li><strong>Ground</strong> answers in retrieved documents or tool results, not model memory. See <a href="../rag-android-apps/index.html">RAG</a> and <a href="../function-calling-ai-android/index.html">Function Calling</a>.</li>
+  <li><strong>Constrain</strong>: narrow tasks, schemas, low temperature for factual work.</li>
+  <li><strong>Permit uncertainty</strong>: instruct "if the answer isn't in the context, say you don't know", and reward it in evaluation.</li>
+  <li><strong>Verify</strong>: validate structured fields, check that citations exist, cross-check numbers against your data.</li>
+  <li><strong>Contain</strong>: show sources, let users edit, and avoid AI-only decisions in high-stakes domains.</li>
+</ul>
+
+<h2 id="dataset">Build a golden evaluation set</h2>
+<p>Collect 50–200 realistic inputs (with consent and anonymisation) covering common cases, edge cases, other languages, adversarial inputs, and questions that <em>should</em> be refused. For each, note what a good answer must contain or avoid.</p>
+<code-block lang="kotlin" file="EvalCase.kt">
+@Serializable
+data class EvalCase(
+    val id: String,
+    val input: String,
+    val mustContain: List<String> = emptyList(),
+    val mustNotContain: List<String> = emptyList(),
+    val shouldRefuse: Boolean = false,
+    val maxWords: Int = 150,
+)
+
+data class EvalOutcome(val id: String, val passed: Boolean, val reasons: List<String>)
+
+fun check(case: EvalCase, output: String, refused: Boolean): EvalOutcome {
+    val reasons = buildList {
+        if (case.shouldRefuse != refused) add(if (case.shouldRefuse) "should have refused" else "refused wrongly")
+        case.mustContain.filterNot { output.contains(it, ignoreCase = true) }.forEach { add("missing: $it") }
+        case.mustNotContain.filter { output.contains(it, ignoreCase = true) }.forEach { add("forbidden: $it") }
+        if (output.split(Regex("\\s+")).size > case.maxWords) add("too long")
+    }
+    return EvalOutcome(case.id, reasons.isEmpty(), reasons)
+}
+</code-block>
+
+<h2 id="automated">Automated checks, from cheap to expensive</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Check</th><th>Catches</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>Schema/format validation</td><td>Broken JSON, missing fields</td><td>Free</td></tr>
+    <tr><td>Rule checks (contains/forbids, length, valid IDs)</td><td>Obvious errors, policy violations</td><td>Free</td></tr>
+    <tr><td>Citation verification</td><td>Invented sources</td><td>Cheap</td></tr>
+    <tr><td>LLM-as-judge (rubric scoring)</td><td>Faithfulness, helpfulness, tone</td><td>Model calls; needs calibration</td></tr>
+    <tr><td>Human review of samples</td><td>Subtle errors, real-world quality</td><td>Time</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="warn"><b>LLM-as-judge needs care</b><p>Judges have their own biases and errors. Use clear rubrics, check them against human ratings on a sample, and never treat their scores as ground truth.</p></div>
+
+<h2 id="regression">Regression testing</h2>
+<ol class="steps">
+  <li>Run the evaluation set whenever you change the prompt, model, retrieval or temperature.</li>
+  <li>Compare pass rates per category against the previous version.</li>
+  <li>Block releases on significant drops, and review failures manually.</li>
+  <li>Record prompt and model versions with results.</li>
+</ol>
+
+<h2 id="production">Learning from production</h2>
+<ul>
+  <li>Add thumbs up/down and "report" on AI outputs, and capture the reason.</li>
+  <li>Track acceptance, edit and regeneration rates for suggestions.</li>
+  <li>Sample and review conversations (with consent and privacy safeguards), then add failures to the golden set.</li>
+</ul>
+
+<h2 id="use-cases">Applying it</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Help assistant</h3><p>Golden questions per help article, plus "not covered" questions that must be refused, with citation checks.</p></div>
+  <div class="card usecase"><h3>Extraction</h3><p>Field-level accuracy against labelled receipts, and schema validation on every response.</p></div>
+  <div class="card usecase"><h3>Writing suggestions</h3><p>Acceptance rate, plus checks that names and numbers are preserved.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I eliminate hallucinations?</summary><div><p>No. You can reduce and contain them. Design features so occasional errors are visible, correctable and low-impact.</p></div></details>
+  <details><summary>How often should I run evaluations?</summary><div><p>On every prompt, model or retrieval change, and periodically, since providers update models.</p></div></details>
+  <details><summary>Is temperature 0 deterministic?</summary><div><p>Not always across calls or model versions. Treat evaluation results statistically, and run each case more than once for critical features.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Quality AI features combine <strong>prevention</strong> (grounding, constraints, permission to say "I don't know"), <strong>verification</strong> (validation, citation checks) and <strong>evaluation</strong> (golden datasets, regression runs, production feedback). Treat quality as an ongoing process, not a launch checklist.</p>
+<p>Next step: explore the AI tools that help <em>you</em> build, starting with <a href="../ai-coding-assistants-android/index.html">AI Coding Assistants for Android Developers</a>.</p>

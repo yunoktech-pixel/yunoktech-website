@@ -1,0 +1,240 @@
+<!--meta
+{
+  "seo_title": "How to Build Your First Android App (Kotlin + Compose)",
+  "description": "Build your first Android app step by step with Kotlin and Jetpack Compose: a tip calculator with state, input validation, a ViewModel, previews, a unit test and running on a device.",
+  "primary_keyword": "build your first android app",
+  "keywords": ["first android app tutorial", "android app kotlin beginner", "jetpack compose beginner project", "tip calculator android", "android studio first project", "compose state tutorial"],
+  "lede": "The fastest way to understand Android is to build something small but real. In this tutorial you'll build a tip calculator with Kotlin and Jetpack Compose, then improve it step by step with state, validation, a ViewModel, a preview and a unit test.",
+  "date": "2026-10-15",
+  "cta": "beginner",
+  "related": ["setup-android-studio", "what-is-jetpack-compose", "android-beginner-mistakes", "compose-state-management"],
+  "refs": [
+    ["Create your first Android app (Compose)", "https://developer.android.com/codelabs/basic-android-kotlin-compose-first-app"],
+    ["State and Jetpack Compose", "https://developer.android.com/develop/ui/compose/state"],
+    ["ViewModel overview", "https://developer.android.com/topic/libraries/architecture/viewmodel"],
+    ["Build local unit tests", "https://developer.android.com/training/testing/local-tests"]
+  ]
+}
+-->
+<p class="ad-lead">Tutorials that only show "Hello World" teach you how to press Run, not how to build an app. In this project you'll build a <strong>tip and bill-split calculator</strong>, small enough to finish in an evening but real enough to cover the core of modern Android: Compose UI, state, input handling, a ViewModel, previews and testing.</p>
+<p>You need Android Studio installed (see <a href="../setup-android-studio/index.html">How to Set Up Android Studio</a>) and basic Kotlin knowledge.</p>
+
+<h2 id="plan">What we'll build</h2>
+<ul>
+  <li>Enter a bill amount, choose a tip percentage and the number of people.</li>
+  <li>See the tip, the total and the amount per person update instantly.</li>
+  <li>Invalid input shows a helpful error instead of crashing.</li>
+  <li>State survives screen rotation.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tip-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-tip-t fig-tip-d">
+    <title id="fig-tip-t">Data flow in the tip calculator</title>
+    <desc id="fig-tip-d">The user types into text fields; events go to the TipViewModel, which updates TipUiState; a pure calculate function produces tip, total and per-person amounts; the Compose screen re-renders from the new state.</desc>
+    <defs><marker id="t1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 70 H170 M320 70 H350 M510 70 H540" marker-end="url(#t1)"/>
+    <path class="d-dash" d="M620 100 V140 H80 V104" marker-end="url(#t1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="120" height="60" rx="12"/><text class="d-t" x="80" y="66" text-anchor="middle">User types</text><text class="d-s" x="80" y="84" text-anchor="middle">"1250", 15%</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="174" y="40" width="146" height="60" rx="12"/><text class="d-t" x="247" y="66" text-anchor="middle">TipViewModel</text><text class="d-s" x="247" y="84" text-anchor="middle">onBillChange()</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="354" y="40" width="156" height="60" rx="12"/><text class="d-t" x="432" y="66" text-anchor="middle">calculate()</text><text class="d-s" x="432" y="84" text-anchor="middle">pure function</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="544" y="40" width="156" height="60" rx="12"/><text class="d-t" x="622" y="66" text-anchor="middle">TipUiState</text><text class="d-s" x="622" y="84" text-anchor="middle">→ Compose redraws</text></g>
+  </svg>
+  <figcaption id="fig-tip-cap">Unidirectional data flow: input goes up as events, and state comes down to the screen.</figcaption>
+</figure>
+
+<h2 id="create">Step 1: Create the project</h2>
+<p>In Android Studio choose <strong>New Project → Empty Activity</strong>, name it <em>TipSplit</em>, keep Kotlin and the Kotlin DSL, and finish. Run it once on an emulator or phone to confirm the setup works.</p>
+<p>Add the ViewModel-for-Compose dependency to your version catalog and app module (use the latest stable Lifecycle version):</p>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:<lifecycle-version>")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:<lifecycle-version>")
+}
+</code-block>
+
+<h2 id="logic">Step 2: Write the calculation as a pure function</h2>
+<p>Start with the logic, separate from the UI. A pure function, with no Android and no side effects, is easy to reason about and test.</p>
+<code-block lang="kotlin" file="TipCalculator.kt">
+import java.math.BigDecimal
+import java.math.RoundingMode
+
+data class TipResult(val tip: BigDecimal, val total: BigDecimal, val perPerson: BigDecimal)
+
+/** Money uses BigDecimal: Double can't represent values like 0.1 exactly. */
+fun calculate(bill: BigDecimal, tipPercent: Int, people: Int): TipResult {
+    require(people >= 1) { "people must be at least 1" }
+    val tip = bill.multiply(BigDecimal(tipPercent)).divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
+    val total = bill.add(tip).setScale(2, RoundingMode.HALF_UP)
+    val perPerson = total.divide(BigDecimal(people), 2, RoundingMode.HALF_UP)
+    return TipResult(tip, total, perPerson)
+}
+</code-block>
+
+<h2 id="viewmodel">Step 3: Hold state in a ViewModel</h2>
+<code-block lang="kotlin" file="TipViewModel.kt">
+import androidx.lifecycle.ViewModel
+import java.math.BigDecimal
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+data class TipUiState(
+    val billInput: String = "",
+    val tipPercent: Int = 10,
+    val peopleInput: String = "1",
+    val result: TipResult? = null,
+    val error: String? = null,
+)
+
+class TipViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(TipUiState())
+    val uiState: StateFlow<TipUiState> = _uiState.asStateFlow()
+
+    fun onBillChange(text: String) = recompute { it.copy(billInput = text) }
+    fun onTipChange(percent: Int) = recompute { it.copy(tipPercent = percent) }
+    fun onPeopleChange(text: String) = recompute { it.copy(peopleInput = text) }
+
+    private fun recompute(change: (TipUiState) -> TipUiState) = _uiState.update { old ->
+        val s = change(old)
+        val bill = s.billInput.toBigDecimalOrNull()
+        val people = s.peopleInput.toIntOrNull()
+        when {
+            s.billInput.isBlank() -> s.copy(result = null, error = null)
+            bill == null || bill < BigDecimal.ZERO -> s.copy(result = null, error = "Enter a valid amount")
+            people == null || people < 1 -> s.copy(result = null, error = "People must be 1 or more")
+            else -> s.copy(result = calculate(bill, s.tipPercent, people), error = null)
+        }
+    }
+}
+</code-block>
+
+<h2 id="ui">Step 4: Build the Compose UI</h2>
+<code-block lang="kotlin" file="TipScreen.kt">
+@Composable
+fun TipRoute(viewModel: TipViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    TipScreen(state, viewModel::onBillChange, viewModel::onTipChange, viewModel::onPeopleChange)
+}
+
+@Composable
+fun TipScreen(
+    state: TipUiState,
+    onBillChange: (String) -> Unit,
+    onTipChange: (Int) -> Unit,
+    onPeopleChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text("Tip & Split", style = MaterialTheme.typography.headlineMedium)
+
+        OutlinedTextField(
+            value = state.billInput,
+            onValueChange = onBillChange,
+            label = { Text("Bill amount (₹)") },
+            isError = state.error != null,
+            supportingText = { state.error?.let { Text(it) } },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Text("Tip: ${state.tipPercent}%")
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(0, 5, 10, 15, 20).forEach { pct ->
+                FilterChip(
+                    selected = state.tipPercent == pct,
+                    onClick = { onTipChange(pct) },
+                    label = { Text("$pct%") },
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = state.peopleInput,
+            onValueChange = onPeopleChange,
+            label = { Text("Number of people") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        state.result?.let { r ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    Text("Tip: ₹${r.tip}")
+                    Text("Total: ₹${r.total}")
+                    Text("Each person pays ₹${r.perPerson}", style = MaterialTheme.typography.titleLarge)
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TipPreview() {
+    MaterialTheme {
+        TipScreen(
+            state = TipUiState(billInput = "1250", tipPercent = 10, peopleInput = "3",
+                result = calculate(BigDecimal("1250"), 10, 3)),
+            onBillChange = {}, onTipChange = {}, onPeopleChange = {},
+        )
+    }
+}
+</code-block>
+<p>Finally, call <code>TipRoute()</code> inside <code>setContent { MaterialTheme { ... } }</code> in <code>MainActivity</code>. Notice that <code>TipScreen</code> is <strong>stateless</strong>: everything comes from parameters. That's why the preview can show any state you like.</p>
+
+<h2 id="test">Step 5: Add a unit test</h2>
+<code-block lang="kotlin" file="src/test/.../TipCalculatorTest.kt">
+class TipCalculatorTest {
+    @Test
+    fun `splits total with tip across people`() {
+        val r = calculate(BigDecimal("1000"), tipPercent = 10, people = 4)
+        assertEquals(BigDecimal("100.00"), r.tip)
+        assertEquals(BigDecimal("1100.00"), r.total)
+        assertEquals(BigDecimal("275.00"), r.perPerson)
+    }
+
+    @Test
+    fun `invalid bill shows an error`() {
+        val vm = TipViewModel()
+        vm.onBillChange("12abc")
+        assertEquals("Enter a valid amount", vm.uiState.value.error)
+    }
+}
+</code-block>
+<p>Run the tests from the gutter icon or with <code>./gradlew testDebugUnitTest</code>. They run on your computer in seconds.</p>
+
+<h2 id="run">Step 6: Run, rotate, and break it</h2>
+<ul>
+  <li>Rotate the emulator. Values stay, because the ViewModel survives configuration changes.</li>
+  <li>Type letters into the amount field. You should see an error, not a crash.</li>
+  <li>Enable dark theme and large font in system settings, and check the layout still works.</li>
+</ul>
+
+<h2 id="extensions">Ideas to extend it</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Round up per person</h3><p>Add a switch to round each share up to the nearest rupee. It's a small change to the pure function, plus a new test.</p></div>
+  <div class="card usecase"><h3>Remember the last tip</h3><p>Persist the chosen percentage with DataStore so it's restored next launch.</p></div>
+  <div class="card usecase"><h3>Currency and locale</h3><p>Format amounts with <code>NumberFormat.getCurrencyInstance()</code> for the user's locale instead of a hard-coded ₹.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>"Unresolved reference: viewModel" or "collectAsStateWithLifecycle":</strong> add the two lifecycle dependencies above and sync Gradle.</li>
+  <li><strong>Preview doesn't render:</strong> build the project once. Previews need compiled code.</li>
+  <li><strong>Values reset on rotation:</strong> you're probably creating state with <code>remember</code> inside the screen instead of reading it from the ViewModel.</li>
+  <li><strong>Wrong decimals:</strong> make sure you use <code>BigDecimal</code> with explicit rounding, not <code>Double</code>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why use a ViewModel for such a small app?</summary><div><p>It keeps logic out of the UI, survives rotation and makes testing easy. These habits matter as apps grow, so it's worth practising them early.</p></div></details>
+  <details><summary>Why BigDecimal instead of Double?</summary><div><p>Binary floating point can't represent many decimal fractions exactly, which causes rounding surprises with money. BigDecimal with explicit rounding is the safe choice.</p></div></details>
+  <details><summary>Can I publish this app?</summary><div><p>You can. Polish it, add an icon and a privacy policy, and follow <a href="../publish-android-app-google-play/index.html">How to Publish an Android App on Google Play</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>You've built a complete first app using the modern Android pattern: a <strong>pure calculation function</strong>, a <strong>ViewModel exposing immutable state</strong>, a <strong>stateless Compose screen</strong> with a preview, and <strong>unit tests</strong>. The same shape scales to much bigger apps.</p>
+<p>Next step: read <a href="../android-beginner-mistakes/index.html">Common Mistakes Beginners Make in Android Development</a> before your next project.</p>

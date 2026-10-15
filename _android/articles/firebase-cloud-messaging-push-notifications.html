@@ -1,0 +1,198 @@
+<!--meta
+{
+  "seo_title": "Firebase Cloud Messaging & Push Notifications (Android)",
+  "description": "Implement push notifications with Firebase Cloud Messaging on Android: tokens, POST_NOTIFICATIONS permission, notification vs data messages, channels, deep links, HTTP v1 and testing.",
+  "primary_keyword": "firebase cloud messaging android",
+  "keywords": ["push notifications android kotlin", "fcm token android", "post_notifications permission android 13", "notification channels android", "fcm data message vs notification message", "fcm http v1"],
+  "lede": "Push notifications bring users back to your app, when they're relevant. This guide sets up Firebase Cloud Messaging end to end: runtime permission, tokens, message types, channels, deep links, sending from a server with the HTTP v1 API, and testing.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["firebase-authentication-android", "android-permissions-privacy", "deep-links-app-links-android", "workmanager-background-work"],
+  "refs": [
+    ["Set up a Firebase Cloud Messaging client app on Android", "https://firebase.google.com/docs/cloud-messaging/android/client"],
+    ["Receive messages in an Android app", "https://firebase.google.com/docs/cloud-messaging/android/receive"],
+    ["Notification runtime permission", "https://developer.android.com/develop/ui/views/notifications/notification-permission"],
+    ["Create and manage notification channels", "https://developer.android.com/develop/ui/views/notifications/channels"],
+    ["FCM HTTP v1 API", "https://firebase.google.com/docs/cloud-messaging/send/v1-api"]
+  ]
+}
+-->
+<p class="ad-lead">Notifications are a privilege, not a channel you own. Since Android 13, users must explicitly grant permission, and they revoke it quickly when apps spam. This guide shows how to implement FCM correctly and how to ask for permission at a moment that makes sense.</p>
+
+<h2 id="architecture">How FCM delivery works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fcm-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-fcm-t fig-fcm-d">
+    <title id="fig-fcm-t">FCM token registration and message delivery</title>
+    <desc id="fig-fcm-d">The app obtains an FCM registration token and sends it to your backend. When an event happens, your backend calls the FCM HTTP v1 API with that token. FCM delivers the message to the device; the system shows notification messages automatically when the app is in background, or your FirebaseMessagingService handles data messages.</desc>
+    <defs><marker id="fcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="150" height="66" rx="12"/><text class="d-t" x="95" y="68" text-anchor="middle">Android app</text><text class="d-s" x="95" y="88" text-anchor="middle">gets token</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="290" y="40" width="150" height="66" rx="12"/><text class="d-t" x="365" y="68" text-anchor="middle">Your backend</text><text class="d-s" x="365" y="88" text-anchor="middle">stores token</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="550" y="40" width="150" height="66" rx="12"/><text class="d-t" x="625" y="68" text-anchor="middle">FCM</text><text class="d-s" x="625" y="88" text-anchor="middle">HTTP v1 API</text></g>
+    <path class="d-flow" d="M170 60 H286" marker-end="url(#fcm)"/><text class="d-s" x="228" y="52" text-anchor="middle">1. register token</text>
+    <path class="d-flow" d="M440 60 H546" marker-end="url(#fcm)"/><text class="d-s" x="493" y="52" text-anchor="middle">2. send message</text>
+    <path class="d-flow" d="M625 106 V150 H95 V110" marker-end="url(#fcm)"/><text class="d-s" x="360" y="168" text-anchor="middle">3. deliver to device → notification or onMessageReceived()</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M625 106 V150 H95 V110');--dur:2s;--delay:.6s"/>
+  </svg>
+  <figcaption id="fig-fcm-cap">Your server decides who gets what. The app only manages its token and how messages are displayed.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:<latest>"))
+    implementation("com.google.firebase:firebase-messaging")
+}
+</code-block>
+<code-block lang="xml" file="AndroidManifest.xml">
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+<application>
+    <service
+        android:name=".push.AppMessagingService"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT" />
+        </intent-filter>
+    </service>
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="general" />
+</application>
+</code-block>
+
+<h2 id="permission">Ask for permission at the right moment</h2>
+<p>On Android 13 (API 33) and later, <code>POST_NOTIFICATIONS</code> is a runtime permission. Ask in context, for example after the user places an order ("Get delivery updates?"), not on first launch.</p>
+<code-block lang="kotlin" file="NotificationPermission.kt (Compose)">
+@Composable
+fun rememberNotificationPermissionRequester(onResult: (Boolean) -> Unit): () -> Unit {
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission(), onResult)
+    return remember {
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else onResult(true)        // granted by default below Android 13 (user can still disable)
+        }
+    }
+}
+</code-block>
+
+<h2 id="channels">Notification channels</h2>
+<code-block lang="kotlin" file="Create channels at startup">
+fun createNotificationChannels(context: Context) {
+    val manager = context.getSystemService(NotificationManager::class.java)
+    manager.createNotificationChannels(listOf(
+        NotificationChannel("orders", "Order updates", NotificationManager.IMPORTANCE_HIGH)
+            .apply { description = "Shipping and delivery status" },
+        NotificationChannel("general", "General", NotificationManager.IMPORTANCE_DEFAULT),
+        NotificationChannel("promotions", "Offers", NotificationManager.IMPORTANCE_LOW),
+    ))
+}
+</code-block>
+<p>Users can turn off "Offers" while keeping "Order updates". Separate channels respect their choice and keep important alerts alive.</p>
+
+<h2 id="service">Handling tokens and messages</h2>
+<code-block lang="kotlin" file="AppMessagingService.kt">
+class AppMessagingService : FirebaseMessagingService() {
+
+    override fun onNewToken(token: String) {
+        // Tokens can change (reinstall, data cleared). Send to backend via WorkManager for reliability.
+        TokenUploadWorker.enqueue(applicationContext, token)
+    }
+
+    override fun onMessageReceived(message: RemoteMessage) {
+        // Data messages arrive here in foreground and background.
+        // Notification messages arrive here only when the app is in the foreground.
+        val data = message.data
+        when (data["type"]) {
+            "order_update" -> showOrderNotification(
+                orderId = data["orderId"] ?: return,
+                title = data["title"] ?: "Order update",
+                body = data["body"].orEmpty(),
+            )
+            "sync" -> SyncScheduler(WorkManager.getInstance(this)).requestSync()   // silent refresh
+        }
+    }
+
+    private fun showOrderNotification(orderId: String, title: String, body: String) {
+        val intent = Intent(Intent.ACTION_VIEW, "https://yunoktech.com/orders/$orderId".toUri(), this, MainActivity::class.java)
+        val pending = PendingIntent.getActivity(this, orderId.hashCode(), intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val notification = NotificationCompat.Builder(this, "orders")
+            .setSmallIcon(R.drawable.ic_stat_notify)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setAutoCancel(true)
+            .setContentIntent(pending)
+            .build()
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            NotificationManagerCompat.from(this).notify(orderId.hashCode(), notification)
+        }
+    }
+}
+</code-block>
+
+<h2 id="types">Notification vs data messages</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Notification message</th><th>Data message</th></tr></thead>
+  <tbody>
+    <tr><td>App in background</td><td>System shows it automatically</td><td>Delivered to <code>onMessageReceived</code></td></tr>
+    <tr><td>App in foreground</td><td><code>onMessageReceived</code></td><td><code>onMessageReceived</code></td></tr>
+    <tr><td>Control over display</td><td>Limited</td><td>Full (channels, actions, grouping)</td></tr>
+    <tr><td>Best for</td><td>Simple marketing or announcements</td><td>Transactional alerts, deep links, silent sync</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="server">Sending from your server (HTTP v1)</h2>
+<code-block lang="json" file="POST https://fcm.googleapis.com/v1/projects/PROJECT_ID/messages:send">
+{
+  "message": {
+    "token": "DEVICE_REGISTRATION_TOKEN",
+    "data": {
+      "type": "order_update",
+      "orderId": "A1042",
+      "title": "Out for delivery",
+      "body": "Your order arrives today by 6 PM"
+    },
+    "android": { "priority": "high" }
+  }
+}
+</code-block>
+<p>The legacy FCM server APIs have been retired. Use HTTP v1 with OAuth 2.0 service-account credentials, which <strong>must stay on your server</strong> and never ship in the app. The Firebase Admin SDK handles authentication for you.</p>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Use the Firebase console's "Send test message" with your device token.</li>
+  <li>Test foreground, background and killed states. They behave differently.</li>
+  <li>Test with notifications disabled, and with a specific channel disabled.</li>
+  <li>Check behaviour on manufacturers with aggressive battery management.</li>
+</ul>
+
+<h2 id="use-cases">Good notification use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Transactional</h3><p>Order shipped, payment received, OTP alternatives. High value, expected by users.</p></div>
+  <div class="card usecase"><h3>Collaboration</h3><p>Mentions, replies and shared-document changes, grouped and rate-limited.</p></div>
+  <div class="card usecase"><h3>Silent sync</h3><p>A data message triggers WorkManager to refresh content before the user opens the app.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Requesting notification permission on first launch with no context.</li>
+  <li>Sending everything through one channel, so users disable all notifications.</li>
+  <li>Heavy work in <code>onMessageReceived</code>. Enqueue WorkManager instead.</li>
+  <li>Putting personal or sensitive data in notification text on the lock screen.</li>
+  <li>Not handling token refresh, so pushes silently stop reaching users.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why don't my notifications arrive on some phones?</summary><div><p>Common causes are denied permission, a disabled channel, aggressive OEM battery optimisation for background apps, or an invalid token on the server. Check delivery reports in Firebase.</p></div></details>
+  <details><summary>Can I send to groups of users?</summary><div><p>Yes, with topics (<code>subscribeToTopic</code>) or by sending to multiple tokens from your server.</p></div></details>
+  <details><summary>Is FCM free?</summary><div><p>FCM itself is free to use. Your backend infrastructure for sending messages has its own costs.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A solid FCM integration <strong>asks for permission in context</strong>, uses <strong>meaningful channels</strong>, prefers <strong>data messages</strong> for transactional alerts with deep links, keeps <strong>tokens in sync</strong> with your server, and sends with the <strong>HTTP v1 API</strong> from secure server code.</p>
+<p>Next step: compare real-time options in <a href="../websockets-vs-rest-android/index.html">WebSockets vs REST APIs in Android</a>.</p>

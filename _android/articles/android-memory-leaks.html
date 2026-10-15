@@ -1,0 +1,116 @@
+<!--meta
+{
+  "seo_title": "Android Memory Leaks: Causes and Solutions",
+  "description": "Find and fix Android memory leaks: how leaks happen, common causes (Context, listeners, coroutines, Fragments views), LeakCanary, heap dumps in Android Studio and prevention tips.",
+  "primary_keyword": "android memory leaks",
+  "keywords": ["leakcanary android", "context memory leak", "fragment view leak", "memory profiler heap dump", "outofmemoryerror android", "coroutine leak globalscope"],
+  "lede": "A memory leak keeps objects alive that should be garbage collected, often entire Activities with their Views and bitmaps. Leaks cause slowdowns, jank and eventually OutOfMemoryError crashes. Here's how leaks happen in Android apps, how to find them, and how to prevent them.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["android-studio-profiler-guide", "android-app-performance-optimization", "how-android-app-works-internally", "android-beginner-mistakes"],
+  "refs": [
+    ["Manage your app's memory", "https://developer.android.com/topic/performance/memory"],
+    ["Inspect memory usage with Memory Profiler", "https://developer.android.com/studio/profile/memory-profiler"],
+    ["LeakCanary (official repository)", "https://github.com/square/leakcanary"],
+    ["Overview of memory management", "https://developer.android.com/topic/performance/memory-overview"]
+  ]
+}
+-->
+<p class="ad-lead">Garbage collection frees objects nothing references any more. A leak happens when something long-lived (a singleton, a static field, a running coroutine, a registered listener) keeps a reference to something short-lived, like an Activity that has already been destroyed. Every rotation can then add another dead Activity to memory.</p>
+
+<h2 id="how">How a leak happens</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lk-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-lk-t fig-lk-d">
+    <title id="fig-lk-t">A singleton holding a destroyed Activity</title>
+    <desc id="fig-lk-d">A long-lived singleton, such as an analytics manager, holds a listener that references Activity A. After rotation, Activity A is destroyed and Activity B is created, but A cannot be garbage collected because the singleton still references it, along with its whole view hierarchy and bitmaps.</desc>
+    <defs><marker id="lkm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ef4444"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="20" y="60" width="180" height="70" rx="12"/><text class="d-w" x="110" y="90" text-anchor="middle">Singleton</text><text class="d-w" x="110" y="110" text-anchor="middle">(lives forever)</text></g>
+    <path d="M200 95 H276" stroke="#ef4444" stroke-width="2.4" fill="none" marker-end="url(#lkm)"/><text class="d-s" x="238" y="86" text-anchor="middle">listener ref</text>
+    <g class="d-step" style="--i:1"><rect class="d-red" x="280" y="40" width="200" height="110" rx="12"/><text class="d-t" x="380" y="70" text-anchor="middle">Activity A (destroyed)</text><text class="d-s" x="380" y="94" text-anchor="middle">+ View hierarchy</text><text class="d-s" x="380" y="112" text-anchor="middle">+ bitmaps</text><text class="d-s" x="380" y="130" text-anchor="middle">can't be collected</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="520" y="60" width="180" height="70" rx="12"/><text class="d-t" x="610" y="90" text-anchor="middle">Activity B</text><text class="d-s" x="610" y="110" text-anchor="middle">(after rotation)</text></g>
+  </svg>
+  <figcaption id="fig-lk-cap">The leak isn't the listener itself. It's the reference path from a long-lived root to a dead object.</figcaption>
+</figure>
+
+<h2 id="causes">Common causes and fixes</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Cause</th><th>Example</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Activity Context in a singleton</td><td><code>ImageLoader.init(activity)</code></td><td>Use <code>applicationContext</code>; don't store UI contexts</td></tr>
+    <tr><td>Unregistered listeners/callbacks</td><td>Location, sensor or broadcast listeners</td><td>Unregister in the matching lifecycle callback or <code>DisposableEffect</code></td></tr>
+    <tr><td>Fragment View references</td><td>Binding kept after <code>onDestroyView</code></td><td>Null out the binding in <code>onDestroyView</code></td></tr>
+    <tr><td>Long-running work capturing UI</td><td><code>GlobalScope.launch { textView.text = … }</code></td><td>Lifecycle-aware scopes; never capture Views in background work</td></tr>
+    <tr><td>Static or companion fields holding Views</td><td><code>companion object { var lastView: View? }</code></td><td>Don't. Pass IDs or state instead</td></tr>
+    <tr><td>Inner classes and anonymous handlers</td><td>A delayed <code>Handler</code> message referencing the Activity</td><td>Remove callbacks on destroy; prefer coroutines with lifecycle scopes</td></tr>
+    <tr><td>ViewModel holding a View or Activity</td><td><code>class VM(val activity: Activity)</code></td><td>ViewModels must not reference UI objects</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="fragment">The Fragment binding leak</h2>
+<code-block lang="kotlin" file="Correct View Binding in Fragments">
+class ProfileFragment : Fragment(R.layout.fragment_profile) {
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding!!      // only valid between onViewCreated and onDestroyView
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        _binding = FragmentProfileBinding.bind(view)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null                           // the Fragment may outlive its View (back stack)
+    }
+}
+</code-block>
+
+<h2 id="leakcanary">Finding leaks with LeakCanary</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:<version>")   // debug builds only
+}
+</code-block>
+<p>LeakCanary watches destroyed Activities, Fragments, Views and ViewModels. When one isn't collected, it dumps the heap, analyses it, and shows the <strong>leak trace</strong>: the reference chain from a GC root to the leaked object. Read it bottom-up to find the reference that shouldn't exist.</p>
+
+<h2 id="profiler">Investigating with Android Studio</h2>
+<ol class="steps">
+  <li>Open the <strong>Profiler</strong> and choose memory tracking for your app.</li>
+  <li>Reproduce the suspected leak, for example by rotating several times or opening and closing a screen.</li>
+  <li>Force garbage collection, then <strong>capture a heap dump</strong>.</li>
+  <li>Filter by your Activity class. More instances than expected indicate a leak, and Android Studio can highlight leaked Activities and Fragments.</li>
+  <li>Inspect the <strong>references</strong> of a leaked instance to find the GC root path.</li>
+</ol>
+
+<h2 id="not-leaks">Memory problems that aren't leaks</h2>
+<ul>
+  <li><strong>Large bitmaps:</strong> decoding full-resolution images for thumbnails. Use an image library that downsamples.</li>
+  <li><strong>Unbounded caches:</strong> in-memory lists that grow forever. Use <code>LruCache</code> with limits.</li>
+  <li><strong>Holding large data in UI state:</strong> page it with Paging, or keep it in the database.</li>
+</ul>
+
+<h2 id="use-cases">Real investigations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>OOM after many rotations</h3><p>Leak trace: an analytics singleton held the Activity via a listener. Fix: application context and unregistering.</p></div>
+  <div class="card usecase"><h3>Fragment back stack growth</h3><p>Bindings kept after <code>onDestroyView</code>. Fix: null out the binding, or move the screen to Compose.</p></div>
+  <div class="card usecase"><h3>Slow app after long use</h3><p>Not a leak: an image cache without limits. Fix: size the cache and respond to <code>onTrimMemory</code>.</p></div>
+</div>
+
+<h2 id="prevent">Prevention habits</h2>
+<ul>
+  <li>Use lifecycle-aware components and scopes (<code>viewModelScope</code>, <code>repeatOnLifecycle</code>, <code>DisposableEffect</code>).</li>
+  <li>Inject the application context with Hilt's <code>@ApplicationContext</code> into long-lived objects.</li>
+  <li>Keep LeakCanary in debug builds and treat its reports as bugs.</li>
+  <li>Compose reduces many View-related leaks, but listeners and contexts can still leak.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I ship LeakCanary in release builds?</summary><div><p>No. Add it with <code>debugImplementation</code> only. Heap dumps are expensive and may contain user data.</p></div></details>
+  <details><summary>Does Kotlin or Compose eliminate leaks?</summary><div><p>They reduce common causes, but any long-lived reference to a short-lived object still leaks.</p></div></details>
+  <details><summary>Is a ViewModel holding Application context a leak?</summary><div><p>No. The Application lives as long as the process. <code>AndroidViewModel</code> exists for this, though injecting specific dependencies is cleaner.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Memory leaks are <strong>reference paths from long-lived roots to dead objects</strong>, usually Activities, Fragments' Views or Contexts. Detect them with <strong>LeakCanary</strong> and heap dumps, fix the offending reference, and prevent them with lifecycle-aware scopes and application context.</p>
+<p>Next step: tackle the other major stability issue in <a href="../android-anr-errors/index.html">ANR Errors Explained</a>.</p>

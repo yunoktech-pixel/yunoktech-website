@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dependency Injection with Hilt in Android (Guide) | Yunok Tech</title>
+  <meta name="description" content="Learn Hilt dependency injection for Android: setup, @Inject, modules, @Binds vs @Provides, scopes and components, ViewModels, qualifiers, assisted injection and testing.">
+  <meta name="keywords" content="hilt dependency injection android, hilt tutorial, hiltViewModel, hilt module binds provides, hilt scopes singleton, hilt testing, dagger hilt android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/hilt-dependency-injection/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/hilt-dependency-injection/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Dependency Injection with Hilt in Android (Guide)">
+  <meta property="og:description" content="Learn Hilt dependency injection for Android: setup, @Inject, modules, @Binds vs @Provides, scopes and components, ViewModels, qualifiers, assisted injection and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="Dependency Injection with Hilt in Android (Guide)">
+  <meta name="twitter:description" content="Learn Hilt dependency injection for Android: setup, @Inject, modules, @Binds vs @Provides, scopes and components, ViewModels, qualifiers, assisted injection and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Dependency Injection with Hilt", "description": "Learn Hilt dependency injection for Android: setup, @Inject, modules, @Binds vs @Provides, scopes and components, ViewModels, qualifiers, assisted injection and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Architecture and Clean Code", "keywords": "hilt tutorial, hiltViewModel, hilt module binds provides, hilt scopes singleton, hilt testing, dagger hilt android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/hilt-dependency-injection/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Dependency Injection with Hilt", "item": "https://yunoktech.com/android/hilt-dependency-injection/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">Dependency Injection with Hilt</h1>
+    <p class="ad-lede">Dependency injection sounds abstract until you try to test a ViewModel that creates its own Retrofit client. Hilt, Android's recommended DI library built on Dagger, wires your object graph at compile time with very little code. Here's how to set it up and use it well.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#why">Why DI, and why Hilt</a></li><li><a href="#setup">Setup</a></li><li><a href="#graph">How Hilt builds the graph</a></li><li><a href="#modules">Modules: teaching Hilt to create things</a></li><li><a href="#qualifiers">Qualifiers: two of the same type</a></li><li><a href="#compose">ViewModels in Compose</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Practical guidance</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Dependency injection (DI) means objects <em>receive</em> their dependencies instead of creating them. A ViewModel that receives a <code>WeatherRepository</code> can be given a fake in tests and the real one in the app. Hilt automates the wiring and manages object lifetimes tied to Android components.</p>
+
+<h2 id="why">Why DI, and why Hilt</h2>
+<figure class="code"><figcaption><span class="file">Without DI: hard to test and change</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">WeatherViewModel</span> : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository = <span class="tk-t">WeatherRepositoryImpl</span>(
+        <span class="tk-t">Retrofit</span>.<span class="tk-t">Builder</span>().baseUrl(<span class="tk-t">BASE_URL</span>).build().create(<span class="tk-t">WeatherApi</span>::<span class="tk-k">class</span>.java),
+        <span class="tk-t">Room</span>.databaseBuilder(<span class="tk-c">/* needs a Context... */</span>).build().weatherDao(),
+    )
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">With DI: dependencies are parameters</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltViewModel</span>
+<span class="tk-k">class</span> <span class="tk-t">WeatherViewModel</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">WeatherRepository</span>,
+) : <span class="tk-t">ViewModel</span>()</code></pre></figure>
+<p>Hilt generates the Dagger code at compile time, so wiring errors are caught at build time and there's no reflection at runtime. It also understands Android lifecycles: Application, Activity, ViewModel, Fragment and Service.</p>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">build.gradle.kts (app)</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">plugins {
+    id(<span class="tk-s">"com.google.devtools.ksp"</span>)
+    id(<span class="tk-s">"com.google.dagger.hilt.android"</span>)
+}
+dependencies {
+    implementation(<span class="tk-s">"com.google.dagger:hilt-android:&lt;hilt-version&gt;"</span>)
+    ksp(<span class="tk-s">"com.google.dagger:hilt-compiler:&lt;hilt-version&gt;"</span>)
+    implementation(<span class="tk-s">"androidx.hilt:hilt-navigation-compose:&lt;version&gt;"</span>)   <span class="tk-c">// hiltViewModel() in Compose</span>
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">App.kt and MainActivity.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltAndroidApp</span>
+<span class="tk-k">class</span> <span class="tk-t">App</span> : <span class="tk-t">Application</span>()
+
+<span class="tk-a">@AndroidEntryPoint</span>
+<span class="tk-k">class</span> <span class="tk-t">MainActivity</span> : <span class="tk-t">ComponentActivity</span>() { <span class="tk-c">/* ... */</span> }</code></pre></figure>
+
+<h2 id="graph">How Hilt builds the graph</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-hg-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-hg-t fig-hg-d">
+    <title id="fig-hg-t">Hilt component hierarchy and scopes</title>
+    <desc id="fig-hg-d">SingletonComponent lives as long as the application and holds singletons such as Retrofit, OkHttp, the Room database and repositories. ActivityRetainedComponent survives configuration changes. ViewModelComponent creates ViewModel dependencies. ActivityComponent and FragmentComponent are tied to UI lifecycles.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="200" y="10" width="320" height="50" rx="12"/><text class="d-t" x="360" y="32" text-anchor="middle">SingletonComponent  @Singleton</text><text class="d-s" x="360" y="50" text-anchor="middle">OkHttp, Retrofit, Room, repositories</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="200" y="80" width="320" height="44" rx="12"/><text class="d-t" x="360" y="107" text-anchor="middle">ActivityRetainedComponent  @ActivityRetainedScoped</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="40" y="150" width="280" height="56" rx="12"/><text class="d-t" x="180" y="174" text-anchor="middle">ViewModelComponent</text><text class="d-s" x="180" y="192" text-anchor="middle">@ViewModelScoped, SavedStateHandle</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="400" y="150" width="280" height="56" rx="12"/><text class="d-t" x="540" y="174" text-anchor="middle">ActivityComponent → Fragment…</text><text class="d-s" x="540" y="192" text-anchor="middle">@ActivityScoped, UI-bound objects</text></g>
+    <path class="d-line" d="M360 60 V80 M300 124 L180 150 M420 124 L540 150"/>
+  </svg>
+  <figcaption id="fig-hg-cap">Child components can use anything from their parents. Scope an object to the shortest lifetime that makes sense.</figcaption>
+</figure>
+
+<h2 id="modules">Modules: teaching Hilt to create things</h2>
+<p>Classes you own get <code>@Inject constructor</code>. For interfaces and third-party classes, write modules:</p>
+<figure class="code"><figcaption><span class="file">di/NetworkModule.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Module</span>
+<span class="tk-a">@InstallIn</span>(<span class="tk-t">SingletonComponent</span>::<span class="tk-k">class</span>)
+<span class="tk-k">object</span> <span class="tk-t">NetworkModule</span> {
+
+    <span class="tk-a">@Provides</span> <span class="tk-a">@Singleton</span>
+    <span class="tk-k">fun</span> provideOkHttp(): <span class="tk-t">OkHttpClient</span> = <span class="tk-t">OkHttpClient</span>.<span class="tk-t">Builder</span>()
+        .connectTimeout(<span class="tk-n">15</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">SECONDS</span>)
+        .build()
+
+    <span class="tk-a">@Provides</span> <span class="tk-a">@Singleton</span>
+    <span class="tk-k">fun</span> provideRetrofit(client: <span class="tk-t">OkHttpClient</span>, json: <span class="tk-t">Json</span>): <span class="tk-t">Retrofit</span> = <span class="tk-t">Retrofit</span>.<span class="tk-t">Builder</span>()
+        .baseUrl(<span class="tk-s">"https://api.example.com/"</span>)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory(<span class="tk-s">"application/json"</span>.toMediaType()))
+        .build()
+
+    <span class="tk-a">@Provides</span> <span class="tk-a">@Singleton</span>
+    <span class="tk-k">fun</span> provideJson(): <span class="tk-t">Json</span> = <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }
+
+    <span class="tk-a">@Provides</span>
+    <span class="tk-k">fun</span> provideWeatherApi(retrofit: <span class="tk-t">Retrofit</span>): <span class="tk-t">WeatherApi</span> = retrofit.create(<span class="tk-t">WeatherApi</span>::<span class="tk-k">class</span>.java)
+}
+
+<span class="tk-a">@Module</span>
+<span class="tk-a">@InstallIn</span>(<span class="tk-t">SingletonComponent</span>::<span class="tk-k">class</span>)
+<span class="tk-k">abstract</span> <span class="tk-k">class</span> <span class="tk-t">RepositoryModule</span> {
+    <span class="tk-a">@Binds</span> <span class="tk-a">@Singleton</span>
+    <span class="tk-k">abstract</span> <span class="tk-k">fun</span> bindWeatherRepository(impl: <span class="tk-t">DefaultWeatherRepository</span>): <span class="tk-t">WeatherRepository</span>
+}</code></pre></figure>
+<div class="tip"><b>@Binds vs @Provides</b><p>Use <code>@Binds</code> to map an interface to an implementation that has an <code>@Inject</code> constructor. It's less code and more efficient. Use <code>@Provides</code> when you must call builders or factories.</p></div>
+
+<h2 id="qualifiers">Qualifiers: two of the same type</h2>
+<figure class="code"><figcaption><span class="file">Dispatcher qualifiers</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Qualifier</span> <span class="tk-a">@Retention</span>(<span class="tk-t">AnnotationRetention</span>.<span class="tk-t">BINARY</span>) <span class="tk-k">annotation</span> <span class="tk-k">class</span> <span class="tk-t">IoDispatcher</span>
+<span class="tk-a">@Qualifier</span> <span class="tk-a">@Retention</span>(<span class="tk-t">AnnotationRetention</span>.<span class="tk-t">BINARY</span>) <span class="tk-k">annotation</span> <span class="tk-k">class</span> <span class="tk-t">DefaultDispatcher</span>
+
+<span class="tk-a">@Module</span> <span class="tk-a">@InstallIn</span>(<span class="tk-t">SingletonComponent</span>::<span class="tk-k">class</span>)
+<span class="tk-k">object</span> <span class="tk-t">DispatchersModule</span> {
+    <span class="tk-a">@Provides</span> <span class="tk-a">@IoDispatcher</span> <span class="tk-k">fun</span> io(): <span class="tk-t">CoroutineDispatcher</span> = <span class="tk-t">Dispatchers</span>.<span class="tk-t">IO</span>
+    <span class="tk-a">@Provides</span> <span class="tk-a">@DefaultDispatcher</span> <span class="tk-k">fun</span> default(): <span class="tk-t">CoroutineDispatcher</span> = <span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>
+}
+
+<span class="tk-k">class</span> <span class="tk-t">ImageRepository</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(<span class="tk-a">@IoDispatcher</span> <span class="tk-k">private</span> <span class="tk-k">val</span> io: <span class="tk-t">CoroutineDispatcher</span>)</code></pre></figure>
+
+<h2 id="compose">ViewModels in Compose</h2>
+<figure class="code"><figcaption><span class="file">Screen</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">WeatherRoute</span>(viewModel: <span class="tk-t">WeatherViewModel</span> = hiltViewModel()) { <span class="tk-c">/* ... */</span> }</code></pre></figure>
+<p>For runtime arguments that aren't in <code>SavedStateHandle</code>, Hilt supports <strong>assisted injection</strong> for ViewModels with <code>@AssistedInject</code> and an assisted factory. Check the Hilt docs for the current Compose API.</p>
+
+<h2 id="testing">Testing</h2>
+<figure class="code"><figcaption><span class="file">Replace bindings in instrumented tests</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@UninstallModules</span>(<span class="tk-t">RepositoryModule</span>::<span class="tk-k">class</span>)
+<span class="tk-a">@HiltAndroidTest</span>
+<span class="tk-k">class</span> <span class="tk-t">WeatherScreenTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span>(order = <span class="tk-n">0</span>) <span class="tk-k">val</span> hilt = <span class="tk-t">HiltAndroidRule</span>(<span class="tk-k">this</span>)
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span>(order = <span class="tk-n">1</span>) <span class="tk-k">val</span> compose = createAndroidComposeRule&lt;<span class="tk-t">MainActivity</span>&gt;()
+
+    <span class="tk-a">@BindValue</span> <span class="tk-a">@JvmField</span> <span class="tk-k">val</span> repo: <span class="tk-t">WeatherRepository</span> = <span class="tk-t">FakeWeatherRepository</span>()
+
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> showsForecast() { <span class="tk-c">/* ... */</span> }
+}</code></pre></figure>
+<p>For plain unit tests you often don't need Hilt at all: construct the ViewModel directly with fakes. That's the main benefit of constructor injection.</p>
+
+<h2 id="use-cases">Practical guidance</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Small app</h3><p>Hilt with a few modules: network, database, repositories. Most classes use <code>@Inject constructor</code>.</p></div>
+  <div class="card usecase"><h3>Multi-module app</h3><p>Each module contributes its own Hilt modules, and the <code>:app</code> module assembles the graph.</p></div>
+  <div class="card usecase"><h3>KMP or lighter needs</h3><p>Consider Koin or manual DI. Hilt is Android-only and annotation-based.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Scoping everything <code>@Singleton</code>, which keeps objects alive forever. Scope only what must be shared.</li>
+  <li>Injecting Activity Context into singletons, which leaks. Use <code>@ApplicationContext</code>.</li>
+  <li>Field injection everywhere. Prefer constructor injection, and use field injection only in Android classes Hilt instantiates.</li>
+  <li>Huge modules providing everything. Split them by feature or layer.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Hilt or Koin?</summary><div><p>Hilt does compile-time validation and is Google's recommendation for Android. Koin is a lightweight runtime DSL that works on Kotlin Multiplatform. Both are viable, so choose based on platform and team preference.</p></div></details>
+  <details><summary>Does Hilt slow down builds?</summary><div><p>Annotation processing adds build time. Using KSP instead of kapt helps, and modularisation limits recompilation.</p></div></details>
+  <details><summary>Is manual DI ever better?</summary><div><p>For very small apps or libraries, a simple manual container can be enough. Hilt pays off as the graph grows.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Hilt gives Android apps <strong>compile-time-checked dependency injection</strong> with lifecycle-aware scopes. Use constructor injection, <code>@Binds</code> for interfaces, <code>@Provides</code> for builders, qualifiers for duplicate types, and the shortest sensible scope.</p>
+<p>Next step: decide where business logic lives in <a href="../android-use-cases-domain-layer/index.html">Use Cases and Domain Layers</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/dependency-injection/hilt-android" target="_blank" rel="noopener">Dependency injection with Hilt</a></li><li><a href="https://developer.android.com/training/dependency-injection/hilt-jetpack" target="_blank" rel="noopener">Hilt and Jetpack integrations</a></li><li><a href="https://developer.android.com/training/dependency-injection/hilt-testing" target="_blank" rel="noopener">Hilt testing guide</a></li><li><a href="https://dagger.dev/hilt/" target="_blank" rel="noopener">Dagger Hilt documentation</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhilt-dependency-injection-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhilt-dependency-injection-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li><li><a href="../../android/mvvm-architecture-android/index.html"><small>Android Architecture and Clean Code</small>MVVM Architecture in Android Explained</a></li><li><a href="../../android/multi-module-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Multi-Module Architecture in Android: Pros, Cons, and Lessons</a></li><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/hilt-dependency-injection/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/hilt-dependency-injection/&amp;text=Dependency Injection with Hilt" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/hilt-dependency-injection/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#why">Why DI, and why Hilt</a></li><li><a href="#setup">Setup</a></li><li><a href="#graph">How Hilt builds the graph</a></li><li><a href="#modules">Modules: teaching Hilt to create things</a></li><li><a href="#qualifiers">Qualifiers: two of the same type</a></li><li><a href="#compose">ViewModels in Compose</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Practical guidance</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhilt-dependency-injection-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhilt-dependency-injection-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

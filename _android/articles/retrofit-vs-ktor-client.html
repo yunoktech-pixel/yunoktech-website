@@ -1,0 +1,109 @@
+<!--meta
+{
+  "seo_title": "Retrofit vs Ktor Client for Android: Which to Choose?",
+  "description": "Retrofit vs Ktor Client compared for Android: API style, Kotlin Multiplatform support, engines, serialization, interceptors and plugins, testing, maturity and a decision guide.",
+  "primary_keyword": "retrofit vs ktor",
+  "keywords": ["ktor client android", "ktor vs retrofit kotlin multiplatform", "ktor client okhttp engine", "ktor content negotiation", "retrofit kmp", "android http client comparison"],
+  "lede": "Retrofit is the long-standing default for Android networking. Ktor Client is JetBrains' multiplatform HTTP client. Both work well. The right choice depends mostly on whether your networking code must run beyond Android.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["retrofit-android-guide", "kotlin-multiplatform-vs-native-android", "okhttp-interceptors", "rest-api-kotlin-coroutines"],
+  "refs": [
+    ["Retrofit (official repository)", "https://github.com/square/retrofit"],
+    ["Ktor Client", "https://ktor.io/docs/client-create-new-application.html"],
+    ["Ktor Client engines", "https://ktor.io/docs/client-engines.html"],
+    ["Ktor content negotiation", "https://ktor.io/docs/client-serialization.html"]
+  ]
+}
+-->
+<p class="ad-lead">If your project is Android-only, Retrofit is a safe, well-understood default. If you share networking with iOS through Kotlin Multiplatform, Ktor Client is the natural fit. Everything else in this comparison refines that headline.</p>
+
+<h2 id="side-by-side">The same endpoint in both</h2>
+<code-block lang="kotlin" file="Retrofit">
+interface GithubApi {
+    @GET("users/{user}/repos")
+    suspend fun repos(@Path("user") user: String, @Query("per_page") perPage: Int = 30): List<RepoDto>
+}
+// val api = retrofit.create(GithubApi::class.java); api.repos("android")
+</code-block>
+<code-block lang="kotlin" file="Ktor Client">
+val client = HttpClient(OkHttp) {                          // engine: OkHttp on Android
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+    install(HttpTimeout) { requestTimeoutMillis = 15_000 }
+    defaultRequest { url("https://api.github.com/") }
+    expectSuccess = true                                    // throw on non-2xx
+}
+
+class GithubApi(private val client: HttpClient) {
+    suspend fun repos(user: String, perPage: Int = 30): List<RepoDto> =
+        client.get("users/$user/repos") { parameter("per_page", perPage) }.body()
+}
+</code-block>
+
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Retrofit</th><th>Ktor Client</th></tr></thead>
+  <tbody>
+    <tr><td>Style</td><td>Declarative annotated interfaces</td><td>Imperative DSL (request builders)</td></tr>
+    <tr><td>Platforms</td><td>JVM and Android</td><td>Kotlin Multiplatform: Android, iOS, JVM, JS, native</td></tr>
+    <tr><td>Transport</td><td>OkHttp</td><td>Pluggable engines (OkHttp, CIO, Darwin on iOS…)</td></tr>
+    <tr><td>Serialization</td><td>Converters (kotlinx.serialization, Moshi…)</td><td>ContentNegotiation plugin (kotlinx.serialization)</td></tr>
+    <tr><td>Cross-cutting concerns</td><td>OkHttp interceptors and authenticators</td><td>Plugins (Auth, Logging, HttpTimeout, retry)</td></tr>
+    <tr><td>Testing</td><td>MockWebServer, fakes</td><td>MockEngine, fakes</td></tr>
+    <tr><td>Ecosystem on Android</td><td>Very mature, huge community knowledge</td><td>Mature and growing, strong in KMP</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-rk-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-rk-t fig-rk-d">
+    <title id="fig-rk-t">Choosing between Retrofit and Ktor Client</title>
+    <desc id="fig-rk-d">If networking code must be shared with iOS or other platforms, choose Ktor Client. If Android-only and the team already uses Retrofit, keep Retrofit. If Android-only and starting fresh, either works; choose Retrofit for familiarity or Ktor for future multiplatform plans.</desc>
+    <rect class="d-amber" x="230" y="10" width="260" height="44" rx="12"/><text class="d-t" x="360" y="37" text-anchor="middle">Share networking with iOS?</text>
+    <path class="d-line" d="M300 54 L150 100 M420 54 L570 100"/>
+    <text class="d-s" x="205" y="80">yes</text><text class="d-s" x="505" y="80">no</text>
+    <rect class="d-violet" x="40" y="100" width="220" height="56" rx="12"/><text class="d-t" x="150" y="126" text-anchor="middle">Ktor Client</text><text class="d-s" x="150" y="144" text-anchor="middle">in KMP shared module</text>
+    <rect class="d-green" x="460" y="100" width="220" height="56" rx="12"/><text class="d-t" x="570" y="126" text-anchor="middle">Retrofit (default)</text><text class="d-s" x="570" y="144" text-anchor="middle">or Ktor if KMP is planned</text>
+  </svg>
+  <figcaption id="fig-rk-cap">Platform scope decides most cases. Team familiarity decides the rest.</figcaption>
+</figure>
+
+<h2 id="testing">Testing with Ktor's MockEngine</h2>
+<code-block lang="kotlin" file="GithubApiTest.kt">
+@Test
+fun `parses repos`() = runTest {
+    val engine = MockEngine { request ->
+        assertEquals("/users/android/repos", request.url.encodedPath)
+        respond("""[{"id":1,"name":"nowinandroid"}]""", headers = headersOf(HttpHeaders.ContentType, "application/json"))
+    }
+    val client = HttpClient(engine) { install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) } }
+    val repos = GithubApi(client).repos("android")
+    assertEquals("nowinandroid", repos.single().name)
+}
+</code-block>
+
+<h2 id="use-cases">Real scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Android-only app with existing Retrofit code</h3><p>Keep Retrofit. Migration cost brings no user benefit.</p></div>
+  <div class="card usecase"><h3>New KMP app (Android + iOS)</h3><p>Ktor in <code>commonMain</code> with the OkHttp engine on Android and the Darwin engine on iOS.</p></div>
+  <div class="card usecase"><h3>Gradual KMP adoption</h3><p>Keep Retrofit in the Android app, and write new shared modules with Ktor behind a repository interface.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Creating a new <code>HttpClient</code> per request in Ktor. Create one and share it, then close it when it's no longer needed.</li>
+  <li>Forgetting <code>expectSuccess = true</code> (or manual status checks) in Ktor, which silently parses error bodies.</li>
+  <li>Mixing both clients for the same API, which doubles configuration (auth, timeouts, logging).</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Ktor slower than Retrofit on Android?</summary><div><p>With the OkHttp engine, both use the same transport. Differences are rarely significant compared with network latency.</p></div></details>
+  <details><summary>Can Retrofit be used in Kotlin Multiplatform?</summary><div><p>Retrofit targets the JVM and Android. For shared code that also runs on iOS, use a multiplatform client like Ktor.</p></div></details>
+  <details><summary>Which is easier for beginners?</summary><div><p>Retrofit's annotated interfaces are very approachable, and most Android tutorials use them. Ktor's DSL is also straightforward once you know coroutines.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Retrofit</strong> remains an excellent default for Android-only apps. <strong>Ktor Client</strong> is the better fit when networking must be shared across platforms with Kotlin Multiplatform. Either way, hide the client behind repositories so the choice stays reversible.</p>
+<p>Next step: master the layer underneath Retrofit with <a href="../okhttp-interceptors/index.html">OkHttp Interceptors Explained</a>.</p>

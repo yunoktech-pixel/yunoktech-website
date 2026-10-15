@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Database Tutorial with Kotlin (Android) | Yunok Tech</title>
+  <meta name="description" content="Learn Room with Kotlin step by step: entities, DAOs, Flow queries, suspend writes, relations, type converters, migrations, transactions, testing and performance tips.">
+  <meta name="keywords" content="room database kotlin, room database tutorial, room dao flow, room migrations, room relations kotlin, room typeconverter, room ksp setup">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/room-database-kotlin/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/room-database-kotlin/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Room Database Tutorial with Kotlin (Android)">
+  <meta property="og:description" content="Learn Room with Kotlin step by step: entities, DAOs, Flow queries, suspend writes, relations, type converters, migrations, transactions, testing and performance tips.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Room Database Tutorial with Kotlin (Android)">
+  <meta name="twitter:description" content="Learn Room with Kotlin step by step: entities, DAOs, Flow queries, suspend writes, relations, type converters, migrations, transactions, testing and performance tips.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Room Database Tutorial with Kotlin", "description": "Learn Room with Kotlin step by step: entities, DAOs, Flow queries, suspend writes, relations, type converters, migrations, transactions, testing and performance tips.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "room database tutorial, room dao flow, room migrations, room relations kotlin, room typeconverter, room ksp setup", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/room-database-kotlin/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Room Database Tutorial with Kotlin", "item": "https://yunoktech.com/android/room-database-kotlin/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Room Database Tutorial with Kotlin</h1>
+    <p class="ad-lede">Room is Android's recommended SQLite library: compile-time-checked SQL, Kotlin coroutine and Flow support, and painless migrations. This tutorial builds a notes database from setup to migrations and tests.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architecture">Room&#x27;s three parts</a></li><li><a href="#setup">Setup</a></li><li><a href="#entity">Entities</a></li><li><a href="#dao">DAOs</a></li><li><a href="#database">The database</a></li><li><a href="#relations">Relations</a></li><li><a href="#converters">Type converters</a></li><li><a href="#migrations">Migrations</a></li><li><a href="#testing">Testing a DAO</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Raw SQLite on Android means string queries that fail at runtime, cursor juggling and manual threading. Room keeps the power of SQL but checks your queries at compile time, maps rows to Kotlin classes, and exposes results as Flows that update automatically when data changes.</p>
+
+<h2 id="architecture">Room's three parts</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rm-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-rm-t fig-rm-d">
+    <title id="fig-rm-t">Room components</title>
+    <desc id="fig-rm-d">The RoomDatabase class is the access point and holds DAOs. DAOs declare queries with SQL annotations and return Flow or suspend results. Entities are data classes mapped to tables in SQLite.</desc>
+    <defs><marker id="rmm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M210 80 H246 M450 80 H486" marker-end="url(#rmm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="40" width="190" height="80" rx="12"/><text class="d-t" x="115" y="72" text-anchor="middle">AppDatabase</text><text class="d-s" x="115" y="92" text-anchor="middle">@Database, version</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="250" y="40" width="200" height="80" rx="12"/><text class="d-t" x="350" y="72" text-anchor="middle">NoteDao</text><text class="d-s" x="350" y="92" text-anchor="middle">@Query / @Upsert → Flow</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="490" y="40" width="210" height="80" rx="12"/><text class="d-t" x="595" y="72" text-anchor="middle">NoteEntity</text><text class="d-s" x="595" y="92" text-anchor="middle">@Entity → SQLite table</text></g>
+  </svg>
+  <figcaption id="fig-rm-cap">The database provides DAOs, and DAOs read and write entities. Room generates the implementation at compile time.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">plugins { id(<span class="tk-s">"com.google.devtools.ksp"</span>) }
+dependencies {
+    implementation(<span class="tk-s">"androidx.room:room-runtime:&lt;room-version&gt;"</span>)
+    implementation(<span class="tk-s">"androidx.room:room-ktx:&lt;room-version&gt;"</span>)      <span class="tk-c">// coroutines/Flow support</span>
+    ksp(<span class="tk-s">"androidx.room:room-compiler:&lt;room-version&gt;"</span>)
+    testImplementation(<span class="tk-s">"androidx.room:room-testing:&lt;room-version&gt;"</span>)
+}</code></pre></figure>
+
+<h2 id="entity">Entities</h2>
+<figure class="code"><figcaption><span class="file">NoteEntity.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Entity</span>(
+    tableName = <span class="tk-s">"notes"</span>,
+    indices = [<span class="tk-t">Index</span>(<span class="tk-s">"folderId"</span>), <span class="tk-t">Index</span>(<span class="tk-s">"updatedAt"</span>)],
+)
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">NoteEntity</span>(
+    <span class="tk-a">@PrimaryKey</span> <span class="tk-k">val</span> id: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> title: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> body: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> folderId: <span class="tk-t">String</span>?,
+    <span class="tk-k">val</span> pinned: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> updatedAt: <span class="tk-t">Long</span>,                    <span class="tk-c">// epoch millis: simple, sortable</span>
+)
+
+<span class="tk-a">@Entity</span>(tableName = <span class="tk-s">"folders"</span>)
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">FolderEntity</span>(<span class="tk-a">@PrimaryKey</span> <span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> name: <span class="tk-t">String</span>)</code></pre></figure>
+
+<h2 id="dao">DAOs</h2>
+<figure class="code"><figcaption><span class="file">NoteDao.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Dao</span>
+<span class="tk-k">interface</span> <span class="tk-t">NoteDao</span> {
+    <span class="tk-c">// Observed query: re-emits whenever the notes table changes</span>
+    <span class="tk-a">@Query</span>(<span class="tk-s">"SELECT * FROM notes ORDER BY pinned DESC, updatedAt DESC"</span>)
+    <span class="tk-k">fun</span> observeAll(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">NoteEntity</span>&gt;&gt;
+
+    <span class="tk-a">@Query</span>(<span class="tk-s">"SELECT * FROM notes WHERE title LIKE '%' || :query || '%' OR body LIKE '%' || :query || '%'"</span>)
+    <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">NoteEntity</span>&gt;&gt;
+
+    <span class="tk-a">@Query</span>(<span class="tk-s">"SELECT * FROM notes WHERE id = :id"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> getById(id: <span class="tk-t">String</span>): <span class="tk-t">NoteEntity</span>?
+
+    <span class="tk-a">@Upsert</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> upsert(note: <span class="tk-t">NoteEntity</span>)
+
+    <span class="tk-a">@Query</span>(<span class="tk-s">"DELETE FROM notes WHERE id = :id"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> delete(id: <span class="tk-t">String</span>)
+
+    <span class="tk-a">@Query</span>(<span class="tk-s">"UPDATE notes SET pinned = NOT pinned WHERE id = :id"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> togglePinned(id: <span class="tk-t">String</span>)
+}</code></pre></figure>
+<p>Room checks every SQL query against your schema at compile time, so a typo in a column name is a build error, not a crash. Suspend functions and Flow queries run off the main thread automatically.</p>
+
+<h2 id="database">The database</h2>
+<figure class="code"><figcaption><span class="file">AppDatabase.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Database</span>(entities = [<span class="tk-t">NoteEntity</span>::<span class="tk-k">class</span>, <span class="tk-t">FolderEntity</span>::<span class="tk-k">class</span>], version = <span class="tk-n">2</span>, exportSchema = <span class="tk-k">true</span>)
+<span class="tk-a">@TypeConverters</span>(<span class="tk-t">Converters</span>::<span class="tk-k">class</span>)
+<span class="tk-k">abstract</span> <span class="tk-k">class</span> <span class="tk-t">AppDatabase</span> : <span class="tk-t">RoomDatabase</span>() {
+    <span class="tk-k">abstract</span> <span class="tk-k">fun</span> noteDao(): <span class="tk-t">NoteDao</span>
+    <span class="tk-k">abstract</span> <span class="tk-k">fun</span> folderDao(): <span class="tk-t">FolderDao</span>
+}
+
+<span class="tk-c">// Provide ONE instance for the whole app (e.g. Hilt @Singleton)</span>
+<span class="tk-k">fun</span> buildDatabase(context: <span class="tk-t">Context</span>): <span class="tk-t">AppDatabase</span> =
+    <span class="tk-t">Room</span>.databaseBuilder(context, <span class="tk-t">AppDatabase</span>::<span class="tk-k">class</span>.java, <span class="tk-s">"app.db"</span>)
+        .addMigrations(<span class="tk-t">MIGRATION_1_2</span>)
+        .build()</code></pre></figure>
+
+<h2 id="relations">Relations</h2>
+<figure class="code"><figcaption><span class="file">FolderWithNotes.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">FolderWithNotes</span>(
+    <span class="tk-a">@Embedded</span> <span class="tk-k">val</span> folder: <span class="tk-t">FolderEntity</span>,
+    <span class="tk-a">@Relation</span>(parentColumn = <span class="tk-s">"id"</span>, entityColumn = <span class="tk-s">"folderId"</span>)
+    <span class="tk-k">val</span> notes: <span class="tk-t">List</span>&lt;<span class="tk-t">NoteEntity</span>&gt;,
+)
+
+<span class="tk-a">@Dao</span>
+<span class="tk-k">interface</span> <span class="tk-t">FolderDao</span> {
+    <span class="tk-a">@Transaction</span>                                       <span class="tk-c">// runs the two underlying queries atomically</span>
+    <span class="tk-a">@Query</span>(<span class="tk-s">"SELECT * FROM folders ORDER BY name"</span>)
+    <span class="tk-k">fun</span> observeFoldersWithNotes(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">FolderWithNotes</span>&gt;&gt;
+}</code></pre></figure>
+
+<h2 id="converters">Type converters</h2>
+<figure class="code"><figcaption><span class="file">Converters.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">Converters</span> {
+    <span class="tk-a">@TypeConverter</span> <span class="tk-k">fun</span> fromTags(tags: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;): <span class="tk-t">String</span> = tags.joinToString(<span class="tk-s">","</span>)
+    <span class="tk-a">@TypeConverter</span> <span class="tk-k">fun</span> toTags(<span class="tk-k">value</span>: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; = <span class="tk-k">if</span> (<span class="tk-k">value</span>.isEmpty()) emptyList() <span class="tk-k">else</span> <span class="tk-k">value</span>.split(<span class="tk-s">","</span>)
+}</code></pre></figure>
+<p>For queryable lists, prefer a separate table over a converted string.</p>
+
+<h2 id="migrations">Migrations</h2>
+<figure class="code"><figcaption><span class="file">Migrations.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> <span class="tk-t">MIGRATION_1_2</span> = <span class="tk-k">object</span> : <span class="tk-t">Migration</span>(<span class="tk-n">1</span>, <span class="tk-n">2</span>) {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> migrate(db: <span class="tk-t">SupportSQLiteDatabase</span>) {
+        db.execSQL(<span class="tk-s">"ALTER TABLE notes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0"</span>)
+        db.execSQL(<span class="tk-s">"CREATE INDEX IF NOT EXISTS index_notes_updatedAt ON notes(updatedAt)"</span>)
+    }
+}</code></pre></figure>
+<p>With <code>exportSchema = true</code> and a configured schema directory, Room writes JSON schema files you commit to Git. They enable <strong>auto-migrations</strong> for simple changes and migration testing. Never use <code>fallbackToDestructiveMigration()</code> for user data you can't re-download.</p>
+
+<h2 id="testing">Testing a DAO</h2>
+<figure class="code"><figcaption><span class="file">NoteDaoTest.kt (androidTest)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@RunWith</span>(<span class="tk-t">AndroidJUnit4</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">NoteDaoTest</span> {
+    <span class="tk-k">private</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> db: <span class="tk-t">AppDatabase</span>
+    <span class="tk-k">private</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> dao: <span class="tk-t">NoteDao</span>
+
+    <span class="tk-a">@Before</span> <span class="tk-k">fun</span> setUp() {
+        db = <span class="tk-t">Room</span>.inMemoryDatabaseBuilder(<span class="tk-t">ApplicationProvider</span>.getApplicationContext(), <span class="tk-t">AppDatabase</span>::<span class="tk-k">class</span>.java).build()
+        dao = db.noteDao()
+    }
+    <span class="tk-a">@After</span> <span class="tk-k">fun</span> tearDown() = db.close()
+
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> pinnedNotesComeFirst() = runTest {
+        dao.upsert(<span class="tk-t">NoteEntity</span>(<span class="tk-s">"1"</span>, <span class="tk-s">"Old"</span>, <span class="tk-s">""</span>, <span class="tk-k">null</span>, pinned = <span class="tk-k">false</span>, updatedAt = <span class="tk-n">2</span>))
+        dao.upsert(<span class="tk-t">NoteEntity</span>(<span class="tk-s">"2"</span>, <span class="tk-s">"Pinned"</span>, <span class="tk-s">""</span>, <span class="tk-k">null</span>, pinned = <span class="tk-k">true</span>, updatedAt = <span class="tk-n">1</span>))
+        assertEquals(listOf(<span class="tk-s">"2"</span>, <span class="tk-s">"1"</span>), dao.observeAll().first().map { it.id })
+    }
+}</code></pre></figure>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Offline cache</h3><p>Room as the source of truth for API data. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p></div>
+  <div class="card usecase"><h3>User-created content</h3><p>Notes, tasks and expenses: data that must never be lost, with careful migrations.</p></div>
+  <div class="card usecase"><h3>Paged lists</h3><p>Return <code>PagingSource</code> from DAOs for huge tables. See <a href="../paging-3-pagination/index.html">Paging 3</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Creating multiple database instances. Use a singleton.</li>
+  <li>Missing indices on columns used in WHERE and ORDER BY clauses.</li>
+  <li>Exposing entities to the UI. Map them to domain models.</li>
+  <li><code>allowMainThreadQueries()</code> in production.</li>
+  <li>Destructive migration for important user data.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Room or SQLDelight?</summary><div><p>Room is Google's Android-first solution, and it now supports Kotlin Multiplatform too. SQLDelight generates Kotlin from SQL files and is also multiplatform. Both are solid choices.</p></div></details>
+  <details><summary>How do I do full-text search?</summary><div><p>Room supports SQLite FTS through <code>@Fts4</code> entities, which are much faster than <code>LIKE</code> for large text.</p></div></details>
+  <details><summary>Can I inspect the database while debugging?</summary><div><p>Yes. Android Studio's App Inspection includes a Database Inspector for live queries.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Room gives you <strong>compile-time-checked SQL</strong>, <strong>Flow-based observation</strong>, <strong>suspend writes</strong> and <strong>managed migrations</strong>. Use a single instance, index your queries, export schemas, test DAOs and migrations, and map entities before they reach the UI.</p>
+<p>Next step: decide what belongs in Room and what in DataStore with <a href="../room-vs-datastore/index.html">Room vs DataStore</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/data-storage/room" target="_blank" rel="noopener">Save data in a local database using Room</a></li><li><a href="https://developer.android.com/training/data-storage/room/accessing-data" target="_blank" rel="noopener">Accessing data using Room DAOs</a></li><li><a href="https://developer.android.com/training/data-storage/room/migrating-db-versions" target="_blank" rel="noopener">Migrating Room databases</a></li><li><a href="https://developer.android.com/training/data-storage/room/relationships" target="_blank" rel="noopener">Define relationships between objects</a></li><li><a href="https://developer.android.com/training/data-storage/room/testing-db" target="_blank" rel="noopener">Test and debug your database</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Droom-database-kotlin-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Droom-database-kotlin-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/room-vs-datastore/index.html"><small>APIs, Databases, and Backend Integration</small>Room vs DataStore: Which Should You Use?</a></li><li><a href="../../android/offline-first-android-architecture/index.html"><small>APIs, Databases, and Backend Integration</small>Offline-First Android App Architecture</a></li><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li><li><a href="../../android/paging-3-pagination/index.html"><small>APIs, Databases, and Backend Integration</small>Pagination with Paging 3</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/room-database-kotlin/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/room-database-kotlin/&amp;text=Room Database Tutorial with Kotlin" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/room-database-kotlin/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architecture">Room&#x27;s three parts</a></li><li><a href="#setup">Setup</a></li><li><a href="#entity">Entities</a></li><li><a href="#dao">DAOs</a></li><li><a href="#database">The database</a></li><li><a href="#relations">Relations</a></li><li><a href="#converters">Type converters</a></li><li><a href="#migrations">Migrations</a></li><li><a href="#testing">Testing a DAO</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Droom-database-kotlin-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Droom-database-kotlin-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

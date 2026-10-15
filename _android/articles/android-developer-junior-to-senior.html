@@ -1,0 +1,91 @@
+<!--meta
+{
+  "seo_title": "Android Developer Roadmap: Junior to Senior",
+  "description": "How Android developers grow from junior to mid-level to senior: skills and behaviours at each level, what to learn next, how to get stretch opportunities and avoid common plateaus.",
+  "primary_keyword": "android developer junior to senior",
+  "keywords": ["android career growth", "mid level android developer skills", "senior android developer skills", "android career roadmap", "how to become senior developer", "android tech lead path"],
+  "lede": "Growing from junior to senior isn't about learning more libraries. It's about expanding the scope of problems you can own: from tasks, to features, to systems and teams. Here's what changes at each level and how to grow deliberately.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["become-android-developer-2026", "senior-android-developer-interview", "android-developer-resume-portfolio", "android-engineering-tradeoffs"],
+  "refs": [
+    ["Android Developers documentation", "https://developer.android.com/"],
+    ["Now in Android sample", "https://github.com/android/nowinandroid"],
+    ["Google engineering practices", "https://google.github.io/eng-practices/"]
+  ]
+}
+-->
+<p class="ad-lead">Two developers with the same years of experience can be at very different levels. One has repeated the same year five times; the other has steadily taken on bigger, more ambiguous problems. Growth comes from scope, not time.</p>
+
+<h2 id="levels">The levels at a glance</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lv-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-lv-t fig-lv-d">
+    <title id="fig-lv-t">Scope of ownership from junior to senior</title>
+    <desc id="fig-lv-d">Junior developers own well-defined tasks with guidance. Mid-level developers own features end to end. Senior developers own systems and outcomes across features, influence architecture and grow others. Beyond senior, staff or lead roles shape direction across teams.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="150" width="160" height="50" rx="10"/><text class="d-t" x="100" y="172" text-anchor="middle">Junior</text><text class="d-s" x="100" y="190" text-anchor="middle">tasks, with guidance</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="200" y="110" width="160" height="90" rx="10"/><text class="d-t" x="280" y="140" text-anchor="middle">Mid-level</text><text class="d-s" x="280" y="160" text-anchor="middle">features end to end</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="380" y="60" width="160" height="140" rx="10"/><text class="d-t" x="460" y="90" text-anchor="middle">Senior</text><text class="d-s" x="460" y="110" text-anchor="middle">systems + outcomes</text><text class="d-s" x="460" y="128" text-anchor="middle">grows others</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="560" y="20" width="140" height="180" rx="10"/><text class="d-w" x="630" y="50" text-anchor="middle">Staff / Lead</text><text class="d-w" x="630" y="70" text-anchor="middle">direction across</text><text class="d-w" x="630" y="88" text-anchor="middle">teams</text></g>
+  </svg>
+  <figcaption id="fig-lv-cap">Each step widens the scope you own and reduces the guidance you need.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Area</th><th>Junior</th><th>Mid-level</th><th>Senior</th></tr></thead>
+  <tbody>
+    <tr><td>Scope</td><td>Well-defined tasks</td><td>Features end to end</td><td>Systems, cross-feature outcomes</td></tr>
+    <tr><td>Technical</td><td>Kotlin, Compose basics, follows patterns</td><td>Coroutines, data layer, testing, debugging independently</td><td>Architecture, performance, security, platform internals</td></tr>
+    <tr><td>Quality</td><td>Fixes reported bugs</td><td>Writes tests, handles edge cases</td><td>Sets standards, prevents classes of bugs</td></tr>
+    <tr><td>Collaboration</td><td>Asks good questions</td><td>Works with design, backend and QA</td><td>Aligns stakeholders, mentors, reviews deeply</td></tr>
+    <tr><td>Ambiguity</td><td>Needs clear specs</td><td>Clarifies requirements</td><td>Shapes requirements, proposes options</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="junior-mid">Junior → mid-level: own features</h2>
+<ul>
+  <li><strong>Master fundamentals:</strong> lifecycle, process death, coroutines and Flow, Compose state, Room and Retrofit.</li>
+  <li><strong>Debug independently:</strong> read stack traces, use the debugger and profiler before asking.</li>
+  <li><strong>Test your work:</strong> unit tests for ViewModels, and edge cases (offline, errors, rotation).</li>
+  <li><strong>Deliver end to end:</strong> take a feature from spec to release, including the release notes.</li>
+</ul>
+
+<h2 id="mid-senior">Mid-level → senior: own outcomes and influence</h2>
+<ul>
+  <li><strong>Think in systems:</strong> data flow across features, offline and sync, modular boundaries.</li>
+  <li><strong>Own quality metrics:</strong> crash rate, ANRs, startup time, accessibility.</li>
+  <li><strong>Write things down:</strong> design docs and decision records for non-trivial changes.</li>
+  <li><strong>Multiply others:</strong> thoughtful code reviews, mentoring, improving tooling and CI.</li>
+  <li><strong>Partner with product:</strong> propose simpler alternatives, estimate honestly, flag risks early.</li>
+</ul>
+
+<h2 id="practices">Habits that accelerate growth</h2>
+<ol class="steps">
+  <li>Ask for one stretch responsibility each quarter (a migration, a performance initiative, an on-call improvement).</li>
+  <li>Read the official docs and release notes for the libraries you use.</li>
+  <li>Study good codebases, such as Google's Now in Android sample, and compare them with yours.</li>
+  <li>Teach: write internal docs, give a short talk, or blog. Explaining exposes gaps.</li>
+  <li>Keep a brag document of impact with numbers. It helps reviews, promotions and interviews.</li>
+</ol>
+
+<h2 id="plateaus">Common plateaus</h2>
+<div class="cards">
+  <div class="card cons"><h4>Library collector</h4><p>Knows many tools superficially. Go deep on fundamentals instead.</p></div>
+  <div class="card cons"><h4>Ticket finisher</h4><p>Delivers tasks but never questions the requirements. Start proposing options.</p></div>
+  <div class="card cons"><h4>Lone hero</h4><p>Fixes everything personally. Senior impact comes through others too.</p></div>
+</div>
+
+<h2 id="ai">Growth in the AI era</h2>
+<p>AI tools speed up implementation, which makes judgement, review, debugging and system thinking even more valuable. Use AI to learn faster and offload boilerplate, while deliberately building the understanding needed to evaluate its output. See <a href="../ai-changing-android-developer-work/index.html">How AI Is Changing Android Work</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How long does junior to senior take?</summary><div><p>It varies widely, often several years. It depends on the opportunities you take on and how deliberately you learn, not just time served.</p></div></details>
+  <details><summary>Should I switch companies to grow?</summary><div><p>Sometimes a new environment offers bigger scope faster. First ask for stretch work where you are, since growth inside a known codebase is often efficient.</p></div></details>
+  <details><summary>Do I need to become a manager?</summary><div><p>No. Many companies have senior, staff and principal individual-contributor tracks alongside management.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Seniority is <strong>scope and influence</strong>: from tasks to features to systems, and from your own code to the team's quality and decisions. Grow deliberately with fundamentals, ownership of outcomes, documentation, mentoring and stretch projects.</p>
+<p>Next step: present that growth well with the <a href="../android-developer-resume-portfolio/index.html">Android Developer Resume and Portfolio Guide</a>.</p>

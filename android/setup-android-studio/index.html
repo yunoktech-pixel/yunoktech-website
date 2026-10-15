@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Set Up Android Studio Step by Step (2026) | Yunok Tech</title>
+  <meta name="description" content="Install and configure Android Studio step by step: system requirements, SDK, emulator, device debugging, first project, Gradle sync and fixes for common setup errors.">
+  <meta name="keywords" content="how to set up android studio, install android studio windows, android studio setup guide, android emulator setup, usb debugging android, android sdk manager, gradle sync failed fix">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/setup-android-studio/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/setup-android-studio/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="How to Set Up Android Studio Step by Step (2026)">
+  <meta property="og:description" content="Install and configure Android Studio step by step: system requirements, SDK, emulator, device debugging, first project, Gradle sync and fixes for common setup errors.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Development for Beginners">
+  <meta name="twitter:title" content="How to Set Up Android Studio Step by Step (2026)">
+  <meta name="twitter:description" content="Install and configure Android Studio step by step: system requirements, SDK, emulator, device debugging, first project, Gradle sync and fixes for common setup errors.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to Set Up Android Studio Step by Step", "description": "Install and configure Android Studio step by step: system requirements, SDK, emulator, device debugging, first project, Gradle sync and fixes for common setup errors.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android Development for Beginners", "keywords": "install android studio windows, android studio setup guide, android emulator setup, usb debugging android, android sdk manager, gradle sync failed fix", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/setup-android-studio/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "How to Set Up Android Studio Step by Step", "item": "https://yunoktech.com/android/setup-android-studio/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#beginners">Android Development for Beginners</a></nav>
+    <span class="ad-chip">🌱 Android Development for Beginners</span>
+    <h1 id="article-title">How to Set Up Android Studio Step by Step</h1>
+    <p class="ad-lede">A clean Android Studio setup saves you hours of confusing errors later. Follow these steps to install the IDE, the SDK and an emulator, connect a real phone, run your first project, and fix the setup problems beginners hit most often.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>5 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#requirements">Before you install: system requirements</a></li><li><a href="#install">Step-by-step installation</a></li><li><a href="#first-project">Create and run your first project</a></li><li><a href="#emulator">Set up an emulator</a></li><li><a href="#device">Run on a physical phone</a></li><li><a href="#settings">Recommended settings for beginners</a></li><li><a href="#troubleshooting">Troubleshooting common setup errors</a></li><li><a href="#use-cases">Setups for different situations</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Many beginners lose their first weekend to setup problems: a Gradle sync that never finishes, an emulator that won't start, a phone that Android Studio can't see. None of these mean Android is too hard. They're configuration issues with known fixes.</p>
+<p>This guide walks you through a clean installation on Windows, macOS or Linux, explains what each component is for, and covers the errors you're most likely to meet.</p>
+
+<h2 id="requirements">Before you install: system requirements</h2>
+<p>Google publishes the official minimum requirements on the <a href="https://developer.android.com/studio/install" target="_blank" rel="noopener">install page</a>. In practice:</p>
+<ul>
+  <li><strong>RAM:</strong> 16 GB makes Android Studio plus the emulator comfortable. With 8 GB, prefer a physical phone over the emulator.</li>
+  <li><strong>Disk:</strong> an SSD with plenty of free space. The SDK, system images and Gradle caches grow over time.</li>
+  <li><strong>CPU:</strong> a 64-bit processor with virtualisation support (Intel VT-x or AMD-V, enabled in BIOS/UEFI) for a fast emulator.</li>
+</ul>
+
+<h2 id="install">Step-by-step installation</h2>
+<ol class="steps">
+  <li><strong>Download</strong> the latest stable Android Studio from <a href="https://developer.android.com/studio" target="_blank" rel="noopener">developer.android.com/studio</a>. Avoid third-party download sites.</li>
+  <li><strong>Run the installer.</strong> On Windows, run the .exe and keep the default components. On macOS, drag Android Studio to Applications. On Linux, unpack the archive and run <code>studio.sh</code> from <code>bin/</code>.</li>
+  <li><strong>Complete the Setup Wizard.</strong> Choose <em>Standard</em> setup. It downloads the latest Android SDK, platform tools and an emulator system image.</li>
+  <li><strong>Accept the SDK licences</strong> when prompted, and wait for the downloads to finish completely.</li>
+  <li><strong>Open the SDK Manager</strong> (Settings → Languages &amp; Frameworks → Android SDK) and confirm a recent Android platform and <em>Android SDK Platform-Tools</em> are installed.</li>
+</ol>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-set-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-set-t fig-set-d">
+    <title id="fig-set-t">What the Android Studio installation contains</title>
+    <desc id="fig-set-d">Android Studio contains the IDE and a bundled JDK. The SDK Manager installs SDK platforms, build tools, platform-tools including adb, and emulator system images. Gradle is downloaded per project by the Gradle wrapper.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="16" y="20" width="200" height="130" rx="14"/><text class="d-t" x="116" y="46" text-anchor="middle">Android Studio</text><text class="d-s" x="116" y="74" text-anchor="middle">IDE · editor · debugger</text><text class="d-s" x="116" y="94" text-anchor="middle">Compose previews</text><text class="d-s" x="116" y="114" text-anchor="middle">bundled JDK (JBR)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="260" y="20" width="220" height="130" rx="14"/><text class="d-t" x="370" y="46" text-anchor="middle">Android SDK</text><text class="d-s" x="370" y="74" text-anchor="middle">SDK platforms (API levels)</text><text class="d-s" x="370" y="94" text-anchor="middle">platform-tools (adb)</text><text class="d-s" x="370" y="114" text-anchor="middle">emulator + system images</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="524" y="20" width="180" height="130" rx="14"/><text class="d-t" x="614" y="46" text-anchor="middle">Gradle</text><text class="d-s" x="614" y="74" text-anchor="middle">downloaded per project</text><text class="d-s" x="614" y="94" text-anchor="middle">by the Gradle wrapper</text><text class="d-s" x="614" y="114" text-anchor="middle">+ library caches</text></g>
+  </svg>
+  <figcaption id="fig-set-cap">Three separate pieces work together. Knowing which is which makes error messages much easier to read.</figcaption>
+</figure>
+
+<h2 id="first-project">Create and run your first project</h2>
+<ol class="steps">
+  <li>Choose <strong>New Project → Empty Activity</strong>. Recent templates use Jetpack Compose.</li>
+  <li>Set a <strong>name</strong> and a <strong>package name</strong> such as <code>com.yourname.firstapp</code>. The package name becomes your app's permanent ID on Google Play, so choose carefully for real apps.</li>
+  <li>Keep <strong>Kotlin</strong> and the <strong>Kotlin DSL</strong> (<code>build.gradle.kts</code>). Leave the suggested minimum SDK unless you have a reason to change it.</li>
+  <li>Click <strong>Finish</strong> and wait for the first <strong>Gradle sync</strong>. The first one downloads Gradle and libraries and can take several minutes.</li>
+  <li>Pick a device from the toolbar and press <strong>Run</strong>.</li>
+</ol>
+
+<h2 id="emulator">Set up an emulator</h2>
+<p>Open <strong>Device Manager</strong> → <strong>Create Virtual Device</strong>, pick a phone profile, then select a recent system image (an image with Google Play is useful for testing Play services features). Make sure hardware acceleration is working, because the emulator is very slow without it:</p>
+<ul>
+  <li><strong>Windows:</strong> enable virtualisation in BIOS/UEFI and use the Windows Hypervisor Platform as described in Google's acceleration guide.</li>
+  <li><strong>macOS:</strong> acceleration is built in.</li>
+  <li><strong>Linux:</strong> install and enable KVM.</li>
+</ul>
+
+<h2 id="device">Run on a physical phone</h2>
+<ol class="steps">
+  <li>On the phone, open <strong>Settings → About phone</strong> and tap <strong>Build number</strong> seven times to enable Developer options.</li>
+  <li>In <strong>Developer options</strong>, enable <strong>USB debugging</strong>, or <strong>Wireless debugging</strong> on supported versions.</li>
+  <li>Connect via USB and accept the <em>Allow USB debugging?</em> prompt on the phone.</li>
+  <li>Your phone appears in Android Studio's device list. Windows may need the manufacturer's USB driver.</li>
+</ol>
+<p>You can confirm the connection from a terminal with <code>adb</code>, which lives in the SDK's <code>platform-tools</code> folder:</p>
+<figure class="code"><figcaption><span class="file">Terminal</span><span class="lang">Shell</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-bash">adb devices
+<span class="tk-c"># List of devices attached</span>
+<span class="tk-c"># R58N12ABCDE    device        ← ready</span>
+<span class="tk-c"># R58N12ABCDE    unauthorized  ← accept the prompt on the phone</span></code></pre></figure>
+
+<h2 id="settings">Recommended settings for beginners</h2>
+<ul>
+  <li><strong>Turn on auto-import</strong> (Editor → General → Auto Import) for Kotlin, so imports are added as you type.</li>
+  <li><strong>Learn three shortcuts</strong>: Search Everywhere (double Shift), Find Action, and Reformat Code.</li>
+  <li><strong>Use Logcat filters</strong>, such as <code>package:mine</code>, to see only your app's logs.</li>
+  <li><strong>Keep Android Studio updated</strong> on the stable channel, and update the Android Gradle Plugin with the built-in Upgrade Assistant.</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting common setup errors</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Problem</th><th>Likely cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Gradle sync takes forever or fails</td><td>Slow or blocked network, proxy, antivirus scanning the Gradle cache</td><td>Check network and proxy settings; exclude the project and <code>.gradle</code> folders from real-time antivirus scanning; retry the sync</td></tr>
+    <tr><td>"SDK location not found"</td><td>Missing <code>local.properties</code> or SDK path</td><td>Set the SDK path in the SDK Manager; Android Studio writes <code>local.properties</code></td></tr>
+    <tr><td>Emulator won't start or is very slow</td><td>Virtualisation disabled or hypervisor conflict</td><td>Enable VT-x/AMD-V in BIOS; follow Google's emulator acceleration guide</td></tr>
+    <tr><td>Phone not detected</td><td>USB debugging off, charge-only cable, missing driver</td><td>Enable debugging, use a data cable, install the OEM driver, accept the prompt</td></tr>
+    <tr><td>"Incompatible Gradle JVM"</td><td>Project uses a JDK version the build doesn't support</td><td>Settings → Build Tools → Gradle → Gradle JDK: choose the bundled JDK</td></tr>
+    <tr><td>Disk fills up</td><td>System images and Gradle caches</td><td>Delete unused AVDs and system images; clear old Gradle caches</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">Setups for different situations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Laptop with 8 GB RAM</h3><p>Skip the emulator, debug on your phone over USB or Wi-Fi, and close other heavy apps while building.</p></div>
+  <div class="card usecase"><h3>College lab or shared PC</h3><p>Install the SDK in a path without spaces or special characters, and keep projects in your user directory to avoid permission errors.</p></div>
+  <div class="card usecase"><h3>Office behind a proxy</h3><p>Configure the HTTP proxy in Android Studio <em>and</em> in <code>gradle.properties</code>, because Gradle downloads separately from the IDE.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need to install Java (JDK) separately?</summary><div><p>Usually not. Android Studio bundles a JDK (the JetBrains Runtime), and new projects use it by default. See <a href="../android-sdk-vs-jdk-vs-gradle/index.html">SDK vs JDK vs Gradle</a> for details.</p></div></details>
+  <details><summary>Which Android version should my emulator run?</summary><div><p>Use a recent version for daily development, and create one more AVD near your app's <code>minSdk</code> to catch compatibility issues.</p></div></details>
+  <details><summary>Can I use VS Code instead of Android Studio?</summary><div><p>It's possible to build from the command line with any editor, but Android Studio's debugger, Compose previews, profilers and emulator integration make it the practical choice, especially for beginners.</p></div></details>
+  <details><summary>Should I use the Beta or Canary channel?</summary><div><p>Use Stable for learning and production work. Preview channels are for trying upcoming features and may have bugs.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A working setup has four parts: <strong>Android Studio, the Android SDK, a fast emulator or connected phone, and a successful Gradle sync</strong>. Most setup errors come from virtualisation, networking, drivers or JDK settings, and all of them are fixable with the table above.</p>
+<p>Next step: <a href="../build-first-android-app/index.html">build your first Android app</a>, and read <a href="../android-sdk-vs-jdk-vs-gradle/index.html">SDK vs JDK vs Gradle</a> to understand what's happening under the hood.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio" target="_blank" rel="noopener">Download Android Studio</a></li><li><a href="https://developer.android.com/studio/install" target="_blank" rel="noopener">Install Android Studio</a></li><li><a href="https://developer.android.com/studio/run/managing-avds" target="_blank" rel="noopener">Create and manage virtual devices</a></li><li><a href="https://developer.android.com/studio/run/device" target="_blank" rel="noopener">Run apps on a hardware device</a></li><li><a href="https://developer.android.com/studio/run/emulator-acceleration" target="_blank" rel="noopener">Configure hardware acceleration for the emulator</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsetup-android-studio-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsetup-android-studio-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/build-first-android-app/index.html"><small>Android Development for Beginners</small>How to Build Your First Android App</a></li><li><a href="../../android/android-sdk-vs-jdk-vs-gradle/index.html"><small>Android Development for Beginners</small>Android SDK vs JDK vs Gradle: What&#x27;s the Difference?</a></li><li><a href="../../android/android-emulator-vs-physical-device/index.html"><small>Android Development for Beginners</small>Android Emulator vs Physical Device for Development</a></li><li><a href="../../android/what-is-android-development/index.html"><small>Android Development for Beginners</small>What Is Android Development? A Complete Beginner&#x27;s Guide</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/setup-android-studio/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/setup-android-studio/&amp;text=How to Set Up Android Studio Step by Step" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/setup-android-studio/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#requirements">Before you install: system requirements</a></li><li><a href="#install">Step-by-step installation</a></li><li><a href="#first-project">Create and run your first project</a></li><li><a href="#emulator">Set up an emulator</a></li><li><a href="#device">Run on a physical phone</a></li><li><a href="#settings">Recommended settings for beginners</a></li><li><a href="#troubleshooting">Troubleshooting common setup errors</a></li><li><a href="#use-cases">Setups for different situations</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsetup-android-studio-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsetup-android-studio-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

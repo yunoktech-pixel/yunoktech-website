@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reducing Android App Startup Time (Practical Guide) | Yunok Tech</title>
+  <meta name="description" content="Speed up Android app startup: cold, warm and hot starts, measuring TTID and TTFD, trimming Application.onCreate, App Startup library, lazy DI, Baseline Profiles and splash screens.">
+  <meta name="keywords" content="reduce android app startup time, android cold start optimization, time to initial display, reportFullyDrawn, app startup library, android splash screen api, baseline profile startup">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/reduce-android-app-startup-time/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/reduce-android-app-startup-time/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Reducing Android App Startup Time (Practical Guide)">
+  <meta property="og:description" content="Speed up Android app startup: cold, warm and hot starts, measuring TTID and TTFD, trimming Application.onCreate, App Startup library, lazy DI, Baseline Profiles and splash screens.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Reducing Android App Startup Time (Practical Guide)">
+  <meta name="twitter:description" content="Speed up Android app startup: cold, warm and hot starts, measuring TTID and TTFD, trimming Application.onCreate, App Startup library, lazy DI, Baseline Profiles and splash screens.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Reducing Android App Startup Time", "description": "Speed up Android app startup: cold, warm and hot starts, measuring TTID and TTFD, trimming Application.onCreate, App Startup library, lazy DI, Baseline Profiles and splash screens.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Testing, Debugging, and Performance", "keywords": "android cold start optimization, time to initial display, reportFullyDrawn, app startup library, android splash screen api, baseline profile startup", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/reduce-android-app-startup-time/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Reducing Android App Startup Time", "item": "https://yunoktech.com/android/reduce-android-app-startup-time/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Reducing Android App Startup Time</h1>
+    <p class="ad-lede">Startup is your app's first impression, repeated every time a user opens it. Slow cold starts frustrate users and show up in Android vitals. This guide shows how to measure startup precisely and the changes that usually make the biggest difference.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#types">Cold, warm and hot starts</a></li><li><a href="#metrics">Metrics: TTID and TTFD</a></li><li><a href="#measure">Measuring reliably</a></li><li><a href="#fixes">The highest-impact fixes</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Every SDK added "just one line" to <code>Application.onCreate()</code>. Two years later, cold start takes three seconds on mid-range phones. Startup regressions creep in silently, so you need measurement, a budget, and a few structural fixes.</p>
+
+<h2 id="types">Cold, warm and hot starts</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Type</th><th>What happens</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>Cold</td><td>Process created, Application and Activity created, first frame drawn</td><td>Highest: optimise this</td></tr>
+    <tr><td>Warm</td><td>Process exists, but the Activity is recreated</td><td>Medium</td></tr>
+    <tr><td>Hot</td><td>Activity brought to the foreground</td><td>Lowest</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="metrics">Metrics: TTID and TTFD</h2>
+<ul>
+  <li><strong>Time to Initial Display (TTID):</strong> until the first frame is drawn. Logcat prints it as "Displayed …".</li>
+  <li><strong>Time to Full Display (TTFD):</strong> until the content the user cares about is shown. Report it by calling <code>reportFullyDrawn()</code>, or with Compose's <code>ReportDrawnWhen</code>.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">Report full display in Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">HomeScreen</span>(state: <span class="tk-t">HomeUiState</span>) {
+    <span class="tk-t">ReportDrawnWhen</span> { state <span class="tk-k">is</span> <span class="tk-t">HomeUiState</span>.<span class="tk-t">Content</span> }    <span class="tk-c">// tells the system when real content is visible</span>
+    <span class="tk-c">// ...</span>
+}</code></pre></figure>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-st2-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-st2-t fig-st2-d">
+    <title id="fig-st2-t">Cold start timeline with common delays</title>
+    <desc id="fig-st2-d">Cold start timeline: process start, Application onCreate where SDK initialisation often adds hundreds of milliseconds, Activity onCreate and the first composition, first frame marking time to initial display, then loading content marking time to full display.</desc>
+    <rect class="d-box" x="20" y="60" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="24" y="64" width="90" height="36" rx="6"/><text class="d-s" x="69" y="86" text-anchor="middle">process</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-red" x="118" y="64" width="220" height="36" rx="6"/><text class="d-s" x="228" y="86" text-anchor="middle">Application.onCreate (SDKs!)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="342" y="64" width="150" height="36" rx="6"/><text class="d-s" x="417" y="86" text-anchor="middle">Activity + compose</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="496" y="64" width="80" height="36" rx="6"/><text class="d-s" x="536" y="86" text-anchor="middle">1st frame</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="580" y="64" width="116" height="36" rx="6"/><text class="d-s" x="638" y="86" text-anchor="middle">content</text></g>
+    <path class="d-dash" d="M576 50 V114"/><text class="d-s" x="576" y="40" text-anchor="middle">TTID</text>
+    <path class="d-dash" d="M696 50 V114"/><text class="d-s" x="690" y="40" text-anchor="middle">TTFD</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">The red segment is usually the cheapest to shrink.</text>
+  </svg>
+  <figcaption id="fig-st2-cap">Profile a cold start once with a system trace and you'll usually find the biggest item immediately.</figcaption>
+</figure>
+
+<h2 id="measure">Measuring reliably</h2>
+<ul>
+  <li><strong>Macrobenchmark</strong> with <code>StartupTimingMetric</code> on a release-like build. See <a href="../android-app-performance-optimization/index.html">the performance guide</a> for code.</li>
+  <li><strong>System traces</strong> (Perfetto or the Android Studio Profiler) to see what runs during startup.</li>
+  <li><strong>Android vitals</strong> for real-user startup data.</li>
+</ul>
+
+<h2 id="fixes">The highest-impact fixes</h2>
+<h3 id="application">1. Slim down Application.onCreate()</h3>
+<figure class="code"><figcaption><span class="file">Defer non-critical initialisation</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltAndroidApp</span>
+<span class="tk-k">class</span> <span class="tk-t">App</span> : <span class="tk-t">Application</span>() {
+    <span class="tk-a">@Inject</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> crashReporting: <span class="tk-t">CrashReporting</span>          <span class="tk-c">// keep: needed early</span>
+    <span class="tk-a">@Inject</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> analytics: dagger.<span class="tk-t">Lazy</span>&lt;<span class="tk-t">Analytics</span>&gt;        <span class="tk-c">// defer: created on first use</span>
+    <span class="tk-a">@Inject</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> appScope: <span class="tk-t">CoroutineScope</span>                  <span class="tk-c">// injected application scope</span>
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate() {
+        <span class="tk-k">super</span>.onCreate()
+        crashReporting.<span class="tk-k">init</span>()
+        appScope.launch(<span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>) {
+            delay(<span class="tk-n">1_000</span>)                                          <span class="tk-c">// after the first screen settles</span>
+            analytics.<span class="tk-k">get</span>().<span class="tk-k">init</span>()
+            <span class="tk-t">RemoteConfigWarmup</span>.fetch()
+        }
+    }
+}</code></pre></figure>
+<p>Ask of every initialiser: <em>does the first screen need it?</em> If not, defer it, make it lazy, or initialise it on first use.</p>
+
+<h3 id="content-providers">2. Watch hidden initialisers</h3>
+<p>Some libraries initialise themselves through ContentProviders that run before <code>Application.onCreate()</code>. The <strong>App Startup</strong> library lets you consolidate initialisers into one provider, control dependencies between them, and disable automatic initialisation for libraries you want to start lazily.</p>
+
+<h3 id="baseline">3. Ship a Baseline Profile</h3>
+<p>Baseline Profiles pre-compile the code on your startup path. They're often one of the biggest single wins, especially for Compose apps. See <a href="../baseline-profiles-android/index.html">Baseline Profiles</a>.</p>
+
+<h3 id="first-screen">4. Make the first screen cheap</h3>
+<ul>
+  <li>Render cached data or a lightweight skeleton immediately. Load the rest asynchronously.</li>
+  <li>Avoid synchronous disk reads, such as large SharedPreferences, before the first frame.</li>
+  <li>Keep the first composition small. Defer heavy, below-the-fold UI.</li>
+</ul>
+
+<h3 id="splash">5. Use the SplashScreen API correctly</h3>
+<figure class="code"><figcaption><span class="file">Keep splash only while truly necessary</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">MainActivity</span> : <span class="tk-t">ComponentActivity</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> viewModel: <span class="tk-t">StartupViewModel</span> <span class="tk-k">by</span> viewModels()
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate(savedInstanceState: <span class="tk-t">Bundle</span>?) {
+        <span class="tk-k">val</span> splash = installSplashScreen()
+        <span class="tk-k">super</span>.onCreate(savedInstanceState)
+        <span class="tk-c">// Keep the splash only until the minimum state (e.g. auth check from local storage) is ready</span>
+        splash.setKeepOnScreenCondition { !viewModel.isReady.<span class="tk-k">value</span> }
+        setContent { <span class="tk-t">AppRoot</span>() }
+    }
+}</code></pre></figure>
+<p>Don't keep the splash visible for network calls or artificial delays. That only hides a slow start.</p>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>SDK diet</h3><p>Deferring analytics, ads and remote config initialisation often removes a large share of <code>Application.onCreate</code> time.</p></div>
+  <div class="card usecase"><h3>Baseline Profile</h3><p>A measurable startup improvement with little code change. Verify it with Macrobenchmark.</p></div>
+  <div class="card usecase"><h3>Lazy DI graph</h3><p><code>Lazy&lt;T&gt;</code> and providers stop the whole object graph being created at launch.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Measuring debug builds, or only on flagship phones.</li>
+  <li>Moving work to a background thread that the first screen then waits for anyway.</li>
+  <li>Blocking on network or remote config before showing anything.</li>
+  <li>No regression guard. Add a startup benchmark to CI.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's a good cold start time?</summary><div><p>Faster is better, and Android vitals flags excessive startup times. Set a budget for your app on a mid-range device and track it over releases.</p></div></details>
+  <details><summary>Does Hilt slow startup?</summary><div><p>Hilt itself is fast (code generated at compile time), but eagerly creating many singletons can. Use lazy injection for non-critical dependencies.</p></div></details>
+  <details><summary>Should I use multidex or other old tricks?</summary><div><p>Modern minSdk levels support multidex natively. Focus on initialisation work and Baseline Profiles.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Faster startup comes from <strong>measuring cold starts on release builds</strong>, <strong>deferring everything the first screen doesn't need</strong>, <strong>controlling library initialisers</strong>, <strong>shipping a Baseline Profile</strong>, and keeping the first screen light, then guarding it with a benchmark.</p>
+<p>Next step: go deeper on the biggest single lever in <a href="../baseline-profiles-android/index.html">Baseline Profiles and App Performance</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/performance/vitals/launch-time" target="_blank" rel="noopener">App startup time</a></li><li><a href="https://developer.android.com/topic/libraries/app-startup" target="_blank" rel="noopener">App Startup library</a></li><li><a href="https://developer.android.com/develop/ui/views/launch/splash-screen" target="_blank" rel="noopener">Splash screens</a></li><li><a href="https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview" target="_blank" rel="noopener">Inspect app performance with Macrobenchmark</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-startup-time-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-startup-time-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/baseline-profiles-android/index.html"><small>Testing, Debugging, and Performance</small>Baseline Profiles and App Performance</a></li><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li><li><a href="../../android/how-android-app-works-internally/index.html"><small>Android Development for Beginners</small>How an Android App Works Internally</a></li><li><a href="../../android/android-studio-profiler-guide/index.html"><small>Testing, Debugging, and Performance</small>Android Studio Profiler: A Practical Guide</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/reduce-android-app-startup-time/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/reduce-android-app-startup-time/&amp;text=Reducing Android App Startup Time" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/reduce-android-app-startup-time/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#types">Cold, warm and hot starts</a></li><li><a href="#metrics">Metrics: TTID and TTFD</a></li><li><a href="#measure">Measuring reliably</a></li><li><a href="#fixes">The highest-impact fixes</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-startup-time-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-startup-time-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

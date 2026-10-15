@@ -1,0 +1,286 @@
+<!--meta
+{
+  "seo_title": "Jetpack Compose vs XML: Which Should You Learn?",
+  "description": "Jetpack Compose vs XML layouts compared: mental model, code, state, performance, interop and migration, with clear advice for beginners and existing apps.",
+  "primary_keyword": "jetpack compose vs xml",
+  "keywords": ["compose vs xml views", "should i learn jetpack compose or xml", "jetpack compose advantages", "migrate xml to compose", "ComposeView AndroidView interop", "declarative ui android", "recomposition explained"],
+  "intent": "Comparison / decision",
+  "lede": "Compose and XML Views both build Android UIs, but they think about UI in opposite ways. This guide shows the same screen in both, explains recomposition, covers performance and interop, and tells you which to learn first.",
+  "date": "2026-10-14",
+  "cta": "compose",
+  "related": ["android-developer-roadmap-beginners", "mvi-vs-mvvm-android", "kotlin-vs-java-android", "android-app-performance-optimization"],
+  "refs": [
+    ["Jetpack Compose overview", "https://developer.android.com/compose"],
+    ["Thinking in Compose", "https://developer.android.com/develop/ui/compose/mental-model"],
+    ["Interoperability APIs (Compose in Views, Views in Compose)", "https://developer.android.com/develop/ui/compose/migrate/interoperability-apis"],
+    ["Migration strategy to Compose", "https://developer.android.com/develop/ui/compose/migrate/strategy"],
+    ["Compose performance best practices", "https://developer.android.com/develop/ui/compose/performance/bestpractices"]
+  ]
+}
+-->
+<p class="ad-lead">If you open a five-year-old Android project, you'll find <code>activity_main.xml</code>, <code>findViewById</code> or View Binding, RecyclerView adapters and Fragments. Open a project started recently and you'll likely see <code>@Composable</code> functions and no layout XML at all. Both are "Android UI", but they work very differently.</p>
+<p>This article is for beginners deciding what to learn and for developers on XML-based apps deciding whether and how to adopt Compose. You'll see the same screen built both ways, understand <em>why</em> Compose behaves as it does, and get a realistic view of performance, interop and migration.</p>
+
+<h2 id="quick-verdict">Quick verdict</h2>
+<div class="key"><b>Which should you learn?</b>
+<p><strong>Learn Jetpack Compose first.</strong> Google recommends it for new Android UI, new Material 3 components and adaptive layout APIs are Compose-first, and it requires less code for most screens. <strong>Learn enough XML to maintain existing screens</strong>, because many production apps are partly migrated and will be for years.</p></div>
+
+<h2 id="mental-model">Imperative vs declarative: the core difference</h2>
+<p>With <strong>XML Views</strong> you build a tree of View objects once (by inflating XML), then <em>mutate</em> them over time: <code>textView.text = ...</code>, <code>button.isEnabled = false</code>, <code>progress.visibility = View.GONE</code>. Your code is responsible for keeping every view consistent with the data. This is <em>imperative</em> UI.</p>
+<p>With <strong>Compose</strong> you write functions that <em>describe</em> the UI for the current state. When state changes, Compose calls the affected functions again. This is called <strong>recomposition</strong>. It then updates only what changed. You never call setters on widgets. This is <em>declarative</em> UI: <code>UI = f(state)</code>.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-recomp-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-recomp-title fig-recomp-desc">
+    <title id="fig-recomp-title">Imperative View updates compared with Compose recomposition</title>
+    <desc id="fig-recomp-desc">Top: with Views, an event leads your code to manually update a TextView, a Button and a ProgressBar. Bottom: with Compose, an event changes state, Compose re-runs the composables that read that state, and the screen updates.</desc>
+    <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">XML Views (imperative)</text>
+    <rect class="d-amber" x="20" y="36" width="120" height="50" rx="10"/><text class="d-t" x="80" y="66" text-anchor="middle">Event</text>
+    <path class="d-line" d="M140 61 H180" marker-end="url(#c1)"/>
+    <rect class="d-box" x="184" y="36" width="170" height="50" rx="10"/><text class="d-s" x="269" y="58" text-anchor="middle">your code mutates</text><text class="d-s" x="269" y="74" text-anchor="middle">each view by hand</text>
+    <path class="d-line" d="M354 50 H400 M354 61 H400 M354 72 H400" marker-end="url(#c1)"/>
+    <rect class="d-box" x="404" y="30" width="96" height="22" rx="6"/><text class="d-s" x="452" y="45" text-anchor="middle">textView.text</text>
+    <rect class="d-box" x="404" y="54" width="96" height="22" rx="6"/><text class="d-s" x="452" y="69" text-anchor="middle">button.enabled</text>
+    <rect class="d-box" x="404" y="78" width="96" height="22" rx="6"/><text class="d-s" x="452" y="93" text-anchor="middle">progress.visible</text>
+    <text class="d-s" x="520" y="66">easy to forget one → inconsistent UI</text>
+
+    <text class="d-t" x="20" y="146">Jetpack Compose (declarative)</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="160" width="120" height="50" rx="10"/><text class="d-t" x="80" y="190" text-anchor="middle">Event</text></g>
+    <path class="d-flow" d="M140 185 H180" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="184" y="160" width="140" height="50" rx="10"/><text class="d-t" x="254" y="182" text-anchor="middle">State changes</text><text class="d-s" x="254" y="199" text-anchor="middle">isLoading = true</text></g>
+    <path class="d-flow" d="M324 185 H364" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="368" y="160" width="160" height="50" rx="10"/><text class="d-t" x="448" y="182" text-anchor="middle">Recomposition</text><text class="d-s" x="448" y="199" text-anchor="middle">re-run readers of state</text></g>
+    <path class="d-flow" d="M528 185 H568" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="572" y="160" width="130" height="50" rx="10"/><text class="d-t" x="637" y="182" text-anchor="middle">UI = f(state)</text><text class="d-s" x="637" y="199" text-anchor="middle">always consistent</text></g>
+    <circle class="d-dot" r="6" style="offset-path:path('M140 185 H572');--dur:2.4s"/>
+  </svg>
+  <figcaption id="fig-recomp-cap">With Views, consistency is your job. With Compose, the UI is derived from state, so a forgotten update can't leave a stale widget on screen.</figcaption>
+</figure>
+
+<h2 id="same-screen">The same screen, built both ways</h2>
+<p>Let's build a simple login form: email field, a button that is enabled only when the email looks valid, and a loading spinner while signing in.</p>
+
+<h3 id="xml-version">XML + View Binding version</h3>
+<code-block lang="xml" file="res/layout/activity_login.xml">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/emailInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress" />
+
+    <Button
+        android:id="@+id/signInButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="@string/sign_in" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
+</LinearLayout>
+</code-block>
+<code-block lang="kotlin" file="LoginActivity.kt">
+class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
+    private val viewModel: LoginViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.emailInput.doAfterTextChanged { viewModel.onEmailChange(it.toString()) }
+        binding.signInButton.setOnClickListener { viewModel.signIn() }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    // Every view must be updated manually for every state.
+                    binding.signInButton.isEnabled = state.canSubmit
+                    binding.progress.isVisible = state.isLoading
+                    binding.emailInput.isEnabled = !state.isLoading
+                }
+            }
+        }
+    }
+}
+</code-block>
+
+<h3 id="compose-version">Compose version</h3>
+<code-block lang="kotlin" file="LoginScreen.kt">
+@Composable
+fun LoginScreen(viewModel: LoginViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LoginContent(
+        state = state,
+        onEmailChange = viewModel::onEmailChange,
+        onSignIn = viewModel::signIn,
+    )
+}
+
+// Stateless and previewable: everything it shows comes from parameters.
+@Composable
+fun LoginContent(
+    state: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier.fillMaxSize().padding(16.dp)) {
+        OutlinedTextField(
+            value = state.email,
+            onValueChange = onEmailChange,
+            label = { Text(stringResource(R.string.email)) },
+            enabled = !state.isLoading,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(
+            onClick = onSignIn,
+            enabled = state.canSubmit,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) { Text(stringResource(R.string.sign_in)) }
+
+        if (state.isLoading) {
+            CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginPreview() {
+    LoginContent(LoginUiState(email = "dev@example.com", canSubmit = true), {}, {})
+}
+</code-block>
+<code-block lang="kotlin" file="LoginViewModel.kt (shared by both versions)">
+data class LoginUiState(
+    val email: String = "",
+    val canSubmit: Boolean = false,
+    val isLoading: Boolean = false,
+)
+
+class LoginViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    fun onEmailChange(email: String) = _uiState.update {
+        it.copy(email = email, canSubmit = Patterns.EMAIL_ADDRESS.matcher(email).matches())
+    }
+
+    fun signIn() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            delay(1_500) // stand-in for a real authentication call
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+}
+</code-block>
+<p>The ViewModel is identical. That's a useful insight: <strong>good architecture is UI-toolkit independent</strong>. The difference is in the UI layer. The XML version spreads the UI across two files and requires manual syncing for every property. The Compose version keeps structure and behaviour together, and the <code>if (state.isLoading)</code> line <em>is</em> the visibility logic.</p>
+
+<h2 id="comparison">Compose vs XML comparison table</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Jetpack Compose</th><th>XML Views</th></tr></thead>
+  <tbody>
+    <tr><td>Paradigm</td><td>Declarative, UI = f(state)</td><td>Imperative, mutate view objects</td></tr>
+    <tr><td>Language</td><td>Kotlin only</td><td>XML + Kotlin or Java</td></tr>
+    <tr><td>Lists</td><td><code>LazyColumn</code>, a few lines</td><td>RecyclerView + Adapter + ViewHolder + DiffUtil</td></tr>
+    <tr><td>Custom components</td><td>A function</td><td>Custom View class, attrs.xml, measure/draw overrides</td></tr>
+    <tr><td>Animations</td><td><code>animate*AsState</code>, <code>AnimatedVisibility</code></td><td>Animators, transitions, MotionLayout</td></tr>
+    <tr><td>Previews</td><td>@Preview with any state you pass</td><td>Layout editor, limited for dynamic state</td></tr>
+    <tr><td>Theming</td><td>MaterialTheme in Kotlin, dynamic color</td><td>XML themes and styles</td></tr>
+    <tr><td>Testing</td><td>Semantics-based Compose test APIs</td><td>Espresso</td></tr>
+    <tr><td>Maturity</td><td>Stable since 2021, very active development</td><td>Over 15 years mature, stable, in maintenance</td></tr>
+    <tr><td>Where you'll see it</td><td>New apps and new screens</td><td>Existing apps and older tutorials</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="performance">Performance: what's actually true</h2>
+<p>Both can produce smooth, 60fps-or-better UIs, and both can be made slow. The failure modes are different:</p>
+<ul>
+  <li><strong>XML</strong> problems are usually deep or nested layouts causing expensive measure passes, overdraw, and inefficient RecyclerView adapters.</li>
+  <li><strong>Compose</strong> problems are usually <em>unnecessary recomposition</em>: reading rapidly changing state too high in the tree, unstable parameters that prevent skipping, or heavy work inside composable bodies.</li>
+  <li><strong>Debug builds of Compose apps are noticeably slower</strong> than release builds, because of interpretation, debugging hooks and missing R8 optimisation. Always judge Compose performance on a release build, ideally with Baseline Profiles.</li>
+</ul>
+<code-block lang="kotlin" file="Avoiding unnecessary recomposition">
+// ❌ Reads scroll state on every frame at the top of the screen → whole screen recomposes while scrolling.
+val showButton = listState.firstVisibleItemIndex > 0
+
+// ✅ derivedStateOf only notifies readers when the boolean result actually changes.
+val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
+</code-block>
+
+<h2 id="interop">Interop: you don't have to choose all-or-nothing</h2>
+<p>Compose was designed for gradual adoption. You can put Compose inside a View hierarchy with <code>ComposeView</code>, and put a View inside Compose with <code>AndroidView</code>:</p>
+<code-block lang="kotlin" file="Compose inside an existing Fragment">
+class ProfileFragment : Fragment() {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        ComposeView(requireContext()).apply {
+            // Dispose the composition when the Fragment's view is destroyed.
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { MaterialTheme { ProfileScreen() } }
+        }
+}
+</code-block>
+<code-block lang="kotlin" file="A classic View inside Compose">
+@Composable
+fun LegacyChart(points: List<Float>, modifier: Modifier = Modifier) {
+    AndroidView(
+        factory = { context -> LineChartView(context) },   // created once
+        update = { view -> view.setPoints(points) },         // called when points change
+        modifier = modifier,
+    )
+}
+</code-block>
+
+<h2 id="use-cases">Real-world decisions</h2>
+<div class="cards">
+  <div class="card usecase"><h3>New app, small team</h3><dl><dt>Situation</dt><dd>Greenfield product, Android only.</dd><dt>Choice</dt><dd>100% Compose.</dd><dt>Why</dt><dd>Less code, faster iteration with previews, modern components.</dd><dt>Trade-off</dt><dd>The team must learn state and recomposition properly to avoid performance traps.</dd></dl></div>
+  <div class="card usecase"><h3>Large XML app with a release every two weeks</h3><dl><dt>Situation</dt><dd>Hundreds of XML screens, active feature work.</dd><dt>Choice</dt><dd>New screens in Compose; migrate old screens only when redesigned.</dd><dt>Why</dt><dd>Interop allows incremental adoption with no feature freeze.</dd><dt>Trade-off</dt><dd>Two UI systems and two theming setups for a while; keep design tokens in sync.</dd></dl></div>
+  <div class="card usecase"><h3>Complex custom View already working</h3><dl><dt>Situation</dt><dd>A mature, tested custom chart or map View.</dd><dt>Choice</dt><dd>Keep it; wrap with <code>AndroidView</code> inside Compose screens.</dd><dt>Why</dt><dd>Rewriting working, complex drawing code adds risk without user benefit.</dd><dt>Trade-off</dt><dd>That component won't benefit from Compose tooling until rewritten.</dd></dl></div>
+</div>
+
+<h2 id="migration-steps">A practical migration path from XML to Compose</h2>
+<ol class="steps">
+  <li><strong>Set up Compose and a shared theme.</strong> Add the Compose BOM and create a Compose <code>MaterialTheme</code> that matches your XML theme's colours and typography.</li>
+  <li><strong>Build new screens in Compose</strong> and host them with <code>ComposeView</code> or in a Compose navigation graph.</li>
+  <li><strong>Migrate leaf components</strong> such as list items, cards and dialogs, starting with the simplest ones.</li>
+  <li><strong>Move whole screens</strong> when they're due for a redesign, keeping ViewModels unchanged.</li>
+  <li><strong>Finally migrate navigation</strong> to Navigation Compose once most screens are composables.</li>
+</ol>
+
+<h2 id="mistakes">Common mistakes when moving to Compose</h2>
+<ul>
+  <li><strong>Treating composables like Views</strong>: trying to hold references to them or "update" them. Change state instead.</li>
+  <li><strong>Doing work in the composable body</strong>: network calls, database queries or object allocation on every recomposition. Use the ViewModel, <code>remember</code>, or effects such as <code>LaunchedEffect</code>.</li>
+  <li><strong>Forgetting <code>remember</code></strong>: <code>var count = mutableStateOf(0)</code> without <code>remember</code> resets on every recomposition.</li>
+  <li><strong>Hoisting no state at all, or all of it.</strong> Keep UI-element state (an expanded flag) local, and keep screen/business state in the ViewModel.</li>
+  <li><strong>Judging performance in debug builds.</strong> Measure release builds.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is XML deprecated in Android?</summary><div><p>No. XML Views are still supported and used in many apps. Google's recommendation for <em>new</em> UI development is Compose, and new UI features tend to arrive in Compose first.</p></div></details>
+  <details><summary>Is Jetpack Compose production-ready?</summary><div><p>Yes. Compose has been stable since 2021 and is used in many large production apps. Like any toolkit, it needs correct state handling to perform well.</p></div></details>
+  <details><summary>Do I need to learn XML to get an Android job?</summary><div><p>Often yes, at least to read and maintain it, because many company codebases are mixed. Learn Compose deeply first and XML enough to work on existing screens.</p></div></details>
+  <details><summary>Does Compose increase APK size?</summary><div><p>Compose adds library code. With R8 shrinking in release builds, the impact is usually moderate, and migrating fully can offset it by removing View-based dependencies. Measure your own app with the APK Analyzer.</p></div></details>
+  <details><summary>Can Compose and XML share the same ViewModel?</summary><div><p>Yes. ViewModels don't depend on the UI toolkit, which is why the login example above reuses the same ViewModel for both versions.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>XML Views ask you to keep the UI in sync with data by hand. Compose derives the UI from state and keeps it in sync for you. For new work, that makes <strong>Compose the clear first choice</strong>. Your XML knowledge stays valuable for the many apps still in transition, and the interop APIs mean you never need a risky big-bang rewrite.</p>
+<p>Next step: build the login screen above in Compose, then add an error message to <code>LoginUiState</code> and display it. It's the simplest way to feel the declarative model. Then read <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a> to see how that state should be structured as screens grow.</p>

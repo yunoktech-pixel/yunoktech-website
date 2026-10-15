@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composable Functions Explained (Jetpack Compose) | Yunok Tech</title>
+  <meta name="description" content="How @Composable functions work: rules, parameters, modifiers, slots, previews, idempotence, recomposition, skipping and stability, with clean reusable Compose components.">
+  <meta name="keywords" content="composable functions, @composable annotation, compose modifier parameter, slot api compose, compose preview, compose recomposition skipping, compose stability">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/composable-functions-explained/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/composable-functions-explained/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Composable Functions Explained (Jetpack Compose)">
+  <meta property="og:description" content="How @Composable functions work: rules, parameters, modifiers, slots, previews, idempotence, recomposition, skipping and stability, with clean reusable Compose components.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Composable Functions Explained (Jetpack Compose)">
+  <meta name="twitter:description" content="How @Composable functions work: rules, parameters, modifiers, slots, previews, idempotence, recomposition, skipping and stability, with clean reusable Compose components.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Composable Functions Explained", "description": "How @Composable functions work: rules, parameters, modifiers, slots, previews, idempotence, recomposition, skipping and stability, with clean reusable Compose components.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Jetpack Compose", "keywords": "@composable annotation, compose modifier parameter, slot api compose, compose preview, compose recomposition skipping, compose stability", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/composable-functions-explained/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Composable Functions Explained", "item": "https://yunoktech.com/android/composable-functions-explained/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Composable Functions Explained</h1>
+    <p class="ad-lede">A composable function looks like an ordinary Kotlin function with an annotation, but it follows different rules: it can run many times, in any order, or be skipped entirely. Understanding those rules is the difference between Compose code that works and Compose code that works reliably.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#anatomy">Anatomy of a well-written composable</a></li><li><a href="#rules">The rules composables live by</a></li><li><a href="#slots">Slot APIs: composables that accept composables</a></li><li><a href="#modifiers">Modifiers: order matters</a></li><li><a href="#previews">Previews</a></li><li><a href="#skipping">Skipping and stability, briefly</a></li><li><a href="#use-cases">Designing a small component library</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">The <code>@Composable</code> annotation tells the Compose compiler plugin to transform your function so it can take part in composition: it can remember values, be re-run when state changes, and be skipped when nothing relevant changed. Writing good composables means respecting a few rules that ordinary functions don't have.</p>
+
+<h2 id="anatomy">Anatomy of a well-written composable</h2>
+<figure class="code"><figcaption><span class="file">PriceTag.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">PriceTag</span>(
+    pricePaise: <span class="tk-t">Long</span>,                       <span class="tk-c">// 1. required data first</span>
+    modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>,          <span class="tk-c">// 2. first optional parameter: modifier</span>
+    discounted: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,            <span class="tk-c">// 3. other optional parameters with defaults</span>
+    onClick: (() -&gt; <span class="tk-t">Unit</span>)? = <span class="tk-k">null</span>,          <span class="tk-c">// 4. events as lambdas</span>
+) {
+    <span class="tk-k">val</span> text = remember(pricePaise) { formatRupees(pricePaise) }   <span class="tk-c">// cache derived values</span>
+    <span class="tk-t">Surface</span>(
+        modifier = modifier.then(<span class="tk-k">if</span> (onClick != <span class="tk-k">null</span>) <span class="tk-t">Modifier</span>.clickable(onClick = onClick) <span class="tk-k">else</span> <span class="tk-t">Modifier</span>),
+        color = <span class="tk-k">if</span> (discounted) <span class="tk-t">MaterialTheme</span>.colorScheme.tertiaryContainer <span class="tk-k">else</span> <span class="tk-t">MaterialTheme</span>.colorScheme.surface,
+        shape = <span class="tk-t">RoundedCornerShape</span>(<span class="tk-n">8</span>.dp),
+    ) {
+        <span class="tk-t">Text</span>(text, <span class="tk-t">Modifier</span>.padding(horizontal = <span class="tk-n">8</span>.dp, vertical = <span class="tk-n">4</span>.dp), style = <span class="tk-t">MaterialTheme</span>.typography.labelLarge)
+    }
+}</code></pre></figure>
+<ul>
+  <li><strong>Named in PascalCase</strong> because it emits UI, like a noun: <code>PriceTag</code>, not <code>showPriceTag</code>.</li>
+  <li><strong>Returns <code>Unit</code></strong>. It emits UI rather than returning a View.</li>
+  <li><strong>Accepts a <code>modifier</code></strong> as the first optional parameter and applies it to the root element. This lets callers position and size it.</li>
+  <li><strong>Data in, events out</strong>: state comes in as parameters, and user actions go out as lambdas.</li>
+</ul>
+
+<h2 id="rules">The rules composables live by</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-r-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-r-t fig-r-d">
+    <title id="fig-r-t">Properties of composable functions</title>
+    <desc id="fig-r-d">Composable functions can execute frequently, can run in any order, can be skipped when inputs are unchanged, should be idempotent, and should be free of side effects in their body.</desc>
+    <rect class="d-blue" x="10" y="30" width="130" height="100" rx="12"/><text class="d-t" x="75" y="70" text-anchor="middle">Run often</text><text class="d-s" x="75" y="92" text-anchor="middle">every frame of</text><text class="d-s" x="75" y="108" text-anchor="middle">an animation</text>
+    <rect class="d-violet" x="152" y="30" width="130" height="100" rx="12"/><text class="d-t" x="217" y="70" text-anchor="middle">Any order</text><text class="d-s" x="217" y="92" text-anchor="middle">siblings aren't</text><text class="d-s" x="217" y="108" text-anchor="middle">sequential steps</text>
+    <rect class="d-green" x="294" y="30" width="130" height="100" rx="12"/><text class="d-t" x="359" y="70" text-anchor="middle">Skippable</text><text class="d-s" x="359" y="92" text-anchor="middle">unchanged inputs</text><text class="d-s" x="359" y="108" text-anchor="middle">→ not re-run</text>
+    <rect class="d-amber" x="436" y="30" width="130" height="100" rx="12"/><text class="d-t" x="501" y="70" text-anchor="middle">Idempotent</text><text class="d-s" x="501" y="92" text-anchor="middle">same input →</text><text class="d-s" x="501" y="108" text-anchor="middle">same UI</text>
+    <rect class="d-red" x="578" y="30" width="130" height="100" rx="12"/><text class="d-t" x="643" y="70" text-anchor="middle">No side effects</text><text class="d-s" x="643" y="92" text-anchor="middle">in the body; use</text><text class="d-s" x="643" y="108" text-anchor="middle">effect APIs</text>
+  </svg>
+  <figcaption id="fig-r-cap">Write composables as if they could be called at any time, any number of times, because they can.</figcaption>
+</figure>
+<figure class="code"><figcaption><span class="file">Side effect in the body: don&#x27;t</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ArticleScreen</span>(id: <span class="tk-t">String</span>, viewModel: <span class="tk-t">ArticleViewModel</span>) {
+    <span class="tk-c">// ❌ Runs on every recomposition: duplicate analytics events and requests</span>
+    analytics.log(<span class="tk-s">"article_viewed"</span>, id)
+    viewModel.load(id)
+
+    <span class="tk-c">// ✅ Runs when entering composition, and again only if id changes</span>
+    <span class="tk-t">LaunchedEffect</span>(id) {
+        analytics.log(<span class="tk-s">"article_viewed"</span>, id)
+        viewModel.load(id)
+    }
+}</code></pre></figure>
+<p>More on effect APIs in <a href="../compose-side-effects/index.html">Side Effects in Compose</a>.</p>
+
+<h2 id="slots">Slot APIs: composables that accept composables</h2>
+<p>Instead of a long list of parameters for every variation, accept <code>@Composable</code> lambdas, called <strong>slots</strong>. Material's <code>Scaffold</code>, <code>TopAppBar</code> and <code>ListItem</code> work this way.</p>
+<figure class="code"><figcaption><span class="file">SectionCard.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">SectionCard</span>(
+    title: <span class="tk-t">String</span>,
+    modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>,
+    action: (<span class="tk-a">@Composable</span> () -&gt; <span class="tk-t">Unit</span>)? = <span class="tk-k">null</span>,     <span class="tk-c">// optional slot</span>
+    content: <span class="tk-a">@Composable</span> <span class="tk-t">ColumnScope</span>.() -&gt; <span class="tk-t">Unit</span>,  <span class="tk-c">// trailing content slot with ColumnScope receiver</span>
+) {
+    <span class="tk-t">Card</span>(modifier.fillMaxWidth()) {
+        <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">16</span>.dp)) {
+            <span class="tk-t">Row</span>(verticalAlignment = <span class="tk-t">Alignment</span>.<span class="tk-t">CenterVertically</span>) {
+                <span class="tk-t">Text</span>(title, style = <span class="tk-t">MaterialTheme</span>.typography.titleMedium, modifier = <span class="tk-t">Modifier</span>.weight(<span class="tk-n">1f</span>))
+                action?.invoke()
+            }
+            <span class="tk-t">Spacer</span>(<span class="tk-t">Modifier</span>.height(<span class="tk-n">8</span>.dp))
+            content()
+        }
+    }
+}
+
+<span class="tk-c">// Usage</span>
+<span class="tk-t">SectionCard</span>(title = <span class="tk-s">"Recent orders"</span>, action = { <span class="tk-t">TextButton</span>(onClick = onSeeAll) { <span class="tk-t">Text</span>(<span class="tk-s">"See all"</span>) } }) {
+    orders.take(<span class="tk-n">3</span>).forEach { <span class="tk-t">OrderRow</span>(it) }
+}</code></pre></figure>
+
+<h2 id="modifiers">Modifiers: order matters</h2>
+<figure class="code"><figcaption><span class="file">Modifier order</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">16</span>.dp).background(<span class="tk-t">Color</span>.<span class="tk-t">Yellow</span>))   <span class="tk-c">// padding outside: yellow area excludes padding</span>
+<span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.background(<span class="tk-t">Color</span>.<span class="tk-t">Yellow</span>).padding(<span class="tk-n">16</span>.dp))   <span class="tk-c">// background first: yellow includes padding</span>
+<span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.clickable { }.padding(<span class="tk-n">16</span>.dp))              <span class="tk-c">// whole padded area is clickable</span>
+<span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">16</span>.dp).clickable { })              <span class="tk-c">// only the inner area is clickable</span></code></pre></figure>
+<p>Each modifier wraps the next, so read the chain from outside to inside.</p>
+
+<h2 id="previews">Previews</h2>
+<figure class="code"><figcaption><span class="file">Multiple previews</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Preview</span>(name = <span class="tk-s">"Light"</span>, showBackground = <span class="tk-k">true</span>)
+<span class="tk-a">@Preview</span>(name = <span class="tk-s">"Dark"</span>, uiMode = <span class="tk-t">Configuration</span>.<span class="tk-t">UI_MODE_NIGHT_YES</span>, showBackground = <span class="tk-k">true</span>)
+<span class="tk-a">@Preview</span>(name = <span class="tk-s">"Large font"</span>, fontScale = <span class="tk-n">1.5f</span>, showBackground = <span class="tk-k">true</span>)
+<span class="tk-a">@Composable</span>
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">PriceTagPreview</span>() {
+    <span class="tk-t">AppTheme</span> { <span class="tk-t">PriceTag</span>(pricePaise = <span class="tk-n">129_900</span>, discounted = <span class="tk-k">true</span>) }
+}</code></pre></figure>
+<p>Previews work best with stateless composables that take plain data, which is another reason to hoist state out of reusable components.</p>
+
+<h2 id="skipping">Skipping and stability, briefly</h2>
+<p>Compose can skip a composable during recomposition if all its parameters are <strong>stable</strong> and equal to last time. Primitives, Strings, lambdas (in most cases) and data classes with stable <code>val</code> properties are stable. Classes with <code>var</code>s, or interfaces such as <code>List</code> that could be mutable, may be treated as unstable, although the Compose compiler's strong skipping mode, enabled by default in recent versions, relaxes this considerably. Deep dive: <a href="../compose-performance-optimization/index.html">Compose Performance Optimization</a>.</p>
+
+<h2 id="use-cases">Designing a small component library</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design-system components</h3><p>Wrap Material components (<code>AppButton</code>, <code>AppTextField</code>) to enforce your brand's defaults, and expose a modifier and slots.</p></div>
+  <div class="card usecase"><h3>Screen vs component</h3><p>Screen-level composables connect to ViewModels. Components below them stay stateless and previewable.</p></div>
+  <div class="card usecase"><h3>Lists</h3><p>Row composables take an item and click lambdas, and they never fetch data themselves.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Not exposing a <code>modifier</code> parameter, or applying it to an inner element instead of the root.</li>
+  <li>Reading a ViewModel deep inside small components.</li>
+  <li>Expensive computations in the body without <code>remember</code>.</li>
+  <li>Mutating external variables from composable bodies.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a composable return a value?</summary><div><p>Composables that emit UI return <code>Unit</code>. Composables that compute values, such as <code>remember</code> or <code>stringResource</code>, return them and are named in camelCase.</p></div></details>
+  <details><summary>Can I call a composable from a normal function?</summary><div><p>No. Composables can only be called from other composables, because they need the composition context the compiler plugin adds.</p></div></details>
+  <details><summary>Why does my composable run twice?</summary><div><p>Recomposition can run it many times. That's normal. Make sure the body is cheap and free of side effects.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Composable functions are <strong>idempotent descriptions of UI</strong> that may run often, in any order, or be skipped. Design them with data in and events out, a <code>modifier</code> parameter, slots for flexibility, and no side effects in the body.</p>
+<p>Next step: learn where state should live in <a href="../compose-state-management/index.html">State Management in Jetpack Compose</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/mental-model" target="_blank" rel="noopener">Thinking in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/modifiers" target="_blank" rel="noopener">Compose modifiers</a></li><li><a href="https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md" target="_blank" rel="noopener">API guidelines for Jetpack Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/tooling/previews" target="_blank" rel="noopener">Preview your UI with composable previews</a></li><li><a href="https://developer.android.com/develop/ui/compose/performance/stability" target="_blank" rel="noopener">Stability in Compose</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcomposable-functions-explained-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcomposable-functions-explained-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/what-is-jetpack-compose/index.html"><small>Jetpack Compose</small>What Is Jetpack Compose and Why Should You Learn It?</a></li><li><a href="../../android/compose-state-hoisting/index.html"><small>Jetpack Compose</small>State Hoisting Explained with Examples</a></li><li><a href="../../android/compose-state-management/index.html"><small>Jetpack Compose</small>State Management in Jetpack Compose</a></li><li><a href="../../android/compose-performance-optimization/index.html"><small>Jetpack Compose</small>Compose Performance Optimization</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/composable-functions-explained/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/composable-functions-explained/&amp;text=Composable Functions Explained" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/composable-functions-explained/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#anatomy">Anatomy of a well-written composable</a></li><li><a href="#rules">The rules composables live by</a></li><li><a href="#slots">Slot APIs: composables that accept composables</a></li><li><a href="#modifiers">Modifiers: order matters</a></li><li><a href="#previews">Previews</a></li><li><a href="#skipping">Skipping and stability, briefly</a></li><li><a href="#use-cases">Designing a small component library</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcomposable-functions-explained-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcomposable-functions-explained-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

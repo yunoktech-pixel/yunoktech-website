@@ -1,0 +1,114 @@
+<!--meta
+{
+  "seo_title": "How to Reduce Android App Size (Practical Steps)",
+  "description": "Reduce Android app download and install size: App Bundles, R8 and resource shrinking, APK Analyzer, images and WebP/AVIF, native libraries, dependencies, fonts and on-demand delivery.",
+  "primary_keyword": "reduce android app size",
+  "keywords": ["android apk size reduction", "android app bundle size", "apk analyzer", "webp android", "shrink resources android", "play feature delivery"],
+  "lede": "App size affects install conversion, especially for users on limited storage and data plans. Most size problems come from a few sources: images, native libraries, unused dependencies and shipping everything to everyone. Here's how to find and fix them.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["proguard-r8-explained", "android-app-performance-optimization", "publish-android-app-google-play", "android-store-listing-optimization"],
+  "refs": [
+    ["Reduce your app size", "https://developer.android.com/topic/performance/reduce-apk-size"],
+    ["Analyze your build with APK Analyzer", "https://developer.android.com/studio/debug/apk-analyzer"],
+    ["About Android App Bundles", "https://developer.android.com/guide/app-bundle"],
+    ["Play Console: optimize app size", "https://support.google.com/googleplay/android-developer/answer/9859372"]
+  ]
+}
+-->
+<p class="ad-lead">A large download is a quiet conversion killer. Users with full storage or expensive data skip it, and size matters even more in markets where entry-level phones are common. Fortunately, Android's toolchain does much of the work if you let it.</p>
+
+<h2 id="measure">Measure first</h2>
+<ul>
+  <li><strong>Play Console → App size</strong> shows download and install sizes per device configuration.</li>
+  <li><strong>APK Analyzer</strong> (Build → Analyze APK) breaks a build down by DEX, resources, assets and native libraries, and can compare two builds.</li>
+</ul>
+
+<figure class="diagram" role="group" aria-labelledby="fig-sz-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sz-t fig-sz-d">
+    <title id="fig-sz-t">Where app size typically comes from</title>
+    <desc id="fig-sz-d">A bar split into typical contributors: native libraries, images and assets, DEX code, resources and fonts. Matching fixes: App Bundle splits per ABI, image compression and vectors, R8 shrinking and fewer dependencies, resource shrinking and downloadable fonts.</desc>
+    <rect class="d-red" x="20" y="30" width="200" height="44" rx="6"/><text class="d-s" x="120" y="57" text-anchor="middle">native libs (.so)</text>
+    <rect class="d-amber" x="220" y="30" width="180" height="44" rx="6"/><text class="d-s" x="310" y="57" text-anchor="middle">images / assets</text>
+    <rect class="d-violet" x="400" y="30" width="160" height="44" rx="6"/><text class="d-s" x="480" y="57" text-anchor="middle">DEX code</text>
+    <rect class="d-blue" x="560" y="30" width="140" height="44" rx="6"/><text class="d-s" x="630" y="57" text-anchor="middle">resources, fonts</text>
+    <text class="d-s" x="120" y="104" text-anchor="middle">ABI splits (AAB)</text>
+    <text class="d-s" x="310" y="104" text-anchor="middle">WebP/AVIF, vectors</text>
+    <text class="d-s" x="480" y="104" text-anchor="middle">R8, fewer deps</text>
+    <text class="d-s" x="630" y="104" text-anchor="middle">shrinkResources</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Proportions vary by app. APK Analyzer shows your real breakdown.</text>
+  </svg>
+  <figcaption id="fig-sz-cap">Attack the largest category first. Shaving kilobytes off code rarely matters if a single native library is several megabytes.</figcaption>
+</figure>
+
+<h2 id="aab">1. Publish App Bundles</h2>
+<p>With an Android App Bundle (.aab), Google Play generates optimised APKs per device. Each device downloads only its CPU architecture's native code, its screen density's resources and its language strings. AAB is required for new apps on Google Play. Make sure you aren't defeating it, for example by packaging all languages into a single asset.</p>
+
+<h2 id="r8">2. Enable R8 and resource shrinking</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+android {
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+    }
+    androidResources {
+        // Keep only languages you actually support (prevents libraries adding dozens of translations)
+        localeFilters += listOf("en", "hi", "pa", "ta")
+    }
+}
+</code-block>
+<p>See <a href="../proguard-r8-explained/index.html">ProGuard and R8 Explained</a>. The <code>localeFilters</code> property name varies by AGP version (older versions used <code>resourceConfigurations</code>).</p>
+
+<h2 id="images">3. Images</h2>
+<ul>
+  <li>Use <strong>vector drawables</strong> for icons and simple illustrations.</li>
+  <li>Convert raster images to <strong>WebP</strong> (Android Studio can convert them) or <strong>AVIF</strong> where your minSdk supports it.</li>
+  <li>Don't ship huge images for small displays. Provide appropriately sized assets.</li>
+  <li>Load large or rarely used images from a CDN at runtime instead of bundling them.</li>
+</ul>
+
+<h2 id="native">4. Native libraries</h2>
+<ul>
+  <li>Check whether a dependency pulls in large <code>.so</code> files (ML runtimes, video, crypto) you only use for one feature.</li>
+  <li>With App Bundles, each device only gets its own ABI.</li>
+  <li>Consider dynamic feature modules or on-demand downloads for large optional features.</li>
+</ul>
+
+<h2 id="deps">5. Dependencies</h2>
+<code-block lang="bash" file="Find what's pulled in">
+./gradlew :app:dependencies --configuration releaseRuntimeClasspath
+</code-block>
+<ul>
+  <li>Remove unused libraries. Watch for heavy SDKs used for one small function.</li>
+  <li>Prefer modular artifacts (for example specific Play services modules, not all of them).</li>
+  <li>Use <strong>downloadable fonts</strong> instead of bundling font files where possible.</li>
+</ul>
+
+<h2 id="delivery">6. On-demand delivery</h2>
+<p><strong>Play Feature Delivery</strong> (dynamic feature modules) and <strong>Play Asset Delivery</strong> let you ship large features and assets only to users who need them, at install time, conditionally, or on demand. They add complexity, so use them for genuinely large, optional parts of the app.</p>
+
+<h2 id="guard">Prevent regressions</h2>
+<ul>
+  <li>Track release AAB/APK size in CI and fail or alert on unexpected growth.</li>
+  <li>Compare builds in APK Analyzer when adding a new dependency.</li>
+</ul>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Image-heavy onboarding</h3><p>Converting PNG illustrations to WebP or vectors often saves megabytes.</p></div>
+  <div class="card usecase"><h3>Unused translations</h3><p>Locale filters remove dozens of library translations you don't support.</p></div>
+  <div class="card usecase"><h3>Optional ML feature</h3><p>Moving a large on-device model to on-demand download keeps the base install small.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's the difference between download and install size?</summary><div><p>Download size is the compressed transfer. Install size is what occupies the device after installation, including extracted and compiled code. Play Console reports both.</p></div></details>
+  <details><summary>Does Compose increase app size?</summary><div><p>It adds library code, which R8 shrinks substantially. Migrating fully off Views can offset part of it.</p></div></details>
+  <details><summary>Is there a Play Store size limit?</summary><div><p>Yes. Google Play enforces limits on base module and total sizes, with asset delivery for larger content. Check current limits in Play Console Help.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>To reduce app size: <strong>publish App Bundles</strong>, enable <strong>R8 and resource shrinking</strong>, optimise <strong>images</strong>, scrutinise <strong>native libraries and dependencies</strong>, filter <strong>locales</strong>, and use <strong>on-demand delivery</strong> for large optional features. Then guard size in CI.</p>
+<p>Next step: automate builds and checks with <a href="../android-ci-cd-github-actions/index.html">CI/CD for Android with GitHub Actions</a>.</p>

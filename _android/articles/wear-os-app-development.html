@@ -1,0 +1,114 @@
+<!--meta
+{
+  "seo_title": "Wear OS App Development with Compose for Wear OS",
+  "description": "Build Wear OS apps: Compose for Wear OS, round screens, ScalingLazyColumn and TransformingLazyColumn, tiles and complications, data sync with phone, health data, battery and testing.",
+  "primary_keyword": "wear os app development",
+  "keywords": ["compose for wear os", "wear os tiles", "wear os complications", "wearable data layer api", "standalone wear os app", "wear os health services"],
+  "lede": "A watch app isn't a shrunk phone app. Sessions last seconds, screens are round and tiny, and battery is precious. Wear OS development with Compose for Wear OS makes building for the wrist familiar, as long as you design for glances.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["what-is-jetpack-compose", "android-battery-optimization", "android-app-widgets-shortcuts", "android-automotive-development"],
+  "refs": [
+    ["Wear OS developer docs", "https://developer.android.com/training/wearables"],
+    ["Compose for Wear OS", "https://developer.android.com/training/wearables/compose"],
+    ["Tiles", "https://developer.android.com/training/wearables/tiles"],
+    ["Complications", "https://developer.android.com/training/wearables/complications"],
+    ["Data Layer API", "https://developer.android.com/training/wearables/data/overview"]
+  ]
+}
+-->
+<p class="ad-lead">Users interact with a watch for a few seconds at a time. The best Wear OS experiences surface information through <strong>tiles</strong> and <strong>complications</strong>, and use the full app only for short, focused tasks.</p>
+
+<h2 id="surfaces">Wear OS surfaces</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-wear-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-wear-t fig-wear-d">
+    <title id="fig-wear-t">Wear OS surfaces by interaction time</title>
+    <desc id="fig-wear-d">Complications on the watch face show tiny data at a glance in about a second. Tiles show a swipeable card of key information and actions in a few seconds. The app handles focused tasks lasting longer. Notifications bridge from the phone or watch.</desc>
+    <g class="d-step" style="--i:0"><circle class="d-green" cx="110" cy="100" r="70"/><text class="d-t" x="110" y="96" text-anchor="middle">Complication</text><text class="d-s" x="110" y="116" text-anchor="middle">~1 second</text></g>
+    <g class="d-step" style="--i:1"><circle class="d-blue" cx="290" cy="100" r="70"/><text class="d-t" x="290" y="96" text-anchor="middle">Tile</text><text class="d-s" x="290" y="116" text-anchor="middle">a few seconds</text></g>
+    <g class="d-step" style="--i:2"><circle class="d-violet" cx="470" cy="100" r="70"/><text class="d-t" x="470" y="96" text-anchor="middle">App</text><text class="d-s" x="470" y="116" text-anchor="middle">focused task</text></g>
+    <g class="d-step" style="--i:3"><circle class="d-amber" cx="630" cy="100" r="60"/><text class="d-t" x="630" y="96" text-anchor="middle">Notification</text><text class="d-s" x="630" y="116" text-anchor="middle">timely info</text></g>
+  </svg>
+  <figcaption id="fig-wear-cap">Design from the fastest surface outward.</figcaption>
+</figure>
+
+<h2 id="setup">Project setup</h2>
+<p>Create a Wear OS module in Android Studio (New Module → Wear OS). Use the Wear Compose libraries (Material 3 for Wear OS is recommended for new apps) and declare the watch feature:</p>
+<code-block lang="xml" file="wear/AndroidManifest.xml">
+<uses-feature android:name="android.hardware.type.watch" />
+<application>
+    <!-- true = works without a phone app installed -->
+    <meta-data android:name="com.google.android.wearable.standalone" android:value="true" />
+</application>
+</code-block>
+
+<h2 id="compose">Compose for Wear OS</h2>
+<p>Wear Compose provides watch-specific components: scrolling lists that scale items near the edges, time text, round-friendly buttons and rotary input support.</p>
+<code-block lang="kotlin" file="Wear Compose screen">
+@Composable
+fun WorkoutList(workouts: List<Workout>, onSelect: (Workout) -> Unit) {
+    val listState = rememberTransformingLazyColumnState()
+    AppScaffold {
+        ScreenScaffold(scrollState = listState) { contentPadding ->
+            TransformingLazyColumn(state = listState, contentPadding = contentPadding) {
+                item { ListHeader { Text("Workouts") } }
+                items(workouts) { workout ->
+                    Button(
+                        onClick = { onSelect(workout) },
+                        label = { Text(workout.name) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}
+</code-block>
+<p>Component names differ between Wear Compose Material and Material 3 versions (for example <code>ScalingLazyColumn</code> vs <code>TransformingLazyColumn</code>). Follow the docs for the version you use.</p>
+
+<h2 id="tiles">Tiles and complications</h2>
+<ul>
+  <li><strong>Tiles:</strong> implemented with a <code>TileService</code> and the ProtoLayout library. Show key data and one or two actions. Keep updates efficient.</li>
+  <li><strong>Complications:</strong> provide data to watch faces through a <code>ComplicationDataSourceService</code> (short text, ranged value, icon and so on).</li>
+</ul>
+
+<h2 id="data">Syncing with the phone</h2>
+<p>Use the Wearable <strong>Data Layer API</strong>: <code>DataClient</code> for synced state, <code>MessageClient</code> for one-off messages, and <code>ChannelClient</code> for large transfers. Standalone apps can also use the network directly (Wi-Fi/LTE, or proxied through the phone).</p>
+<code-block lang="kotlin" file="Send a message to the phone">
+suspend fun sendToPhone(context: Context, path: String, payload: ByteArray) {
+    val nodes = Wearable.getNodeClient(context).connectedNodes.await()
+    nodes.forEach { node ->
+        Wearable.getMessageClient(context).sendMessage(node.id, path, payload).await()
+    }
+}
+</code-block>
+
+<h2 id="health">Health and fitness</h2>
+<p>Use <strong>Health Services</strong> on Wear OS for heart rate, exercise tracking and passive data. It manages sensors efficiently. Request the relevant permissions, and run exercises with the exercise client so tracking survives the app going to the background.</p>
+
+<h2 id="battery">Battery and performance</h2>
+<ul>
+  <li>Avoid keeping the screen on. Support ambient mode for ongoing activities.</li>
+  <li>Batch network calls, and prefer syncing via the phone.</li>
+  <li>Use ongoing activities for workouts, so users can return quickly.</li>
+</ul>
+
+<h2 id="testing">Testing</h2>
+<p>Use round and square Wear OS emulators, test rotary input, and test on a real watch for performance and sensor behaviour. Compose previews support Wear device configurations.</p>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Fitness tracking</h3><p>Health Services + ongoing activity + tile showing today's progress.</p></div>
+  <div class="card usecase"><h3>Quick actions</h3><p>Smart home toggles or timers from a tile.</p></div>
+  <div class="card usecase"><h3>Companion data</h3><p>Next calendar event or delivery status as a complication.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I reuse my phone app's Compose UI?</summary><div><p>You can share ViewModels and data layers, but UI should be designed for the watch using Wear Compose components.</p></div></details>
+  <details><summary>Does a Wear OS app need a phone app?</summary><div><p>No. Standalone apps are supported and recommended where possible.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Build for <strong>glances</strong>: complications and tiles first, then a focused app with <strong>Compose for Wear OS</strong>, the <strong>Data Layer</strong> for phone sync, <strong>Health Services</strong> for fitness, and careful battery use.</p>
+<p>Next step: build for the car with <a href="../android-automotive-development/index.html">Android Auto and Android Automotive OS</a>.</p>

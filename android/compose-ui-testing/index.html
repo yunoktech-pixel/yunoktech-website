@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI Testing in Jetpack Compose: A Practical Guide | Yunok Tech</title>
+  <meta name="description" content="Write reliable Jetpack Compose UI tests: semantics tree, finders, actions and assertions, testing lists and navigation, waiting for async work, Robolectric and avoiding flakiness.">
+  <meta name="keywords" content="jetpack compose ui testing, compose test rule, onNodeWithText, compose semantics testing, compose test lazycolumn, robolectric compose test, flaky ui tests android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/compose-ui-testing/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/compose-ui-testing/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="UI Testing in Jetpack Compose: A Practical Guide">
+  <meta property="og:description" content="Write reliable Jetpack Compose UI tests: semantics tree, finders, actions and assertions, testing lists and navigation, waiting for async work, Robolectric and avoiding flakiness.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="UI Testing in Jetpack Compose: A Practical Guide">
+  <meta name="twitter:description" content="Write reliable Jetpack Compose UI tests: semantics tree, finders, actions and assertions, testing lists and navigation, waiting for async work, Robolectric and avoiding flakiness.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "UI Testing in Jetpack Compose", "description": "Write reliable Jetpack Compose UI tests: semantics tree, finders, actions and assertions, testing lists and navigation, waiting for async work, Robolectric and avoiding flakiness.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "compose test rule, onNodeWithText, compose semantics testing, compose test lazycolumn, robolectric compose test, flaky ui tests android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/compose-ui-testing/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "UI Testing in Jetpack Compose", "item": "https://yunoktech.com/android/compose-ui-testing/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">UI Testing in Jetpack Compose</h1>
+    <p class="ad-lede">Compose UI tests interact with your UI the way users and accessibility services do, through the semantics tree. Done well, they're fast, stable and readable. This guide covers the APIs, patterns for lists and navigation, and how to avoid flaky tests.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#semantics">The semantics tree</a></li><li><a href="#basics">Finders, actions, assertions</a></li><li><a href="#example">Testing a stateless screen</a></li><li><a href="#lists">Lists</a></li><li><a href="#async">Waiting for asynchronous work</a></li><li><a href="#activity">Testing with an Activity, DI and navigation</a></li><li><a href="#robolectric">Running on the JVM with Robolectric</a></li><li><a href="#flaky">Avoiding flaky tests</a></li><li><a href="#debug">Debugging failing tests</a></li><li><a href="#use-cases">What to UI test</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A good UI test reads like a user story: type an email, tap Sign in, see the inbox. Compose's testing APIs make that natural. You find nodes by text or description, perform actions, and assert on what's displayed, with automatic synchronisation instead of sleeps.</p>
+
+<h2 id="semantics">The semantics tree</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sem-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sem-t fig-sem-d">
+    <title id="fig-sem-t">Composition and semantics tree used by tests</title>
+    <desc id="fig-sem-d">The UI tree of composables produces a semantics tree with nodes carrying text, content descriptions, roles, states such as enabled or selected, and actions such as click. Both TalkBack and Compose tests read this tree.</desc>
+    <rect class="d-blue" x="20" y="40" width="200" height="110" rx="12"/><text class="d-t" x="120" y="70" text-anchor="middle">Composables</text><text class="d-s" x="120" y="94" text-anchor="middle">Column, Button, Text…</text>
+    <path class="d-line" d="M220 95 H290"/>
+    <rect class="d-violet" x="290" y="40" width="200" height="110" rx="12"/><text class="d-t" x="390" y="70" text-anchor="middle">Semantics tree</text><text class="d-s" x="390" y="94" text-anchor="middle">text · description · role</text><text class="d-s" x="390" y="112" text-anchor="middle">enabled · selected · onClick</text>
+    <path class="d-line" d="M490 80 H560 M490 110 H560"/>
+    <rect class="d-green" x="560" y="40" width="140" height="44" rx="10"/><text class="d-t" x="630" y="67" text-anchor="middle">TalkBack</text>
+    <rect class="d-amber" x="560" y="106" width="140" height="44" rx="10"/><text class="d-t" x="630" y="133" text-anchor="middle">Compose tests</text>
+  </svg>
+  <figcaption id="fig-sem-cap">Accessible UIs are testable UIs. Improving semantics helps both.</figcaption>
+</figure>
+
+<h2 id="basics">Finders, actions, assertions</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td>Finders</td><td><code>onNodeWithText</code>, <code>onNodeWithContentDescription</code>, <code>onNodeWithTag</code>, <code>onAllNodesWithText</code>, <code>onNode(hasClickAction() and hasText("Pay"))</code></td></tr>
+    <tr><td>Actions</td><td><code>performClick</code>, <code>performTextInput</code>, <code>performTextClearance</code>, <code>performScrollToNode</code>, <code>performTouchInput { swipeUp() }</code></td></tr>
+    <tr><td>Assertions</td><td><code>assertIsDisplayed</code>, <code>assertExists</code>, <code>assertIsEnabled</code>, <code>assertIsSelected</code>, <code>assertTextEquals</code>, <code>assertCountEquals</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="example">Testing a stateless screen</h2>
+<figure class="code"><figcaption><span class="file">CartScreenTest.kt (androidTest)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">CartScreenTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> compose = createComposeRule()
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> items = listOf(
+        <span class="tk-t">CartItemUi</span>(id = <span class="tk-s">"1"</span>, name = <span class="tk-s">"Kotlin Mug"</span>, qty = <span class="tk-n">1</span>, priceText = <span class="tk-s">"₹499"</span>),
+        <span class="tk-t">CartItemUi</span>(id = <span class="tk-s">"2"</span>, name = <span class="tk-s">"Compose Tee"</span>, qty = <span class="tk-n">2</span>, priceText = <span class="tk-s">"₹1,598"</span>),
+    )
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> increasingQuantity_emitsEvent_andCheckoutEnabled() {
+        <span class="tk-k">val</span> events = mutableListOf&lt;<span class="tk-t">Pair</span>&lt;<span class="tk-t">String</span>, <span class="tk-t">Int</span>&gt;&gt;()
+        compose.setContent {
+            <span class="tk-t">AppTheme</span> {
+                <span class="tk-t">CartScreen</span>(
+                    state = <span class="tk-t">CartUiState</span>(items = items, totalText = <span class="tk-s">"₹2,097"</span>, canCheckout = <span class="tk-k">true</span>),
+                    onQuantityChange = { id, qty -&gt; events += id to qty },
+                    onCheckout = {},
+                )
+            }
+        }
+
+        compose.onNodeWithText(<span class="tk-s">"Kotlin Mug"</span>).assertIsDisplayed()
+        compose.onAllNodesWithContentDescription(<span class="tk-s">"Increase quantity"</span>)[<span class="tk-n">0</span>].performClick()
+        assertEquals(listOf(<span class="tk-s">"1"</span> to <span class="tk-n">2</span>), events)
+        compose.onNodeWithText(<span class="tk-s">"Checkout"</span>).assertIsEnabled()
+    }
+}</code></pre></figure>
+
+<h2 id="lists">Lists</h2>
+<figure class="code"><figcaption><span class="file">Scrolling a LazyColumn</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">compose.onNodeWithTag(<span class="tk-s">"orders_list"</span>)
+    .performScrollToNode(hasText(<span class="tk-s">"Order #1042"</span>))
+compose.onNodeWithText(<span class="tk-s">"Order #1042"</span>).assertIsDisplayed().performClick()</code></pre></figure>
+<p>Lazy lists only compose visible items, so scroll to a node before asserting on it.</p>
+
+<h2 id="async">Waiting for asynchronous work</h2>
+<p>The test rule automatically waits for recomposition and Compose animations to become idle. For work outside Compose, such as coroutines with real dispatchers, wait explicitly on a condition:</p>
+<figure class="code"><figcaption><span class="file">waitUntil</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">compose.waitUntil(timeoutMillis = <span class="tk-n">5_000</span>) {
+    compose.onAllNodesWithText(<span class="tk-s">"Welcome back"</span>).fetchSemanticsNodes().isNotEmpty()
+}</code></pre></figure>
+<p>Better still, inject fakes and test dispatchers so data is available immediately and deterministically.</p>
+
+<h2 id="activity">Testing with an Activity, DI and navigation</h2>
+<figure class="code"><figcaption><span class="file">End-to-end-ish flow with Hilt fakes</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltAndroidTest</span>
+<span class="tk-k">class</span> <span class="tk-t">SignInFlowTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span>(order = <span class="tk-n">0</span>) <span class="tk-k">val</span> hilt = <span class="tk-t">HiltAndroidRule</span>(<span class="tk-k">this</span>)
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span>(order = <span class="tk-n">1</span>) <span class="tk-k">val</span> compose = createAndroidComposeRule&lt;<span class="tk-t">MainActivity</span>&gt;()
+
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> signInNavigatesToInbox() {
+        compose.onNodeWithText(<span class="tk-s">"Email"</span>).performTextInput(<span class="tk-s">"dev@example.com"</span>)
+        compose.onNodeWithText(<span class="tk-s">"Password"</span>).performTextInput(<span class="tk-s">"Secret123"</span>)
+        compose.onNodeWithText(<span class="tk-s">"Sign in"</span>).performClick()
+        compose.onNodeWithText(<span class="tk-s">"Inbox"</span>).assertIsDisplayed()
+    }
+}</code></pre></figure>
+<p>Replace network-backed repositories with fakes via Hilt test modules so this stays fast and reliable.</p>
+
+<h2 id="robolectric">Running on the JVM with Robolectric</h2>
+<p>Compose UI tests can also run as local tests with Robolectric (<code>@RunWith(RobolectricTestRunner::class)</code>), which is much faster than an emulator. It's good for screen-level tests in CI, while a smaller set of instrumented tests runs on real devices.</p>
+
+<h2 id="flaky">Avoiding flaky tests</h2>
+<ul>
+  <li>Never use <code>Thread.sleep</code>. Rely on synchronisation or <code>waitUntil</code>.</li>
+  <li>Use fakes for network and time. Don't depend on live servers.</li>
+  <li>Disable system animations on CI devices for instrumented tests.</li>
+  <li>Prefer user-visible text and descriptions. Use test tags only when necessary.</li>
+  <li>Keep each test focused on one behaviour.</li>
+</ul>
+
+<h2 id="debug">Debugging failing tests</h2>
+<figure class="code"><figcaption><span class="file">Print the semantics tree</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">compose.onRoot().printToLog(<span class="tk-s">"UI_TREE"</span>)                       <span class="tk-c">// merged tree</span>
+compose.onRoot(useUnmergedTree = <span class="tk-k">true</span>).printToLog(<span class="tk-s">"UI_TREE"</span>) <span class="tk-c">// see individual child nodes</span></code></pre></figure>
+
+<h2 id="use-cases">What to UI test</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Critical flows</h3><p>Sign-in, checkout and onboarding: a few end-to-end-style tests.</p></div>
+  <div class="card usecase"><h3>Stateful components</h3><p>Forms with validation, expandable items, tabs.</p></div>
+  <div class="card usecase"><h3>Accessibility</h3><p>Assert content descriptions exist and important actions are reachable.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Espresso or Compose testing APIs?</summary><div><p>Use Compose testing APIs for Compose UI. For hybrid screens, both can interoperate in the same test.</p></div></details>
+  <details><summary>Why can't my test find a node inside a button?</summary><div><p>Semantics are merged for some components. Use <code>useUnmergedTree = true</code>, or find the merged parent.</p></div></details>
+  <details><summary>How many UI tests should I write?</summary><div><p>Far fewer than unit tests: critical flows and complex components. Most logic should be covered by fast unit tests.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Compose UI tests interact through the <strong>semantics tree</strong>, synchronise automatically, and stay stable when screens are <strong>stateless and fed by fakes</strong>. Test critical flows and complex components, run many on the JVM with Robolectric, and avoid sleeps.</p>
+<p>Next step: choose a mocking library in <a href="../mockk-vs-mockito/index.html">MockK vs Mockito for Kotlin Testing</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/testing" target="_blank" rel="noopener">Test your Compose layout</a></li><li><a href="https://developer.android.com/develop/ui/compose/testing/testing-cheatsheet" target="_blank" rel="noopener">Compose testing cheatsheet</a></li><li><a href="https://developer.android.com/develop/ui/compose/accessibility/semantics" target="_blank" rel="noopener">Semantics in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/testing/synchronization" target="_blank" rel="noopener">Synchronize your tests</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-testing-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-testing-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-ui-screenshot-testing/index.html"><small>Jetpack Compose</small>Compose UI Testing and Screenshot Testing</a></li><li><a href="../../android/compose-state-hoisting/index.html"><small>Jetpack Compose</small>State Hoisting Explained with Examples</a></li><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/android-ci-cd-github-actions/index.html"><small>Testing, Debugging, and Performance</small>CI/CD for Android with GitHub Actions</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/compose-ui-testing/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/compose-ui-testing/&amp;text=UI Testing in Jetpack Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/compose-ui-testing/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#semantics">The semantics tree</a></li><li><a href="#basics">Finders, actions, assertions</a></li><li><a href="#example">Testing a stateless screen</a></li><li><a href="#lists">Lists</a></li><li><a href="#async">Waiting for asynchronous work</a></li><li><a href="#activity">Testing with an Activity, DI and navigation</a></li><li><a href="#robolectric">Running on the JVM with Robolectric</a></li><li><a href="#flaky">Avoiding flaky tests</a></li><li><a href="#debug">Debugging failing tests</a></li><li><a href="#use-cases">What to UI test</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-testing-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-ui-testing-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

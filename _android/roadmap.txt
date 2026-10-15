@@ -1,0 +1,247 @@
+# Yunoktech Android & AI blog roadmap.
+# "## id | Category name | icon | description" starts a category.
+# Topic lines: LEVEL | Title | slug      (B = beginner, I = intermediate, A = advanced)
+# "@@ Cluster name" starts an Android AI learning-path cluster; its lines are "Title | slug".
+# A topic is shown as published when _android/articles/<slug>.html exists.
+
+## beginners | Android Development for Beginners | 🌱 | Start here: what Android development is, the tools you need and how an app actually runs.
+B | What Is Android Development? A Complete Beginner's Guide | what-is-android-development
+B | How to Become an Android Developer in 2026 | become-android-developer-2026
+B | Android Development Roadmap for Beginners in 2026 | android-developer-roadmap-beginners
+B | How to Set Up Android Studio Step by Step | setup-android-studio
+B | Android SDK vs JDK vs Gradle: What's the Difference? | android-sdk-vs-jdk-vs-gradle
+B | How an Android App Works Internally | how-android-app-works-internally
+B | Android App Components: Activities, Services, and Receivers | android-app-components
+B | Android Emulator vs Physical Device for Development | android-emulator-vs-physical-device
+B | How to Build Your First Android App | build-first-android-app
+B | Common Mistakes Beginners Make in Android Development | android-beginner-mistakes
+
+## kotlin | Kotlin Programming | 🟣 | The language of modern Android: null safety, coroutines, Flow and idiomatic Kotlin.
+B | Kotlin vs Java for Android Development | kotlin-vs-java-android
+B | Kotlin Basics Every Android Developer Should Know | kotlin-basics-android
+B | Kotlin Null Safety Explained with Examples | kotlin-null-safety
+I | Data Classes, Sealed Classes, and Enum Classes | kotlin-data-sealed-enum-classes
+I | Kotlin Collections and Functional Programming | kotlin-collections-functional
+I | Kotlin Coroutines and Flow Explained for Android Developers | kotlin-coroutines-flow-android
+I | Flow vs StateFlow vs SharedFlow | flow-vs-stateflow-vs-sharedflow
+I | Suspend Functions Explained with Real Examples | kotlin-suspend-functions
+I | Extension Functions and Higher-Order Functions | kotlin-extension-higher-order-functions
+A | Kotlin Generics and Reified Types | kotlin-generics-reified
+A | Kotlin Delegation and Property Delegates | kotlin-delegation
+I | Kotlin Multiplatform vs Native Android Development | kotlin-multiplatform-vs-native-android
+
+## compose | Jetpack Compose | 🎨 | Declarative UI on Android: state, recomposition, navigation, animation and performance.
+B | What Is Jetpack Compose and Why Should You Learn It? | what-is-jetpack-compose
+B | Jetpack Compose vs XML: Which Should You Learn? | jetpack-compose-vs-xml
+B | Composable Functions Explained | composable-functions-explained
+I | State Management in Jetpack Compose | compose-state-management
+I | remember vs rememberSaveable | remember-vs-remembersaveable
+I | Side Effects in Compose: LaunchedEffect, SideEffect, and DisposableEffect | compose-side-effects
+I | State Hoisting Explained with Examples | compose-state-hoisting
+I | Navigation in Jetpack Compose | compose-navigation
+B | LazyColumn vs Column: When to Use Each | lazycolumn-vs-column
+B | Jetpack Compose Animations for Beginners | compose-animations-beginners
+I | Material 3 Theming and Dynamic Colors | material3-theming-dynamic-color
+A | Compose Performance Optimization | compose-performance-optimization
+A | Custom Layouts and Drawing in Compose | compose-custom-layouts-drawing
+I | Compose UI Testing and Screenshot Testing | compose-ui-screenshot-testing
+I | Adaptive UI for Tablets and Foldable Devices | compose-adaptive-ui-tablets-foldables
+
+## architecture | Android Architecture and Clean Code | 🏛️ | How to structure apps that stay maintainable: MVVM, MVI, layers, DI and modularization.
+I | MVVM Architecture in Android Explained | mvvm-architecture-android
+I | MVVM vs MVI: Which Android Architecture Should You Use? | mvi-vs-mvvm-android
+A | Clean Architecture in Android: Practical Lessons | clean-architecture-android
+A | Multi-Module Architecture in Android: Pros, Cons, and Lessons | multi-module-architecture-android
+I | Repository Pattern in Android | repository-pattern-android
+I | Dependency Injection with Hilt | hilt-dependency-injection
+I | Use Cases and Domain Layers: Are They Necessary? | android-use-cases-domain-layer
+I | Managing UI State with ViewModel and StateFlow | viewmodel-stateflow-ui-state
+I | Unidirectional Data Flow in Android | unidirectional-data-flow-android
+A | Modularization Strategies for Large Android Apps | android-modularization-strategies
+I | SOLID Principles in Android Development | solid-principles-android
+I | Design Patterns Every Android Developer Should Know | android-design-patterns
+A | How to Refactor Legacy Android Applications | refactor-legacy-android-apps
+A | Scaling an Android Codebase Across Multiple Teams | scaling-android-codebase-teams
+
+## data | APIs, Databases, and Backend Integration | 🔌 | Networking, persistence and sync: Retrofit, Room, DataStore, Paging, Firebase and offline-first.
+B | Retrofit in Android: Complete Guide | retrofit-android-guide
+I | REST API Integration with Kotlin and Coroutines | rest-api-kotlin-coroutines
+I | Retrofit vs Ktor Client for Android | retrofit-vs-ktor-client
+I | OkHttp Interceptors Explained | okhttp-interceptors
+I | Handling API Errors and Network Failures | android-api-error-handling
+B | Room Database Tutorial with Kotlin | room-database-kotlin
+I | Room vs DataStore: Which Should You Use? | room-vs-datastore
+A | Offline-First Android App Architecture | offline-first-android-architecture
+I | Pagination with Paging 3 | paging-3-pagination
+B | Firebase Authentication in Android | firebase-authentication-android
+I | Firebase Cloud Messaging and Push Notifications | firebase-cloud-messaging-push-notifications
+I | WebSockets vs REST APIs in Android | websockets-vs-rest-android
+A | Caching Strategies for Android Apps | android-caching-strategies
+A | Secure Token Storage and API Authentication | secure-token-storage-android
+
+## testing | Testing, Debugging, and Performance | 🧪 | Ship with confidence: tests, profiling, startup time, memory, app size and CI/CD.
+B | Unit Testing in Android with JUnit | android-unit-testing-junit
+I | Testing ViewModels with Coroutines and Flow | testing-viewmodels-coroutines-flow
+I | UI Testing in Jetpack Compose | compose-ui-testing
+I | MockK vs Mockito for Kotlin Testing | mockk-vs-mockito
+I | Android Memory Leaks: Causes and Solutions | android-memory-leaks
+I | ANR Errors Explained and How to Fix Them | android-anr-errors
+A | Reducing Android App Startup Time | reduce-android-app-startup-time
+I | Battery Optimization for Android Apps | android-battery-optimization
+I | Android Studio Profiler: A Practical Guide | android-studio-profiler-guide
+B | Debugging Crashes with Logcat | debugging-crashes-logcat
+A | Baseline Profiles and App Performance | baseline-profiles-android
+I | ProGuard and R8 Explained | proguard-r8-explained
+I | How to Reduce Android App Size | reduce-android-app-size
+I | CI/CD for Android with GitHub Actions | android-ci-cd-github-actions
+I | Android App Performance Optimization Guide | android-app-performance-optimization
+
+## ai | Android AI and Generative AI | 🤖 | Add AI to Android apps the right way: model choice, Gemini, on-device AI, chat, RAG and production concerns.
+B | What Is AI in Android Development? A Complete Developer's Guide | ai-in-android-development
+I | How to Choose the Right AI Model for an Android App | choose-ai-model-android-app
+I | Cloud AI vs On-Device AI for Android | cloud-ai-vs-on-device-ai-android
+I | Gemini API Integration in Android Using Kotlin | gemini-api-android-kotlin
+I | Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works | gemini-nano-ml-kit-genai-android
+I | ML Kit GenAI APIs Explained | ml-kit-genai-apis
+I | Build an AI Chatbot Using Kotlin and Jetpack Compose | ai-chatbot-jetpack-compose
+I | How to Build an AI Writing Assistant for Android | ai-writing-assistant-android
+I | Add AI-Powered Text Summarization to an Android App | ai-text-summarization-android
+I | Image Understanding and Description in Android Apps | ai-image-description-android
+I | Speech-to-Text and AI Voice Features on Android | speech-to-text-ai-voice-android
+I | Using AI to Generate App Content Dynamically | ai-generated-app-content-android
+I | Build an AI-Powered Search Feature for Android | ai-powered-search-android
+A | Integrating Cloud AI APIs Securely in Android | secure-cloud-ai-api-android
+I | AI Model Selection: Gemini, OpenAI, and Open-Source Models | gemini-vs-openai-vs-open-source-models
+A | AI Tokens, Latency, and Cost Optimization for Mobile Apps | ai-tokens-latency-cost-mobile
+I | Prompt Engineering for Android Developers | prompt-engineering-android-developers
+A | RAG for Android Apps: Connecting AI to Your Own Data | rag-android-apps
+A | Function Calling and Tool Use in AI-Powered Apps | function-calling-ai-android
+A | Evaluating AI Responses and Reducing Hallucinations | evaluate-ai-responses-hallucinations
+
+## ai-production | Android AI Projects and Production | 🧠 | Model fundamentals, on-device runtimes, complete AI app projects and the production concerns of shipping AI features.
+B | LLMs vs Traditional Machine Learning | llms-vs-traditional-machine-learning
+I | Gemini Nano vs Cloud-Based Gemini Models | gemini-nano-vs-cloud-gemini
+A | LiteRT and LiteRT-LM on Android | litert-litert-lm-android
+I | On-Device Image and Text Processing on Android | on-device-image-text-processing
+I | Offline AI Features and Device Compatibility | offline-ai-device-compatibility
+I | OpenAI API Integration Patterns for Android | openai-api-android-patterns
+I | Streaming AI Responses in Jetpack Compose | streaming-ai-responses-compose
+I | Build an AI Document Summarizer for Android | ai-document-summarizer-android
+I | Build an AI Photo Caption Generator for Android | ai-photo-caption-generator-android
+I | Build an AI Voice-Notes App for Android | ai-voice-notes-app-android
+I | Build an AI Study Assistant for Android | ai-study-assistant-android
+A | AI Privacy and Data Retention in Android Apps | ai-privacy-data-retention
+A | Prompt Injection and Untrusted Input in Android AI Apps | prompt-injection-android-ai
+I | Fallbacks When AI Is Unavailable | ai-fallbacks-android
+I | Responsible AI User Experience on Android | responsible-ai-ux-android
+A | Monitoring AI Latency, Errors, and Inference Costs | monitor-ai-latency-errors-costs
+
+## ai-tools | AI Tools for Android Developers | 🛠️ | Use AI coding tools productively and safely: Gemini in Android Studio, prompting, testing and review.
+B | How to Use Gemini in Android Studio | gemini-in-android-studio
+B | AI Coding Assistants for Android Developers: A Practical Comparison | ai-coding-assistants-android
+I | How to Generate Jetpack Compose UI with AI | generate-compose-ui-with-ai
+I | Using AI to Write Kotlin Code Responsibly | ai-write-kotlin-responsibly
+I | AI-Assisted Unit Test Generation for Android | ai-unit-test-generation-android
+B | Debugging Android Errors with AI Coding Assistants | debug-android-errors-with-ai
+B | How to Write Better Prompts for AI Coding Tools | better-prompts-ai-coding-tools
+I | AI Code Review: Benefits, Risks, and Limitations | ai-code-review-android
+B | Can AI Build a Complete Android App? | can-ai-build-android-app
+I | Google AI Studio for Android App Prototyping | google-ai-studio-android-prototyping
+I | Using AI to Understand Legacy Java Code | ai-understand-legacy-java-code
+I | AI-Assisted Migration from XML to Jetpack Compose | ai-migrate-xml-to-compose
+A | AI Agents in Android Development: What Developers Should Know | ai-agents-android-development
+I | How to Verify AI-Generated Android Code Before Shipping | verify-ai-generated-android-code
+
+## security | Android Security and Privacy | 🔐 | Protect users and their data: Keystore, secrets, encryption, permissions, biometrics and integrity.
+I | Android App Security Best Practices | android-app-security-best-practices
+I | Android Keystore Explained | android-keystore-explained
+I | Secure API Keys and Secrets in Android Apps | secure-api-keys-android
+A | Certificate Pinning: Benefits and Limitations | certificate-pinning-android
+I | Encrypted Data Storage in Android | encrypted-data-storage-android
+B | Android Permissions and Privacy Best Practices | android-permissions-privacy
+I | Biometric Authentication with Android | biometric-authentication-android
+A | Protecting User Data in AI-Powered Android Apps | protect-user-data-ai-android-apps
+I | Play Integrity API Explained | play-integrity-api-explained
+I | Common Android Security Vulnerabilities | common-android-security-vulnerabilities
+
+## publishing | App Publishing, Monetization, and Product Development | 🚀 | From release build to Play Store growth: signing, Play Console, monetization, analytics and planning.
+B | How to Publish an Android App on Google Play | publish-android-app-google-play
+I | Android App Signing and Upload Keys Explained | android-app-signing-upload-keys
+I | How to Prepare an Android App for Production | prepare-android-app-production
+B | Google Play Console: A Developer's Guide | google-play-console-guide
+B | Android App Monetization: Ads vs In-App Purchases | android-monetization-ads-vs-iap
+I | Subscription Billing in Android Apps | android-subscription-billing
+B | How to Improve Android App Ratings and Reviews | improve-android-app-ratings
+B | App Store Listing Optimization for Android | android-store-listing-optimization
+I | Analytics and Crash Reporting for Android Apps | android-analytics-crash-reporting
+B | Building and Launching an Android App as a Solo Developer | solo-android-developer-launch
+I | Lessons Learned from Maintaining Real Android Apps | maintaining-android-apps-lessons
+I | How to Plan and Estimate Android App Development | plan-estimate-android-app-development
+
+## career | Android Interview Preparation and Career | 🎯 | Interviews, roadmaps and portfolios for junior to senior Android developers.
+I | Top 50 Android Interview Questions and Answers | android-interview-questions
+A | Kotlin Interview Questions for Experienced Developers | kotlin-interview-questions-experienced
+I | Jetpack Compose Interview Questions | jetpack-compose-interview-questions
+A | Android Architecture Interview Questions | android-architecture-interview-questions
+A | Coroutines and Flow Interview Questions | coroutines-flow-interview-questions
+A | Android System Design Interview Questions | android-system-design-interview
+A | How to Prepare for a Senior Android Developer Interview | senior-android-developer-interview
+I | Android Developer Roadmap: Junior to Senior | android-developer-junior-to-senior
+B | Android Developer Resume and Portfolio Guide | android-developer-resume-portfolio
+I | Real-World Android Coding Interview Problems | android-coding-interview-problems
+I | Java to Kotlin Migration Interview Questions | java-to-kotlin-migration-interview
+B | How AI Is Changing the Work of Android Developers | ai-changing-android-developer-work
+
+## advanced | Advanced Android Engineering and Emerging Technology | ⚙️ | Scale, background work, new form factors and the emerging Android AI ecosystem.
+A | Android App Architecture at Scale | android-architecture-at-scale
+A | Multi-Module Gradle Builds and Build Optimization | gradle-multi-module-build-optimization
+I | Compose Multiplatform vs Kotlin Multiplatform | compose-multiplatform-vs-kotlin-multiplatform
+I | Background Work with WorkManager | workmanager-background-work
+I | Android Services and Foreground Services | android-foreground-services
+I | Deep Links, App Links, and Android App Actions | deep-links-app-links-android
+I | App Widgets and Shortcuts | android-app-widgets-shortcuts
+I | Wear OS App Development | wear-os-app-development
+A | Android Automotive Development | android-automotive-development
+I | Large-Screen and Foldable Android Experiences | large-screen-foldable-android
+A | AppFunctions and Android's Emerging AI Ecosystem | android-appfunctions-ai-ecosystem
+I | Building Android Apps for Privacy, Accessibility, and Reliability | android-privacy-accessibility-reliability
+A | Migrating Legacy Android Apps to Modern Architecture | migrate-legacy-android-modern-architecture
+A | Real-World Engineering Trade-offs in Android Development | android-engineering-tradeoffs
+
+@@ A. Understanding AI Models
+LLMs vs Traditional Machine Learning | llms-vs-traditional-machine-learning
+Gemini Nano vs Cloud-Based Gemini Models | gemini-nano-vs-cloud-gemini
+OpenAI Models vs Gemini Models for Android Apps | gemini-vs-openai-vs-open-source-models
+On-Device AI vs Server-Side Inference | cloud-ai-vs-on-device-ai-android
+Choosing an AI Model Based on Privacy, Latency, Cost, and Quality | choose-ai-model-android-app
+
+@@ B. On-Device AI
+Gemini Nano and AICore | gemini-nano-ml-kit-genai-android
+ML Kit GenAI APIs | ml-kit-genai-apis
+LiteRT and LiteRT-LM | litert-litert-lm-android
+On-Device Image and Text Processing | on-device-image-text-processing
+Offline AI Features and Device Compatibility | offline-ai-device-compatibility
+
+@@ C. Cloud AI Integration
+Gemini API with Kotlin | gemini-api-android-kotlin
+OpenAI API Integration Patterns for Android | openai-api-android-patterns
+Secure Backend Architecture for AI Requests | secure-cloud-ai-api-android
+Streaming AI Responses in Jetpack Compose | streaming-ai-responses-compose
+Rate Limits, Token Usage, Retries, and Cost Management | ai-tokens-latency-cost-mobile
+
+@@ D. AI App Projects
+AI Chatbot | ai-chatbot-jetpack-compose
+AI Document Summarizer | ai-document-summarizer-android
+AI Photo Caption Generator | ai-photo-caption-generator-android
+AI Voice-Notes Application | ai-voice-notes-app-android
+AI Study Assistant | ai-study-assistant-android
+AI-Powered Search | ai-powered-search-android
+Personal Knowledge Assistant Using RAG | rag-android-apps
+
+@@ E. Production-Ready AI
+AI Privacy and Data Retention | ai-privacy-data-retention
+Prompt Injection and Untrusted Input | prompt-injection-android-ai
+Model Evaluation and Quality Testing | evaluate-ai-responses-hallucinations
+Fallbacks When AI Is Unavailable | ai-fallbacks-android
+Responsible AI User Experience | responsible-ai-ux-android
+Monitoring Latency, Errors, and Inference Costs | monitor-ai-latency-errors-costs

@@ -1,0 +1,161 @@
+<!--meta
+{
+  "seo_title": "Navigation in Jetpack Compose (Navigation 3 Guide)",
+  "description": "Navigate between Compose screens with Jetpack Navigation 3: back stack as state, NavDisplay, NavKey routes, passing arguments, ViewModel scoping, deep links and Navigation 2 comparison.",
+  "primary_keyword": "jetpack compose navigation",
+  "keywords": ["navigation 3 compose", "NavDisplay backStack", "rememberNavBackStack", "compose navigation arguments", "type safe navigation compose", "navigation compose vs navigation 3"],
+  "lede": "Navigation 3 rethinks navigation for Compose: the back stack is just a list in Compose state that you own and modify. This guide shows how it works, how to pass arguments and scope ViewModels, and how it compares with the Navigation Compose (Navigation 2) API many apps still use.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-state-hoisting", "deep-links-app-links-android", "compose-adaptive-ui-tablets-foldables", "compose-state-management"],
+  "refs": [
+    ["Navigation 3", "https://developer.android.com/guide/navigation/navigation-3"],
+    ["Jetpack Navigation 3 is stable (Android Developers Blog)", "https://developer.android.com/blog/posts/jetpack-navigation-3-is-stable"],
+    ["Navigation Compose (Navigation 2)", "https://developer.android.com/develop/ui/compose/navigation"],
+    ["Type safety in Navigation Compose", "https://developer.android.com/guide/navigation/design/type-safety"]
+  ]
+}
+-->
+<p class="ad-lead">Navigation is where many Compose apps get messy: string routes with hand-parsed arguments, ViewModels that leak between screens, and back behaviour that surprises users. <strong>Jetpack Navigation 3</strong>, stable since late 2025, takes a simpler approach. Your back stack is plain Compose state, and screens are rendered from it.</p>
+
+<div class="note"><b>Which API should you use?</b>
+<p>For new Compose apps, Google now points to <strong>Navigation 3</strong>. Many existing apps use <strong>Navigation Compose</strong> (Navigation 2, with <code>NavHost</code> and <code>NavController</code>), which remains supported and gained type-safe routes. Both are covered below. Check the release notes for current API details, because Navigation 3 is still evolving.</p></div>
+
+<h2 id="model">The Navigation 3 mental model</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-nav-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-nav-t fig-nav-d">
+    <title id="fig-nav-t">Navigation 3: back stack as state rendered by NavDisplay</title>
+    <desc id="fig-nav-d">The back stack is a list of keys: Home, ProductList, Product with id 42. NavDisplay reads the list and shows the entry for the last key, using an entry provider that maps each key type to a composable. Adding a key navigates forward; removing the last key navigates back.</desc>
+    <defs><marker id="nv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-box" x="20" y="30" width="250" height="150" rx="14"/><text class="d-t" x="145" y="54" text-anchor="middle">backStack (state)</text>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="40" y="66" width="210" height="28" rx="6"/><text class="d-s" x="145" y="85" text-anchor="middle">Home</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="40" y="100" width="210" height="28" rx="6"/><text class="d-s" x="145" y="119" text-anchor="middle">ProductList</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="40" y="134" width="210" height="28" rx="6"/><text class="d-s" x="145" y="153" text-anchor="middle">Product(id = "42")  ← top</text></g>
+    <path class="d-flow" d="M270 105 H330" marker-end="url(#nv)"/>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="334" y="70" width="170" height="70" rx="12"/><text class="d-t" x="419" y="98" text-anchor="middle">NavDisplay</text><text class="d-s" x="419" y="118" text-anchor="middle">entryProvider maps keys</text></g>
+    <path class="d-flow" d="M504 105 H560" marker-end="url(#nv)"/>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="564" y="70" width="140" height="70" rx="12"/><text class="d-t" x="634" y="98" text-anchor="middle">ProductScreen</text><text class="d-s" x="634" y="118" text-anchor="middle">id = "42"</text></g>
+    <text class="d-s" x="145" y="196" text-anchor="middle">add() = navigate · removeLastOrNull() = back</text>
+  </svg>
+  <figcaption id="fig-nav-cap">No hidden controller state: what you see in the list is what's on screen.</figcaption>
+</figure>
+
+<h2 id="keys">Step 1: Define routes as keys</h2>
+<code-block lang="kotlin" file="Routes.kt">
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+
+@Serializable data object Home : NavKey
+@Serializable data object ProductList : NavKey
+@Serializable data class Product(val id: String) : NavKey      // arguments are just properties
+@Serializable data object Cart : NavKey
+</code-block>
+<p>Keys are ordinary Kotlin types, so arguments are type-safe properties with no string parsing. Implementing <code>NavKey</code> and <code>@Serializable</code> lets Navigation 3 save the back stack across configuration changes and process death.</p>
+
+<h2 id="display">Step 2: Hold the back stack and render it</h2>
+<code-block lang="kotlin" file="AppNavigation.kt">
+@Composable
+fun AppNavigation() {
+    val backStack = rememberNavBackStack(Home)          // saveable back stack
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),   // per-entry rememberSaveable state
+            rememberViewModelStoreNavEntryDecorator(),        // per-entry ViewModels
+        ),
+        entryProvider = entryProvider {
+            entry<Home> {
+                HomeScreen(onBrowse = { backStack.add(ProductList) })
+            }
+            entry<ProductList> {
+                ProductListScreen(onProductClick = { id -> backStack.add(Product(id)) })
+            }
+            entry<Product> { key ->
+                ProductScreen(
+                    viewModel = viewModel { ProductViewModel(productId = key.id) },
+                    onAddedToCart = { backStack.add(Cart) },
+                )
+            }
+            entry<Cart> {
+                CartScreen(onDone = { backStack.removeAll { it != Home } })   // pop back to Home
+            }
+        },
+    )
+}
+</code-block>
+<p>The ViewModel decorator scopes a ViewModel to its back stack entry, so it's cleared when that entry is popped. Decorator function names and artifacts (for example <code>lifecycle-viewmodel-navigation3</code>) are listed in the Navigation 3 docs, so check them against your version.</p>
+
+<h2 id="patterns">Common navigation patterns</h2>
+<code-block lang="kotlin" file="Back stack operations">
+backStack.add(Product("42"))                          // navigate forward
+backStack.removeLastOrNull()                           // back
+backStack.removeAll { it is Product }                  // pop all product screens
+backStack.clear(); backStack.add(Home)                 // reset (e.g. after logout)
+
+// Avoid duplicates when tapping the same tab twice
+fun NavBackStack<NavKey>.navigateTopLevel(key: NavKey) {
+    if (lastOrNull() != key) { removeAll { it != Home }; if (key != Home) add(key) }
+}
+</code-block>
+<p>Because the back stack is a list you own, you can keep <strong>separate back stacks per bottom-navigation tab</strong>, or show two entries side by side on tablets using Navigation 3 scene strategies (for list-detail layouts).</p>
+
+<h2 id="nav2">Navigation Compose (Navigation 2) for existing apps</h2>
+<code-block lang="kotlin" file="Type-safe routes in Navigation Compose">
+@Serializable object HomeRoute
+@Serializable data class ProductRoute(val id: String)
+
+@Composable
+fun AppNavHost(navController: NavHostController = rememberNavController()) {
+    NavHost(navController, startDestination = HomeRoute) {
+        composable<HomeRoute> {
+            HomeScreen(onProductClick = { id -> navController.navigate(ProductRoute(id)) })
+        }
+        composable<ProductRoute> { entry ->
+            val route: ProductRoute = entry.toRoute()
+            ProductScreen(productId = route.id, onBack = navController::popBackStack)
+        }
+    }
+}
+</code-block>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Navigation 3</th><th>Navigation Compose (2.x)</th></tr></thead>
+  <tbody>
+    <tr><td>Back stack</td><td>Your own list in Compose state</td><td>Owned by NavController</td></tr>
+    <tr><td>Routes</td><td>Any key type (NavKey for saving)</td><td>Serializable route classes (type-safe since 2.8)</td></tr>
+    <tr><td>Adaptive layouts</td><td>Scenes can show multiple entries</td><td>One destination at a time</td></tr>
+    <tr><td>Maturity in your codebase</td><td>Newer</td><td>Widely deployed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="viewmodel-args">Passing arguments to ViewModels</h2>
+<p>Pass only <strong>IDs</strong> through navigation, never whole objects, and let the destination's ViewModel load the data from a repository. This keeps the saved back stack small, avoids stale copies, and survives process death correctly.</p>
+
+<h2 id="use-cases">Real-world structures</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Bottom-nav app</h3><p>One back stack per tab, preserved when switching tabs, with a top-level navigator that switches the active stack.</p></div>
+  <div class="card usecase"><h3>Auth flow</h3><p>Show login keys until authenticated, then clear and push Home, so Back doesn't return to login.</p></div>
+  <div class="card usecase"><h3>Deep link into a product</h3><p>Parse the URI into keys and build a synthetic back stack (Home, ProductList, Product) for natural Up and Back behaviour. See <a href="../deep-links-app-links-android/index.html">Deep Links and App Links</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Passing large objects as arguments instead of IDs.</li>
+  <li>Navigating from inside composable bodies (during composition) instead of from event callbacks.</li>
+  <li>Passing the back stack or NavController deep into components. Pass navigation lambdas instead.</li>
+  <li>Forgetting ViewModel scoping, so ViewModels outlive their screens.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I migrate from Navigation Compose to Navigation 3?</summary><div><p>For new apps, start with Navigation 3. For existing apps, migrate when you need its flexibility (custom back stacks, adaptive scenes) and follow Google's migration guide incrementally.</p></div></details>
+  <details><summary>How do I handle the system back gesture?</summary><div><p>NavDisplay calls your <code>onBack</code> lambda. In Navigation 2, NavHost handles it automatically. Predictive back animations are supported in recent versions.</p></div></details>
+  <details><summary>Can I still use Fragments?</summary><div><p>Yes, with the Fragment-based Navigation component, but new Compose apps rarely need Fragments.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Navigation 3 makes navigation <strong>just state</strong>: a list of type-safe keys you modify, rendered by <code>NavDisplay</code>, with decorators for saved state and ViewModels. Navigation Compose remains a solid choice for existing apps. In both, pass IDs, navigate from events, and keep navigation out of reusable components.</p>
+<p>Next step: render long lists efficiently with <a href="../lazycolumn-vs-column/index.html">LazyColumn vs Column</a>.</p>

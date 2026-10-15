@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Cloud Messaging &amp; Push Notifications (Android) | Yunok Tech</title>
+  <meta name="description" content="Implement push notifications with Firebase Cloud Messaging on Android: tokens, POST_NOTIFICATIONS permission, notification vs data messages, channels, deep links, HTTP v1 and testing.">
+  <meta name="keywords" content="firebase cloud messaging android, push notifications android kotlin, fcm token android, post_notifications permission android 13, notification channels android, fcm data message vs notification message, fcm http v1">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Firebase Cloud Messaging &amp; Push Notifications (Android)">
+  <meta property="og:description" content="Implement push notifications with Firebase Cloud Messaging on Android: tokens, POST_NOTIFICATIONS permission, notification vs data messages, channels, deep links, HTTP v1 and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Firebase Cloud Messaging &amp; Push Notifications (Android)">
+  <meta name="twitter:description" content="Implement push notifications with Firebase Cloud Messaging on Android: tokens, POST_NOTIFICATIONS permission, notification vs data messages, channels, deep links, HTTP v1 and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Firebase Cloud Messaging and Push Notifications", "description": "Implement push notifications with Firebase Cloud Messaging on Android: tokens, POST_NOTIFICATIONS permission, notification vs data messages, channels, deep links, HTTP v1 and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "push notifications android kotlin, fcm token android, post_notifications permission android 13, notification channels android, fcm data message vs notification message, fcm http v1", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Firebase Cloud Messaging and Push Notifications", "item": "https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Firebase Cloud Messaging and Push Notifications</h1>
+    <p class="ad-lede">Push notifications bring users back to your app, when they're relevant. This guide sets up Firebase Cloud Messaging end to end: runtime permission, tokens, message types, channels, deep links, sending from a server with the HTTP v1 API, and testing.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architecture">How FCM delivery works</a></li><li><a href="#setup">Setup</a></li><li><a href="#permission">Ask for permission at the right moment</a></li><li><a href="#channels">Notification channels</a></li><li><a href="#service">Handling tokens and messages</a></li><li><a href="#types">Notification vs data messages</a></li><li><a href="#server">Sending from your server (HTTP v1)</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Good notification use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Notifications are a privilege, not a channel you own. Since Android 13, users must explicitly grant permission, and they revoke it quickly when apps spam. This guide shows how to implement FCM correctly and how to ask for permission at a moment that makes sense.</p>
+
+<h2 id="architecture">How FCM delivery works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fcm-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-fcm-t fig-fcm-d">
+    <title id="fig-fcm-t">FCM token registration and message delivery</title>
+    <desc id="fig-fcm-d">The app obtains an FCM registration token and sends it to your backend. When an event happens, your backend calls the FCM HTTP v1 API with that token. FCM delivers the message to the device; the system shows notification messages automatically when the app is in background, or your FirebaseMessagingService handles data messages.</desc>
+    <defs><marker id="fcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="150" height="66" rx="12"/><text class="d-t" x="95" y="68" text-anchor="middle">Android app</text><text class="d-s" x="95" y="88" text-anchor="middle">gets token</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="290" y="40" width="150" height="66" rx="12"/><text class="d-t" x="365" y="68" text-anchor="middle">Your backend</text><text class="d-s" x="365" y="88" text-anchor="middle">stores token</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="550" y="40" width="150" height="66" rx="12"/><text class="d-t" x="625" y="68" text-anchor="middle">FCM</text><text class="d-s" x="625" y="88" text-anchor="middle">HTTP v1 API</text></g>
+    <path class="d-flow" d="M170 60 H286" marker-end="url(#fcm)"/><text class="d-s" x="228" y="52" text-anchor="middle">1. register token</text>
+    <path class="d-flow" d="M440 60 H546" marker-end="url(#fcm)"/><text class="d-s" x="493" y="52" text-anchor="middle">2. send message</text>
+    <path class="d-flow" d="M625 106 V150 H95 V110" marker-end="url(#fcm)"/><text class="d-s" x="360" y="168" text-anchor="middle">3. deliver to device → notification or onMessageReceived()</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M625 106 V150 H95 V110');--dur:2s;--delay:.6s"/>
+  </svg>
+  <figcaption id="fig-fcm-cap">Your server decides who gets what. The app only manages its token and how messages are displayed.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    implementation(platform(<span class="tk-s">"com.google.firebase:firebase-bom:&lt;latest&gt;"</span>))
+    implementation(<span class="tk-s">"com.google.firebase:firebase-messaging"</span>)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;uses-permission</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.permission.POST_NOTIFICATIONS"</span> <span class="tk-tag">/&gt;</span>
+
+<span class="tk-tag">&lt;application</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;service</span>
+        <span class="tk-at">android:name</span>=<span class="tk-s">".push.AppMessagingService"</span>
+        <span class="tk-at">android:exported</span>=<span class="tk-s">"false"</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;intent-filter</span><span class="tk-tag">&gt;</span>
+            <span class="tk-tag">&lt;action</span> <span class="tk-at">android:name</span>=<span class="tk-s">"com.google.firebase.MESSAGING_EVENT"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;/intent-filter</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;/service</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;meta-data</span>
+        <span class="tk-at">android:name</span>=<span class="tk-s">"com.google.firebase.messaging.default_notification_channel_id"</span>
+        <span class="tk-at">android:value</span>=<span class="tk-s">"general"</span> <span class="tk-tag">/&gt;</span>
+<span class="tk-tag">&lt;/application</span><span class="tk-tag">&gt;</span></code></pre></figure>
+
+<h2 id="permission">Ask for permission at the right moment</h2>
+<p>On Android 13 (API 33) and later, <code>POST_NOTIFICATIONS</code> is a runtime permission. Ask in context, for example after the user places an order ("Get delivery updates?"), not on first launch.</p>
+<figure class="code"><figcaption><span class="file">NotificationPermission.kt (Compose)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> rememberNotificationPermissionRequester(onResult: (<span class="tk-t">Boolean</span>) -&gt; <span class="tk-t">Unit</span>): () -&gt; <span class="tk-t">Unit</span> {
+    <span class="tk-k">val</span> launcher = rememberLauncherForActivityResult(<span class="tk-t">ActivityResultContracts</span>.<span class="tk-t">RequestPermission</span>(), onResult)
+    <span class="tk-k">return</span> remember {
+        {
+            <span class="tk-k">if</span> (<span class="tk-t">Build</span>.<span class="tk-t">VERSION</span>.<span class="tk-t">SDK_INT</span> &gt;= <span class="tk-t">Build</span>.<span class="tk-t">VERSION_CODES</span>.<span class="tk-t">TIRAMISU</span>) {
+                launcher.launch(<span class="tk-t">Manifest</span>.permission.<span class="tk-t">POST_NOTIFICATIONS</span>)
+            } <span class="tk-k">else</span> onResult(<span class="tk-k">true</span>)        <span class="tk-c">// granted by default below Android 13 (user can still disable)</span>
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="channels">Notification channels</h2>
+<figure class="code"><figcaption><span class="file">Create channels at startup</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> createNotificationChannels(context: <span class="tk-t">Context</span>) {
+    <span class="tk-k">val</span> manager = context.getSystemService(<span class="tk-t">NotificationManager</span>::<span class="tk-k">class</span>.java)
+    manager.createNotificationChannels(listOf(
+        <span class="tk-t">NotificationChannel</span>(<span class="tk-s">"orders"</span>, <span class="tk-s">"Order updates"</span>, <span class="tk-t">NotificationManager</span>.<span class="tk-t">IMPORTANCE_HIGH</span>)
+            .apply { description = <span class="tk-s">"Shipping and delivery status"</span> },
+        <span class="tk-t">NotificationChannel</span>(<span class="tk-s">"general"</span>, <span class="tk-s">"General"</span>, <span class="tk-t">NotificationManager</span>.<span class="tk-t">IMPORTANCE_DEFAULT</span>),
+        <span class="tk-t">NotificationChannel</span>(<span class="tk-s">"promotions"</span>, <span class="tk-s">"Offers"</span>, <span class="tk-t">NotificationManager</span>.<span class="tk-t">IMPORTANCE_LOW</span>),
+    ))
+}</code></pre></figure>
+<p>Users can turn off "Offers" while keeping "Order updates". Separate channels respect their choice and keep important alerts alive.</p>
+
+<h2 id="service">Handling tokens and messages</h2>
+<figure class="code"><figcaption><span class="file">AppMessagingService.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">AppMessagingService</span> : <span class="tk-t">FirebaseMessagingService</span>() {
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onNewToken(token: <span class="tk-t">String</span>) {
+        <span class="tk-c">// Tokens can change (reinstall, data cleared). Send to backend via WorkManager for reliability.</span>
+        <span class="tk-t">TokenUploadWorker</span>.enqueue(applicationContext, token)
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onMessageReceived(message: <span class="tk-t">RemoteMessage</span>) {
+        <span class="tk-c">// Data messages arrive here in foreground and background.</span>
+        <span class="tk-c">// Notification messages arrive here only when the app is in the foreground.</span>
+        <span class="tk-k">val</span> <span class="tk-k">data</span> = message.<span class="tk-k">data</span>
+        <span class="tk-k">when</span> (<span class="tk-k">data</span>[<span class="tk-s">"type"</span>]) {
+            <span class="tk-s">"order_update"</span> -&gt; showOrderNotification(
+                orderId = <span class="tk-k">data</span>[<span class="tk-s">"orderId"</span>] ?: <span class="tk-k">return</span>,
+                title = <span class="tk-k">data</span>[<span class="tk-s">"title"</span>] ?: <span class="tk-s">"Order update"</span>,
+                body = <span class="tk-k">data</span>[<span class="tk-s">"body"</span>].orEmpty(),
+            )
+            <span class="tk-s">"sync"</span> -&gt; <span class="tk-t">SyncScheduler</span>(<span class="tk-t">WorkManager</span>.getInstance(<span class="tk-k">this</span>)).requestSync()   <span class="tk-c">// silent refresh</span>
+        }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> showOrderNotification(orderId: <span class="tk-t">String</span>, title: <span class="tk-t">String</span>, body: <span class="tk-t">String</span>) {
+        <span class="tk-k">val</span> intent = <span class="tk-t">Intent</span>(<span class="tk-t">Intent</span>.<span class="tk-t">ACTION_VIEW</span>, <span class="tk-s">"https://yunoktech.com/orders/$orderId"</span>.toUri(), <span class="tk-k">this</span>, <span class="tk-t">MainActivity</span>::<span class="tk-k">class</span>.java)
+        <span class="tk-k">val</span> pending = <span class="tk-t">PendingIntent</span>.getActivity(<span class="tk-k">this</span>, orderId.hashCode(), intent,
+            <span class="tk-t">PendingIntent</span>.<span class="tk-t">FLAG_IMMUTABLE</span> or <span class="tk-t">PendingIntent</span>.<span class="tk-t">FLAG_UPDATE_CURRENT</span>)
+        <span class="tk-k">val</span> notification = <span class="tk-t">NotificationCompat</span>.<span class="tk-t">Builder</span>(<span class="tk-k">this</span>, <span class="tk-s">"orders"</span>)
+            .setSmallIcon(<span class="tk-t">R</span>.drawable.ic_stat_notify)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setAutoCancel(<span class="tk-k">true</span>)
+            .setContentIntent(pending)
+            .build()
+        <span class="tk-k">if</span> (<span class="tk-t">ContextCompat</span>.checkSelfPermission(<span class="tk-k">this</span>, <span class="tk-t">Manifest</span>.permission.<span class="tk-t">POST_NOTIFICATIONS</span>) == <span class="tk-t">PackageManager</span>.<span class="tk-t">PERMISSION_GRANTED</span> ||
+            <span class="tk-t">Build</span>.<span class="tk-t">VERSION</span>.<span class="tk-t">SDK_INT</span> &lt; <span class="tk-t">Build</span>.<span class="tk-t">VERSION_CODES</span>.<span class="tk-t">TIRAMISU</span>) {
+            <span class="tk-t">NotificationManagerCompat</span>.from(<span class="tk-k">this</span>).notify(orderId.hashCode(), notification)
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="types">Notification vs data messages</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Notification message</th><th>Data message</th></tr></thead>
+  <tbody>
+    <tr><td>App in background</td><td>System shows it automatically</td><td>Delivered to <code>onMessageReceived</code></td></tr>
+    <tr><td>App in foreground</td><td><code>onMessageReceived</code></td><td><code>onMessageReceived</code></td></tr>
+    <tr><td>Control over display</td><td>Limited</td><td>Full (channels, actions, grouping)</td></tr>
+    <tr><td>Best for</td><td>Simple marketing or announcements</td><td>Transactional alerts, deep links, silent sync</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="server">Sending from your server (HTTP v1)</h2>
+<figure class="code"><figcaption><span class="file">POST https://fcm.googleapis.com/v1/projects/PROJECT_ID/messages:send</span><span class="lang">JSON</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-json">{
+  <span class="tk-s">"message"</span>: {
+    <span class="tk-s">"token"</span>: <span class="tk-s">"DEVICE_REGISTRATION_TOKEN"</span>,
+    <span class="tk-s">"data"</span>: {
+      <span class="tk-s">"type"</span>: <span class="tk-s">"order_update"</span>,
+      <span class="tk-s">"orderId"</span>: <span class="tk-s">"A1042"</span>,
+      <span class="tk-s">"title"</span>: <span class="tk-s">"Out for delivery"</span>,
+      <span class="tk-s">"body"</span>: <span class="tk-s">"Your order arrives today by 6 PM"</span>
+    },
+    <span class="tk-s">"android"</span>: { <span class="tk-s">"priority"</span>: <span class="tk-s">"high"</span> }
+  }
+}</code></pre></figure>
+<p>The legacy FCM server APIs have been retired. Use HTTP v1 with OAuth 2.0 service-account credentials, which <strong>must stay on your server</strong> and never ship in the app. The Firebase Admin SDK handles authentication for you.</p>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Use the Firebase console's "Send test message" with your device token.</li>
+  <li>Test foreground, background and killed states. They behave differently.</li>
+  <li>Test with notifications disabled, and with a specific channel disabled.</li>
+  <li>Check behaviour on manufacturers with aggressive battery management.</li>
+</ul>
+
+<h2 id="use-cases">Good notification use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Transactional</h3><p>Order shipped, payment received, OTP alternatives. High value, expected by users.</p></div>
+  <div class="card usecase"><h3>Collaboration</h3><p>Mentions, replies and shared-document changes, grouped and rate-limited.</p></div>
+  <div class="card usecase"><h3>Silent sync</h3><p>A data message triggers WorkManager to refresh content before the user opens the app.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Requesting notification permission on first launch with no context.</li>
+  <li>Sending everything through one channel, so users disable all notifications.</li>
+  <li>Heavy work in <code>onMessageReceived</code>. Enqueue WorkManager instead.</li>
+  <li>Putting personal or sensitive data in notification text on the lock screen.</li>
+  <li>Not handling token refresh, so pushes silently stop reaching users.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why don't my notifications arrive on some phones?</summary><div><p>Common causes are denied permission, a disabled channel, aggressive OEM battery optimisation for background apps, or an invalid token on the server. Check delivery reports in Firebase.</p></div></details>
+  <details><summary>Can I send to groups of users?</summary><div><p>Yes, with topics (<code>subscribeToTopic</code>) or by sending to multiple tokens from your server.</p></div></details>
+  <details><summary>Is FCM free?</summary><div><p>FCM itself is free to use. Your backend infrastructure for sending messages has its own costs.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A solid FCM integration <strong>asks for permission in context</strong>, uses <strong>meaningful channels</strong>, prefers <strong>data messages</strong> for transactional alerts with deep links, keeps <strong>tokens in sync</strong> with your server, and sends with the <strong>HTTP v1 API</strong> from secure server code.</p>
+<p>Next step: compare real-time options in <a href="../websockets-vs-rest-android/index.html">WebSockets vs REST APIs in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/cloud-messaging/android/client" target="_blank" rel="noopener">Set up a Firebase Cloud Messaging client app on Android</a></li><li><a href="https://firebase.google.com/docs/cloud-messaging/android/receive" target="_blank" rel="noopener">Receive messages in an Android app</a></li><li><a href="https://developer.android.com/develop/ui/views/notifications/notification-permission" target="_blank" rel="noopener">Notification runtime permission</a></li><li><a href="https://developer.android.com/develop/ui/views/notifications/channels" target="_blank" rel="noopener">Create and manage notification channels</a></li><li><a href="https://firebase.google.com/docs/cloud-messaging/send/v1-api" target="_blank" rel="noopener">FCM HTTP v1 API</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-cloud-messaging-push-notifications-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-cloud-messaging-push-notifications-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/firebase-authentication-android/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Authentication in Android</a></li><li><a href="../../android/android-permissions-privacy/index.html"><small>Android Security and Privacy</small>Android Permissions and Privacy Best Practices</a></li><li><a href="../../android/deep-links-app-links-android/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Deep Links, App Links, and Android App Actions</a></li><li><a href="../../android/workmanager-background-work/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Background Work with WorkManager</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/&amp;text=Firebase Cloud Messaging and Push Notifications" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/firebase-cloud-messaging-push-notifications/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architecture">How FCM delivery works</a></li><li><a href="#setup">Setup</a></li><li><a href="#permission">Ask for permission at the right moment</a></li><li><a href="#channels">Notification channels</a></li><li><a href="#service">Handling tokens and messages</a></li><li><a href="#types">Notification vs data messages</a></li><li><a href="#server">Sending from your server (HTTP v1)</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Good notification use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-cloud-messaging-push-notifications-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-cloud-messaging-push-notifications-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

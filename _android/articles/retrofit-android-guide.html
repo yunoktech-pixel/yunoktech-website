@@ -1,0 +1,187 @@
+<!--meta
+{
+  "seo_title": "Retrofit in Android: Complete Guide with Kotlin",
+  "description": "Use Retrofit in Android with Kotlin coroutines: setup, kotlinx.serialization, defining endpoints, path and query params, POST bodies, headers, OkHttp config, errors and testing with MockWebServer.",
+  "primary_keyword": "retrofit android",
+  "keywords": ["retrofit kotlin coroutines", "retrofit kotlinx serialization", "retrofit suspend function", "retrofit post request", "okhttp retrofit setup", "mockwebserver retrofit test"],
+  "lede": "Retrofit turns an HTTP API into a Kotlin interface. Combined with coroutines and kotlinx.serialization, a network call becomes a single suspend function. This guide covers setup, every common request type, configuration, error handling and testing.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["rest-api-kotlin-coroutines", "okhttp-interceptors", "android-api-error-handling", "retrofit-vs-ktor-client"],
+  "refs": [
+    ["Retrofit (official repository)", "https://github.com/square/retrofit"],
+    ["OkHttp (official repository)", "https://github.com/square/okhttp"],
+    ["kotlinx.serialization", "https://kotlinlang.org/docs/serialization.html"],
+    ["Connect to the network (Android)", "https://developer.android.com/develop/connectivity/network-ops/connecting"]
+  ]
+}
+-->
+<p class="ad-lead">Most Android apps talk to a REST API. Writing raw HTTP code (building URLs, encoding JSON, parsing responses, handling threads) is repetitive and error-prone. Retrofit, from Square, generates all of that from an annotated interface, and it's the most widely used HTTP client in the Android ecosystem.</p>
+
+<h2 id="how">How Retrofit works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rf-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-rf-t fig-rf-d">
+    <title id="fig-rf-t">Retrofit request pipeline</title>
+    <desc id="fig-rf-d">Your code calls a suspend function on an annotated interface. Retrofit builds an HTTP request, the converter serialises the body, OkHttp sends it through interceptors to the server, and the response JSON is deserialised back into a Kotlin data class.</desc>
+    <defs><marker id="rfm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 60 H164 M296 60 H320 M452 60 H476 M590 60 H614" marker-end="url(#rfm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="130" height="60" rx="12"/><text class="d-t" x="75" y="56" text-anchor="middle">api.getUser(id)</text><text class="d-s" x="75" y="74" text-anchor="middle">suspend call</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="168" y="30" width="128" height="60" rx="12"/><text class="d-t" x="232" y="56" text-anchor="middle">Retrofit</text><text class="d-s" x="232" y="74" text-anchor="middle">builds request</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="324" y="30" width="128" height="60" rx="12"/><text class="d-t" x="388" y="56" text-anchor="middle">OkHttp</text><text class="d-s" x="388" y="74" text-anchor="middle">interceptors</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-box" x="480" y="30" width="110" height="60" rx="12"/><text class="d-t" x="535" y="64" text-anchor="middle">Server</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="618" y="30" width="92" height="60" rx="12"/><text class="d-t" x="664" y="56" text-anchor="middle">UserDto</text><text class="d-s" x="664" y="74" text-anchor="middle">parsed</text></g>
+    <text class="d-s" x="360" y="130" text-anchor="middle">Converter (kotlinx.serialization) handles JSON ↔ data classes</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">OkHttp does the network work off the main thread</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M140 60 H618');--dur:2.4s"/>
+  </svg>
+  <figcaption id="fig-rf-cap">You write the interface; Retrofit, a converter and OkHttp do the rest.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins { id("org.jetbrains.kotlin.plugin.serialization") }
+dependencies {
+    implementation("com.squareup.retrofit2:retrofit:<version>")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:<version>")
+    implementation("com.squareup.okhttp3:okhttp:<version>")
+    implementation("com.squareup.okhttp3:logging-interceptor:<version>")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:<version>")
+}
+</code-block>
+<code-block lang="xml" file="AndroidManifest.xml">
+<uses-permission android:name="android.permission.INTERNET" />
+</code-block>
+
+<h2 id="models">Models</h2>
+<code-block lang="kotlin" file="Dtos.kt">
+@Serializable
+data class UserDto(
+    val id: String,
+    val name: String,
+    @SerialName("avatar_url") val avatarUrl: String? = null,   // map snake_case, tolerate missing
+)
+
+@Serializable
+data class CreatePostRequest(val title: String, val body: String, val tags: List<String> = emptyList())
+
+@Serializable
+data class PostDto(val id: Long, val title: String, val body: String)
+</code-block>
+
+<h2 id="interface">Defining the API</h2>
+<code-block lang="kotlin" file="BlogApi.kt">
+interface BlogApi {
+    @GET("users/{id}")
+    suspend fun getUser(@Path("id") id: String): UserDto
+
+    @GET("posts")
+    suspend fun getPosts(
+        @Query("page") page: Int,
+        @Query("limit") limit: Int = 20,
+        @Query("tag") tag: String? = null,          // null query params are omitted
+    ): List<PostDto>
+
+    @POST("posts")
+    suspend fun createPost(@Body request: CreatePostRequest): PostDto
+
+    @DELETE("posts/{id}")
+    suspend fun deletePost(@Path("id") id: Long): Response<Unit>   // Response<T> when you need status/headers
+
+    @Multipart
+    @POST("uploads")
+    suspend fun upload(@Part file: MultipartBody.Part): UploadResult
+}
+</code-block>
+
+<h2 id="build">Building the client</h2>
+<code-block lang="kotlin" file="NetworkModule.kt">
+object Network {
+    private val json = Json {
+        ignoreUnknownKeys = true      // new server fields won't crash old app versions
+        explicitNulls = false
+    }
+
+    private val okHttp = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+        })
+        .build()
+
+    val blogApi: BlogApi = Retrofit.Builder()
+        .baseUrl("https://api.example.com/v1/")     // must end with "/"
+        .client(okHttp)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+        .create(BlogApi::class.java)
+}
+</code-block>
+<p>In a real app, provide these through Hilt as singletons. See <a href="../hilt-dependency-injection/index.html">Hilt</a>. Never log bodies or auth headers in release builds.</p>
+
+<h2 id="calling">Calling from a repository</h2>
+<code-block lang="kotlin" file="PostRepository.kt">
+class PostRepository(private val api: BlogApi) {
+    suspend fun latestPosts(page: Int): List<Post> = api.getPosts(page).map { it.toDomain() }
+}
+</code-block>
+<p>Retrofit's suspend functions are main-safe: OkHttp performs the I/O on its own threads, so you can call them from <code>viewModelScope</code> directly.</p>
+
+<h2 id="errors">Errors</h2>
+<ul>
+  <li><strong>Non-2xx responses</strong> throw <code>HttpException</code> (with <code>code()</code>) when the return type isn't <code>Response&lt;T&gt;</code>.</li>
+  <li><strong>Network failures</strong> (no connection, timeouts) throw <code>IOException</code>.</li>
+  <li><strong>Malformed JSON</strong> throws a <code>SerializationException</code>.</li>
+</ul>
+<p>Map these to user-friendly states in one place. See <a href="../android-api-error-handling/index.html">Handling API Errors and Network Failures</a>.</p>
+
+<h2 id="testing">Testing with MockWebServer</h2>
+<code-block lang="kotlin" file="BlogApiTest.kt">
+class BlogApiTest {
+    private val server = MockWebServer()
+    private lateinit var api: BlogApi
+
+    @Before fun setUp() {
+        server.start()
+        api = Retrofit.Builder()
+            .baseUrl(server.url("/"))
+            .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
+            .build().create(BlogApi::class.java)
+    }
+    @After fun tearDown() = server.shutdown()
+
+    @Test fun `parses user and ignores unknown fields`() = runTest {
+        server.enqueue(MockResponse().setBody("""{"id":"7","name":"Asha","extra":true}"""))
+        val user = api.getUser("7")
+        assertEquals("Asha", user.name)
+        assertEquals("/users/7", server.takeRequest().path)
+    }
+}
+</code-block>
+
+<h2 id="use-cases">Common real-world needs</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Auth headers</h3><p>An OkHttp interceptor adds the token, and an authenticator refreshes it on 401. See <a href="../okhttp-interceptors/index.html">OkHttp Interceptors</a>.</p></div>
+  <div class="card usecase"><h3>Pagination</h3><p>Query params for page and cursor, wired into <a href="../paging-3-pagination/index.html">Paging 3</a>.</p></div>
+  <div class="card usecase"><h3>File uploads</h3><p><code>@Multipart</code> with a request body streamed from a <code>ContentResolver</code> URI.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Creating a new Retrofit or OkHttp instance per request, which wastes connection pools and caches.</li>
+  <li>Base URL without a trailing slash, or leading slashes in endpoint paths, which produce surprising URL resolution.</li>
+  <li>Strict JSON parsing without <code>ignoreUnknownKeys</code>, so new server fields crash old app versions.</li>
+  <li>Using DTOs directly in UI state. Map them to domain models.</li>
+  <li>Logging sensitive data in production.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Gson, Moshi or kotlinx.serialization?</summary><div><p>For Kotlin-first apps, kotlinx.serialization respects default values and nullability and works with Kotlin Multiplatform. Moshi is also solid. Gson ignores Kotlin nullability and defaults, so it's less suited to new Kotlin code.</p></div></details>
+  <details><summary>Do I need Dispatchers.IO for Retrofit calls?</summary><div><p>No. Suspend Retrofit functions are already main-safe.</p></div></details>
+  <details><summary>How do I cancel a request?</summary><div><p>Cancel the coroutine. Retrofit cancels the underlying OkHttp call automatically.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Retrofit + OkHttp + kotlinx.serialization + coroutines give you <strong>type-safe, concise, main-safe networking</strong>. Share one configured client, tolerate unknown JSON fields, map DTOs to domain models, handle errors centrally, and test with MockWebServer.</p>
+<p>Next step: build a complete flow around it in <a href="../rest-api-kotlin-coroutines/index.html">REST API Integration with Kotlin and Coroutines</a>.</p>

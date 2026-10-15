@@ -1,0 +1,120 @@
+<!--meta
+{
+  "seo_title": "Monitoring AI Latency, Errors and Inference Costs",
+  "description": "Monitor AI features in Android apps: key metrics (time to first token, total latency, error rates, token usage, cost per user), client and backend instrumentation, dashboards, alerts, budgets and quality signals.",
+  "primary_keyword": "monitor ai latency cost",
+  "keywords": ["llm observability mobile", "time to first token metric", "ai cost tracking per user", "firebase performance custom trace", "ai error rate monitoring", "token usage metadata"],
+  "lede": "Once an AI feature ships, you need to know: is it fast, is it working, how much does it cost, and do users find it useful? AI adds new metrics, such as time to first token, tokens per request and cost per user, on top of normal app monitoring. Here's what to measure and how.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-tokens-latency-cost-mobile", "android-analytics-crash-reporting", "ai-fallbacks-android", "ai-privacy-data-retention"],
+  "refs": [
+    ["Firebase Performance Monitoring: custom traces", "https://firebase.google.com/docs/perf-mon/custom-code-traces?platform=android"],
+    ["Firebase AI Logic: monitoring", "https://firebase.google.com/docs/ai-logic/monitoring"],
+    ["Gemini API: token counting", "https://ai.google.dev/gemini-api/docs/tokens"],
+    ["Gemini API pricing", "https://ai.google.dev/gemini-api/docs/pricing"]
+  ]
+}
+-->
+<p class="ad-lead"><a href="../ai-tokens-latency-cost-mobile/index.html">Tokens, Latency and Cost</a> explains the concepts. This article is about operating AI in production: instrumenting calls, building dashboards, setting alerts and budgets, and connecting metrics to quality.</p>
+
+<h2 id="metrics">What to measure</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>Metric</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Latency</td><td>Time to first token (TTFT), total time, p50/p95</td><td>TTFT drives perceived speed</td></tr>
+    <tr><td>Reliability</td><td>Error rate by type (429, timeout, blocked, parse)</td><td>Detect outages and limits</td></tr>
+    <tr><td>Usage</td><td>Requests per feature/user, input/output tokens</td><td>Capacity planning</td></tr>
+    <tr><td>Cost</td><td>Cost per request, per active user, per feature</td><td>Unit economics</td></tr>
+    <tr><td>Tier</td><td>On-device vs cloud vs fallback share</td><td>Device availability reality</td></tr>
+    <tr><td>Quality</td><td>Thumbs up/down, edits, retries, stops</td><td>Usefulness signals</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="pipeline">Instrumentation overview</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mon-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-mon-t fig-mon-d">
+    <title id="fig-mon-t">AI monitoring pipeline</title>
+    <desc id="fig-mon-d">The app measures time to first token, total latency, outcome and tier, and sends events without content. The backend or provider records token usage and cost. Both feed dashboards and alerts on latency, error rate and spend, and quality signals from user feedback.</desc>
+    <defs><marker id="monm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M220 60 H276 M220 140 H276 M460 100 H516" marker-end="url(#monm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="30" width="200" height="60" rx="12"/><text class="d-t" x="120" y="56" text-anchor="middle">App</text><text class="d-s" x="120" y="74" text-anchor="middle">TTFT · latency · outcome</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="20" y="110" width="200" height="60" rx="12"/><text class="d-t" x="120" y="136" text-anchor="middle">Backend / provider</text><text class="d-s" x="120" y="154" text-anchor="middle">tokens · cost</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="280" y="60" width="180" height="80" rx="12"/><text class="d-t" x="370" y="94" text-anchor="middle">Events store</text><text class="d-s" x="370" y="114" text-anchor="middle">no prompt content</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="60" width="180" height="80" rx="12"/><text class="d-t" x="610" y="94" text-anchor="middle">Dashboards</text><text class="d-s" x="610" y="114" text-anchor="middle">+ alerts, budgets</text></g>
+  </svg>
+  <figcaption id="fig-mon-cap">Client metrics show user experience; server metrics show cost and provider health.</figcaption>
+</figure>
+
+<h2 id="client">Client instrumentation</h2>
+<code-block lang="kotlin" file="Measuring a streamed call">
+fun <T> Flow<T>.instrumented(feature: String, model: String, source: String, telemetry: AiTelemetry): Flow<T> {
+    var start = 0L
+    var firstTokenAt = 0L
+    return this
+        .onStart { start = SystemClock.elapsedRealtime() }
+        .onEach { if (firstTokenAt == 0L) firstTokenAt = SystemClock.elapsedRealtime() }
+        .onCompletion { cause ->
+            val end = SystemClock.elapsedRealtime()
+            telemetry.record(
+                AiCallEvent(
+                    feature = feature, model = model, source = source,
+                    ttftMs = if (firstTokenAt > 0) firstTokenAt - start else null,
+                    totalMs = end - start,
+                    outcome = when (cause) {
+                        null -> "ok"
+                        is CancellationException -> "stopped"
+                        else -> "error:${cause::class.simpleName}"
+                    },
+                )
+            )
+        }
+}
+// Usage: model.generateContentStream(prompt).mapNotNull { it.text }.instrumented("summarize", "gemini-3.8-flash", "cloud", telemetry)
+</code-block>
+<p>Send these as analytics events or custom Performance Monitoring traces. Never include prompts or responses. See <a href="../ai-privacy-data-retention/index.html">AI Privacy</a>.</p>
+
+<h2 id="tokens">Token usage and cost</h2>
+<p>Responses usually include usage metadata (input and output token counts). Record it where you can trust it, ideally on your backend, and multiply by your model's current price:</p>
+<code-block lang="kotlin" file="Cost estimate (prices are inputs, not constants)">
+data class ModelPrice(val inputPerMillion: Double, val outputPerMillion: Double)   // from your config
+
+fun estimateCost(inputTokens: Int, outputTokens: Int, price: ModelPrice): Double =
+    inputTokens / 1_000_000.0 * price.inputPerMillion +
+    outputTokens / 1_000_000.0 * price.outputPerMillion
+// Load prices from remote config/backend; check the provider's pricing page for current rates.
+</code-block>
+<p>Firebase AI Logic also offers AI monitoring in the Firebase console, covering requests, latency, errors and tokens. Use it alongside your own feature-level metrics.</p>
+
+<h2 id="alerts">Dashboards, alerts and budgets</h2>
+<ul>
+  <li><strong>Dashboards:</strong> p95 TTFT and error rate per feature and model; daily cost per feature; tier share.</li>
+  <li><strong>Alerts:</strong> error-rate spikes (for example 429s), latency regressions after model changes, cost above a daily threshold.</li>
+  <li><strong>Budgets:</strong> cloud billing budget alerts, plus per-user quotas on your backend to prevent abuse.</li>
+</ul>
+
+<h2 id="quality">Quality signals</h2>
+<ul>
+  <li>Ratings, report rate, regenerate/retry rate, stop rate, and edit distance between suggestion and final text.</li>
+  <li>Compare quality metrics when switching models or prompts (A/B tests with flags).</li>
+  <li>Combine with offline evaluation sets. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI</a>.</li>
+</ul>
+
+<h2 id="optimise">Acting on the data</h2>
+<div class="cards">
+  <div class="card usecase"><h3>High TTFT</h3><p>Stream, shorten prompts, use a faster model, or move simple tasks on device.</p></div>
+  <div class="card usecase"><h3>High cost</h3><p>Cap output tokens, trim context, cache results, route simple requests to cheaper models.</p></div>
+  <div class="card usecase"><h3>High errors</h3><p>Check quotas, add backoff, and improve fallbacks. See <a href="../ai-fallbacks-android/index.html">Fallbacks</a>.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I trust client-reported token counts?</summary><div><p>For dashboards, yes. For billing users or enforcing quotas, record usage on your backend, where clients can't tamper with it.</p></div></details>
+  <details><summary>How do I monitor on-device AI?</summary><div><p>Track availability, latency, errors (including busy and quota errors) and tier share. There's no per-token cost, but there may be battery impact.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Operate AI like any production dependency, plus a few new metrics: <strong>TTFT and latency percentiles</strong>, <strong>error types</strong>, <strong>tokens and cost per feature and user</strong>, <strong>tier share</strong> and <strong>quality signals</strong>, with dashboards, alerts and budgets, and without logging user content.</p>
+<p>Explore more in the <a href="../index.html">Android Developer Blog hub</a>.</p>

@@ -1,0 +1,107 @@
+<!--meta
+{
+  "seo_title": "Google AI Studio for Android App Prototyping",
+  "description": "Use Google AI Studio to prototype AI features before writing Android code: test prompts and models, system instructions, structured output, multimodal inputs, then move to Firebase AI Logic.",
+  "primary_keyword": "google ai studio android",
+  "keywords": ["ai studio prototype prompts", "gemini prompt testing", "ai studio to android", "structured output prototype", "ai feature prototyping", "firebase ai logic from ai studio"],
+  "lede": "Before you wire an AI feature into ViewModels and Compose, prove that the model can actually do the task. Google AI Studio is a browser workspace for exactly that: iterate on prompts, compare models, test images and structured outputs, then carry the proven setup into your Android app.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["gemini-api-android-kotlin", "prompt-engineering-android-developers", "evaluate-ai-responses-hallucinations", "choose-ai-model-android-app"],
+  "refs": [
+    ["Google AI Studio", "https://aistudio.google.com/"],
+    ["Google AI Studio quickstart", "https://ai.google.dev/gemini-api/docs/ai-studio-quickstart"],
+    ["Structured output", "https://ai.google.dev/gemini-api/docs/structured-output"],
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"]
+  ]
+}
+-->
+<p class="ad-lead">Teams often discover too late that a model can't reliably do what the feature promised: extract fields from blurry receipts, answer in Hindi with the right tone, or stay under 100 words. A few hours in AI Studio with real examples answers those questions before any Android code exists.</p>
+
+<h2 id="flow">From prototype to app</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-as-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-as-t fig-as-d">
+    <title id="fig-as-t">Prototyping in AI Studio before Android integration</title>
+    <desc id="fig-as-d">Collect real sample inputs, iterate on the prompt and system instruction in AI Studio, compare models and settings, define structured output, record results as an evaluation set, then implement in Android with Firebase AI Logic using the same prompt, model and schema.</desc>
+    <defs><marker id="asm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#asm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Samples</text><text class="d-s" x="70" y="84" text-anchor="middle">real inputs</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">Iterate</text><text class="d-s" x="212" y="84" text-anchor="middle">prompt</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Compare</text><text class="d-s" x="352" y="84" text-anchor="middle">models, settings</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Lock in</text><text class="d-s" x="497" y="84" text-anchor="middle">schema + eval set</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="12"/><text class="d-w" x="647" y="66" text-anchor="middle">Android</text><text class="d-w" x="647" y="84" text-anchor="middle">Firebase AI Logic</text></g>
+  </svg>
+  <figcaption id="fig-as-cap">The prototype's output isn't throwaway: the prompt, model choice, schema and test cases carry straight into the app.</figcaption>
+</figure>
+
+<h2 id="what">What to prototype</h2>
+<ul>
+  <li><strong>System instruction and task prompt</strong>, iterated against 20–50 real inputs, including messy ones.</li>
+  <li><strong>Model tier</strong>: does a fast, cheap model pass, or do you need a larger one?</li>
+  <li><strong>Settings</strong>: temperature and maximum output length.</li>
+  <li><strong>Structured output</strong>: define the JSON schema your app will parse.</li>
+  <li><strong>Multimodal inputs</strong>: images, audio or PDFs your feature will send.</li>
+  <li><strong>Safety behaviour</strong>: what happens with inappropriate or adversarial inputs.</li>
+</ul>
+
+<h2 id="example">Example: receipt extraction prototype</h2>
+<code-block lang="text" file="System instruction (tested in AI Studio)">
+You extract expense data from receipt photos for an Indian expense-tracking app.
+Return JSON only, matching the schema. Amounts in paise (integer). Dates in ISO-8601.
+If a field is unreadable, use null. Never guess the merchant name.
+</code-block>
+<code-block lang="json" file="Response schema (tested in AI Studio)">
+{
+  "type": "object",
+  "properties": {
+    "merchant": { "type": "string", "nullable": true },
+    "totalPaise": { "type": "integer", "nullable": true },
+    "date": { "type": "string", "nullable": true },
+    "category": { "type": "string", "enum": ["food", "travel", "shopping", "bills", "other"] }
+  },
+  "required": ["category"]
+}
+</code-block>
+<p>Test with 30 real receipts (with consent, and with personal details removed): crumpled, faded, Hindi and English, and handwritten totals. Record which ones fail and why. That list becomes your evaluation set.</p>
+
+<h2 id="to-android">Moving to Android</h2>
+<code-block lang="kotlin" file="Same prompt, model and schema in the app">
+private const val EXTRACTION_PROMPT_VERSION = "receipt-v2"   // matches what you validated in AI Studio
+
+val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+    modelName = "gemini-3.8-flash",                            // the tier that passed your prototype
+    generationConfig = generationConfig {
+        temperature = 0f
+        responseMimeType = "application/json"
+        responseSchema = receiptSchema                          // Kotlin version of the JSON schema above
+    },
+    systemInstruction = content { text(RECEIPT_SYSTEM_INSTRUCTION) },
+)
+</code-block>
+<p>Full integration (App Check, streaming and errors) is in <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android</a>. Never copy an AI Studio API key into the app. Production calls go through Firebase AI Logic or your backend.</p>
+
+<h2 id="tips">Prototyping tips</h2>
+<ul>
+  <li>Use realistic inputs from your users' world, not polished examples.</li>
+  <li>Change one thing at a time and keep notes of prompt versions and results.</li>
+  <li>Test failure cases deliberately: empty input, wrong language, adversarial text.</li>
+  <li>Estimate tokens per request from the prototype to forecast cost. See <a href="../ai-tokens-latency-cost-mobile/index.html">Tokens and Cost</a>.</li>
+</ul>
+
+<h2 id="use-cases">Good candidates for prototyping</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Extraction</h3><p>Receipts, forms, IDs (with privacy care): validate field accuracy first.</p></div>
+  <div class="card usecase"><h3>Tone and language</h3><p>Support replies in Hinglish, Hindi or Tamil: check quality with native speakers.</p></div>
+  <div class="card usecase"><h3>Classification</h3><p>Routing support tickets: measure accuracy on labelled samples.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is AI Studio free?</summary><div><p>AI Studio offers free usage within limits for experimentation. Check current terms, especially regarding data use on free tiers, before uploading sensitive data.</p></div></details>
+  <details><summary>Can I prototype on-device Gemini Nano in AI Studio?</summary><div><p>AI Studio targets cloud Gemini models. Test on-device behaviour on supported Android devices, since outputs can differ from cloud models.</p></div></details>
+  <details><summary>Should designers and PMs use AI Studio too?</summary><div><p>Yes. Shared prototyping helps the whole team understand what the model can and can't do before committing to UX.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use Google AI Studio to <strong>prove feasibility</strong> with real inputs: iterate prompts, choose the model tier, define structured output and build an evaluation set. Then implement the <strong>same validated setup</strong> in Android through Firebase AI Logic, never with a raw API key.</p>
+<p>Next step: apply AI to old code with <a href="../ai-understand-legacy-java-code/index.html">Using AI to Understand Legacy Java Code</a>.</p>

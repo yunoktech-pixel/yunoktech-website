@@ -1,0 +1,173 @@
+<!--meta
+{
+  "seo_title": "Managing UI State with ViewModel and StateFlow",
+  "description": "Model and expose Android UI state with ViewModel and StateFlow: single UiState, sealed vs data class state, combine and stateIn, user messages, loading and errors, and tests.",
+  "primary_keyword": "viewmodel stateflow ui state",
+  "keywords": ["android ui state", "stateflow viewmodel compose", "stateIn whilesubscribed", "combine flows viewmodel", "ui state data class sealed", "user messages android"],
+  "lede": "A screen's UI state is everything the UI needs to render: data, loading flags, errors, input. How you model and expose it decides whether screens are predictable or full of edge-case bugs. Here are the patterns that work, with complete Kotlin code.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["mvvm-architecture-android", "flow-vs-stateflow-vs-sharedflow", "unidirectional-data-flow-android", "testing-viewmodels-coroutines-flow"],
+  "refs": [
+    ["UI layer", "https://developer.android.com/topic/architecture/ui-layer"],
+    ["State holders and UI state", "https://developer.android.com/topic/architecture/ui-layer/stateholders"],
+    ["UI events", "https://developer.android.com/topic/architecture/ui-layer/events"],
+    ["StateFlow and SharedFlow", "https://developer.android.com/kotlin/flow/stateflow-and-sharedflow"]
+  ]
+}
+-->
+<p class="ad-lead">Bugs like "the spinner never disappears", "the error shows over the data" or "the list flickers empty on rotation" are state-modelling bugs. The fix isn't more if-statements in the UI. It's a better-shaped state object, exposed through a single, predictable stream.</p>
+
+<h2 id="principles">Principles</h2>
+<ul>
+  <li><strong>One <code>StateFlow&lt;UiState&gt;</code> per screen</strong>, which is the single source of truth for rendering.</li>
+  <li><strong>Immutable state</strong>: <code>data class</code> with <code>val</code>s, updated with <code>copy</code>.</li>
+  <li><strong>Make impossible states impossible</strong>: choose between sealed and data class deliberately.</li>
+  <li><strong>Derive, don't duplicate</strong>: compute values from sources rather than storing copies.</li>
+</ul>
+
+<h2 id="shape">Choosing the shape: sealed vs data class</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Screen behaviour</th><th>Shape</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Mutually exclusive modes</td><td>Sealed interface</td><td>Loading / Content / Error for a detail page</td></tr>
+    <tr><td>Fields that coexist</td><td>Data class</td><td>A list that stays visible while refreshing, with an optional message</td></tr>
+    <tr><td>Both</td><td>Data class containing a sealed field</td><td><code>FeedUiState(query, results: ResultsState)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="combine">Building state from several sources</h2>
+<code-block lang="kotlin" file="TasksViewModel.kt">
+data class TasksUiState(
+    val tasks: List<TaskUi> = emptyList(),
+    val filter: TaskFilter = TaskFilter.ALL,
+    val isRefreshing: Boolean = false,
+    val userMessage: String? = null,
+    val isEmpty: Boolean = false,
+)
+
+@HiltViewModel
+class TasksViewModel @Inject constructor(
+    private val repository: TaskRepository,
+    private val savedState: SavedStateHandle,
+) : ViewModel() {
+
+    private val filter = savedState.getStateFlow("filter", TaskFilter.ALL)
+    private val refreshing = MutableStateFlow(false)
+    private val message = MutableStateFlow<String?>(null)
+
+    val uiState: StateFlow<TasksUiState> = combine(
+        repository.observeTasks(), filter, refreshing, message,
+    ) { tasks, f, isRefreshing, msg ->
+        val visible = tasks.filter(f::matches).map(Task::toUi)
+        TasksUiState(visible, f, isRefreshing, msg, isEmpty = visible.isEmpty() && !isRefreshing)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = TasksUiState(isRefreshing = true),
+    )
+
+    fun setFilter(f: TaskFilter) { savedState["filter"] = f }
+
+    fun refresh() = viewModelScope.launch {
+        refreshing.value = true
+        try { repository.refresh() }
+        catch (e: IOException) { message.value = "Couldn't sync. Showing saved tasks." }
+        finally { refreshing.value = false }
+    }
+
+    fun messageShown() { message.value = null }
+}
+</code-block>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cb-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-cb-t fig-cb-d">
+    <title id="fig-cb-t">Combining sources into one UI state</title>
+    <desc id="fig-cb-d">Four sources, the repository's task Flow, the saved filter, a refreshing flag and a user message, are combined into one TasksUiState and exposed with stateIn as a single StateFlow collected by the screen.</desc>
+    <defs><marker id="cbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="10" width="170" height="36" rx="8"/><text class="d-s" x="105" y="33" text-anchor="middle">observeTasks()</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="56" width="170" height="36" rx="8"/><text class="d-s" x="105" y="79" text-anchor="middle">filter (SavedState)</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="102" width="170" height="36" rx="8"/><text class="d-s" x="105" y="125" text-anchor="middle">refreshing</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="148" width="170" height="36" rx="8"/><text class="d-s" x="105" y="171" text-anchor="middle">userMessage</text></g>
+    <path class="d-flow" d="M190 28 L290 92 M190 74 L290 96 M190 120 L290 100 M190 166 L290 104" marker-end="url(#cbm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="294" y="70" width="140" height="56" rx="12"/><text class="d-t" x="364" y="94" text-anchor="middle">combine</text><text class="d-s" x="364" y="112" text-anchor="middle">+ stateIn</text></g>
+    <path class="d-flow" d="M434 98 H496" marker-end="url(#cbm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="500" y="70" width="200" height="56" rx="12"/><text class="d-t" x="600" y="94" text-anchor="middle">StateFlow&lt;TasksUiState&gt;</text><text class="d-s" x="600" y="112" text-anchor="middle">→ collected by UI</text></g>
+  </svg>
+  <figcaption id="fig-cb-cap">Many inputs, one output. The UI never has to reconcile separate streams.</figcaption>
+</figure>
+
+<h2 id="update">Imperative updates with update { }</h2>
+<p>For state the ViewModel owns directly, such as form input, use a <code>MutableStateFlow</code> and <code>update</code>, which is atomic and safe under concurrency:</p>
+<code-block lang="kotlin" file="Form state">
+private val _form = MutableStateFlow(SignupForm())
+val form: StateFlow<SignupForm> = _form.asStateFlow()
+
+fun onEmailChange(email: String) = _form.update {
+    it.copy(email = email, emailError = if (email.isBlank() || "@" in email) null else "Invalid email")
+}
+</code-block>
+
+<h2 id="messages">Messages and one-off events as state</h2>
+<p>Store user messages in state and clear them after display, as in <code>userMessage</code> and <code>messageShown()</code> above. Navigation can be modelled the same way (<code>navigateTo: Destination?</code>), or triggered directly by the UI after observing a result state. See <a href="../flow-vs-stateflow-vs-sharedflow/index.html">Flow vs StateFlow vs SharedFlow</a> for the trade-offs.</p>
+
+<h2 id="ui">Consuming in Compose</h2>
+<code-block lang="kotlin" file="TasksRoute.kt">
+@Composable
+fun TasksRoute(viewModel: TasksViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbar = remember { SnackbarHostState() }
+
+    state.userMessage?.let { msg ->
+        LaunchedEffect(msg) { snackbar.showSnackbar(msg); viewModel.messageShown() }
+    }
+    TasksScreen(state, snackbar, onFilter = viewModel::setFilter, onRefresh = viewModel::refresh)
+}
+</code-block>
+
+<h2 id="testing">Testing state</h2>
+<code-block lang="kotlin" file="TasksViewModelTest.kt">
+@Test
+fun `failed refresh keeps tasks and shows message`() = runTest {
+    val repo = FakeTaskRepository(tasks = listOf(task("Write tests")), refreshFails = true)
+    val vm = TasksViewModel(repo, SavedStateHandle())
+    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+
+    vm.refresh(); advanceUntilIdle()
+
+    with(vm.uiState.value) {
+        assertEquals(1, tasks.size)
+        assertEquals("Couldn't sync. Showing saved tasks.", userMessage)
+        assertFalse(isRefreshing)
+    }
+}
+</code-block>
+<p>Collecting in <code>backgroundScope</code> activates <code>WhileSubscribed</code> upstreams during the test.</p>
+
+<h2 id="use-cases">Patterns by screen type</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Detail screen</h3><p>Sealed: Loading, Content(item) or Error(message, canRetry).</p></div>
+  <div class="card usecase"><h3>List with refresh</h3><p>Data class: items, isRefreshing and message. Items stay visible during refresh.</p></div>
+  <div class="card usecase"><h3>Multi-step form</h3><p>Data class per step plus a sealed submission status. Input is kept in SavedStateHandle.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Several public StateFlows for one screen that the UI must combine.</li>
+  <li>Emitting new state objects with identical content in tight loops, which wastes recomposition.</li>
+  <li><code>SharingStarted.Eagerly</code> for screen state, keeping work alive when invisible.</li>
+  <li>UI-toolkit types (Compose <code>Color</code>, <code>Painter</code>) in UiState. Use semantic values and resource IDs.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should formatting happen in the ViewModel?</summary><div><p>Simple display formatting (dates, prices) in the ViewModel or a UI mapper keeps composables simple and testable. Locale-sensitive formatting can also live in composables if it depends on the configuration.</p></div></details>
+  <details><summary>Is a big UiState bad for performance?</summary><div><p>Usually not. Compose skips parts whose inputs are unchanged. Split state only if unrelated parts update at very high frequency.</p></div></details>
+  <details><summary>Compose State or StateFlow in the ViewModel?</summary><div><p>Both are supported. StateFlow is toolkit-agnostic and integrates with Flow operators, which is why it's the most common choice.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Expose <strong>one immutable StateFlow per screen</strong>, shape it to rule out impossible combinations, build it with <code>combine</code> and <code>stateIn(WhileSubscribed)</code>, and treat messages as consumable state. Screens become simple renderers, and ViewModels become easy to test.</p>
+<p>Next step: see the principle behind all this in <a href="../unidirectional-data-flow-android/index.html">Unidirectional Data Flow in Android</a>.</p>

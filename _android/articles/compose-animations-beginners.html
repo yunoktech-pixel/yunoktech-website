@@ -1,0 +1,151 @@
+<!--meta
+{
+  "seo_title": "Jetpack Compose Animations for Beginners",
+  "description": "Learn Jetpack Compose animations step by step: animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, Crossfade, updateTransition, infinite transitions and specs.",
+  "primary_keyword": "jetpack compose animations",
+  "keywords": ["animateFloatAsState", "AnimatedVisibility compose", "AnimatedContent", "animateContentSize", "compose spring tween", "compose animation tutorial"],
+  "lede": "Good animation explains change: where something came from, what just happened, what's loading. Compose makes most animations a one-line change. This guide starts with the simplest APIs and builds up, with guidance on motion that helps rather than distracts.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["what-is-jetpack-compose", "lazycolumn-vs-column", "compose-performance-optimization", "material3-theming-dynamic-color"],
+  "refs": [
+    ["Animations in Compose", "https://developer.android.com/develop/ui/compose/animation/introduction"],
+    ["Choose an animation API", "https://developer.android.com/develop/ui/compose/animation/choose-api"],
+    ["Customize animations (specs)", "https://developer.android.com/develop/ui/compose/animation/customize"],
+    ["Material motion", "https://m3.material.io/styles/motion/overview"]
+  ]
+}
+-->
+<p class="ad-lead">In the View system, animating meant ObjectAnimators, listeners and careful cleanup. In Compose, animation follows the same idea as everything else: you change <strong>state</strong>, and the animation APIs smoothly move the UI from the old value to the new one.</p>
+
+<h2 id="choose">Which API should you use?</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-an-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-an-t fig-an-d">
+    <title id="fig-an-t">Choosing a Compose animation API</title>
+    <desc id="fig-an-d">If a composable appears or disappears, use AnimatedVisibility. If content swaps based on state, use AnimatedContent or Crossfade. If size changes, use animateContentSize. If a single value such as color, size or alpha changes, use animate as state. If several values change together with one state, use updateTransition. If it repeats forever, use rememberInfiniteTransition.</desc>
+    <rect class="d-green" x="10" y="10" width="225" height="60" rx="10"/><text class="d-t" x="122" y="36" text-anchor="middle">Appear / disappear</text><text class="d-s" x="122" y="56" text-anchor="middle">AnimatedVisibility</text>
+    <rect class="d-green" x="247" y="10" width="225" height="60" rx="10"/><text class="d-t" x="359" y="36" text-anchor="middle">Content swaps</text><text class="d-s" x="359" y="56" text-anchor="middle">AnimatedContent · Crossfade</text>
+    <rect class="d-green" x="484" y="10" width="225" height="60" rx="10"/><text class="d-t" x="596" y="36" text-anchor="middle">Size changes</text><text class="d-s" x="596" y="56" text-anchor="middle">Modifier.animateContentSize()</text>
+    <rect class="d-blue" x="10" y="84" width="225" height="60" rx="10"/><text class="d-t" x="122" y="110" text-anchor="middle">One value changes</text><text class="d-s" x="122" y="130" text-anchor="middle">animate*AsState</text>
+    <rect class="d-blue" x="247" y="84" width="225" height="60" rx="10"/><text class="d-t" x="359" y="110" text-anchor="middle">Many values, one state</text><text class="d-s" x="359" y="130" text-anchor="middle">updateTransition</text>
+    <rect class="d-blue" x="484" y="84" width="225" height="60" rx="10"/><text class="d-t" x="596" y="110" text-anchor="middle">Repeats forever</text><text class="d-s" x="596" y="130" text-anchor="middle">rememberInfiniteTransition</text>
+    <rect class="d-violet" x="130" y="158" width="460" height="50" rx="10"/><text class="d-t" x="360" y="180" text-anchor="middle">Gesture-driven / fully custom</text><text class="d-s" x="360" y="198" text-anchor="middle">Animatable (coroutine-based)</text>
+  </svg>
+  <figcaption id="fig-an-cap">Start with the highest-level API that fits. Drop to <code>Animatable</code> only for gestures or custom choreography.</figcaption>
+</figure>
+
+<h2 id="as-state">1. animate*AsState: animate a single value</h2>
+<code-block lang="kotlin" file="Favourite button">
+@Composable
+fun FavoriteButton(isFavorite: Boolean, onToggle: () -> Unit) {
+    val scale by animateFloatAsState(
+        targetValue = if (isFavorite) 1.2f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "favoriteScale",
+    )
+    val tint by animateColorAsState(
+        targetValue = if (isFavorite) Color(0xFFE11D48) else MaterialTheme.colorScheme.onSurfaceVariant,
+        label = "favoriteTint",
+    )
+    IconButton(onClick = onToggle) {
+        Icon(
+            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+            contentDescription = if (isFavorite) "Remove from favourites" else "Add to favourites",
+            tint = tint,
+            modifier = Modifier.graphicsLayer { scaleX = scale; scaleY = scale },
+        )
+    }
+}
+</code-block>
+<p>Change the target and Compose animates to it, even if it changes again mid-animation. Using <code>graphicsLayer</code> applies the scale in the draw phase, which is cheaper than changing layout size.</p>
+
+<h2 id="visibility">2. AnimatedVisibility: enter and exit</h2>
+<code-block lang="kotlin" file="Error banner">
+AnimatedVisibility(
+    visible = state.error != null,
+    enter = slideInVertically { -it } + fadeIn(),
+    exit = slideOutVertically { -it } + fadeOut(),
+) {
+    ErrorBanner(message = state.error.orEmpty(), onRetry = onRetry)
+}
+</code-block>
+
+<h2 id="content">3. AnimatedContent: swap content</h2>
+<code-block lang="kotlin" file="Animated counter">
+AnimatedContent(
+    targetState = cartCount,
+    transitionSpec = {
+        if (targetState > initialState) slideInVertically { it } + fadeIn() togetherWith slideOutVertically { -it } + fadeOut()
+        else slideInVertically { -it } + fadeIn() togetherWith slideOutVertically { it } + fadeOut()
+    },
+    label = "cartCount",
+) { count -> Text("$count", style = MaterialTheme.typography.titleLarge) }
+</code-block>
+
+<h2 id="size">4. animateContentSize: smooth expand and collapse</h2>
+<code-block lang="kotlin" file="Expandable text">
+var expanded by remember { mutableStateOf(false) }
+Text(
+    text = longDescription,
+    maxLines = if (expanded) Int.MAX_VALUE else 3,
+    overflow = TextOverflow.Ellipsis,
+    modifier = Modifier.animateContentSize().clickable { expanded = !expanded },
+)
+</code-block>
+
+<h2 id="transition">5. updateTransition: coordinate several values</h2>
+<code-block lang="kotlin" file="Selectable card">
+val transition = updateTransition(targetState = selected, label = "cardSelection")
+val elevation by transition.animateDp(label = "elevation") { if (it) 8.dp else 1.dp }
+val borderWidth by transition.animateDp(label = "border") { if (it) 2.dp else 0.dp }
+val bg by transition.animateColor(label = "bg") {
+    if (it) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+}
+</code-block>
+
+<h2 id="infinite">6. Infinite animations: use sparingly</h2>
+<code-block lang="kotlin" file="Skeleton shimmer alpha">
+val infinite = rememberInfiniteTransition(label = "skeleton")
+val alpha by infinite.animateFloat(
+    initialValue = 0.4f, targetValue = 0.9f,
+    animationSpec = infiniteRepeatable(tween(800), RepeatMode.Reverse),
+    label = "skeletonAlpha",
+)
+Box(Modifier.fillMaxWidth().height(16.dp).graphicsLayer { this.alpha = alpha }.background(Color.LightGray))
+</code-block>
+
+<h2 id="specs">Animation specs in one minute</h2>
+<ul>
+  <li><strong><code>spring()</code></strong>: physics-based and the default for most APIs. It handles interruptions naturally.</li>
+  <li><strong><code>tween(durationMillis, easing)</code></strong>: a fixed duration with an easing curve. Good for fades.</li>
+  <li><strong><code>keyframes { }</code></strong>: specific values at specific times.</li>
+</ul>
+
+<h2 id="accessibility">Motion and accessibility</h2>
+<p>Some users enable <em>Remove animations</em> in system settings. Compose's animation system respects the device's animator duration scale. Keep motion purposeful: short UI transitions (roughly 150–300 ms) feel responsive. Never hide essential information inside an animation, and avoid large, continuous movement.</p>
+
+<h2 id="use-cases">Where animation helps users</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Feedback</h3><p>A heart scaling on tap confirms the action happened.</p></div>
+  <div class="card usecase"><h3>Continuity</h3><p>Expanding cards and list item animations show where content went.</p></div>
+  <div class="card usecase"><h3>Status</h3><p>Skeleton placeholders and progress indicators set expectations while loading.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Animating layout-affecting values (padding, size) every frame when a <code>graphicsLayer</code> transform would be cheaper.</li>
+  <li>Infinite animations left running off-screen or behind dialogs.</li>
+  <li>Omitting <code>label</code>, which makes Animation Preview and the inspector harder to use.</li>
+  <li>Over-animating: everything bouncing distracts and slows users down.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I preview animations?</summary><div><p>Yes. Android Studio's Animation Preview lets you inspect and scrub transitions, which is where labels help.</p></div></details>
+  <details><summary>How do I animate between screens?</summary><div><p>Navigation libraries provide enter and exit transitions, and shared element transitions are available in Compose for matching elements across screens.</p></div></details>
+  <details><summary>Are Compose animations performant?</summary><div><p>Yes, when they animate draw-phase properties (alpha, translation, scale via <code>graphicsLayer</code>) and avoid recomposing large trees every frame.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Compose animation is state-driven: change the state and let <strong>animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, updateTransition</strong> or an infinite transition interpolate. Prefer high-level APIs, draw-phase transforms and purposeful, short motion.</p>
+<p>Next step: make your app look polished and personal with <a href="../material3-theming-dynamic-color/index.html">Material 3 Theming and Dynamic Colors</a>.</p>

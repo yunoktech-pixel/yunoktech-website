@@ -1,0 +1,115 @@
+<!--meta
+{
+  "seo_title": "How to Verify AI-Generated Android Code Before Shipping",
+  "description": "A practical checklist to verify AI-generated Android code: build and tests, Kotlin correctness, lifecycle and threading, security, accessibility, performance, dependencies and release checks.",
+  "primary_keyword": "verify ai generated code",
+  "keywords": ["ai code checklist android", "review ai generated kotlin", "android code review checklist", "ai code security review", "ship ai code safely", "android release checklist"],
+  "lede": "AI-generated code compiles more often than it's correct. Before it reaches users, run it through a verification process that targets the mistakes AI tools commonly make in Android apps: lifecycle, threading, security, accessibility and invented APIs.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["ai-write-kotlin-responsibly", "ai-code-review-android", "ai-agents-android-development", "android-app-security-best-practices"],
+  "refs": [
+    ["Core app quality guidelines", "https://developer.android.com/docs/quality-guidelines/core-app-quality"],
+    ["Android lint", "https://developer.android.com/studio/write/lint"],
+    ["Security best practices", "https://developer.android.com/privacy-and-security/security-best-practices"],
+    ["Accessibility testing", "https://developer.android.com/guide/topics/ui/accessibility/testing"]
+  ]
+}
+-->
+<p class="ad-lead">The most dangerous AI-generated code isn't the code that fails to compile. It's the code that compiles, passes a quick manual test, and fails for 2% of users after rotation, on slow networks or in release builds. Verification has to look exactly where those failures hide.</p>
+
+<h2 id="layers">Verification layers</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-vl-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-vl-t fig-vl-d">
+    <title id="fig-vl-t">Layers of verification for AI-generated code</title>
+    <desc id="fig-vl-d">Six layers: automated checks (build, lint, tests); human understanding of every line; Android correctness (lifecycle, threading, process death); security and privacy; quality (accessibility, performance); and release readiness on a minified build and real device.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="20" width="215" height="70" rx="12"/><text class="d-t" x="127" y="50" text-anchor="middle">1. Automated</text><text class="d-s" x="127" y="70" text-anchor="middle">build · lint · tests</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="252" y="20" width="215" height="70" rx="12"/><text class="d-t" x="359" y="50" text-anchor="middle">2. Understanding</text><text class="d-s" x="359" y="70" text-anchor="middle">explain every line</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="484" y="20" width="215" height="70" rx="12"/><text class="d-t" x="591" y="50" text-anchor="middle">3. Android correctness</text><text class="d-s" x="591" y="70" text-anchor="middle">lifecycle · threads</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="20" y="110" width="215" height="70" rx="12"/><text class="d-t" x="127" y="140" text-anchor="middle">4. Security</text><text class="d-s" x="127" y="160" text-anchor="middle">secrets · data · exports</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="252" y="110" width="215" height="70" rx="12"/><text class="d-t" x="359" y="140" text-anchor="middle">5. Quality</text><text class="d-s" x="359" y="160" text-anchor="middle">a11y · performance</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="484" y="110" width="215" height="70" rx="12"/><text class="d-w" x="591" y="140" text-anchor="middle">6. Release</text><text class="d-w" x="591" y="160" text-anchor="middle">minified · real device</text></g>
+  </svg>
+  <figcaption id="fig-vl-cap">Automated checks catch the obvious. The remaining layers catch what AI most often gets subtly wrong.</figcaption>
+</figure>
+
+<h2 id="checklist">The checklist</h2>
+<h3 id="c1">1. Automated</h3>
+<ul>
+  <li>☐ Builds cleanly with no new warnings you don't understand</li>
+  <li>☐ Lint passes (run <code>./gradlew lintDebug</code>), and static analysis passes</li>
+  <li>☐ Unit tests added or updated for new logic, and they fail when the logic is broken</li>
+</ul>
+<h3 id="c2">2. Understanding</h3>
+<ul>
+  <li>☐ You can explain every line and why it's there</li>
+  <li>☐ Every API and dependency exists in the versions you use (checked in official docs)</li>
+  <li>☐ No dead code, unused parameters or leftover placeholder logic</li>
+</ul>
+<h3 id="c3">3. Android correctness</h3>
+<ul>
+  <li>☐ No I/O or heavy work on the main thread; no <code>runBlocking</code></li>
+  <li>☐ Coroutines in lifecycle-aware scopes; <code>CancellationException</code> not swallowed</li>
+  <li>☐ No Activity, View or Context held in ViewModels or singletons</li>
+  <li>☐ State survives rotation and process death where it matters</li>
+  <li>☐ Flows collected lifecycle-aware (<code>collectAsStateWithLifecycle</code>, <code>repeatOnLifecycle</code>)</li>
+  <li>☐ Runtime permissions requested and handled when denied</li>
+</ul>
+<h3 id="c4">4. Security and privacy</h3>
+<ul>
+  <li>☐ No API keys, tokens or secrets in code or resources</li>
+  <li>☐ No logging of personal data or auth headers</li>
+  <li>☐ No disabled TLS or certificate validation, and no cleartext traffic added</li>
+  <li>☐ New components not exported unless required; intents validated</li>
+  <li>☐ Data safety and privacy disclosures still accurate</li>
+</ul>
+<h3 id="c5">5. Quality</h3>
+<ul>
+  <li>☐ Content descriptions, 48dp touch targets, sufficient contrast, TalkBack order</li>
+  <li>☐ Strings in resources; works at large font scale and in dark mode</li>
+  <li>☐ Lazy lists with keys; no expensive work in composition</li>
+  <li>☐ Loading, empty and error states handled</li>
+</ul>
+<h3 id="c6">6. Release readiness</h3>
+<ul>
+  <li>☐ Tested on a <strong>minified release build</strong> (R8) to catch reflection and serialization issues</li>
+  <li>☐ Tested on at least one real, mid-range device</li>
+  <li>☐ Feature flag or staged rollout for risky changes</li>
+</ul>
+
+<h2 id="examples">Common AI mistakes, caught</h2>
+<code-block lang="kotlin" file="Three subtle issues a quick test won't reveal">
+// 1. Works until rotation: state in remember instead of saveable/ViewModel
+var draft by remember { mutableStateOf("") }               // lost on rotation → rememberSaveable
+
+// 2. Works in debug, crashes in release: reflective JSON without keep rules / codegen
+val user = Gson().fromJson(json, User::class.java)         // R8 may strip/rename fields
+
+// 3. Works on Wi-Fi, ANRs on slow networks: blocking call in a click listener
+button.setOnClickListener { api.syncBlocking() }            // move to viewModelScope + suspend
+</code-block>
+
+<h2 id="automate">Automate what you can</h2>
+<ul>
+  <li>CI runs lint, tests and a release build on every PR. See <a href="../android-ci-cd-github-actions/index.html">CI/CD with GitHub Actions</a>.</li>
+  <li>StrictMode and LeakCanary in debug builds catch threading and leak issues during manual testing.</li>
+  <li>Screenshot tests catch visual and accessibility regressions in shared components.</li>
+</ul>
+
+<h2 id="use-cases">Scaling the checklist</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Small UI change</h3><p>Layers 1, 2 and 5, plus a quick device check.</p></div>
+  <div class="card usecase"><h3>New data or async logic</h3><p>All layers, with extra attention to layer 3.</p></div>
+  <div class="card usecase"><h3>Anything touching auth, payments or personal data</h3><p>All layers, plus a security-focused review by a second person.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Isn't this checklist the same for human-written code?</summary><div><p>Mostly, yes. AI-generated code just makes certain mistakes more often (invented APIs, lifecycle subtleties, generic error handling), and it arrives faster, so applying the checklist consistently matters more.</p></div></details>
+  <details><summary>How long should verification take?</summary><div><p>Proportional to risk. Small UI tweaks take minutes. New async or security-relevant logic deserves careful review and tests.</p></div></details>
+  <details><summary>Can another AI verify the code?</summary><div><p>AI review can help find issues, but it doesn't replace running the code, tests and human understanding. See <a href="../ai-code-review-android/index.html">AI Code Review</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Verify AI-generated Android code in layers: <strong>automated checks, full understanding, Android correctness, security, quality and release readiness</strong> on a minified build and a real device. That's how you get AI's speed without shipping its subtle mistakes.</p>
+<p>Next step: secure your app more broadly with <a href="../android-app-security-best-practices/index.html">Android App Security Best Practices</a>.</p>

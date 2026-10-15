@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android App Security Best Practices (2026 Checklist) | Yunok Tech</title>
+  <meta name="description" content="Android app security best practices: threat modelling, secure network config, data storage, secrets, components and intents, WebViews, authentication, dependencies, integrity checks and releases.">
+  <meta name="keywords" content="android app security best practices, android security checklist, secure android app development, network security config, exported components security, webview security android, owasp masvs android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-app-security-best-practices/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-app-security-best-practices/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android App Security Best Practices (2026 Checklist)">
+  <meta property="og:description" content="Android app security best practices: threat modelling, secure network config, data storage, secrets, components and intents, WebViews, authentication, dependencies, integrity checks and releases.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Android App Security Best Practices (2026 Checklist)">
+  <meta name="twitter:description" content="Android app security best practices: threat modelling, secure network config, data storage, secrets, components and intents, WebViews, authentication, dependencies, integrity checks and releases.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android App Security Best Practices", "description": "Android app security best practices: threat modelling, secure network config, data storage, secrets, components and intents, WebViews, authentication, dependencies, integrity checks and releases.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Security and Privacy", "keywords": "android security checklist, secure android app development, network security config, exported components security, webview security android, owasp masvs android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-app-security-best-practices/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android App Security Best Practices", "item": "https://yunoktech.com/android/android-app-security-best-practices/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Android App Security Best Practices</h1>
+    <p class="ad-lede">Most Android security incidents come from a handful of repeat mistakes: secrets in the APK, sensitive data in logs or plain storage, exported components, unsafe WebViews, and trusting the client. This guide organises Android security into practical layers, with code for each.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#layers">Security layers</a></li><li><a href="#principles">Core principles</a></li><li><a href="#network">Network security</a></li><li><a href="#storage">Data storage</a></li><li><a href="#secrets">Secrets</a></li><li><a href="#components">Components and intents</a></li><li><a href="#webview">WebViews</a></li><li><a href="#ui">UI and logs</a></li><li><a href="#release">Release and supply chain</a></li><li><a href="#use-cases">Priorities by app type</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Android gives every app a strong sandbox, but the sandbox can't protect you from your own design decisions. Security has to be built into how you store data, talk to servers, expose components and handle authentication, and it has to assume the device and the APK can be inspected by an attacker.</p>
+
+<h2 id="layers">Security layers</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sl-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-sl-t fig-sl-d">
+    <title id="fig-sl-t">Layers of Android app security</title>
+    <desc id="fig-sl-d">Concentric layers from the server outward: the server enforces authorization and validation; the network is protected with TLS and network security config; on-device storage uses the sandbox and Keystore-backed encryption; app components restrict exports and validate intents; the UI and WebViews avoid leaking data; and the release pipeline uses R8, signing and dependency hygiene.</desc>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="20" y="10" width="680" height="210" rx="18"/><text class="d-s" x="360" y="30" text-anchor="middle">Release: R8, signing, dependency updates, integrity checks</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="60" y="40" width="600" height="170" rx="16"/><text class="d-s" x="360" y="60" text-anchor="middle">UI &amp; WebView: no sensitive data in logs/screenshots, safe WebView settings</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="100" y="70" width="520" height="130" rx="14"/><text class="d-s" x="360" y="90" text-anchor="middle">Components: minimal exports, validated intents, permissions</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="140" y="100" width="440" height="90" rx="12"/><text class="d-s" x="360" y="120" text-anchor="middle">Storage: sandbox + Keystore-backed encryption, no secrets</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="180" y="130" width="360" height="50" rx="10"/><text class="d-s" x="360" y="152" text-anchor="middle">Network: TLS only, network security config</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="250" y="168" width="220" height="24" rx="6"/><text class="d-w" x="360" y="185" text-anchor="middle">Server: the real authority</text></g>
+  </svg>
+  <figcaption id="fig-sl-cap">The server is the final authority. Everything on the device can be observed or modified by a determined attacker.</figcaption>
+</figure>
+
+<h2 id="principles">Core principles</h2>
+<ul>
+  <li><strong>Never trust the client.</strong> Enforce authorisation, prices, limits and business rules on the server.</li>
+  <li><strong>Minimise data:</strong> collect, store and log only what you need.</li>
+  <li><strong>Least privilege:</strong> request minimal permissions, and export minimal components.</li>
+  <li><strong>Defence in depth:</strong> combine controls, because each one can fail.</li>
+</ul>
+
+<h2 id="network">Network security</h2>
+<figure class="code"><figcaption><span class="file">res/xml/network_security_config.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;network-security-config</span><span class="tk-tag">&gt;</span>
+    <span class="tk-c">&lt;!-- Disallow cleartext HTTP everywhere (default for targetSdk 28+, made explicit here) --&gt;</span>
+    <span class="tk-tag">&lt;base-config</span> <span class="tk-at">cleartextTrafficPermitted</span>=<span class="tk-s">"false"</span> <span class="tk-tag">/&gt;</span>
+    <span class="tk-c">&lt;!-- Allow user-installed CAs only in debug builds, e.g. for proxy debugging --&gt;</span>
+    <span class="tk-tag">&lt;debug-overrides</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;trust-anchors</span><span class="tk-tag">&gt;</span>
+            <span class="tk-tag">&lt;certificates</span> <span class="tk-at">src</span>=<span class="tk-s">"user"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;/trust-anchors</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;/debug-overrides</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;/network-security-config</span><span class="tk-tag">&gt;</span></code></pre></figure>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;application</span> <span class="tk-at">android:networkSecurityConfig</span>=<span class="tk-s">"@xml/network_security_config"</span> ... <span class="tk-tag">&gt;</span></code></pre></figure>
+<p>Never ship a custom <code>TrustManager</code> that accepts all certificates or a <code>HostnameVerifier</code> that returns <code>true</code>. Consider certificate pinning only with a rotation plan. See <a href="../certificate-pinning-android/index.html">Certificate Pinning</a>.</p>
+
+<h2 id="storage">Data storage</h2>
+<ul>
+  <li>Keep sensitive data in <strong>app-private storage</strong>, never on shared external storage.</li>
+  <li>Encrypt secrets and sensitive data with <strong>Keystore-backed keys</strong>. See <a href="../encrypted-data-storage-android/index.html">Encrypted Data Storage</a> and <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</li>
+  <li>Exclude sensitive files from backups.</li>
+  <li>Clear user data on logout.</li>
+</ul>
+
+<h2 id="secrets">Secrets</h2>
+<p>Anything in the APK is extractable, including BuildConfig fields, resources, native libraries and obfuscated strings. Keep real secrets on servers and use short-lived, scoped tokens. See <a href="../secure-api-keys-android/index.html">Secure API Keys and Secrets</a>.</p>
+
+<h2 id="components">Components and intents</h2>
+<figure class="code"><figcaption><span class="file">Export only what must be public</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;activity</span> <span class="tk-at">android:name</span>=<span class="tk-s">".internal.DebugMenuActivity"</span> <span class="tk-at">android:exported</span>=<span class="tk-s">"false"</span> <span class="tk-tag">/&gt;</span>
+
+<span class="tk-tag">&lt;receiver</span> <span class="tk-at">android:name</span>=<span class="tk-s">".SyncReceiver"</span> <span class="tk-at">android:exported</span>=<span class="tk-s">"false"</span> <span class="tk-tag">/&gt;</span>
+
+<span class="tk-c">&lt;!-- Public deep-link entry: exported, but validate all incoming data --&gt;</span>
+<span class="tk-tag">&lt;activity</span> <span class="tk-at">android:name</span>=<span class="tk-s">".DeepLinkActivity"</span> <span class="tk-at">android:exported</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;intent-filter</span> <span class="tk-at">android:autoVerify</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;action</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.action.VIEW"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;category</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.category.DEFAULT"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;category</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.category.BROWSABLE"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;data</span> <span class="tk-at">android:scheme</span>=<span class="tk-s">"https"</span> <span class="tk-at">android:host</span>=<span class="tk-s">"yunoktech.com"</span> <span class="tk-at">android:pathPrefix</span>=<span class="tk-s">"/orders/"</span> <span class="tk-tag">/&gt;</span>
+    <span class="tk-tag">&lt;/intent-filter</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;/activity</span><span class="tk-tag">&gt;</span></code></pre></figure>
+<figure class="code"><figcaption><span class="file">Validate incoming deep link data</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> orderId = intent.<span class="tk-k">data</span>?.lastPathSegment
+    ?.takeIf { it.matches(<span class="tk-t">Regex</span>(<span class="tk-s">"^[A-Z0-9]{4,20}$"</span>)) }   <span class="tk-c">// allow-list format</span>
+    ?: <span class="tk-k">return</span> finish()
+<span class="tk-c">// Then load the order through the authenticated API, which enforces ownership server-side.</span></code></pre></figure>
+<ul>
+  <li>Use <code>PendingIntent.FLAG_IMMUTABLE</code> unless mutability is required.</li>
+  <li>Use explicit intents for internal communication.</li>
+  <li>Protect custom permissions with <code>signature</code> protection level when sharing between your own apps.</li>
+</ul>
+
+<h2 id="webview">WebViews</h2>
+<ul>
+  <li>Keep JavaScript disabled unless needed. Never enable file access from file URLs.</li>
+  <li>Load only your own trusted HTTPS content, and restrict navigation to allowed hosts.</li>
+  <li>Avoid <code>addJavascriptInterface</code> with untrusted content. Prefer <code>WebViewCompat.addWebMessageListener</code> with origin allow-lists.</li>
+</ul>
+
+<h2 id="ui">UI and logs</h2>
+<figure class="code"><figcaption><span class="file">Protect sensitive screens</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Prevent screenshots and recent-apps thumbnails on screens showing sensitive data</span>
+window.setFlags(<span class="tk-t">WindowManager</span>.<span class="tk-t">LayoutParams</span>.<span class="tk-t">FLAG_SECURE</span>, <span class="tk-t">WindowManager</span>.<span class="tk-t">LayoutParams</span>.<span class="tk-t">FLAG_SECURE</span>)</code></pre></figure>
+<ul>
+  <li>Never log tokens, OTPs, personal data or full API responses in release builds.</li>
+  <li>Mark password fields correctly (<code>KeyboardType.Password</code> or the password input type) so keyboards don't learn them.</li>
+</ul>
+
+<h2 id="release">Release and supply chain</h2>
+<ul>
+  <li>Enable R8 (it raises the effort of reverse engineering, but isn't a security boundary).</li>
+  <li>Use Play App Signing, and protect upload keys. See <a href="../android-app-signing-upload-keys/index.html">App Signing</a>.</li>
+  <li>Keep dependencies updated, remove unused SDKs, and review SDK data collection.</li>
+  <li>Use <a href="../play-integrity-api-explained/index.html">Play Integrity</a> on the server for high-value actions.</li>
+</ul>
+
+<h2 id="use-cases">Priorities by app type</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Content app</h3><p>TLS, minimal permissions, no secrets in the APK, safe WebViews.</p></div>
+  <div class="card usecase"><h3>Commerce app</h3><p>Plus server-side price and order validation, secure tokens, and Play Integrity for checkout.</p></div>
+  <div class="card usecase"><h3>Finance or health app</h3><p>Plus encrypted storage, FLAG_SECURE, biometrics for sensitive actions, strict logging, and regular security testing (MASVS).</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does obfuscation make my app secure?</summary><div><p>No. It slows reverse engineering. Security comes from server-side enforcement, proper storage and not shipping secrets.</p></div></details>
+  <details><summary>Should I detect rooted devices?</summary><div><p>Client-side root detection is easily bypassed. Prefer server-side Play Integrity verdicts for risk decisions, and don't break the app for legitimate users without reason.</p></div></details>
+  <details><summary>Where can I find a complete checklist?</summary><div><p>OWASP's Mobile Application Security Verification Standard (MASVS) and testing guide are comprehensive references.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android security is layered: <strong>server-side authority</strong>, <strong>TLS-only networking</strong>, <strong>sandboxed and encrypted storage</strong>, <strong>minimal exported components with validated input</strong>, <strong>safe WebViews and logging</strong>, and a <strong>secure release pipeline</strong>. Fix the common mistakes first, then deepen for higher-risk apps.</p>
+<p>Next step: understand the foundation of on-device cryptography in <a href="../android-keystore-explained/index.html">Android Keystore Explained</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/privacy-and-security/security-best-practices" target="_blank" rel="noopener">Android security best practices</a></li><li><a href="https://developer.android.com/privacy-and-security/security-config" target="_blank" rel="noopener">Network security configuration</a></li><li><a href="https://mas.owasp.org/MASVS/" target="_blank" rel="noopener">OWASP MASVS</a></li><li><a href="https://developer.android.com/privacy-and-security/risks" target="_blank" rel="noopener">App security improvement program / risks</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-security-best-practices-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-security-best-practices-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/common-android-security-vulnerabilities/index.html"><small>Android Security and Privacy</small>Common Android Security Vulnerabilities</a></li><li><a href="../../android/secure-api-keys-android/index.html"><small>Android Security and Privacy</small>Secure API Keys and Secrets in Android Apps</a></li><li><a href="../../android/encrypted-data-storage-android/index.html"><small>Android Security and Privacy</small>Encrypted Data Storage in Android</a></li><li><a href="../../android/play-integrity-api-explained/index.html"><small>Android Security and Privacy</small>Play Integrity API Explained</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-app-security-best-practices/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-app-security-best-practices/&amp;text=Android App Security Best Practices" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-app-security-best-practices/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#layers">Security layers</a></li><li><a href="#principles">Core principles</a></li><li><a href="#network">Network security</a></li><li><a href="#storage">Data storage</a></li><li><a href="#secrets">Secrets</a></li><li><a href="#components">Components and intents</a></li><li><a href="#webview">WebViews</a></li><li><a href="#ui">UI and logs</a></li><li><a href="#release">Release and supply chain</a></li><li><a href="#use-cases">Priorities by app type</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-security-best-practices-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-security-best-practices-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

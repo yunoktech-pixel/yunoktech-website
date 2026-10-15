@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Architecture in Android: Practical Lessons | Yunok Tech</title>
+  <meta name="description" content="Clean Architecture in Android without the ceremony: layers, dependency rule, repositories, optional use cases, mapping, Hilt wiring, modules, testing and when to keep it simple.">
+  <meta name="keywords" content="clean architecture android, android clean architecture kotlin, domain layer android, use cases android, repository pattern android, android app layers, dependency inversion android, android architecture best practices">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/clean-architecture-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/clean-architecture-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Clean Architecture in Android: Practical Lessons">
+  <meta property="og:description" content="Clean Architecture in Android without the ceremony: layers, dependency rule, repositories, optional use cases, mapping, Hilt wiring, modules, testing and when to keep it simple.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="Clean Architecture in Android: Practical Lessons">
+  <meta name="twitter:description" content="Clean Architecture in Android without the ceremony: layers, dependency rule, repositories, optional use cases, mapping, Hilt wiring, modules, testing and when to keep it simple.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Clean Architecture in Android: Practical Lessons", "description": "Clean Architecture in Android without the ceremony: layers, dependency rule, repositories, optional use cases, mapping, Hilt wiring, modules, testing and when to keep it simple.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android Architecture and Clean Code", "keywords": "android clean architecture kotlin, domain layer android, use cases android, repository pattern android, android app layers, dependency inversion android, android architecture best practices", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/clean-architecture-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Clean Architecture in Android: Practical Lessons", "item": "https://yunoktech.com/android/clean-architecture-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">Clean Architecture in Android: Practical Lessons</h1>
+    <p class="ad-lede">Clean Architecture is often taught as five layers and twenty files per feature. In real Android apps, the value comes from a few rules applied with judgement. Here are the rules, a complete feature built with them, and the lessons about when they help and when they hurt.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>5 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#core-idea">The core idea: one rule, not five layers</a></li><li><a href="#feature">Building one feature: &quot;Saved articles&quot;</a></li><li><a href="#testing">Testing pays off here</a></li><li><a href="#modules">Packages first, modules when you need them</a></li><li><a href="#lessons">Practical lessons from real codebases</a></li><li><a href="#use-cases">When Clean Architecture pays off, and when it doesn&#x27;t</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A common story: a team adopts Clean Architecture after a painful legacy project. Six months later, adding a text field requires touching a DTO, an entity, a domain model, two mappers, a repository interface, its implementation, a use case, a ViewModel and a UI model. Everyone agrees the code is "clean". Nobody agrees it's productive.</p>
+<p>This article is for intermediate and senior Android developers who want the benefits of Clean Architecture (testability, replaceable data sources, business logic independent of frameworks) without the ceremony. It aligns the ideas with <a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Google's official architecture guidance</a>, builds one feature end to end, and shares practical lessons about where to draw lines.</p>
+
+<h2 id="core-idea">The core idea: one rule, not five layers</h2>
+<p>Strip Clean Architecture down and one rule remains: <strong>the dependency rule</strong>. Source-code dependencies point <em>inward</em>, toward the business logic. Your business rules don't know about Retrofit, Room, Compose or Android. Frameworks are details that plug in at the edges.</p>
+<p>Google's architecture guide expresses a compatible structure in Android terms:</p>
+<ul>
+  <li><strong>UI layer</strong>: composables or Views plus state holders (ViewModels).</li>
+  <li><strong>Domain layer (optional)</strong>: use cases that encapsulate complex or reused business logic.</li>
+  <li><strong>Data layer</strong>: repositories that expose data and hide data sources (network, database, files).</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-layers-cap">
+  <svg viewBox="0 0 720 280" role="img" aria-labelledby="fig-layers-title fig-layers-desc">
+    <title id="fig-layers-title">Android app layers and the dependency rule</title>
+    <desc id="fig-layers-desc">The UI layer (Compose, ViewModel) depends on the optional domain layer (use cases), which depends on repository interfaces. The data layer implements those interfaces using Retrofit and Room. Arrows show dependencies pointing inward toward the domain; data flows outward to the UI.</desc>
+    <defs><marker id="l1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="200" height="200" rx="16"/><text class="d-t" x="120" y="66" text-anchor="middle">UI layer</text>
+      <rect class="d-box" x="40" y="84" width="160" height="50" rx="10"/><text class="d-s" x="120" y="114" text-anchor="middle">Compose screen</text>
+      <rect class="d-box" x="40" y="150" width="160" height="50" rx="10"/><text class="d-s" x="120" y="180" text-anchor="middle">ViewModel</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="260" y="40" width="200" height="200" rx="16"/><text class="d-t" x="360" y="66" text-anchor="middle">Domain (optional)</text>
+      <rect class="d-box" x="280" y="84" width="160" height="50" rx="10"/><text class="d-s" x="360" y="114" text-anchor="middle">Use cases</text>
+      <rect class="d-box" x="280" y="150" width="160" height="50" rx="10"/><text class="d-s" x="360" y="172" text-anchor="middle">Models + repository</text><text class="d-s" x="360" y="188" text-anchor="middle">interfaces</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="500" y="40" width="200" height="200" rx="16"/><text class="d-t" x="600" y="66" text-anchor="middle">Data layer</text>
+      <rect class="d-box" x="520" y="84" width="160" height="50" rx="10"/><text class="d-s" x="600" y="114" text-anchor="middle">Repository impl</text>
+      <rect class="d-box" x="520" y="150" width="76" height="50" rx="10"/><text class="d-s" x="558" y="180" text-anchor="middle">Retrofit</text>
+      <rect class="d-box" x="604" y="150" width="76" height="50" rx="10"/><text class="d-s" x="642" y="180" text-anchor="middle">Room</text></g>
+    <path class="d-flow" d="M200 175 H276 M200 109 H276" marker-end="url(#l1)"/>
+    <path class="d-flow" d="M516 109 C480 109 480 175 444 175" marker-end="url(#l1)"/>
+    <text class="d-s" x="238" y="262" text-anchor="middle">depends on →</text><text class="d-s" x="480" y="262" text-anchor="middle">← implements</text>
+  </svg>
+  <figcaption id="fig-layers-cap">The data layer depends on the domain's interfaces, not the other way round. Swapping Retrofit for Ktor, or adding a cache, changes nothing above it.</figcaption>
+</figure>
+
+<h2 id="feature">Building one feature: "Saved articles"</h2>
+<p>Requirements: show saved articles (offline-capable), refresh from the server, and let users unsave an article. Saved articles older than 90 days are hidden unless pinned. That last rule is a genuine business rule, and it will justify a use case.</p>
+
+<h3 id="domain">Domain: models and contracts</h3>
+<figure class="code"><figcaption><span class="file">domain/Article.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Plain Kotlin: no Android, Room or serialization annotations.</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Article</span>(
+    <span class="tk-k">val</span> id: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> title: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> savedAt: java.time.<span class="tk-t">Instant</span>,
+    <span class="tk-k">val</span> isPinned: <span class="tk-t">Boolean</span>,
+)
+
+<span class="tk-k">interface</span> <span class="tk-t">SavedArticlesRepository</span> {
+    <span class="tk-k">fun</span> observeSaved(): kotlinx.coroutines.flow.<span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;&gt;
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refresh()
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> unsave(id: <span class="tk-t">String</span>)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">domain/GetVisibleSavedArticlesUseCase.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> java.time.<span class="tk-t">Clock</span>
+<span class="tk-k">import</span> java.time.<span class="tk-t">Duration</span>
+<span class="tk-k">import</span> javax.inject.<span class="tk-t">Inject</span>
+<span class="tk-k">import</span> kotlinx.coroutines.flow.<span class="tk-t">Flow</span>
+<span class="tk-k">import</span> kotlinx.coroutines.flow.map
+
+<span class="tk-c">/** Business rule: hide unpinned items saved more than 90 days ago; pinned first, newest first. */</span>
+<span class="tk-k">class</span> <span class="tk-t">GetVisibleSavedArticlesUseCase</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">SavedArticlesRepository</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> clock: <span class="tk-t">Clock</span>,                          <span class="tk-c">// injectable → deterministic tests</span>
+) {
+    <span class="tk-k">operator</span> <span class="tk-k">fun</span> invoke(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;&gt; = repository.observeSaved().map { articles -&gt;
+        <span class="tk-k">val</span> cutoff = clock.instant().minus(<span class="tk-t">Duration</span>.ofDays(<span class="tk-n">90</span>))
+        articles
+            .filter { it.isPinned || it.savedAt.isAfter(cutoff) }
+            .sortedWith(compareByDescending&lt;<span class="tk-t">Article</span>&gt; { it.isPinned }.thenByDescending { it.savedAt })
+    }
+}</code></pre></figure>
+
+<h3 id="data">Data: repository implementation and mapping</h3>
+<figure class="code"><figcaption><span class="file">data/SavedArticlesRepositoryImpl.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SavedArticlesRepositoryImpl</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">SavedArticlesApi</span>,          <span class="tk-c">// Retrofit</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> dao: <span class="tk-t">SavedArticleDao</span>,           <span class="tk-c">// Room</span>
+) : <span class="tk-t">SavedArticlesRepository</span> {
+
+    <span class="tk-c">// Room is the single source of truth; the UI always reads from the database.</span>
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> observeSaved(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;&gt; =
+        dao.observeAll().map { entities -&gt; entities.map { it.toDomain() } }
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refresh() {
+        <span class="tk-k">val</span> remote = api.getSaved()                       <span class="tk-c">// throws IOException/HttpException</span>
+        dao.replaceAll(remote.map { it.toEntity() })      <span class="tk-c">// @Transaction in the DAO</span>
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> unsave(id: <span class="tk-t">String</span>) {
+        dao.delete(id)                                    <span class="tk-c">// optimistic local update</span>
+        api.unsave(id)                                    <span class="tk-c">// in production: queue with WorkManager on failure</span>
+    }
+}
+
+<span class="tk-c">// Mappers live at the boundary that needs them.</span>
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">SavedArticleEntity</span>.toDomain() =
+    <span class="tk-t">Article</span>(id = id, title = title, savedAt = <span class="tk-t">Instant</span>.ofEpochMilli(savedAtMillis), isPinned = pinned)
+
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">SavedArticleDto</span>.toEntity() =
+    <span class="tk-t">SavedArticleEntity</span>(id = id, title = title, savedAtMillis = savedAt, pinned = pinned)</code></pre></figure>
+
+<h3 id="ui">UI: ViewModel</h3>
+<figure class="code"><figcaption><span class="file">ui/SavedArticlesViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">SavedUiState</span>(
+    <span class="tk-k">val</span> articles: <span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> isRefreshing: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> message: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+)
+
+<span class="tk-a">@HiltViewModel</span>
+<span class="tk-k">class</span> <span class="tk-t">SavedArticlesViewModel</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(
+    getVisibleSaved: <span class="tk-t">GetVisibleSavedArticlesUseCase</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">SavedArticlesRepository</span>,      <span class="tk-c">// simple actions call the repository directly</span>
+) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> refreshing = <span class="tk-t">MutableStateFlow</span>(<span class="tk-k">false</span>)
+    <span class="tk-k">private</span> <span class="tk-k">val</span> message = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">String</span>?&gt;(<span class="tk-k">null</span>)
+
+    <span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SavedUiState</span>&gt; =
+        combine(getVisibleSaved(), refreshing, message) { articles, isRefreshing, msg -&gt;
+            <span class="tk-t">SavedUiState</span>(articles, isRefreshing, msg)
+        }.stateIn(viewModelScope, <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>), <span class="tk-t">SavedUiState</span>())
+
+    <span class="tk-k">init</span> { refresh() }
+
+    <span class="tk-k">fun</span> refresh() = viewModelScope.launch {
+        refreshing.<span class="tk-k">value</span> = <span class="tk-k">true</span>
+        <span class="tk-k">try</span> {
+            repository.refresh()
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            message.<span class="tk-k">value</span> = <span class="tk-s">"Showing saved copies. Couldn't reach the server."</span>
+        } <span class="tk-k">finally</span> {
+            refreshing.<span class="tk-k">value</span> = <span class="tk-k">false</span>
+        }
+    }
+
+    <span class="tk-k">fun</span> unsave(id: <span class="tk-t">String</span>) = viewModelScope.launch { repository.unsave(id) }
+    <span class="tk-k">fun</span> messageShown() { message.<span class="tk-k">value</span> = <span class="tk-k">null</span> }
+}</code></pre></figure>
+<div class="key"><b>Lesson: use cases are optional, per operation</b>
+<p>The 90-day visibility rule lives in a use case because it's real business logic that should be tested and could be reused (for example by a widget). <code>refresh()</code> and <code>unsave()</code> are simple pass-throughs, so the ViewModel calls the repository directly. Google's guidance describes the domain layer as optional for exactly this reason. Wrapper use cases that only forward a call add files, not value.</p></div>
+
+<h3 id="di">Wiring with Hilt</h3>
+<figure class="code"><figcaption><span class="file">di/DataModule.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Module</span>
+<span class="tk-a">@InstallIn</span>(<span class="tk-t">SingletonComponent</span>::<span class="tk-k">class</span>)
+<span class="tk-k">abstract</span> <span class="tk-k">class</span> <span class="tk-t">DataModule</span> {
+    <span class="tk-a">@Binds</span>
+    <span class="tk-k">abstract</span> <span class="tk-k">fun</span> bindSavedArticlesRepository(impl: <span class="tk-t">SavedArticlesRepositoryImpl</span>): <span class="tk-t">SavedArticlesRepository</span>
+}
+
+<span class="tk-a">@Module</span>
+<span class="tk-a">@InstallIn</span>(<span class="tk-t">SingletonComponent</span>::<span class="tk-k">class</span>)
+<span class="tk-k">object</span> <span class="tk-t">TimeModule</span> {
+    <span class="tk-a">@Provides</span>
+    <span class="tk-k">fun</span> provideClock(): <span class="tk-t">Clock</span> = <span class="tk-t">Clock</span>.systemUTC()
+}</code></pre></figure>
+
+<h2 id="testing">Testing pays off here</h2>
+<p>Because the use case depends only on an interface and a <code>Clock</code>, the business rule is testable with plain JUnit and a fake:</p>
+<figure class="code"><figcaption><span class="file">GetVisibleSavedArticlesUseCaseTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">GetVisibleSavedArticlesUseCaseTest</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> now = <span class="tk-t">Instant</span>.parse(<span class="tk-s">"2026-10-14T10:00:00Z"</span>)
+    <span class="tk-k">private</span> <span class="tk-k">val</span> clock = <span class="tk-t">Clock</span>.fixed(now, <span class="tk-t">ZoneOffset</span>.<span class="tk-t">UTC</span>)
+
+    <span class="tk-k">private</span> <span class="tk-k">class</span> <span class="tk-t">FakeRepo</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> items: <span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;) : <span class="tk-t">SavedArticlesRepository</span> {
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> observeSaved() = flowOf(items)
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refresh() = <span class="tk-t">Unit</span>
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> unsave(id: <span class="tk-t">String</span>) = <span class="tk-t">Unit</span>
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `old unpinned articles are hidden, pinned ones stay first`() = runTest {
+        <span class="tk-k">val</span> old = <span class="tk-t">Article</span>(<span class="tk-s">"1"</span>, <span class="tk-s">"Old"</span>, now.minus(<span class="tk-t">Duration</span>.ofDays(<span class="tk-n">120</span>)), isPinned = <span class="tk-k">false</span>)
+        <span class="tk-k">val</span> oldPinned = <span class="tk-t">Article</span>(<span class="tk-s">"2"</span>, <span class="tk-s">"Old pinned"</span>, now.minus(<span class="tk-t">Duration</span>.ofDays(<span class="tk-n">200</span>)), isPinned = <span class="tk-k">true</span>)
+        <span class="tk-k">val</span> recent = <span class="tk-t">Article</span>(<span class="tk-s">"3"</span>, <span class="tk-s">"Recent"</span>, now.minus(<span class="tk-t">Duration</span>.ofDays(<span class="tk-n">2</span>)), isPinned = <span class="tk-k">false</span>)
+
+        <span class="tk-k">val</span> result = <span class="tk-t">GetVisibleSavedArticlesUseCase</span>(<span class="tk-t">FakeRepo</span>(listOf(old, oldPinned, recent)), clock)().first()
+
+        assertEquals(listOf(<span class="tk-s">"2"</span>, <span class="tk-s">"3"</span>), result.map { it.id })
+    }
+}</code></pre></figure>
+
+<h2 id="modules">Packages first, modules when you need them</h2>
+<p>Layers are a <em>logical</em> boundary. Gradle modules are a <em>physical</em> one that the compiler enforces. Start with packages per feature and layer. Introduce modules when you have a concrete reason: build times, team ownership, or reuse across apps.</p>
+<figure class="code"><figcaption><span class="file">A pragmatic modular structure (when the app grows)</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">:app                         ← navigation, DI graph assembly
+:feature:saved               ← UI + ViewModels for "Saved articles"
+:feature:search
+:core:domain                 ← pure Kotlin: models, repository interfaces, use cases
+:core:data                   ← repository implementations
+:core:network                ← Retrofit setup, DTOs
+:core:database               ← Room database, DAOs, entities
+:core:designsystem           ← theme, shared composables</code></pre></figure>
+<p>Google's <a href="https://developer.android.com/topic/modularization" target="_blank" rel="noopener">modularization guide</a> and the open-source <em>Now in Android</em> sample show this kind of structure in practice.</p>
+
+<h2 id="lessons">Practical lessons from real codebases</h2>
+<div class="cards">
+  <div class="card"><h4>1. Don't map for the sake of mapping</h4><p>Separate DTO, entity and domain models when they genuinely differ, for example when the API shape differs from what the app needs or Room needs annotations. If three classes are identical, you've tripled maintenance for no isolation benefit. Introduce mappers when shapes diverge.</p></div>
+  <div class="card"><h4>2. The repository is the real boundary</h4><p>Most of the testability and flexibility comes from ViewModels depending on repository <em>interfaces</em>. Get that right before adding anything else.</p></div>
+  <div class="card"><h4>3. Keep the domain pure Kotlin</h4><p>No <code>Context</code>, no <code>LiveData</code>, no Room annotations in domain code. A pure-Kotlin <code>:core:domain</code> module enforces this automatically.</p></div>
+  <div class="card"><h4>4. Name use cases after actions</h4><p><code>GetVisibleSavedArticlesUseCase</code> and <code>PlaceOrderUseCase</code> say what they do. <code>ArticleUseCases</code> with 15 methods is a service class with a new name.</p></div>
+  <div class="card"><h4>5. Decide threading at the edges</h4><p>Repositories and data sources are main-safe (using <code>withContext</code> internally), so ViewModels and use cases never think about dispatchers.</p></div>
+  <div class="card"><h4>6. Architecture should match team size</h4><p>A solo developer with a 6-screen app and a 40-person team with 200 screens need different amounts of structure. Both can be "clean".</p></div>
+</div>
+
+<h2 id="use-cases">When Clean Architecture pays off, and when it doesn't</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Situation</th><th>Recommended approach</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Prototype or hackathon</td><td>ViewModel + repository, single module</td><td>Speed matters; boundaries can come later</td></tr>
+    <tr><td>Small production app (1–3 devs)</td><td>UI + data layers, use cases only for real rules, packages not modules</td><td>Testable without ceremony</td></tr>
+    <tr><td>Growing app, several teams</td><td>Feature modules + core modules, domain module, strict dependency rules</td><td>Ownership, build speed, enforced boundaries</td></tr>
+    <tr><td>Sharing logic with iOS (KMP)</td><td>Pure-Kotlin domain and data in shared modules</td><td>Clean boundaries make multiplatform sharing much easier</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><strong>Pass-through use cases everywhere</strong> (<code>GetUserUseCase</code> that just calls <code>repository.getUser()</code>).</li>
+  <li><strong>Leaking framework types inward</strong>: Retrofit <code>Response</code>, Room entities or <code>Context</code> in the domain layer.</li>
+  <li><strong>Repositories returning UI models</strong> such as formatted strings or colours. Formatting belongs in the UI layer.</li>
+  <li><strong>One giant "BaseUseCase" hierarchy</strong> with generics and callbacks, instead of simple <code>suspend</code> or <code>Flow</code>-returning functions.</li>
+  <li><strong>Over-modularising early</strong>: 30 modules for 5 screens, with slower syncs and no real benefit.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Clean Architecture the same as Google's recommended architecture?</summary><div><p>They're compatible but not identical. Google's guide defines UI, optional domain and data layers with unidirectional data flow. Clean Architecture adds the strict dependency rule and terminology from Robert C. Martin. Many Android teams combine the two.</p></div></details>
+  <details><summary>Do I need a domain layer?</summary><div><p>Only where there is business logic worth isolating: complex rules, logic reused by several ViewModels, or logic you want to test independently. Simple screens can depend on repositories directly.</p></div></details>
+  <details><summary>MVVM or MVI with Clean Architecture?</summary><div><p>Either. Clean Architecture is about the layers below and around the ViewModel. MVVM and MVI describe how the ViewModel and UI communicate. See <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a>.</p></div></details>
+  <details><summary>Should repositories return Result types or throw?</summary><div><p>Both work. Pick one convention for the codebase. Throwing exceptions from suspend functions and catching them in the ViewModel is simple and idiomatic. Result or sealed types make failures explicit in signatures.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Clean Architecture on Android works best as <strong>a few firm rules</strong>: dependencies point inward, repositories hide data sources behind interfaces, business logic is plain Kotlin, and frameworks stay at the edges. Add use cases, mappers and modules <strong>when they solve a real problem</strong>, not because a template says so.</p>
+<p>Next step: pick one feature in your app and check two things. Does the ViewModel depend on an interface? Is the business rule testable without Android? Fix those first. Then measure the result with <a href="../android-app-performance-optimization/index.html">the Android performance optimisation guide</a>, because clean code still has to be fast.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li><li><a href="https://developer.android.com/topic/architecture/data-layer" target="_blank" rel="noopener">Data layer</a></li><li><a href="https://developer.android.com/topic/architecture/domain-layer" target="_blank" rel="noopener">Domain layer</a></li><li><a href="https://developer.android.com/topic/architecture/recommendations" target="_blank" rel="noopener">Recommendations for Android architecture</a></li><li><a href="https://developer.android.com/topic/modularization" target="_blank" rel="noopener">Guide to Android app modularization</a></li><li><a href="https://developer.android.com/training/dependency-injection/hilt-android" target="_blank" rel="noopener">Dependency injection with Hilt</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dclean-architecture-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dclean-architecture-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/mvi-vs-mvvm-android/index.html"><small>Android Architecture and Clean Code</small>MVVM vs MVI: Which Android Architecture Should You Use?</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li><li><a href="../../android/android-developer-roadmap-beginners/index.html"><small>Android Development for Beginners</small>Android Development Roadmap for Beginners in 2026</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/clean-architecture-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/clean-architecture-android/&amp;text=Clean Architecture in Android: Practical Lessons" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/clean-architecture-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#core-idea">The core idea: one rule, not five layers</a></li><li><a href="#feature">Building one feature: &quot;Saved articles&quot;</a></li><li><a href="#testing">Testing pays off here</a></li><li><a href="#modules">Packages first, modules when you need them</a></li><li><a href="#lessons">Practical lessons from real codebases</a></li><li><a href="#use-cases">When Clean Architecture pays off, and when it doesn&#x27;t</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dclean-architecture-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dclean-architecture-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

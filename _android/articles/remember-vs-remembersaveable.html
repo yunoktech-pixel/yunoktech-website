@@ -1,0 +1,121 @@
+<!--meta
+{
+  "seo_title": "remember vs rememberSaveable in Jetpack Compose",
+  "description": "remember vs rememberSaveable explained: what survives recomposition, rotation and process death, keys, custom Savers, Parcelize, size limits and when to use a ViewModel instead.",
+  "primary_keyword": "remember vs remembersaveable",
+  "keywords": ["rememberSaveable compose", "compose remember keys", "compose saver", "state survives rotation compose", "process death compose", "parcelize compose state"],
+  "lede": "remember and rememberSaveable look almost identical, but they survive very different events. Pick the wrong one and your users lose what they typed when they rotate the phone, or when Android reclaims memory in the background.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-state-management", "compose-state-hoisting", "how-android-app-works-internally", "compose-side-effects"],
+  "refs": [
+    ["Save UI state in Compose", "https://developer.android.com/develop/ui/compose/state-saving"],
+    ["State and Jetpack Compose", "https://developer.android.com/develop/ui/compose/state"],
+    ["Save UI states (overview)", "https://developer.android.com/topic/libraries/architecture/saving-states"],
+    ["Parcelable implementation generator (Parcelize)", "https://developer.android.com/kotlin/parcelize"]
+  ]
+}
+-->
+<p class="ad-lead">A user types a long review, rotates the phone to see it better, and the text field is empty. Or they switch to their banking app to copy an OTP, come back, and the screen has reset. Both bugs come from choosing <code>remember</code> where <code>rememberSaveable</code> (or a ViewModel) was needed.</p>
+
+<h2 id="survival">What each one survives</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Event</th><th><code>remember</code></th><th><code>rememberSaveable</code></th><th>ViewModel</th><th>ViewModel + SavedStateHandle</th></tr></thead>
+  <tbody>
+    <tr><td>Recomposition</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Leaving composition (e.g. <code>if</code> hides it)</td><td>❌</td><td>❌ (unless in a saveable state holder, as in navigation)</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Configuration change (rotation, dark mode, locale)</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Process death (system kills app in background)</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+    <tr><td>User closes app from recents / back from root</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+  </tbody>
+</table>
+</div>
+<p>For data that must survive even the user closing the app, such as drafts or settings, persist it with Room or DataStore.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rs-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-rs-t fig-rs-d">
+    <title id="fig-rs-t">Survival levels of Compose state</title>
+    <desc id="fig-rs-d">Nested boxes from smallest to largest lifetime: remember survives recomposition; rememberSaveable also survives configuration changes and process death via the saved instance state Bundle; Room or DataStore persists across app restarts.</desc>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="20" y="10" width="680" height="160" rx="16"/><text class="d-t" x="360" y="34" text-anchor="middle">Room / DataStore: survives app restarts</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="80" y="46" width="560" height="110" rx="14"/><text class="d-t" x="360" y="70" text-anchor="middle">rememberSaveable: + rotation + process death (Bundle)</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="200" y="86" width="320" height="56" rx="12"/><text class="d-t" x="360" y="119" text-anchor="middle">remember: recomposition only</text></g>
+  </svg>
+  <figcaption id="fig-rs-cap">Choose the smallest lifetime that still protects the user's work.</figcaption>
+</figure>
+
+<h2 id="how">How rememberSaveable works</h2>
+<p><code>rememberSaveable</code> stores its value in the <strong>saved instance state Bundle</strong>, the same mechanism Activities use. The value must therefore be saveable: primitives, Strings, and <code>Parcelable</code> or <code>Serializable</code> types, or you provide a <code>Saver</code>.</p>
+<code-block lang="kotlin" file="Common usages">
+@Composable
+fun ReviewForm() {
+    var text by rememberSaveable { mutableStateOf("") }              // String: saveable
+    var rating by rememberSaveable { mutableIntStateOf(0) }          // Int: saveable
+    var showTips by remember { mutableStateOf(true) }                // transient UI hint: remember is fine
+    // ...
+}
+</code-block>
+
+<h2 id="parcelize">Custom types with Parcelize</h2>
+<code-block lang="kotlin" file="Parcelable state">
+@Parcelize
+data class DateRange(val startEpochDay: Long, val endEpochDay: Long) : Parcelable
+
+var range by rememberSaveable { mutableStateOf(DateRange(0, 0)) }
+</code-block>
+<p>This requires the <code>kotlin-parcelize</code> Gradle plugin.</p>
+
+<h2 id="saver">Custom Savers</h2>
+<code-block lang="kotlin" file="mapSaver / listSaver">
+data class Filters(val query: String, val onlyUnread: Boolean)
+
+val FiltersSaver = listSaver<Filters, Any>(
+    save = { listOf(it.query, it.onlyUnread) },
+    restore = { Filters(it[0] as String, it[1] as Boolean) },
+)
+
+var filters by rememberSaveable(stateSaver = FiltersSaver) { mutableStateOf(Filters("", false)) }
+</code-block>
+
+<h2 id="keys">Keys: resetting remembered values</h2>
+<code-block lang="kotlin" file="remember with keys">
+@Composable
+fun ProductScreen(productId: String) {
+    // Recreated when productId changes, otherwise reused
+    val formatter = remember(productId) { PriceFormatter(productId) }
+    // Saved selection resets when navigating to a different product
+    var selectedSize by rememberSaveable(productId) { mutableStateOf<String?>(null) }
+}
+</code-block>
+
+<h2 id="limits">Limits and when to use a ViewModel instead</h2>
+<ul>
+  <li><strong>Bundle size is limited.</strong> Saving large lists or bitmaps can cause <code>TransactionTooLargeException</code>. Save IDs or small input, and reload data from the repository.</li>
+  <li><strong>Business logic doesn't belong in composables.</strong> If state needs loading, validation or saving, put it in a ViewModel, using <code>SavedStateHandle</code> for the parts that must survive process death.</li>
+  <li><strong>Don't save derived values.</strong> Save the inputs and recompute the rest.</li>
+</ul>
+
+<h2 id="test">How to test process death</h2>
+<ol class="steps">
+  <li>Run the app, type into the form, then press Home.</li>
+  <li>Run <code>adb shell am kill com.your.package</code> (it only kills background apps), or enable <em>Don't keep activities</em>.</li>
+  <li>Reopen the app from recents. Everything in <code>rememberSaveable</code> and <code>SavedStateHandle</code> should be restored.</li>
+</ol>
+
+<h2 id="use-cases">Choosing in practice</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Text the user typed</h3><p><code>rememberSaveable</code>, or <code>SavedStateHandle</code> in the ViewModel if the screen logic uses it.</p></div>
+  <div class="card usecase"><h3>Animation or tooltip flags</h3><p><code>remember</code>. Losing it on rotation is harmless.</p></div>
+  <div class="card usecase"><h3>Scroll position</h3><p><code>rememberLazyListState()</code> already uses a saver internally.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does rememberSaveable survive navigating away and back?</summary><div><p>Inside Navigation Compose or Navigation 3 destinations, saveable state is kept for back stack entries, so returning to a screen restores it. Outside such holders, leaving composition discards it.</p></div></details>
+  <details><summary>Is rememberSaveable slower?</summary><div><p>Only slightly: it registers with the saved-state registry. Use it where survival matters, not for every value.</p></div></details>
+  <details><summary>Can I rememberSaveable a ViewModel?</summary><div><p>No. ViewModels have their own lifecycle. Use <code>viewModel()</code> or <code>hiltViewModel()</code> instead.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><code>remember</code> survives <strong>recomposition</strong>. <code>rememberSaveable</code> also survives <strong>configuration changes and process death</strong>, via the Bundle. Use saveable state for user input, ViewModels with <code>SavedStateHandle</code> for screen logic, and Room or DataStore for anything that must outlive the session.</p>
+<p>Next step: run work at the right time with <a href="../compose-side-effects/index.html">Side Effects in Compose</a>.</p>

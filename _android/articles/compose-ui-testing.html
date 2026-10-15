@@ -1,0 +1,147 @@
+<!--meta
+{
+  "seo_title": "UI Testing in Jetpack Compose: A Practical Guide",
+  "description": "Write reliable Jetpack Compose UI tests: semantics tree, finders, actions and assertions, testing lists and navigation, waiting for async work, Robolectric and avoiding flakiness.",
+  "primary_keyword": "jetpack compose ui testing",
+  "keywords": ["compose test rule", "onNodeWithText", "compose semantics testing", "compose test lazycolumn", "robolectric compose test", "flaky ui tests android"],
+  "lede": "Compose UI tests interact with your UI the way users and accessibility services do, through the semantics tree. Done well, they're fast, stable and readable. This guide covers the APIs, patterns for lists and navigation, and how to avoid flaky tests.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-ui-screenshot-testing", "compose-state-hoisting", "android-unit-testing-junit", "android-ci-cd-github-actions"],
+  "refs": [
+    ["Test your Compose layout", "https://developer.android.com/develop/ui/compose/testing"],
+    ["Compose testing cheatsheet", "https://developer.android.com/develop/ui/compose/testing/testing-cheatsheet"],
+    ["Semantics in Compose", "https://developer.android.com/develop/ui/compose/accessibility/semantics"],
+    ["Synchronize your tests", "https://developer.android.com/develop/ui/compose/testing/synchronization"]
+  ]
+}
+-->
+<p class="ad-lead">A good UI test reads like a user story: type an email, tap Sign in, see the inbox. Compose's testing APIs make that natural. You find nodes by text or description, perform actions, and assert on what's displayed, with automatic synchronisation instead of sleeps.</p>
+
+<h2 id="semantics">The semantics tree</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sem-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sem-t fig-sem-d">
+    <title id="fig-sem-t">Composition and semantics tree used by tests</title>
+    <desc id="fig-sem-d">The UI tree of composables produces a semantics tree with nodes carrying text, content descriptions, roles, states such as enabled or selected, and actions such as click. Both TalkBack and Compose tests read this tree.</desc>
+    <rect class="d-blue" x="20" y="40" width="200" height="110" rx="12"/><text class="d-t" x="120" y="70" text-anchor="middle">Composables</text><text class="d-s" x="120" y="94" text-anchor="middle">Column, Button, Text…</text>
+    <path class="d-line" d="M220 95 H290"/>
+    <rect class="d-violet" x="290" y="40" width="200" height="110" rx="12"/><text class="d-t" x="390" y="70" text-anchor="middle">Semantics tree</text><text class="d-s" x="390" y="94" text-anchor="middle">text · description · role</text><text class="d-s" x="390" y="112" text-anchor="middle">enabled · selected · onClick</text>
+    <path class="d-line" d="M490 80 H560 M490 110 H560"/>
+    <rect class="d-green" x="560" y="40" width="140" height="44" rx="10"/><text class="d-t" x="630" y="67" text-anchor="middle">TalkBack</text>
+    <rect class="d-amber" x="560" y="106" width="140" height="44" rx="10"/><text class="d-t" x="630" y="133" text-anchor="middle">Compose tests</text>
+  </svg>
+  <figcaption id="fig-sem-cap">Accessible UIs are testable UIs. Improving semantics helps both.</figcaption>
+</figure>
+
+<h2 id="basics">Finders, actions, assertions</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td>Finders</td><td><code>onNodeWithText</code>, <code>onNodeWithContentDescription</code>, <code>onNodeWithTag</code>, <code>onAllNodesWithText</code>, <code>onNode(hasClickAction() and hasText("Pay"))</code></td></tr>
+    <tr><td>Actions</td><td><code>performClick</code>, <code>performTextInput</code>, <code>performTextClearance</code>, <code>performScrollToNode</code>, <code>performTouchInput { swipeUp() }</code></td></tr>
+    <tr><td>Assertions</td><td><code>assertIsDisplayed</code>, <code>assertExists</code>, <code>assertIsEnabled</code>, <code>assertIsSelected</code>, <code>assertTextEquals</code>, <code>assertCountEquals</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="example">Testing a stateless screen</h2>
+<code-block lang="kotlin" file="CartScreenTest.kt (androidTest)">
+class CartScreenTest {
+    @get:Rule val compose = createComposeRule()
+
+    private val items = listOf(
+        CartItemUi(id = "1", name = "Kotlin Mug", qty = 1, priceText = "₹499"),
+        CartItemUi(id = "2", name = "Compose Tee", qty = 2, priceText = "₹1,598"),
+    )
+
+    @Test
+    fun increasingQuantity_emitsEvent_andCheckoutEnabled() {
+        val events = mutableListOf<Pair<String, Int>>()
+        compose.setContent {
+            AppTheme {
+                CartScreen(
+                    state = CartUiState(items = items, totalText = "₹2,097", canCheckout = true),
+                    onQuantityChange = { id, qty -> events += id to qty },
+                    onCheckout = {},
+                )
+            }
+        }
+
+        compose.onNodeWithText("Kotlin Mug").assertIsDisplayed()
+        compose.onAllNodesWithContentDescription("Increase quantity")[0].performClick()
+        assertEquals(listOf("1" to 2), events)
+        compose.onNodeWithText("Checkout").assertIsEnabled()
+    }
+}
+</code-block>
+
+<h2 id="lists">Lists</h2>
+<code-block lang="kotlin" file="Scrolling a LazyColumn">
+compose.onNodeWithTag("orders_list")
+    .performScrollToNode(hasText("Order #1042"))
+compose.onNodeWithText("Order #1042").assertIsDisplayed().performClick()
+</code-block>
+<p>Lazy lists only compose visible items, so scroll to a node before asserting on it.</p>
+
+<h2 id="async">Waiting for asynchronous work</h2>
+<p>The test rule automatically waits for recomposition and Compose animations to become idle. For work outside Compose, such as coroutines with real dispatchers, wait explicitly on a condition:</p>
+<code-block lang="kotlin" file="waitUntil">
+compose.waitUntil(timeoutMillis = 5_000) {
+    compose.onAllNodesWithText("Welcome back").fetchSemanticsNodes().isNotEmpty()
+}
+</code-block>
+<p>Better still, inject fakes and test dispatchers so data is available immediately and deterministically.</p>
+
+<h2 id="activity">Testing with an Activity, DI and navigation</h2>
+<code-block lang="kotlin" file="End-to-end-ish flow with Hilt fakes">
+@HiltAndroidTest
+class SignInFlowTest {
+    @get:Rule(order = 0) val hilt = HiltAndroidRule(this)
+    @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
+
+    @Test fun signInNavigatesToInbox() {
+        compose.onNodeWithText("Email").performTextInput("dev@example.com")
+        compose.onNodeWithText("Password").performTextInput("Secret123")
+        compose.onNodeWithText("Sign in").performClick()
+        compose.onNodeWithText("Inbox").assertIsDisplayed()
+    }
+}
+</code-block>
+<p>Replace network-backed repositories with fakes via Hilt test modules so this stays fast and reliable.</p>
+
+<h2 id="robolectric">Running on the JVM with Robolectric</h2>
+<p>Compose UI tests can also run as local tests with Robolectric (<code>@RunWith(RobolectricTestRunner::class)</code>), which is much faster than an emulator. It's good for screen-level tests in CI, while a smaller set of instrumented tests runs on real devices.</p>
+
+<h2 id="flaky">Avoiding flaky tests</h2>
+<ul>
+  <li>Never use <code>Thread.sleep</code>. Rely on synchronisation or <code>waitUntil</code>.</li>
+  <li>Use fakes for network and time. Don't depend on live servers.</li>
+  <li>Disable system animations on CI devices for instrumented tests.</li>
+  <li>Prefer user-visible text and descriptions. Use test tags only when necessary.</li>
+  <li>Keep each test focused on one behaviour.</li>
+</ul>
+
+<h2 id="debug">Debugging failing tests</h2>
+<code-block lang="kotlin" file="Print the semantics tree">
+compose.onRoot().printToLog("UI_TREE")                       // merged tree
+compose.onRoot(useUnmergedTree = true).printToLog("UI_TREE") // see individual child nodes
+</code-block>
+
+<h2 id="use-cases">What to UI test</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Critical flows</h3><p>Sign-in, checkout and onboarding: a few end-to-end-style tests.</p></div>
+  <div class="card usecase"><h3>Stateful components</h3><p>Forms with validation, expandable items, tabs.</p></div>
+  <div class="card usecase"><h3>Accessibility</h3><p>Assert content descriptions exist and important actions are reachable.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Espresso or Compose testing APIs?</summary><div><p>Use Compose testing APIs for Compose UI. For hybrid screens, both can interoperate in the same test.</p></div></details>
+  <details><summary>Why can't my test find a node inside a button?</summary><div><p>Semantics are merged for some components. Use <code>useUnmergedTree = true</code>, or find the merged parent.</p></div></details>
+  <details><summary>How many UI tests should I write?</summary><div><p>Far fewer than unit tests: critical flows and complex components. Most logic should be covered by fast unit tests.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Compose UI tests interact through the <strong>semantics tree</strong>, synchronise automatically, and stay stable when screens are <strong>stateless and fed by fakes</strong>. Test critical flows and complex components, run many on the JVM with Robolectric, and avoid sleeps.</p>
+<p>Next step: choose a mocking library in <a href="../mockk-vs-mockito/index.html">MockK vs Mockito for Kotlin Testing</a>.</p>

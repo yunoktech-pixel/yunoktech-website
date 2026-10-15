@@ -1,0 +1,100 @@
+<!--meta
+{
+  "seo_title": "Using AI to Understand Legacy Java Android Code",
+  "description": "Use AI assistants to understand legacy Java Android code: mapping modules, explaining classes and flows, finding risks, drafting characterization tests and planning safe Kotlin migration.",
+  "primary_keyword": "ai understand legacy code android",
+  "keywords": ["legacy java android ai", "explain code with ai", "ai codebase onboarding", "java to kotlin ai", "characterization tests ai", "asynctask migration ai"],
+  "lede": "Joining a team with a ten-year-old Java Android app, 2,000-line Activities and no documentation is daunting. AI assistants can speed up comprehension dramatically, if you use them to build understanding rather than to rewrite blindly.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["refactor-legacy-android-apps", "migrate-legacy-android-modern-architecture", "kotlin-vs-java-android", "ai-unit-test-generation-android"],
+  "refs": [
+    ["Gemini in Android Studio", "https://developer.android.com/studio/gemini/overview"],
+    ["Add Kotlin to an existing app", "https://developer.android.com/kotlin/add-kotlin"],
+    ["Convert Java to Kotlin in Android Studio", "https://developer.android.com/kotlin/add-kotlin#convert"],
+    ["Fundamentals of testing", "https://developer.android.com/training/testing/fundamentals"]
+  ]
+}
+-->
+<p class="ad-lead">Legacy code is code that works and that people are afraid to change. The fear comes from not knowing what it does or what depends on it. AI can explain code at the speed you can read, generate maps of flows, and draft tests that capture current behaviour.</p>
+
+<h2 id="approach">A comprehension-first approach</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-lc-t fig-lc-d">
+    <title id="fig-lc-t">Using AI to understand legacy code before changing it</title>
+    <desc id="fig-lc-d">First map the codebase at a high level, then trace one user flow end to end, then explain key classes and their side effects, then list risks and hidden dependencies, then capture behaviour with characterization tests, and only then refactor or migrate in small steps.</desc>
+    <defs><marker id="lcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H124 M224 70 H238 M338 70 H352 M452 70 H466 M566 70 H580" marker-end="url(#lcm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="100" height="60" rx="10"/><text class="d-t" x="60" y="74" text-anchor="middle">Map</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="128" y="40" width="96" height="60" rx="10"/><text class="d-t" x="176" y="66" text-anchor="middle">Trace</text><text class="d-s" x="176" y="84" text-anchor="middle">one flow</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="242" y="40" width="96" height="60" rx="10"/><text class="d-t" x="290" y="66" text-anchor="middle">Explain</text><text class="d-s" x="290" y="84" text-anchor="middle">classes</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="356" y="40" width="96" height="60" rx="10"/><text class="d-t" x="404" y="66" text-anchor="middle">Risks</text><text class="d-s" x="404" y="84" text-anchor="middle">hidden deps</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="470" y="40" width="96" height="60" rx="10"/><text class="d-t" x="518" y="66" text-anchor="middle">Capture</text><text class="d-s" x="518" y="84" text-anchor="middle">tests</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="10"/><text class="d-w" x="647" y="66" text-anchor="middle">Change</text><text class="d-w" x="647" y="84" text-anchor="middle">small steps</text></g>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Verify AI explanations by stepping through with the debugger.</text>
+  </svg>
+  <figcaption id="fig-lc-cap">Understanding before changing. AI accelerates each step, but the order matters.</figcaption>
+</figure>
+
+<h2 id="prompts">Prompts for each step</h2>
+<code-block lang="text" file="1. Map">
+Based on these files (manifest, build.gradle, package list), describe the app's main modules,
+entry points (Activities, Services, Receivers), networking and storage approach, and third-party SDKs.
+Flag anything deprecated (AsyncTask, Loaders, legacy support libraries).
+</code-block>
+<code-block lang="text" file="2. Trace a flow">
+Trace what happens from tapping "Place order" in CheckoutActivity to the confirmation screen:
+list each class/method in order, which thread it runs on, network calls, database writes and
+any static/global state touched. Mark places where errors are swallowed.
+</code-block>
+<code-block lang="text" file="3-4. Explain and assess risk">
+Explain OrderManager.java: responsibilities, inputs/outputs, side effects, thread safety.
+Then list risks if we change it: callers, static state, implicit ordering, reflection, and
+behaviour that tests should capture before refactoring.
+</code-block>
+
+<h2 id="verify">Verify what AI tells you</h2>
+<ul>
+  <li>Step through the traced flow with the <strong>debugger</strong>. AI can misread callbacks and dynamic dispatch.</li>
+  <li>Use Android Studio's <strong>Find Usages</strong> and call hierarchy to confirm dependencies.</li>
+  <li>Check runtime behaviour in Logcat. Legacy code often depends on side effects that static reading misses.</li>
+</ul>
+
+<h2 id="tests">Characterization tests with AI help</h2>
+<code-block lang="kotlin" file="Capturing current Java behaviour from Kotlin tests">
+class LegacyDiscountCalculatorTest {
+    // Generated as drafts by AI from reading the Java source, then verified by running them.
+    @Test fun `discount above 100 percent is clamped to zero price`() {
+        assertEquals(0.0, LegacyDiscountCalculator.apply(500.0, 120), 0.001)
+    }
+    @Test fun `negative price returns zero (legacy behaviour, keep for now)`() {
+        assertEquals(0.0, LegacyDiscountCalculator.apply(-10.0, 10), 0.001)
+    }
+}
+</code-block>
+<p>Characterization tests record what the code <em>does</em>, not what it <em>should</em> do. Confirm odd behaviours with the product team before "fixing" them.</p>
+
+<h2 id="migrate">Then migrate safely</h2>
+<ol class="steps">
+  <li>Convert one class to Kotlin (Android Studio's converter or AI), keeping behaviour identical.</li>
+  <li>Run the characterization tests, then improve idioms (nullability, data classes) in a separate commit.</li>
+  <li>Extract logic from Activities into ViewModels and repositories. See <a href="../refactor-legacy-android-apps/index.html">Refactoring Legacy Apps</a>.</li>
+</ol>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Onboarding</h3><p>New developers generate a codebase map and flow traces in their first week, verified with a mentor.</p></div>
+  <div class="card usecase"><h3>Bug fixing in unknown code</h3><p>Explain the module, add a characterization test, fix, keep the test.</p></div>
+  <div class="card usecase"><h3>Migration planning</h3><p>AI inventories deprecated APIs and risky classes to prioritise the roadmap.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I paste the whole codebase into an AI chat?</summary><div><p>Usually not effective, and possibly against policy. Use IDE-integrated tools with project context, focused on specific modules, and follow data-sharing rules.</p></div></details>
+  <details><summary>Is AI-converted Kotlin idiomatic?</summary><div><p>Often not. Expect <code>!!</code>, <code>lateinit</code> overuse and Java-style patterns. Convert first, then refactor idioms with tests in place.</p></div></details>
+  <details><summary>What if the AI explanation is wrong?</summary><div><p>That's why you verify with the debugger and tests. Treat explanations as hypotheses.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI turns legacy comprehension from weeks into days: <strong>map, trace, explain, assess risk and capture behaviour</strong>, all verified with the debugger and tests, before making small, safe changes.</p>
+<p>Next step: modernise the UI layer with <a href="../ai-migrate-xml-to-compose/index.html">AI-Assisted Migration from XML to Jetpack Compose</a>.</p>

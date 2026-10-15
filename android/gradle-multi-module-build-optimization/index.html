@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Module Gradle Builds and Build Optimization | Yunok Tech</title>
+  <meta name="description" content="Speed up Android Gradle builds: measuring with build scans, configuration cache, build cache, parallel execution, KSP over kapt, non-transitive R classes, module structure and CI caching.">
+  <meta name="keywords" content="gradle build optimization android, android build speed, gradle configuration cache, gradle build cache android, ksp vs kapt build time, non transitive r class, gradle build scan">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/gradle-multi-module-build-optimization/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/gradle-multi-module-build-optimization/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Multi-Module Gradle Builds and Build Optimization">
+  <meta property="og:description" content="Speed up Android Gradle builds: measuring with build scans, configuration cache, build cache, parallel execution, KSP over kapt, non-transitive R classes, module structure and CI caching.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Advanced Android Engineering and Emerging Technology">
+  <meta name="twitter:title" content="Multi-Module Gradle Builds and Build Optimization">
+  <meta name="twitter:description" content="Speed up Android Gradle builds: measuring with build scans, configuration cache, build cache, parallel execution, KSP over kapt, non-transitive R classes, module structure and CI caching.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Multi-Module Gradle Builds and Build Optimization", "description": "Speed up Android Gradle builds: measuring with build scans, configuration cache, build cache, parallel execution, KSP over kapt, non-transitive R classes, module structure and CI caching.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Advanced Android Engineering and Emerging Technology", "keywords": "android build speed, gradle configuration cache, gradle build cache android, ksp vs kapt build time, non transitive r class, gradle build scan", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/gradle-multi-module-build-optimization/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Multi-Module Gradle Builds and Build Optimization", "item": "https://yunoktech.com/android/gradle-multi-module-build-optimization/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#advanced">Advanced Android Engineering and Emerging Technology</a></nav>
+    <span class="ad-chip">⚙️ Advanced Android Engineering and Emerging Technology</span>
+    <h1 id="article-title">Multi-Module Gradle Builds and Build Optimization</h1>
+    <p class="ad-lede">Slow builds tax every developer, every day. In multi-module Android projects, a handful of Gradle settings and structural choices often cut build times dramatically. Here's how to measure, what to enable, and which module design choices matter.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#phases">Where build time goes</a></li><li><a href="#measure">Measure first</a></li><li><a href="#settings">High-impact settings</a></li><li><a href="#ksp">Prefer KSP over kapt</a></li><li><a href="#structure">Module structure choices</a></li><li><a href="#hygiene">Build script hygiene</a></li><li><a href="#ci">CI builds</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A 3-minute incremental build, run 40 times a day by 20 developers, is 40 developer-hours lost daily. Build speed is productivity. Most wins come from measuring, enabling caches, and avoiding module structures that force unnecessary recompilation.</p>
+
+<h2 id="phases">Where build time goes</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gb-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-gb-t fig-gb-d">
+    <title id="fig-gb-t">Gradle build phases and caches</title>
+    <desc id="fig-gb-d">Initialization determines projects; configuration evaluates build scripts, accelerated by the configuration cache; execution runs tasks, accelerated by up-to-date checks, the local and remote build cache and parallel execution.</desc>
+    <defs><marker id="gbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M190 70 H226 M440 70 H476" marker-end="url(#gbm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="40" width="170" height="60" rx="12"/><text class="d-t" x="105" y="66" text-anchor="middle">Initialization</text><text class="d-s" x="105" y="84" text-anchor="middle">which projects</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="230" y="40" width="210" height="60" rx="12"/><text class="d-t" x="335" y="66" text-anchor="middle">Configuration</text><text class="d-s" x="335" y="84" text-anchor="middle">→ configuration cache</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="480" y="40" width="220" height="60" rx="12"/><text class="d-t" x="590" y="66" text-anchor="middle">Execution</text><text class="d-s" x="590" y="84" text-anchor="middle">→ build cache, parallel</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Measure each phase before changing anything (build scans, Build Analyzer).</text>
+  </svg>
+  <figcaption id="fig-gb-cap">Configuration time grows with module count. Execution time grows with what needs recompiling.</figcaption>
+</figure>
+
+<h2 id="measure">Measure first</h2>
+<ul>
+  <li><strong>Build Analyzer</strong> in Android Studio identifies slow tasks and plugins.</li>
+  <li><strong>Gradle build scans</strong> (<code>--scan</code>) show timelines, cache hits and configuration time.</li>
+  <li>Benchmark typical scenarios: clean build, an ABI change in a core module, a non-ABI change in a feature module.</li>
+</ul>
+
+<h2 id="settings">High-impact settings</h2>
+<figure class="code"><figcaption><span class="file">gradle.properties</span><span class="lang">Properties</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-properties"><span class="tk-c"># Reuse configuration results between builds</span>
+org.gradle.configuration-cache=true
+<span class="tk-c"># Reuse task outputs from previous builds (local, optionally remote)</span>
+org.gradle.caching=true
+<span class="tk-c"># Run independent module tasks in parallel</span>
+org.gradle.parallel=true
+<span class="tk-c"># Give the daemon enough memory (tune for your machine)</span>
+org.gradle.jvmargs=-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8
+<span class="tk-c"># Smaller, non-transitive R classes: changes in one module's resources recompile less</span>
+android.nonTransitiveRClass=true</code></pre></figure>
+<p>Recent AGP versions enable some of these by default (non-transitive R classes, for example). Check what your versions default to, and verify that plugins are configuration-cache compatible.</p>
+
+<h2 id="ksp">Prefer KSP over kapt</h2>
+<p>kapt generates Java stubs and is significantly slower. Hilt, Room and Moshi support KSP. Migrating annotation processors to KSP often gives large wins in modules that use them.</p>
+
+<h2 id="structure">Module structure choices</h2>
+<ul>
+  <li><strong><code>implementation</code> over <code>api</code></strong>: limits recompilation of consumers when internals change.</li>
+  <li><strong>API/impl splits</strong> for frequently changed features used by others.</li>
+  <li><strong>Avoid a giant "common" module</strong> that everything depends on: one change rebuilds the world.</li>
+  <li><strong>Pure Kotlin/JVM modules</strong> for domain logic. They build and test faster than Android library modules.</li>
+  <li><strong>Convention plugins</strong> instead of <code>subprojects { }</code> or <code>allprojects { }</code>, which slow configuration and break isolation.</li>
+</ul>
+
+<h2 id="hygiene">Build script hygiene</h2>
+<figure class="code"><figcaption><span class="file">Avoid eager, configuration-time work</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts"><span class="tk-c">// ❌ Runs at configuration time on EVERY build (even unrelated tasks)</span>
+<span class="tk-k">val</span> gitSha = <span class="tk-t">Runtime</span>.getRuntime().exec(<span class="tk-s">"git rev-parse --short HEAD"</span>).inputStream.reader().readText().trim()
+
+<span class="tk-c">// ✅ Lazy provider evaluated only when needed (configuration-cache friendly)</span>
+<span class="tk-k">val</span> gitSha = providers.exec { commandLine(<span class="tk-s">"git"</span>, <span class="tk-s">"rev-parse"</span>, <span class="tk-s">"--short"</span>, <span class="tk-s">"HEAD"</span>) }
+    .standardOutput.asText.map { it.trim() }</code></pre></figure>
+<ul>
+  <li>Use lazy APIs (<code>register</code>, providers), not <code>create</code>, and don't read files at configuration time.</li>
+  <li>Disable unused build features per module (<code>buildConfig</code>, <code>aidl</code>, <code>renderscript</code>).</li>
+  <li>Keep dependencies and plugins up to date. Gradle and AGP improve performance regularly.</li>
+</ul>
+
+<h2 id="ci">CI builds</h2>
+<ul>
+  <li>Cache Gradle home and the build cache between runs (for example with <code>gradle/actions/setup-gradle</code>).</li>
+  <li>Consider a remote build cache shared by CI and developers, populated by trusted CI builds.</li>
+  <li>Run only affected modules' tests on PRs in large projects.</li>
+</ul>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>kapt → KSP</h3><p>Large reductions in annotation-processing time for Room and Hilt modules.</p></div>
+  <div class="card usecase"><h3>Configuration cache</h3><p>Repeat builds skip configuration, especially noticeable with many modules.</p></div>
+  <div class="card usecase"><h3>Breaking up "core:common"</h3><p>Fewer modules recompiled per change, and better parallelism.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do more modules always mean faster builds?</summary><div><p>Not always. Incremental builds and parallelism improve, but configuration time and sync time grow. Measure to find the sweet spot.</p></div></details>
+  <details><summary>Why is my configuration cache failing?</summary><div><p>A plugin or script does configuration-time work that isn't cacheable. Build output reports the problem, so update or replace the plugin, or rewrite the logic lazily.</p></div></details>
+  <details><summary>Does more RAM help?</summary><div><p>Up to a point. Too little memory causes GC thrashing. Tune <code>org.gradle.jvmargs</code> and the Kotlin daemon settings, and monitor them.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Fast Android builds come from <strong>measuring</strong>, enabling <strong>configuration and build caches</strong>, <strong>parallel execution</strong>, <strong>KSP</strong>, <strong>non-transitive R classes</strong>, sensible <strong>module boundaries</strong> with <code>implementation</code> dependencies, and <strong>lazy build scripts</strong>, plus caching in CI.</p>
+<p>Next step: decide how far to share code across platforms with <a href="../compose-multiplatform-vs-kotlin-multiplatform/index.html">Compose Multiplatform vs Kotlin Multiplatform</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/build/optimize-your-build" target="_blank" rel="noopener">Optimize your build speed</a></li><li><a href="https://docs.gradle.org/current/userguide/configuration_cache.html" target="_blank" rel="noopener">Gradle configuration cache</a></li><li><a href="https://docs.gradle.org/current/userguide/build_cache.html" target="_blank" rel="noopener">Gradle build cache</a></li><li><a href="https://developer.android.com/build/migrate-to-ksp" target="_blank" rel="noopener">Migrate from kapt to KSP</a></li><li><a href="https://developer.android.com/build/build-analyzer" target="_blank" rel="noopener">Build Analyzer</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgradle-multi-module-build-optimization-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgradle-multi-module-build-optimization-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/multi-module-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Multi-Module Architecture in Android: Pros, Cons, and Lessons</a></li><li><a href="../../android/android-modularization-strategies/index.html"><small>Android Architecture and Clean Code</small>Modularization Strategies for Large Android Apps</a></li><li><a href="../../android/android-ci-cd-github-actions/index.html"><small>Testing, Debugging, and Performance</small>CI/CD for Android with GitHub Actions</a></li><li><a href="../../android/android-sdk-vs-jdk-vs-gradle/index.html"><small>Android Development for Beginners</small>Android SDK vs JDK vs Gradle: What&#x27;s the Difference?</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/gradle-multi-module-build-optimization/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/gradle-multi-module-build-optimization/&amp;text=Multi-Module Gradle Builds and Build Optimization" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/gradle-multi-module-build-optimization/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#phases">Where build time goes</a></li><li><a href="#measure">Measure first</a></li><li><a href="#settings">High-impact settings</a></li><li><a href="#ksp">Prefer KSP over kapt</a></li><li><a href="#structure">Module structure choices</a></li><li><a href="#hygiene">Build script hygiene</a></li><li><a href="#ci">CI builds</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgradle-multi-module-build-optimization-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgradle-multi-module-build-optimization-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

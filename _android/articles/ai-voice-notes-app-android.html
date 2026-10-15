@@ -1,0 +1,147 @@
+<!--meta
+{
+  "seo_title": "Build an AI Voice-Notes App for Android (Kotlin)",
+  "description": "Project guide: record voice notes, transcribe them on device or in the cloud, summarise and extract action items with Gemini, store in Room, search, and handle permissions, background work and privacy.",
+  "primary_keyword": "ai voice notes app android",
+  "keywords": ["voice notes transcription android", "speech to text kotlin app", "mediarecorder kotlin", "gemini audio transcription", "action items extraction ai", "android ai project"],
+  "lede": "Speak for a minute, get a clean transcript, a summary and a list of action items. A voice-notes app combines audio recording, speech-to-text, LLM post-processing and search. Here's the architecture and key code.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["speech-to-text-ai-voice-android", "ai-document-summarizer-android", "room-database-kotlin", "workmanager-background-work"],
+  "refs": [
+    ["MediaRecorder", "https://developer.android.com/media/platform/mediarecorder"],
+    ["SpeechRecognizer", "https://developer.android.com/reference/android/speech/SpeechRecognizer"],
+    ["Firebase AI Logic: analyze audio", "https://firebase.google.com/docs/ai-logic/analyze-audio"],
+    ["ML Kit GenAI Speech Recognition (alpha)", "https://developers.google.com/ml-kit/genai/speech-recognition/android"]
+  ]
+}
+-->
+<p class="ad-lead"><a href="../speech-to-text-ai-voice-android/index.html">Speech to Text</a> covers dictation APIs. This project records audio files and processes them afterwards, which lets you transcribe longer notes, re-process later, and run AI over the result.</p>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-vn-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-vn-t fig-vn-d">
+    <title id="fig-vn-t">Voice notes processing pipeline</title>
+    <desc id="fig-vn-d">Record audio to an app-private file. A WorkManager job transcribes it, either on device or by sending audio to a multimodal cloud model. Then an LLM produces a title, summary and action items as JSON. Results are saved in Room with full-text search, and the UI shows status per note.</desc>
+    <defs><marker id="vnm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 80 H160 M300 80 H320 M460 80 H480 M590 80 H610" marker-end="url(#vnm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="10" y="50" width="130" height="60" rx="12"/><text class="d-t" x="75" y="76" text-anchor="middle">Record</text><text class="d-s" x="75" y="94" text-anchor="middle">.m4a, private</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="162" y="50" width="138" height="60" rx="12"/><text class="d-t" x="231" y="76" text-anchor="middle">Transcribe</text><text class="d-s" x="231" y="94" text-anchor="middle">worker</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="322" y="50" width="138" height="60" rx="12"/><text class="d-t" x="391" y="76" text-anchor="middle">Enrich</text><text class="d-s" x="391" y="94" text-anchor="middle">summary, todos</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="482" y="50" width="108" height="60" rx="12"/><text class="d-t" x="536" y="76" text-anchor="middle">Room</text><text class="d-s" x="536" y="94" text-anchor="middle">+ FTS</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="612" y="50" width="98" height="60" rx="12"/><text class="d-w" x="661" y="84" text-anchor="middle">UI</text></g>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Processing is resumable: each note has a status (recorded → transcribed → enriched).</text>
+  </svg>
+  <figcaption id="fig-vn-cap">Background processing means users can record and move on.</figcaption>
+</figure>
+
+<h2 id="record">1. Record audio</h2>
+<code-block lang="kotlin" file="VoiceRecorder.kt">
+class VoiceRecorder(private val context: Context) {
+    private var recorder: MediaRecorder? = null
+
+    /** Requires RECORD_AUDIO permission granted. */
+    fun start(output: File) {
+        recorder = MediaRecorder(context).apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioSamplingRate(16_000)
+            setAudioEncodingBitRate(64_000)
+            setOutputFile(output)
+            prepare()
+            start()
+        }
+    }
+
+    fun stop() {
+        recorder?.runCatching { stop() }       // stop() throws if nothing was recorded
+        recorder?.release()
+        recorder = null
+    }
+}
+// MediaRecorder(Context) requires API 31+; use the deprecated no-arg constructor on older versions.
+</code-block>
+<p>Store files in <code>filesDir</code> (app-private). Request <code>RECORD_AUDIO</code> in context. For long recordings in the background, you'd need a foreground service with the microphone type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</p>
+
+<h2 id="transcribe">2. Transcribe</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Option</th><th>Pros</th><th>Cons</th></tr></thead>
+  <tbody>
+    <tr><td>Cloud multimodal (Gemini audio input)</td><td>Works on all devices, handles long audio, can transcribe + summarise together</td><td>Audio leaves the device; cost</td></tr>
+    <tr><td>ML Kit GenAI Speech Recognition (alpha)</td><td>On-device, private</td><td>Alpha; device and language support limited</td></tr>
+    <tr><td>Platform <code>SpeechRecognizer</code></td><td>Built in</td><td>Designed for live mic input, not files</td></tr>
+  </tbody>
+</table>
+</div>
+<code-block lang="kotlin" file="Cloud transcription with Gemini (audio as inline data)">
+suspend fun transcribe(model: GenerativeModel, audio: File): String {
+    val response = model.generateContent(content {
+        inlineData(audio.readBytes(), "audio/mp4")
+        text("Transcribe this voice note verbatim. Mark unclear words as [inaudible].")
+    })
+    return response.text.orEmpty()
+}
+// Inline data has size limits; for long recordings, split audio or use file upload options per the docs.
+</code-block>
+
+<h2 id="enrich">3. Summarise and extract action items</h2>
+<code-block lang="kotlin" file="NoteEnricher.kt">
+@Serializable
+data class Enrichment(val title: String, val summary: String, val actionItems: List<String>)
+
+suspend fun enrich(model: GenerativeModel, transcript: String): Enrichment {
+    val response = model.generateContent(
+        "From this voice note transcript, return JSON with: title (max 6 words), " +
+        "summary (max 2 sentences), actionItems (list, only explicit tasks; empty if none). " +
+        "Use only information in the transcript.\n\nTranscript:\n$transcript"
+    )
+    return Json { ignoreUnknownKeys = true }.decodeFromString(response.text.orEmpty())
+}
+// Configure the model with responseMimeType = "application/json" and a schema for reliability.
+</code-block>
+
+<h2 id="worker">4. Process in the background</h2>
+<code-block lang="kotlin" file="ProcessNoteWorker.kt">
+@HiltWorker
+class ProcessNoteWorker @AssistedInject constructor(
+    @Assisted ctx: Context, @Assisted params: WorkerParameters,
+    private val notes: NoteRepository,
+    private val ai: VoiceAi,
+) : CoroutineWorker(ctx, params) {
+    override suspend fun doWork(): Result {
+        val id = inputData.getLong("noteId", -1)
+        val note = notes.get(id) ?: return Result.failure()
+        return try {
+            val transcript = note.transcript ?: ai.transcribe(File(note.audioPath)).also { notes.saveTranscript(id, it) }
+            if (note.summary == null) notes.saveEnrichment(id, ai.enrich(transcript))
+            Result.success()
+        } catch (e: IOException) {
+            Result.retry()
+        }
+    }
+}
+// Enqueue with a CONNECTED network constraint as unique work per note.
+</code-block>
+
+<h2 id="search">5. Store and search</h2>
+<p>Use Room with an FTS table over title, transcript and summary for instant search. See <a href="../room-database-kotlin/index.html">Room Database</a>. Show per-note status: "Transcribing…", "Ready", "Failed – retry".</p>
+
+<h2 id="privacy">Privacy</h2>
+<ul>
+  <li>Voice notes can be very personal: explain where audio is processed, and offer on-device mode where supported.</li>
+  <li>Let users delete audio after transcription, and delete everything with one action.</li>
+  <li>Exclude audio from cloud backups if sensitive.</li>
+  <li>See <a href="../ai-privacy-data-retention/index.html">AI Privacy and Data Retention</a>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Which languages are supported?</summary><div><p>Cloud multimodal models support many languages. On-device options are more limited, so check the docs and test with real speakers.</p></div></details>
+  <details><summary>How accurate are transcripts?</summary><div><p>Usually good for clear speech, worse with noise, accents and jargon. Let users edit transcripts.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A voice-notes app <strong>records to private files</strong>, <strong>transcribes</strong> on device or in the cloud, <strong>enriches</strong> with summaries and action items as JSON, processes in <strong>WorkManager</strong>, and stores searchable notes, with privacy controls front and centre.</p>
+<p>Next project: <a href="../ai-study-assistant-android/index.html">an AI Study Assistant</a>.</p>

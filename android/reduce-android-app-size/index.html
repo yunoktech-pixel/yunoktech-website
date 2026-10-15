@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Reduce Android App Size (Practical Steps) | Yunok Tech</title>
+  <meta name="description" content="Reduce Android app download and install size: App Bundles, R8 and resource shrinking, APK Analyzer, images and WebP/AVIF, native libraries, dependencies, fonts and on-demand delivery.">
+  <meta name="keywords" content="reduce android app size, android apk size reduction, android app bundle size, apk analyzer, webp android, shrink resources android, play feature delivery">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/reduce-android-app-size/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/reduce-android-app-size/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="How to Reduce Android App Size (Practical Steps)">
+  <meta property="og:description" content="Reduce Android app download and install size: App Bundles, R8 and resource shrinking, APK Analyzer, images and WebP/AVIF, native libraries, dependencies, fonts and on-demand delivery.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="How to Reduce Android App Size (Practical Steps)">
+  <meta name="twitter:description" content="Reduce Android app download and install size: App Bundles, R8 and resource shrinking, APK Analyzer, images and WebP/AVIF, native libraries, dependencies, fonts and on-demand delivery.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to Reduce Android App Size", "description": "Reduce Android app download and install size: App Bundles, R8 and resource shrinking, APK Analyzer, images and WebP/AVIF, native libraries, dependencies, fonts and on-demand delivery.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "android apk size reduction, android app bundle size, apk analyzer, webp android, shrink resources android, play feature delivery", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/reduce-android-app-size/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "How to Reduce Android App Size", "item": "https://yunoktech.com/android/reduce-android-app-size/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">How to Reduce Android App Size</h1>
+    <p class="ad-lede">App size affects install conversion, especially for users on limited storage and data plans. Most size problems come from a few sources: images, native libraries, unused dependencies and shipping everything to everyone. Here's how to find and fix them.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#measure">Measure first</a></li><li><a href="#aab">1. Publish App Bundles</a></li><li><a href="#r8">2. Enable R8 and resource shrinking</a></li><li><a href="#images">3. Images</a></li><li><a href="#native">4. Native libraries</a></li><li><a href="#deps">5. Dependencies</a></li><li><a href="#delivery">6. On-demand delivery</a></li><li><a href="#guard">Prevent regressions</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A large download is a quiet conversion killer. Users with full storage or expensive data skip it, and size matters even more in markets where entry-level phones are common. Fortunately, Android's toolchain does much of the work if you let it.</p>
+
+<h2 id="measure">Measure first</h2>
+<ul>
+  <li><strong>Play Console → App size</strong> shows download and install sizes per device configuration.</li>
+  <li><strong>APK Analyzer</strong> (Build → Analyze APK) breaks a build down by DEX, resources, assets and native libraries, and can compare two builds.</li>
+</ul>
+
+<figure class="diagram" role="group" aria-labelledby="fig-sz-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sz-t fig-sz-d">
+    <title id="fig-sz-t">Where app size typically comes from</title>
+    <desc id="fig-sz-d">A bar split into typical contributors: native libraries, images and assets, DEX code, resources and fonts. Matching fixes: App Bundle splits per ABI, image compression and vectors, R8 shrinking and fewer dependencies, resource shrinking and downloadable fonts.</desc>
+    <rect class="d-red" x="20" y="30" width="200" height="44" rx="6"/><text class="d-s" x="120" y="57" text-anchor="middle">native libs (.so)</text>
+    <rect class="d-amber" x="220" y="30" width="180" height="44" rx="6"/><text class="d-s" x="310" y="57" text-anchor="middle">images / assets</text>
+    <rect class="d-violet" x="400" y="30" width="160" height="44" rx="6"/><text class="d-s" x="480" y="57" text-anchor="middle">DEX code</text>
+    <rect class="d-blue" x="560" y="30" width="140" height="44" rx="6"/><text class="d-s" x="630" y="57" text-anchor="middle">resources, fonts</text>
+    <text class="d-s" x="120" y="104" text-anchor="middle">ABI splits (AAB)</text>
+    <text class="d-s" x="310" y="104" text-anchor="middle">WebP/AVIF, vectors</text>
+    <text class="d-s" x="480" y="104" text-anchor="middle">R8, fewer deps</text>
+    <text class="d-s" x="630" y="104" text-anchor="middle">shrinkResources</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Proportions vary by app. APK Analyzer shows your real breakdown.</text>
+  </svg>
+  <figcaption id="fig-sz-cap">Attack the largest category first. Shaving kilobytes off code rarely matters if a single native library is several megabytes.</figcaption>
+</figure>
+
+<h2 id="aab">1. Publish App Bundles</h2>
+<p>With an Android App Bundle (.aab), Google Play generates optimised APKs per device. Each device downloads only its CPU architecture's native code, its screen density's resources and its language strings. AAB is required for new apps on Google Play. Make sure you aren't defeating it, for example by packaging all languages into a single asset.</p>
+
+<h2 id="r8">2. Enable R8 and resource shrinking</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">android {
+    buildTypes {
+        release {
+            isMinifyEnabled = <span class="tk-k">true</span>
+            isShrinkResources = <span class="tk-k">true</span>
+        }
+    }
+    androidResources {
+        <span class="tk-c">// Keep only languages you actually support (prevents libraries adding dozens of translations)</span>
+        localeFilters += listOf(<span class="tk-s">"en"</span>, <span class="tk-s">"hi"</span>, <span class="tk-s">"pa"</span>, <span class="tk-s">"ta"</span>)
+    }
+}</code></pre></figure>
+<p>See <a href="../proguard-r8-explained/index.html">ProGuard and R8 Explained</a>. The <code>localeFilters</code> property name varies by AGP version (older versions used <code>resourceConfigurations</code>).</p>
+
+<h2 id="images">3. Images</h2>
+<ul>
+  <li>Use <strong>vector drawables</strong> for icons and simple illustrations.</li>
+  <li>Convert raster images to <strong>WebP</strong> (Android Studio can convert them) or <strong>AVIF</strong> where your minSdk supports it.</li>
+  <li>Don't ship huge images for small displays. Provide appropriately sized assets.</li>
+  <li>Load large or rarely used images from a CDN at runtime instead of bundling them.</li>
+</ul>
+
+<h2 id="native">4. Native libraries</h2>
+<ul>
+  <li>Check whether a dependency pulls in large <code>.so</code> files (ML runtimes, video, crypto) you only use for one feature.</li>
+  <li>With App Bundles, each device only gets its own ABI.</li>
+  <li>Consider dynamic feature modules or on-demand downloads for large optional features.</li>
+</ul>
+
+<h2 id="deps">5. Dependencies</h2>
+<figure class="code"><figcaption><span class="file">Find what&#x27;s pulled in</span><span class="lang">Shell</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-bash">./gradlew :app:dependencies --configuration releaseRuntimeClasspath</code></pre></figure>
+<ul>
+  <li>Remove unused libraries. Watch for heavy SDKs used for one small function.</li>
+  <li>Prefer modular artifacts (for example specific Play services modules, not all of them).</li>
+  <li>Use <strong>downloadable fonts</strong> instead of bundling font files where possible.</li>
+</ul>
+
+<h2 id="delivery">6. On-demand delivery</h2>
+<p><strong>Play Feature Delivery</strong> (dynamic feature modules) and <strong>Play Asset Delivery</strong> let you ship large features and assets only to users who need them, at install time, conditionally, or on demand. They add complexity, so use them for genuinely large, optional parts of the app.</p>
+
+<h2 id="guard">Prevent regressions</h2>
+<ul>
+  <li>Track release AAB/APK size in CI and fail or alert on unexpected growth.</li>
+  <li>Compare builds in APK Analyzer when adding a new dependency.</li>
+</ul>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Image-heavy onboarding</h3><p>Converting PNG illustrations to WebP or vectors often saves megabytes.</p></div>
+  <div class="card usecase"><h3>Unused translations</h3><p>Locale filters remove dozens of library translations you don't support.</p></div>
+  <div class="card usecase"><h3>Optional ML feature</h3><p>Moving a large on-device model to on-demand download keeps the base install small.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's the difference between download and install size?</summary><div><p>Download size is the compressed transfer. Install size is what occupies the device after installation, including extracted and compiled code. Play Console reports both.</p></div></details>
+  <details><summary>Does Compose increase app size?</summary><div><p>It adds library code, which R8 shrinks substantially. Migrating fully off Views can offset part of it.</p></div></details>
+  <details><summary>Is there a Play Store size limit?</summary><div><p>Yes. Google Play enforces limits on base module and total sizes, with asset delivery for larger content. Check current limits in Play Console Help.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>To reduce app size: <strong>publish App Bundles</strong>, enable <strong>R8 and resource shrinking</strong>, optimise <strong>images</strong>, scrutinise <strong>native libraries and dependencies</strong>, filter <strong>locales</strong>, and use <strong>on-demand delivery</strong> for large optional features. Then guard size in CI.</p>
+<p>Next step: automate builds and checks with <a href="../android-ci-cd-github-actions/index.html">CI/CD for Android with GitHub Actions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/performance/reduce-apk-size" target="_blank" rel="noopener">Reduce your app size</a></li><li><a href="https://developer.android.com/studio/debug/apk-analyzer" target="_blank" rel="noopener">Analyze your build with APK Analyzer</a></li><li><a href="https://developer.android.com/guide/app-bundle" target="_blank" rel="noopener">About Android App Bundles</a></li><li><a href="https://support.google.com/googleplay/android-developer/answer/9859372" target="_blank" rel="noopener">Play Console: optimize app size</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-size-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-size-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/proguard-r8-explained/index.html"><small>Testing, Debugging, and Performance</small>ProGuard and R8 Explained</a></li><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li><li><a href="../../android/publish-android-app-google-play/index.html"><small>App Publishing, Monetization, and Product Development</small>How to Publish an Android App on Google Play</a></li><li><a href="../../android/android-store-listing-optimization/index.html"><small>App Publishing, Monetization, and Product Development</small>App Store Listing Optimization for Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/reduce-android-app-size/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/reduce-android-app-size/&amp;text=How to Reduce Android App Size" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/reduce-android-app-size/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#measure">Measure first</a></li><li><a href="#aab">1. Publish App Bundles</a></li><li><a href="#r8">2. Enable R8 and resource shrinking</a></li><li><a href="#images">3. Images</a></li><li><a href="#native">4. Native libraries</a></li><li><a href="#deps">5. Dependencies</a></li><li><a href="#delivery">6. On-demand delivery</a></li><li><a href="#guard">Prevent regressions</a></li><li><a href="#use-cases">Typical wins</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-size-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dreduce-android-app-size-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

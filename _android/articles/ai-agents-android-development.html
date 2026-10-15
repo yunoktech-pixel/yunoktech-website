@@ -1,0 +1,95 @@
+<!--meta
+{
+  "seo_title": "AI Agents in Android Development: What to Know",
+  "description": "What AI coding agents can do in Android projects: planning, multi-file edits, running Gradle and tests, MCP tools, permissions and sandboxing, good tasks, failure modes and team practices.",
+  "primary_keyword": "ai agents android development",
+  "keywords": ["agent mode android studio", "ai coding agent gradle", "mcp server android studio", "agentic coding risks", "agents.md android", "autonomous code changes"],
+  "lede": "AI coding agents don't just suggest code. They plan, edit multiple files, run builds and tests, read the results and iterate. For Android projects that's powerful and risky. This guide explains how agents work, which tasks suit them, and how to keep control.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["gemini-in-android-studio", "verify-ai-generated-android-code", "better-prompts-ai-coding-tools", "can-ai-build-android-app"],
+  "refs": [
+    ["Gemini in Android Studio: Agent Mode", "https://developer.android.com/studio/gemini/overview"],
+    ["Model Context Protocol", "https://modelcontextprotocol.io/"],
+    ["AGENTS.md", "https://agents.md/"],
+    ["OWASP LLM Top 10: excessive agency", "https://owasp.org/www-project-top-10-for-large-language-model-applications/"]
+  ]
+}
+-->
+<p class="ad-lead">An agent receives a goal, such as "add a sort option to the product list with tests", and works in a loop: plan, edit files, run Gradle, read errors, fix, run tests, summarise. Android Studio's Agent Mode and other agentic tools work this way. The productivity gain is real for well-scoped tasks, and so is the risk of large, plausible-looking but wrong changes.</p>
+
+<h2 id="loop">How agents work</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ag-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-ag-t fig-ag-d">
+    <title id="fig-ag-t">The agent loop</title>
+    <desc id="fig-ag-d">A goal and project rules go to the agent, which plans, then uses tools: reading files, editing files, running Gradle builds and tests, and calling external tools through MCP servers. It observes results and repeats until done or blocked, then presents a summary and diff for human review. Permissions gate risky tools.</desc>
+    <defs><marker id="agm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="90" width="130" height="56" rx="12"/><text class="d-t" x="85" y="114" text-anchor="middle">Goal + rules</text><text class="d-s" x="85" y="132" text-anchor="middle">AGENTS.md</text></g>
+    <path class="d-flow" d="M150 118 H196" marker-end="url(#agm)"/>
+    <g class="d-step" style="--i:1"><circle class="d-violet" cx="290" cy="118" r="70"/><text class="d-t" x="290" y="104" text-anchor="middle">plan → act</text><text class="d-t" x="290" y="124" text-anchor="middle">→ observe</text><text class="d-s" x="290" y="144" text-anchor="middle">repeat</text></g>
+    <path class="d-flow" d="M360 90 L426 40 M360 108 L426 96 M360 128 L426 152 M360 146 L426 206" marker-end="url(#agm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="430" y="20" width="150" height="36" rx="8"/><text class="d-s" x="505" y="43" text-anchor="middle">read/edit files</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="430" y="78" width="150" height="36" rx="8"/><text class="d-s" x="505" y="101" text-anchor="middle">./gradlew build/test</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="430" y="136" width="150" height="36" rx="8"/><text class="d-s" x="505" y="159" text-anchor="middle">MCP tools</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="430" y="190" width="150" height="36" rx="8"/><text class="d-s" x="505" y="213" text-anchor="middle">summary + diff</text></g>
+    <rect class="d-red" x="600" y="70" width="110" height="60" rx="10"/><text class="d-t" x="655" y="96" text-anchor="middle">Permissions</text><text class="d-s" x="655" y="114" text-anchor="middle">gate risky tools</text>
+  </svg>
+  <figcaption id="fig-ag-cap">The loop is what makes agents capable, and why permissions and review matter.</figcaption>
+</figure>
+
+<h2 id="good-tasks">Tasks that suit agents</h2>
+<div class="cards">
+  <div class="card pros"><h4>Good</h4><ul><li>Dependency upgrades with build fixes</li><li>Mechanical refactors across files</li><li>Adding tests for existing classes</li><li>Small features following an existing pattern</li><li>Fixing lint warnings in bulk</li></ul></div>
+  <div class="card cons"><h4>Poor</h4><ul><li>Vague goals ("improve architecture")</li><li>Security-critical code paths</li><li>Product decisions</li><li>Huge cross-cutting rewrites</li><li>Tasks without a way to verify success</li></ul></div>
+</div>
+
+<h2 id="setup">Setting agents up for success</h2>
+<ol class="steps">
+  <li><strong>Rules file:</strong> conventions, forbidden actions and verification commands in <code>AGENTS.md</code>.</li>
+  <li><strong>Clear definition of done:</strong> "<code>./gradlew :feature:cart:testDebugUnitTest</code> passes; no new dependencies".</li>
+  <li><strong>Clean starting point:</strong> commit before starting so you can diff and revert.</li>
+  <li><strong>Permissions:</strong> require approval for running commands, touching sensitive files, or network access.</li>
+  <li><strong>Small scope:</strong> one feature or one migration step per task.</li>
+</ol>
+<code-block lang="text" file="Agent task example">
+Goal: Add "Sort by rating" to ProductListScreen, following the existing "Sort by price" implementation.
+Scope: :feature:catalog only. No new dependencies. Keep public APIs unchanged.
+Steps you may run: ./gradlew :feature:catalog:testDebugUnitTest, ./gradlew :app:assembleDebug
+Done when: new enum value + ViewModel logic + UI chip + unit tests for ordering and ties; build green.
+Stop and ask if you need to change files outside :feature:catalog.
+</code-block>
+
+<h2 id="mcp">Extending agents with MCP</h2>
+<p>The Model Context Protocol (MCP) lets agents call external tools, such as issue trackers, documentation servers, design files or internal APIs. Android Studio's Agent Mode supports adding MCP servers. Every tool is new capability, so connect only trusted servers, scope their permissions, and remember that tool outputs can contain prompt-injection attempts.</p>
+
+<h2 id="failure-modes">Failure modes to watch</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Failure</th><th>Example</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>Scope creep</td><td>"While fixing X I also refactored Y and Z"</td><td>Explicit scope; review diff size</td></tr>
+    <tr><td>Test gaming</td><td>Weakening or deleting failing tests</td><td>Review test changes first; forbid in rules</td></tr>
+    <tr><td>Version guessing</td><td>Bumping to non-existent versions</td><td>Verify against release notes</td></tr>
+    <tr><td>Silent behaviour change</td><td>Refactor alters edge-case behaviour</td><td>Characterization tests; small diffs</td></tr>
+    <tr><td>Unsafe commands</td><td>Deleting files, network calls</td><td>Permission prompts; sandboxing</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="review">Reviewing agent output</h2>
+<ul>
+  <li>Read the summary, then the <strong>whole diff</strong>, starting with test changes.</li>
+  <li>Re-run builds and tests yourself, and run the app for UI changes.</li>
+  <li>Apply the checklist in <a href="../verify-ai-generated-android-code/index.html">How to Verify AI-Generated Android Code</a>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can agents publish my app?</summary><div><p>Technically, tools could automate parts of release, but releases should stay behind human approval, signed in CI with protected credentials.</p></div></details>
+  <details><summary>Are agents safe to run on company code?</summary><div><p>Only with approved tools, data policies, context exclusions and permission controls. Check with your security team.</p></div></details>
+  <details><summary>How is this different from Android AppFunctions?</summary><div><p>Coding agents act on your <em>source code</em>. AppFunctions expose your <em>app's features</em> to on-device AI agents for end users. See <a href="../android-appfunctions-ai-ecosystem/index.html">AppFunctions</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI agents plan, edit, build and test in a loop, which makes them excellent for <strong>well-scoped, verifiable tasks</strong> and risky for vague or sensitive ones. Give them rules, scope and a definition of done, gate tools with permissions, and review every diff.</p>
+<p>Next step: the final safeguard, <a href="../verify-ai-generated-android-code/index.html">How to Verify AI-Generated Android Code Before Shipping</a>.</p>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Null Safety Explained with Examples | Yunok Tech</title>
+  <meta name="description" content="Kotlin null safety for Android: nullable types, safe calls, Elvis, let, smart casts, lateinit, platform types from Java, and when !! is acceptable, with real examples.">
+  <meta name="keywords" content="kotlin null safety, kotlin nullable types, kotlin elvis operator, kotlin safe call, kotlin lateinit vs lazy, kotlin platform types, nullpointerexception android kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-null-safety/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-null-safety/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Null Safety Explained with Examples">
+  <meta property="og:description" content="Kotlin null safety for Android: nullable types, safe calls, Elvis, let, smart casts, lateinit, platform types from Java, and when !! is acceptable, with real examples.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Null Safety Explained with Examples">
+  <meta name="twitter:description" content="Kotlin null safety for Android: nullable types, safe calls, Elvis, let, smart casts, lateinit, platform types from Java, and when !! is acceptable, with real examples.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Null Safety Explained with Examples", "description": "Kotlin null safety for Android: nullable types, safe calls, Elvis, let, smart casts, lateinit, platform types from Java, and when !! is acceptable, with real examples.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Kotlin Programming", "keywords": "kotlin nullable types, kotlin elvis operator, kotlin safe call, kotlin lateinit vs lazy, kotlin platform types, nullpointerexception android kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-null-safety/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Null Safety Explained with Examples", "item": "https://yunoktech.com/android/kotlin-null-safety/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Null Safety Explained with Examples</h1>
+    <p class="ad-lede">NullPointerException was once one of the most common causes of Android crashes. Kotlin moves nullability into the type system so the compiler catches most of these bugs before they ship. Here's how it works and how to use it well in Android code.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#types">Nullable and non-null types</a></li><li><a href="#operators">The operators</a></li><li><a href="#smart-casts">Smart casts and their limits</a></li><li><a href="#android">Null safety in Android code</a></li><li><a href="#lateinit">lateinit and lazy</a></li><li><a href="#java-interop">Java interop and platform types</a></li><li><a href="#bang-bang">When is !! acceptable?</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">In Java, any object reference might be null, and you only find out at runtime, often in a user's hands. Kotlin flips this: a type is <strong>non-null by default</strong>, and you must explicitly say when something can be null. The compiler then makes you handle that case.</p>
+<p>This article covers the operators, the patterns that keep Android code clean, the edge cases (Java interop, <code>lateinit</code>, platform types), and the habits that keep <code>!!</code> out of your codebase.</p>
+
+<h2 id="types">Nullable and non-null types</h2>
+<figure class="code"><figcaption><span class="file">Basics</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">var</span> title: <span class="tk-t">String</span> = <span class="tk-s">"Inbox"</span>
+<span class="tk-c">// title = null            // ❌ compile error: String can't hold null</span>
+
+<span class="tk-k">var</span> subtitle: <span class="tk-t">String</span>? = <span class="tk-k">null</span>   <span class="tk-c">// ✅ nullable type</span>
+<span class="tk-c">// subtitle.length          // ❌ compile error: must handle the null case</span></code></pre></figure>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-n-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-n-t fig-n-d">
+    <title id="fig-n-t">Ways to handle a nullable value</title>
+    <desc id="fig-n-d">A String? value can be handled with a safe call returning null, the Elvis operator providing a default, let to run code only when non-null, an if check enabling a smart cast, or the not-null assertion operator which throws if null.</desc>
+    <defs><marker id="n2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-amber" x="290" y="10" width="140" height="44" rx="12"/><text class="d-t" x="360" y="37" text-anchor="middle">name: String?</text>
+    <path class="d-flow" d="M320 54 L75 100 M340 54 L215 100 M360 54 L360 100 M380 54 L505 100 M400 54 L645 100" marker-end="url(#n2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="10" y="104" width="130" height="66" rx="10"/><text class="d-t" x="75" y="130" text-anchor="middle">?.</text><text class="d-s" x="75" y="150" text-anchor="middle">safe call → null</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="150" y="104" width="130" height="66" rx="10"/><text class="d-t" x="215" y="130" text-anchor="middle">?:</text><text class="d-s" x="215" y="150" text-anchor="middle">Elvis default</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="295" y="104" width="130" height="66" rx="10"/><text class="d-t" x="360" y="130" text-anchor="middle">?.let { }</text><text class="d-s" x="360" y="150" text-anchor="middle">run if present</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="440" y="104" width="130" height="66" rx="10"/><text class="d-t" x="505" y="130" text-anchor="middle">if (x != null)</text><text class="d-s" x="505" y="150" text-anchor="middle">smart cast</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-red" x="580" y="104" width="130" height="66" rx="10"/><text class="d-t" x="645" y="130" text-anchor="middle">!!</text><text class="d-s" x="645" y="150" text-anchor="middle">throws if null</text></g>
+  </svg>
+  <figcaption id="fig-n-cap">Four safe options and one escape hatch. Reach for <code>!!</code> last, if at all.</figcaption>
+</figure>
+
+<h2 id="operators">The operators</h2>
+<figure class="code"><figcaption><span class="file">Operators in practice</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Address</span>(<span class="tk-k">val</span> city: <span class="tk-t">String</span>?)
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">User</span>(<span class="tk-k">val</span> name: <span class="tk-t">String</span>, <span class="tk-k">val</span> address: <span class="tk-t">Address</span>?)
+
+<span class="tk-k">fun</span> cityLabel(user: <span class="tk-t">User</span>?): <span class="tk-t">String</span> =
+    user?.address?.city ?: <span class="tk-s">"City not set"</span>          <span class="tk-c">// safe-call chain + Elvis default</span>
+
+<span class="tk-k">fun</span> greet(user: <span class="tk-t">User</span>?) {
+    user?.let { println(<span class="tk-s">"Welcome back, ${it.name}"</span>) }   <span class="tk-c">// runs only when user != null</span>
+}
+
+<span class="tk-k">fun</span> requireUser(user: <span class="tk-t">User</span>?): <span class="tk-t">User</span> =
+    user ?: <span class="tk-k">throw</span> <span class="tk-t">IllegalStateException</span>(<span class="tk-s">"User must be signed in"</span>)   <span class="tk-c">// Elvis can throw or return</span>
+
+<span class="tk-k">fun</span> firstChar(text: <span class="tk-t">String</span>?): <span class="tk-t">Char</span>? {
+    <span class="tk-k">if</span> (text.isNullOrEmpty()) <span class="tk-k">return</span> <span class="tk-k">null</span>           <span class="tk-c">// early return</span>
+    <span class="tk-k">return</span> text[<span class="tk-n">0</span>]                                   <span class="tk-c">// smart cast: text is String here</span>
+}</code></pre></figure>
+
+<h2 id="smart-casts">Smart casts and their limits</h2>
+<p>After a null check, the compiler treats a local <code>val</code> as non-null. It <em>can't</em> do this for mutable properties (<code>var</code>) or values from other modules, because another thread or code path could change them between the check and the use. Copy them into a local <code>val</code> first:</p>
+<figure class="code"><figcaption><span class="file">Smart cast on a var property</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">PlayerScreen</span> {
+    <span class="tk-k">var</span> currentTrack: <span class="tk-t">Track</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-k">fun</span> showTitle() {
+        <span class="tk-k">val</span> track = currentTrack ?: <span class="tk-k">return</span>       <span class="tk-c">// capture once, then it's non-null</span>
+        titleView.text = track.title
+    }
+}</code></pre></figure>
+
+<h2 id="android">Null safety in Android code</h2>
+<h3 id="intents">Intent extras and arguments</h3>
+<figure class="code"><figcaption><span class="file">Reading navigation arguments safely</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ArticleViewModel</span>(savedStateHandle: <span class="tk-t">SavedStateHandle</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-c">// Fail fast with a clear message if a required argument is missing.</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> articleId: <span class="tk-t">String</span> = checkNotNull(savedStateHandle[<span class="tk-s">"articleId"</span>]) {
+        <span class="tk-s">"ArticleViewModel requires an articleId argument"</span>
+    }
+}</code></pre></figure>
+<h3 id="ui-state">Model absence explicitly in UI state</h3>
+<p>Nullable fields are fine for genuinely optional data, but don't use <code>null</code> to mean "loading", "error" <em>and</em> "empty". Use a sealed type so every state is explicit (see <a href="../kotlin-data-sealed-enum-classes/index.html">sealed classes</a>).</p>
+<h3 id="compose">Compose</h3>
+<figure class="code"><figcaption><span class="file">Optional UI pieces</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ProfileHeader</span>(name: <span class="tk-t">String</span>, bio: <span class="tk-t">String</span>?) {
+    <span class="tk-t">Column</span> {
+        <span class="tk-t">Text</span>(name, style = <span class="tk-t">MaterialTheme</span>.typography.titleLarge)
+        bio?.takeIf { it.isNotBlank() }?.let { <span class="tk-t">Text</span>(it) }   <span class="tk-c">// render only when present</span>
+    }
+}</code></pre></figure>
+
+<h2 id="lateinit">lateinit and lazy</h2>
+<ul>
+  <li><strong><code>lateinit var</code></strong>: a non-null <code>var</code> initialised after construction, such as a View Binding in <code>onCreate</code> or an injected field. Accessing it before initialisation throws <code>UninitializedPropertyAccessException</code>.</li>
+  <li><strong><code>by lazy</code></strong>: a read-only value computed on first access, then cached. It's thread-safe by default.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">lateinit vs lazy</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">MainActivity</span> : <span class="tk-t">AppCompatActivity</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> binding: <span class="tk-t">ActivityMainBinding</span>            <span class="tk-c">// set in onCreate</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> dateFormatter <span class="tk-k">by</span> lazy { <span class="tk-t">DateTimeFormatter</span>.ofPattern(<span class="tk-s">"d MMM yyyy"</span>) }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate(savedInstanceState: <span class="tk-t">Bundle</span>?) {
+        <span class="tk-k">super</span>.onCreate(savedInstanceState)
+        binding = <span class="tk-t">ActivityMainBinding</span>.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+}</code></pre></figure>
+
+<h2 id="java-interop">Java interop and platform types</h2>
+<p>Kotlin can't know whether an unannotated Java method returns null, so the result is a <strong>platform type</strong> (shown as <code>String!</code>). Kotlin lets you treat it either way, and if you choose non-null and it's null, you crash at that line.</p>
+<figure class="code"><figcaption><span class="file">Defend at the boundary</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Legacy Java: public String getDisplayName() { ... may return null ... }</span>
+<span class="tk-k">val</span> displayName: <span class="tk-t">String</span>? = legacyUser.displayName     <span class="tk-c">// declare it nullable deliberately</span>
+<span class="tk-k">val</span> label = displayName ?: <span class="tk-s">"Guest"</span></code></pre></figure>
+<p>Better still, add <code>@Nullable</code> or <code>@NonNull</code> annotations to the Java code. The Android SDK and AndroidX are annotated, so Kotlin sees accurate types for them.</p>
+
+<h2 id="bang-bang">When is <code>!!</code> acceptable?</h2>
+<p>Rarely: in tests, or when an invariant is guaranteed and a crash is the correct outcome if it's violated. Even then, <code>checkNotNull(x) { "reason" }</code> or <code>requireNotNull</code> gives a much better error message than a bare <code>!!</code>.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>!!</code> to make red underlines disappear.</li>
+  <li>Making everything nullable "to be safe". This pushes null checks everywhere and hides real bugs.</li>
+  <li>Using empty strings or <code>-1</code> as fake "no value" markers instead of nullable or sealed types.</li>
+  <li>Trusting platform types from Java or JSON without handling nulls.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a Kotlin app still crash with NullPointerException?</summary><div><p>Yes: through <code>!!</code>, platform types from Java, uninitialised <code>lateinit</code> properties, or reflection and serialisation that bypass constructors. They're much rarer, but possible.</p></div></details>
+  <details><summary>How does JSON parsing interact with null safety?</summary><div><p>kotlinx.serialization respects nullability and default values in your data classes, so mark fields nullable or give defaults when the API may omit them.</p></div></details>
+  <details><summary>Is <code>?.let</code> always better than <code>if</code>?</summary><div><p>No. For simple checks, <code>if (x != null)</code> with a smart cast is often clearer, especially when there's an else branch.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Kotlin's null safety turns a whole class of runtime crashes into compile-time errors. Use <strong>non-null types by default</strong>, handle optional values with <code>?.</code>, <code>?:</code>, <code>let</code> and smart casts, defend at Java boundaries, and treat <code>!!</code> as a code smell that needs justification.</p>
+<p>Next step: model your screen states with <a href="../kotlin-data-sealed-enum-classes/index.html">data, sealed and enum classes</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/null-safety.html" target="_blank" rel="noopener">Null safety (Kotlin docs)</a></li><li><a href="https://kotlinlang.org/docs/java-interop.html#null-safety-and-platform-types" target="_blank" rel="noopener">Calling Java from Kotlin: null safety and platform types</a></li><li><a href="https://kotlinlang.org/docs/properties.html#late-initialized-properties-and-variables" target="_blank" rel="noopener">Properties: late-initialized properties</a></li><li><a href="https://developer.android.com/kotlin/style-guide" target="_blank" rel="noopener">Android Kotlin style guide</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-null-safety-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-null-safety-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-basics-android/index.html"><small>Kotlin Programming</small>Kotlin Basics Every Android Developer Should Know</a></li><li><a href="../../android/kotlin-data-sealed-enum-classes/index.html"><small>Kotlin Programming</small>Data Classes, Sealed Classes, and Enum Classes</a></li><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/android-beginner-mistakes/index.html"><small>Android Development for Beginners</small>Common Mistakes Beginners Make in Android Development</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-null-safety/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-null-safety/&amp;text=Kotlin Null Safety Explained with Examples" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-null-safety/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#types">Nullable and non-null types</a></li><li><a href="#operators">The operators</a></li><li><a href="#smart-casts">Smart casts and their limits</a></li><li><a href="#android">Null safety in Android code</a></li><li><a href="#lateinit">lateinit and lazy</a></li><li><a href="#java-interop">Java interop and platform types</a></li><li><a href="#bang-bang">When is !! acceptable?</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-null-safety-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-null-safety-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

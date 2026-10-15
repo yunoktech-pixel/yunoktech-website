@@ -1,0 +1,381 @@
+<!--meta
+{
+  "seo_title": "Build an AI Chatbot with Kotlin and Jetpack Compose",
+  "description": "Build a streaming AI chatbot in Android with Kotlin, Jetpack Compose and Gemini via Firebase AI Logic: chat history, streaming bubbles, stop, retry, trimming and safety.",
+  "primary_keyword": "ai chatbot jetpack compose",
+  "keywords": ["android chatbot kotlin", "gemini chatbot android", "streaming chat compose", "firebase ai logic chat", "sendMessageStream kotlin", "chat ui jetpack compose", "llm chat app android"],
+  "intent": "Project tutorial",
+  "lede": "A complete, working chatbot project: a clean data model, a repository around Gemini's chat API, a ViewModel that streams tokens into message bubbles, a polished Compose UI with stop and retry, and the production details (history limits, safety, cost) that tutorials usually skip.",
+  "date": "2026-10-14",
+  "cta": "ai",
+  "related": ["gemini-api-android-kotlin", "mvi-vs-mvvm-android", "cloud-ai-vs-on-device-ai-android", "choose-ai-model-android-app"],
+  "refs": [
+    ["Firebase AI Logic: multi-turn chat (Android)", "https://firebase.google.com/docs/ai-logic/chat?platform=android"],
+    ["Firebase AI Logic: Get started", "https://firebase.google.com/docs/ai-logic/get-started?platform=android"],
+    ["App Check for Firebase AI Logic", "https://firebase.google.com/docs/ai-logic/app-check"],
+    ["Lists and grids in Compose", "https://developer.android.com/develop/ui/compose/lists"],
+    ["Gemini models", "https://ai.google.dev/gemini-api/docs/models"]
+  ]
+}
+-->
+<p class="ad-lead">A chatbot looks simple: a text box and a list of bubbles. The hard parts are hidden. Streaming text into a bubble without janking the list, keeping conversation context without sending an ever-growing history, letting users stop a runaway answer, and failing gracefully on a flaky mobile connection.</p>
+<p>In this project you'll build an AI chat assistant for a fictional "Android Study Buddy" app, using Kotlin, Jetpack Compose and Gemini through Firebase AI Logic. It assumes you've completed the setup from <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android Using Kotlin</a> (Firebase project, <code>firebase-ai</code> dependency, App Check).</p>
+
+<h2 id="what-we-build">What we'll build</h2>
+<ul>
+  <li>A conversation screen with user and assistant bubbles, auto-scroll, and an "AI-generated" label.</li>
+  <li>Token-by-token streaming of the assistant's reply, with a <strong>Stop</strong> button.</li>
+  <li>Error bubbles with <strong>Retry</strong> that resends the failed message.</li>
+  <li>A system instruction that keeps the assistant on-topic, and history trimming to control cost.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-chat-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-chat-title fig-chat-desc">
+    <title id="fig-chat-title">Chat message lifecycle from send to streamed reply</title>
+    <desc id="fig-chat-desc">The user sends a message. The ViewModel appends a user bubble and an empty assistant bubble marked streaming, then calls the repository. The repository sends recent history plus the new message to Gemini with sendMessageStream. Each streamed chunk is appended to the assistant bubble. When the stream completes, the bubble is marked done; on error it is marked failed with retry.</desc>
+    <defs><marker id="h1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M118 60 H146 M290 60 H318 M474 60 H502" marker-end="url(#h1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="108" height="60" rx="12"/><text class="d-t" x="64" y="56" text-anchor="middle">User taps</text><text class="d-t" x="64" y="74" text-anchor="middle">Send</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="150" y="22" width="140" height="76" rx="12"/><text class="d-t" x="220" y="46" text-anchor="middle">ViewModel</text><text class="d-s" x="220" y="66" text-anchor="middle">+ user bubble</text><text class="d-s" x="220" y="84" text-anchor="middle">+ empty AI bubble</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="322" y="22" width="152" height="76" rx="12"/><text class="d-t" x="398" y="46" text-anchor="middle">ChatRepository</text><text class="d-s" x="398" y="66" text-anchor="middle">trimmed history</text><text class="d-s" x="398" y="84" text-anchor="middle">sendMessageStream()</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="506" y="30" width="200" height="60" rx="12"/><text class="d-t" x="606" y="56" text-anchor="middle">Gemini (cloud)</text><text class="d-s" x="606" y="74" text-anchor="middle">streams chunks</text></g>
+    <path class="d-dash" d="M606 90 V150 H220 V102" marker-end="url(#h1)"/>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="250" y="132" width="270" height="36" rx="10"/><text class="d-s" x="385" y="155" text-anchor="middle">each chunk → append to AI bubble → recompose</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-green" x="150" y="184" width="170" height="36" rx="10"/><text class="d-s" x="235" y="207" text-anchor="middle">complete → status DONE</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-red" x="340" y="184" width="200" height="36" rx="10"/><text class="d-s" x="440" y="207" text-anchor="middle">error → FAILED + Retry</text></g>
+    <circle class="d-dot" r="6" style="offset-path:path('M118 60 H506');--dur:2s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M606 90 V150 H220 V102');--dur:1.6s;--delay:1.8s"/>
+  </svg>
+  <figcaption id="fig-chat-cap">The assistant bubble exists before the first token arrives, so the UI can show a typing indicator and then fill the same bubble in place.</figcaption>
+</figure>
+
+<h2 id="project-structure">Project structure</h2>
+<code-block lang="text" file="Files we'll create">
+app/src/main/java/com/example/studybuddy/chat/
+├── ChatMessage.kt        ← UI/domain model
+├── ChatRepository.kt     ← wraps Firebase AI Logic chat, trims history
+├── ChatViewModel.kt      ← state, streaming, stop, retry
+└── ChatScreen.kt         ← Compose UI: list, bubbles, input bar
+</code-block>
+
+<h2 id="model">Step 1: The message model</h2>
+<code-block lang="kotlin" file="ChatMessage.kt">
+import java.util.UUID
+
+enum class Author { USER, ASSISTANT }
+enum class Status { STREAMING, DONE, FAILED }
+
+data class ChatMessage(
+    val id: String = UUID.randomUUID().toString(),
+    val author: Author,
+    val text: String,
+    val status: Status = Status.DONE,
+)
+
+data class ChatUiState(
+    val messages: List<ChatMessage> = emptyList(),
+    val input: String = "",
+) {
+    val isResponding: Boolean get() = messages.lastOrNull()?.status == Status.STREAMING
+}
+</code-block>
+<p>Messages are immutable, and every message has a stable <code>id</code>. That id becomes the <code>LazyColumn</code> key, so Compose can update the streaming bubble in place instead of rebuilding the list.</p>
+
+<h2 id="repository">Step 2: The repository</h2>
+<p>Gemini's chat API keeps conversation context by resending history with each turn, and every resent token is billed as input. Instead of holding one ever-growing chat session, the repository rebuilds a chat from the <em>last N completed messages</em> on every send. It's simple, predictable and cheap.</p>
+<code-block lang="kotlin" file="ChatRepository.kt">
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.content
+import com.google.firebase.ai.type.generationConfig
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
+
+interface ChatRepository {
+    /** Streams the assistant's reply to [message], given previous completed turns. */
+    fun reply(history: List<ChatMessage>, message: String): Flow<String>
+}
+
+class GeminiChatRepository(
+    modelName: String = "gemini-3.8-flash",      // keep in remote config in production
+    private val maxHistoryMessages: Int = 12,    // ~6 user/assistant exchanges
+) : ChatRepository {
+
+    private val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = modelName,
+        generationConfig = generationConfig {
+            temperature = 0.6f
+            maxOutputTokens = 1024
+        },
+        systemInstruction = content {
+            text(
+                """
+                You are Study Buddy, a friendly tutor for Android development with Kotlin and Jetpack Compose.
+                - Keep answers under 200 words unless the user asks for more detail.
+                - Use short Kotlin snippets when they help; say when code is untested.
+                - If a question is unrelated to programming, politely steer back to Android topics.
+                - If you are not sure, say so instead of guessing.
+                """.trimIndent()
+            )
+        },
+    )
+
+    override fun reply(history: List<ChatMessage>, message: String): Flow<String> {
+        val recent = history
+            .filter { it.status == Status.DONE && it.text.isNotBlank() }   // skip failed/partial turns
+            .takeLast(maxHistoryMessages)
+            .map { msg ->
+                content(role = if (msg.author == Author.USER) "user" else "model") { text(msg.text) }
+            }
+        val chat = model.startChat(history = recent)
+        return chat.sendMessageStream(message).mapNotNull { it.text }
+    }
+}
+</code-block>
+<div class="tip"><b>Why filter failed turns?</b>
+<p>If a reply failed halfway, sending that partial text back as "what the model said" confuses the next answer. Only completed exchanges become context.</p></div>
+
+<h2 id="viewmodel">Step 3: The ViewModel</h2>
+<code-block lang="kotlin" file="ChatViewModel.kt">
+class ChatViewModel(private val repository: ChatRepository) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ChatUiState())
+    val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
+
+    private var replyJob: Job? = null
+
+    fun onInputChange(text: String) = _uiState.update { it.copy(input = text.take(2_000)) }
+
+    fun send() {
+        val text = _uiState.value.input.trim()
+        if (text.isEmpty() || _uiState.value.isResponding) return
+        _uiState.update { it.copy(input = "") }
+        startReply(userText = text, appendUser = true)
+    }
+
+    /** Re-sends the user message that preceded a failed assistant reply. */
+    fun retry(failedId: String) {
+        val messages = _uiState.value.messages
+        val index = messages.indexOfFirst { it.id == failedId }
+        val userText = messages.getOrNull(index - 1)?.takeIf { it.author == Author.USER }?.text ?: return
+        _uiState.update { it.copy(messages = messages.filterNot { m -> m.id == failedId }) }
+        startReply(userText = userText, appendUser = false)
+    }
+
+    fun stop() { replyJob?.cancel() }
+
+    private fun startReply(userText: String, appendUser: Boolean) {
+        val history = _uiState.value.messages.let { if (appendUser) it else it.dropLast(1) }
+        val assistant = ChatMessage(author = Author.ASSISTANT, text = "", status = Status.STREAMING)
+        _uiState.update { state ->
+            val withUser = if (appendUser) state.messages + ChatMessage(author = Author.USER, text = userText) else state.messages
+            state.copy(messages = withUser + assistant)
+        }
+
+        replyJob = viewModelScope.launch {
+            try {
+                repository.reply(history, userText).collect { chunk ->
+                    updateMessage(assistant.id) { it.copy(text = it.text + chunk) }
+                }
+                updateMessage(assistant.id) { it.copy(status = Status.DONE) }
+            } catch (e: CancellationException) {
+                // Stopped by the user: keep what we have, mark as done.
+                updateMessage(assistant.id) { it.copy(status = Status.DONE, text = it.text.ifBlank { "(stopped)" }) }
+                throw e
+            } catch (e: Exception) {
+                updateMessage(assistant.id) { it.copy(status = Status.FAILED, text = e.toChatError()) }
+            }
+        }
+    }
+
+    private fun updateMessage(id: String, transform: (ChatMessage) -> ChatMessage) =
+        _uiState.update { state -> state.copy(messages = state.messages.map { if (it.id == id) transform(it) else it }) }
+}
+
+private fun Throwable.toChatError(): String = when (this) {
+    is java.io.IOException -> "You're offline. Check your connection."
+    else -> "Study Buddy couldn't answer that. Tap retry."
+}
+</code-block>
+<p>The streaming logic never touches the UI. It only updates one message by id. Because <code>retry</code> removes the failed bubble and reuses the preceding user text, the history stays clean.</p>
+
+<h2 id="ui">Step 4: The Compose UI</h2>
+<code-block lang="kotlin" file="ChatScreen.kt">
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatScreen(viewModel: ChatViewModel) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+
+    // Keep the newest message visible as it grows.
+    val lastText = state.messages.lastOrNull()?.text
+    LaunchedEffect(state.messages.size, lastText) {
+        if (state.messages.isNotEmpty()) listState.animateScrollToItem(state.messages.lastIndex)
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Study Buddy") }) },
+        bottomBar = {
+            ChatInputBar(
+                text = state.input,
+                isResponding = state.isResponding,
+                onTextChange = viewModel::onInputChange,
+                onSend = viewModel::send,
+                onStop = viewModel::stop,
+            )
+        },
+    ) { padding ->
+        if (state.messages.isEmpty()) {
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Text("Ask anything about Kotlin or Compose.", style = MaterialTheme.typography.bodyLarge)
+            }
+        } else {
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize().padding(padding),
+            ) {
+                items(state.messages, key = { it.id }) { message ->
+                    MessageBubble(message = message, onRetry = { viewModel.retry(message.id) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MessageBubble(message: ChatMessage, onRetry: () -> Unit) {
+    val isUser = message.author == Author.USER
+    Column(
+        horizontalAlignment = if (isUser) Alignment.End else Alignment.Start,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Surface(
+            color = when {
+                message.status == Status.FAILED -> MaterialTheme.colorScheme.errorContainer
+                isUser -> MaterialTheme.colorScheme.primaryContainer
+                else -> MaterialTheme.colorScheme.surfaceVariant
+            },
+            shape = RoundedCornerShape(
+                topStart = 16.dp, topEnd = 16.dp,
+                bottomStart = if (isUser) 16.dp else 4.dp,
+                bottomEnd = if (isUser) 4.dp else 16.dp,
+            ),
+            modifier = Modifier.widthIn(max = 320.dp),
+        ) {
+            Column(Modifier.padding(12.dp)) {
+                if (message.status == Status.STREAMING && message.text.isEmpty()) {
+                    Text("Thinking…", style = MaterialTheme.typography.bodyMedium)
+                } else {
+                    SelectionContainer { Text(message.text, style = MaterialTheme.typography.bodyLarge) }
+                }
+            }
+        }
+        if (!isUser) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("AI-generated", style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 4.dp, top = 2.dp))
+                if (message.status == Status.FAILED) TextButton(onClick = onRetry) { Text("Retry") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChatInputBar(
+    text: String,
+    isResponding: Boolean,
+    onTextChange: (String) -> Unit,
+    onSend: () -> Unit,
+    onStop: () -> Unit,
+) {
+    Surface(tonalElevation = 3.dp) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().navigationBarsPadding().imePadding().padding(8.dp),
+        ) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = onTextChange,
+                placeholder = { Text("Message Study Buddy") },
+                maxLines = 4,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(Modifier.width(8.dp))
+            if (isResponding) {
+                FilledTonalButton(onClick = onStop) { Text("Stop") }
+            } else {
+                Button(onClick = onSend, enabled = text.isNotBlank()) { Text("Send") }
+            }
+        }
+    }
+}
+</code-block>
+<div class="note"><b>Wiring it up</b>
+<p>Create the ViewModel with your DI framework (for example Hilt), or a <code>viewModel { ChatViewModel(GeminiChatRepository()) }</code> initializer, and call <code>ChatScreen(viewModel)</code> from your <code>setContent</code> or navigation graph. In the Activity, enable edge-to-edge so <code>imePadding()</code> moves the input bar above the keyboard.</p></div>
+
+<h2 id="test">Step 5: Test the ViewModel with a fake repository</h2>
+<code-block lang="kotlin" file="ChatViewModelTest.kt">
+class ChatViewModelTest {
+    @get:Rule val mainRule = MainDispatcherRule()   // sets Dispatchers.Main to a test dispatcher
+
+    private class FakeRepo(private val chunks: List<String>, private val fail: Boolean = false) : ChatRepository {
+        override fun reply(history: List<ChatMessage>, message: String) = flow {
+            chunks.forEach { emit(it) }
+            if (fail) throw java.io.IOException("offline")
+        }
+    }
+
+    @Test
+    fun `streamed chunks are joined into one assistant message`() = runTest {
+        val vm = ChatViewModel(FakeRepo(listOf("Hel", "lo!")))
+        vm.onInputChange("Hi")
+        vm.send()
+        advanceUntilIdle()
+        val last = vm.uiState.value.messages.last()
+        assertEquals("Hello!", last.text)
+        assertEquals(Status.DONE, last.status)
+    }
+
+    @Test
+    fun `network failure marks the reply as failed`() = runTest {
+        val vm = ChatViewModel(FakeRepo(emptyList(), fail = true))
+        vm.onInputChange("Hi")
+        vm.send()
+        advanceUntilIdle()
+        assertEquals(Status.FAILED, vm.uiState.value.messages.last().status)
+    }
+}
+</code-block>
+<p>The <code>MainDispatcherRule</code> is shown in <a href="../kotlin-coroutines-flow-android/index.html">Kotlin Coroutines and Flow Explained</a>.</p>
+
+<h2 id="production">Production checklist</h2>
+<div class="cards">
+  <div class="card"><h4>Cost control</h4><ul><li>History limited to recent turns</li><li><code>maxOutputTokens</code> set</li><li>Input length capped</li><li>Per-user daily limits (needs a backend or App Check + server rules)</li></ul></div>
+  <div class="card"><h4>Safety &amp; trust</h4><ul><li>System instruction keeps scope narrow</li><li>Replies labelled AI-generated</li><li>No actions taken from model output without user confirmation</li><li>A way for users to report bad answers</li></ul></div>
+  <div class="card"><h4>Privacy</h4><ul><li>Tell users messages go to a cloud AI service</li><li>Data safety form updated</li><li>Don't log full conversations to analytics</li><li>Offer "Clear conversation"</li></ul></div>
+  <div class="card"><h4>UX polish</h4><ul><li>Stop button while streaming</li><li>Retry on failure</li><li>Text selectable for copying</li><li>Persist conversations in Room if users expect them later</li></ul></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>List jumps or flickers while streaming.</strong> Make sure items have stable keys (<code>key = { it.id }</code>) and that you update the message in place rather than creating a new id.</li>
+  <li><strong>The assistant "forgets" earlier context.</strong> That's expected beyond <code>maxHistoryMessages</code>. Raise it carefully, or summarise older turns into a single context message.</li>
+  <li><strong>Replies stop mid-sentence.</strong> <code>maxOutputTokens</code> is too low, or safety filtering ended the response. Inspect the finish reason in debug builds.</li>
+  <li><strong>Requests fail only in release builds.</strong> Usually App Check. Register your release SHA-256 fingerprint and check Play Integrity setup.</li>
+  <li><strong>Keyboard covers the input.</strong> Enable edge-to-edge and use <code>imePadding()</code> on the input bar.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can this chatbot work offline?</summary><div><p>Not with a cloud model. On-device Gemini Nano is currently suited to single-turn tasks rather than full multi-turn chat. See <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI</a> for hybrid options.</p></div></details>
+  <details><summary>How do I make it answer from my own content?</summary><div><p>Retrieve relevant passages from your content (usually on a backend with embeddings) and include them in the prompt. This is called retrieval-augmented generation (RAG).</p></div></details>
+  <details><summary>Should I render Markdown in replies?</summary><div><p>Models often reply with Markdown. Rendering it improves readability, but parsing on every streamed chunk can be expensive. Throttle updates or render only once the message is complete.</p></div></details>
+  <details><summary>Can I use OpenAI or another provider instead?</summary><div><p>Yes. Implement <code>ChatRepository</code> against your own backend that calls the other provider. The ViewModel and UI don't change, which is the point of the interface.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>You've built a chatbot with the pieces that matter in production: <strong>immutable messages with stable ids, a repository that controls history and cost, a ViewModel that streams safely with stop and retry, and a Compose UI that stays smooth while text arrives</strong>. Because the AI provider sits behind <code>ChatRepository</code>, you can swap models, add a backend or introduce on-device features without rewriting the screen.</p>
+<p>Next step: persist conversations with Room and add a "New chat" action. To speed up building the UI itself, see <a href="../gemini-in-android-studio/index.html">How to Use Gemini in Android Studio</a>.</p>

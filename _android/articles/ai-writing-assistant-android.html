@@ -1,0 +1,173 @@
+<!--meta
+{
+  "seo_title": "How to Build an AI Writing Assistant for Android",
+  "description": "Build an AI writing assistant in Android with Kotlin and Compose: proofread, rewrite tone and continue text using on-device Gemini Nano with a cloud Gemini fallback, suggestions UX and safety.",
+  "primary_keyword": "ai writing assistant android",
+  "keywords": ["ai text editor android", "rewrite tone android app", "proofreading ai kotlin", "compose ai suggestions ui", "gemini writing assistant", "on-device ai writing"],
+  "lede": "A writing assistant that fixes grammar, adjusts tone and suggests shorter versions is one of the most useful AI features you can add to an Android app. This guide builds one with a provider-neutral architecture, on-device first and cloud as an opt-in fallback, plus a suggestion UX users trust.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ml-kit-genai-apis", "gemini-api-android-kotlin", "prompt-engineering-android-developers", "responsible-ai-ux-android"],
+  "refs": [
+    ["ML Kit GenAI Proofreading", "https://developers.google.com/ml-kit/genai/proofreading/android"],
+    ["ML Kit GenAI Rewriting", "https://developers.google.com/ml-kit/genai/rewriting/android"],
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"],
+    ["People + AI Guidebook", "https://pair.withgoogle.com/guidebook/"]
+  ]
+}
+-->
+<p class="ad-lead">Users write in your app all the time: messages, reviews, posts, support tickets. A good writing assistant helps without taking over. It <em>suggests</em> improvements, explains what changed, and never sends anything the user didn't approve.</p>
+
+<h2 id="features">Features we'll build</h2>
+<ul>
+  <li><strong>Fix grammar</strong> (proofread)</li>
+  <li><strong>Change tone</strong>: friendlier, more professional</li>
+  <li><strong>Make it shorter</strong></li>
+  <li>Suggestions shown as <strong>previews</strong> the user can accept, compare or dismiss</li>
+</ul>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-wa-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-wa-t fig-wa-d">
+    <title id="fig-wa-t">Writing assistant architecture</title>
+    <desc id="fig-wa-d">The Compose editor sends an action such as fix grammar to the ViewModel. The ViewModel calls a WritingAssistant interface. An on-device implementation uses ML Kit GenAI Proofreading and Rewriting; a cloud implementation uses Gemini via Firebase AI Logic and is used only if the user opted in. Suggestions return to the UI for review.</desc>
+    <defs><marker id="wam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 100 H180 M330 100 H360 M530 84 L566 50 M530 116 L566 150" marker-end="url(#wam)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="70" width="140" height="60" rx="12"/><text class="d-t" x="80" y="96" text-anchor="middle">Editor</text><text class="d-s" x="80" y="114" text-anchor="middle">Compose</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="184" y="70" width="146" height="60" rx="12"/><text class="d-t" x="257" y="96" text-anchor="middle">ViewModel</text><text class="d-s" x="257" y="114" text-anchor="middle">suggestion state</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="364" y="70" width="166" height="60" rx="12"/><text class="d-t" x="447" y="96" text-anchor="middle">WritingAssistant</text><text class="d-s" x="447" y="114" text-anchor="middle">router</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="570" y="20" width="140" height="60" rx="12"/><text class="d-t" x="640" y="46" text-anchor="middle">On-device</text><text class="d-s" x="640" y="64" text-anchor="middle">ML Kit GenAI</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="570" y="120" width="140" height="60" rx="12"/><text class="d-t" x="640" y="146" text-anchor="middle">Cloud (opt-in)</text><text class="d-s" x="640" y="164" text-anchor="middle">Gemini</text></g>
+  </svg>
+  <figcaption id="fig-wa-cap">The UI only knows about suggestions. Where they came from is an implementation detail, but one that's disclosed to the user.</figcaption>
+</figure>
+
+<h2 id="interface">The interface</h2>
+<code-block lang="kotlin" file="WritingAssistant.kt">
+enum class WritingAction { FIX_GRAMMAR, FRIENDLIER, MORE_PROFESSIONAL, SHORTER }
+
+data class Suggestion(val text: String, val source: Source) {
+    enum class Source { ON_DEVICE, CLOUD }
+}
+
+interface WritingAssistant {
+    suspend fun supports(action: WritingAction): Boolean
+    suspend fun suggest(action: WritingAction, text: String): List<Suggestion>
+}
+</code-block>
+
+<h2 id="cloud">Cloud implementation with a constrained prompt</h2>
+<code-block lang="kotlin" file="CloudWritingAssistant.kt">
+class CloudWritingAssistant(private val consent: () -> Boolean) : WritingAssistant {
+    private val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.5-flash-lite",                 // small, fast model is enough; check current names
+        generationConfig = generationConfig { temperature = 0.3f; maxOutputTokens = 400 },
+        systemInstruction = content {
+            text(
+                "You edit user text. Return ONLY the rewritten text, no explanations or quotes. " +
+                "Preserve meaning, names, numbers and the original language. Never add new facts."
+            )
+        },
+    )
+
+    override suspend fun supports(action: WritingAction) = consent()
+
+    override suspend fun suggest(action: WritingAction, text: String): List<Suggestion> {
+        val instruction = when (action) {
+            WritingAction.FIX_GRAMMAR -> "Fix grammar, spelling and punctuation only."
+            WritingAction.FRIENDLIER -> "Make the tone warmer and friendlier."
+            WritingAction.MORE_PROFESSIONAL -> "Make the tone polite and professional."
+            WritingAction.SHORTER -> "Make it about half as long."
+        }
+        // The user's text is clearly delimited as data, not instructions.
+        val prompt = "$instruction\n\n<text>\n${text.take(2_000)}\n</text>"
+        val out = model.generateContent(prompt).text?.trim().orEmpty()
+        return if (out.isBlank()) emptyList() else listOf(Suggestion(out, Suggestion.Source.CLOUD))
+    }
+}
+</code-block>
+<p>The on-device implementation wraps ML Kit's Proofreading and Rewriting clients, as shown in <a href="../ml-kit-genai-apis/index.html">ML Kit GenAI APIs</a>. A router tries on-device first and falls back to cloud only if consent is given.</p>
+
+<h2 id="viewmodel">ViewModel</h2>
+<code-block lang="kotlin" file="ComposeMessageViewModel.kt">
+data class EditorState(
+    val text: String = "",
+    val busy: WritingAction? = null,
+    val suggestions: List<Suggestion> = emptyList(),
+    val error: String? = null,
+)
+
+class ComposeMessageViewModel(private val assistant: WritingAssistant) : ViewModel() {
+    private val _state = MutableStateFlow(EditorState())
+    val state = _state.asStateFlow()
+
+    fun onTextChange(t: String) = _state.update { it.copy(text = t, suggestions = emptyList()) }
+
+    fun request(action: WritingAction) = viewModelScope.launch {
+        val text = _state.value.text
+        if (text.isBlank() || !assistant.supports(action)) return@launch
+        _state.update { it.copy(busy = action, error = null) }
+        try {
+            _state.update { it.copy(suggestions = assistant.suggest(action, text), busy = null) }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            _state.update { it.copy(busy = null, error = "Couldn't get a suggestion. Try again.") }
+        }
+    }
+
+    fun accept(s: Suggestion) = _state.update { it.copy(text = s.text, suggestions = emptyList()) }
+    fun dismiss() = _state.update { it.copy(suggestions = emptyList()) }
+}
+</code-block>
+
+<h2 id="ux">Suggestion UX</h2>
+<code-block lang="kotlin" file="SuggestionCard.kt">
+@Composable
+fun SuggestionCard(s: Suggestion, onAccept: () -> Unit, onDismiss: () -> Unit) {
+    OutlinedCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                if (s.source == Suggestion.Source.ON_DEVICE) "Suggestion · processed on your device"
+                else "Suggestion · AI-generated (cloud)",
+                style = MaterialTheme.typography.labelSmall,
+            )
+            Text(s.text, Modifier.padding(vertical = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = onAccept) { Text("Use this") }
+                TextButton(onClick = onDismiss) { Text("Keep mine") }
+            }
+        }
+    }
+}
+</code-block>
+<ul>
+  <li>Never replace text without consent. Show a preview and let the user accept.</li>
+  <li>Keep "undo" available after accepting.</li>
+  <li>Label the source and processing location.</li>
+  <li>Disable actions while a request is in flight, to avoid duplicate calls and quota use.</li>
+</ul>
+
+<h2 id="safety">Safety and privacy</h2>
+<ul>
+  <li><strong>Prompt injection:</strong> user text can contain instructions ("ignore the above…"). Delimit it, keep output constrained to text, and never let output trigger actions. See <a href="../prompt-injection-android-ai/index.html">Prompt Injection</a>.</li>
+  <li><strong>Privacy:</strong> cloud processing needs clear disclosure and consent, and an accurate Data safety form.</li>
+  <li><strong>Meaning changes:</strong> rewrites can alter facts. Ask the model to preserve names and numbers, and let users review.</li>
+</ul>
+
+<h2 id="use-cases">Where it fits</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Marketplace listings</h3><p>"Make it more professional" for seller descriptions, reviewed before publishing.</p></div>
+  <div class="card usecase"><h3>Support tickets</h3><p>"Fix grammar" helps users describe problems clearly.</p></div>
+  <div class="card usecase"><h3>Social posts</h3><p>"Shorter" fits character limits without losing meaning.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should suggestions appear automatically as users type?</summary><div><p>Usually not. On-demand actions respect user intent, avoid distraction, and stay within quotas and costs.</p></div></details>
+  <details><summary>Which languages are supported?</summary><div><p>On-device APIs support specific languages per API. Cloud models support more. Detect the language and route accordingly.</p></div></details>
+  <details><summary>How do I measure quality?</summary><div><p>Track acceptance rate per action and source, and review a sample of anonymised, consented outputs. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A trustworthy AI writing assistant <strong>suggests rather than replaces</strong>, runs <strong>on-device where possible</strong> with an <strong>opt-in cloud fallback</strong>, uses <strong>constrained prompts</strong>, and labels where processing happened. Users stay in control, and acceptance rates tell you what's working.</p>
+<p>Next step: add another high-value feature with <a href="../ai-text-summarization-android/index.html">AI-Powered Text Summarization</a>.</p>

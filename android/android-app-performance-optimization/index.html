@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android App Performance Optimization Guide (2026) | Yunok Tech</title>
+  <meta name="description" content="Make Android apps faster with a measure-first workflow: startup, Baseline Profiles, Compose jank, memory leaks, ANRs, battery and app size, with Macrobenchmark code.">
+  <meta name="keywords" content="android app performance optimization, android startup time, baseline profiles, macrobenchmark android, jetpack compose performance, android jank, android memory leaks, android vitals anr, r8 app size">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-app-performance-optimization/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-app-performance-optimization/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android App Performance Optimization Guide (2026)">
+  <meta property="og:description" content="Make Android apps faster with a measure-first workflow: startup, Baseline Profiles, Compose jank, memory leaks, ANRs, battery and app size, with Macrobenchmark code.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Android App Performance Optimization Guide (2026)">
+  <meta name="twitter:description" content="Make Android apps faster with a measure-first workflow: startup, Baseline Profiles, Compose jank, memory leaks, ANRs, battery and app size, with Macrobenchmark code.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android App Performance Optimization Guide", "description": "Make Android apps faster with a measure-first workflow: startup, Baseline Profiles, Compose jank, memory leaks, ANRs, battery and app size, with Macrobenchmark code.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "android startup time, baseline profiles, macrobenchmark android, jetpack compose performance, android jank, android memory leaks, android vitals anr, r8 app size", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-app-performance-optimization/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android App Performance Optimization Guide", "item": "https://yunoktech.com/android/android-app-performance-optimization/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Android App Performance Optimization Guide</h1>
+    <p class="ad-lede">Performance work fails when it starts with guesses. This guide gives you a measure-first workflow and the highest-impact fixes for startup time, scrolling jank, memory, ANRs, battery and app size, with the Jetpack tools that prove the improvement.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>7 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#workflow">The workflow: measure, fix, verify</a></li><li><a href="#startup">1. Startup time</a></li><li><a href="#baseline-profiles">2. Baseline Profiles</a></li><li><a href="#rendering">3. Rendering and jank</a></li><li><a href="#anr">4. Responsiveness and ANRs</a></li><li><a href="#memory">5. Memory</a></li><li><a href="#battery-network">6. Battery and network</a></li><li><a href="#size">7. App size</a></li><li><a href="#use-cases">Real-world scenarios</a></li><li><a href="#checklist">Performance checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Users rarely say "this app has a 1.8-second cold start and drops frames in the feed". They say "it feels slow", and some of them uninstall. Performance is a feature, and for Android apps that run on everything from flagship phones to budget devices it's one of the hardest to get right.</p>
+<p>This guide is for Android developers who want a systematic approach rather than a list of random tips. It covers the measure-first workflow, the tools for each problem, and the fixes with the biggest real-world impact across startup, rendering, memory, responsiveness, battery and size.</p>
+
+<h2 id="workflow">The workflow: measure, fix, verify</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-perf-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-perf-title fig-perf-desc">
+    <title id="fig-perf-title">Performance optimisation loop</title>
+    <desc id="fig-perf-desc">A loop of four steps: observe real-world data in Android vitals and Crashlytics; reproduce and measure with Macrobenchmark on a release build; profile with Perfetto or Android Studio Profiler to find the cause; fix and verify with the same benchmark, then guard against regressions in CI.</desc>
+    <defs><marker id="o1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M166 70 H194 M346 70 H374 M526 70 H554" marker-end="url(#o1)"/>
+    <path class="d-dash" d="M630 100 V160 H90 V104" marker-end="url(#o1)"/><text class="d-s" x="360" y="180" text-anchor="middle">repeat · add the benchmark to CI to catch regressions</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="16" y="40" width="150" height="60" rx="12"/><text class="d-t" x="91" y="64" text-anchor="middle">1. Observe</text><text class="d-s" x="91" y="84" text-anchor="middle">Android vitals</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="198" y="40" width="148" height="60" rx="12"/><text class="d-t" x="272" y="64" text-anchor="middle">2. Measure</text><text class="d-s" x="272" y="84" text-anchor="middle">Macrobenchmark</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="378" y="40" width="148" height="60" rx="12"/><text class="d-t" x="452" y="64" text-anchor="middle">3. Profile</text><text class="d-s" x="452" y="84" text-anchor="middle">Perfetto / Profiler</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="558" y="40" width="148" height="60" rx="12"/><text class="d-t" x="632" y="64" text-anchor="middle">4. Fix + verify</text><text class="d-s" x="632" y="84" text-anchor="middle">same benchmark</text></g>
+  </svg>
+  <figcaption id="fig-perf-cap">Never optimise without a number before and after. Measure release-like builds on a real, ideally mid-range, device.</figcaption>
+</figure>
+<div class="warn"><b>Don't measure debug builds</b>
+<p>Debug builds disable R8 optimisations and add debugging overhead. Jetpack Compose in particular runs noticeably slower in debug. Benchmark a release-like (minified, non-debuggable) build type.</p></div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Problem</th><th>Field signal</th><th>Lab tool</th></tr></thead>
+  <tbody>
+    <tr><td>Slow startup</td><td>Android vitals startup metrics</td><td>Macrobenchmark <code>StartupTimingMetric</code>, Perfetto</td></tr>
+    <tr><td>Janky scrolling and animation</td><td>Vitals rendering metrics, JankStats</td><td>Macrobenchmark <code>FrameTimingMetric</code>, Profiler</td></tr>
+    <tr><td>ANRs</td><td>Vitals ANR rate (a core vital)</td><td>StrictMode, Perfetto main-thread traces</td></tr>
+    <tr><td>Memory leaks and OOM</td><td>Crash reports (OutOfMemoryError)</td><td>LeakCanary, Memory Profiler, heap dumps</td></tr>
+    <tr><td>Battery drain</td><td>Vitals (excessive wake locks, background work)</td><td>Power Profiler, Background Task Inspector</td></tr>
+    <tr><td>Large download size</td><td>Play Console size reports</td><td>APK Analyzer, R8 configuration</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="startup">1. Startup time</h2>
+<p>Startup is the first impression, and it compounds because users open apps many times a day. Android distinguishes <strong>cold</strong> starts (process created from scratch), <strong>warm</strong> starts and <strong>hot</strong> starts. Cold start matters most, and it is where most improvements come from.</p>
+<h3 id="measure-startup">Measure it with Macrobenchmark</h3>
+<figure class="code"><figcaption><span class="file">benchmark/src/main/java/.../StartupBenchmark.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@RunWith</span>(<span class="tk-t">AndroidJUnit4</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">StartupBenchmark</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> benchmarkRule = <span class="tk-t">MacrobenchmarkRule</span>()
+
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> coldStartNoCompilation() = startup(<span class="tk-t">CompilationMode</span>.<span class="tk-t">None</span>())
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> coldStartWithBaselineProfile() = startup(<span class="tk-t">CompilationMode</span>.<span class="tk-t">Partial</span>())
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> startup(mode: <span class="tk-t">CompilationMode</span>) = benchmarkRule.measureRepeated(
+        packageName = <span class="tk-s">"com.example.app"</span>,
+        metrics = listOf(<span class="tk-t">StartupTimingMetric</span>()),
+        compilationMode = mode,
+        startupMode = <span class="tk-t">StartupMode</span>.<span class="tk-t">COLD</span>,
+        iterations = <span class="tk-n">10</span>,
+    ) {
+        pressHome()
+        startActivityAndWait()
+    }
+}</code></pre></figure>
+<h3 id="fix-startup">The highest-impact startup fixes</h3>
+<ol class="steps">
+  <li><strong>Do less in <code>Application.onCreate()</code>.</strong> Initialise SDKs lazily or after the first frame. Analytics, remote config and image loaders rarely need to block startup.</li>
+  <li><strong>Add Baseline Profiles</strong> (next section). They help the runtime pre-compile critical code paths and are one of the most effective startup and jank improvements.</li>
+  <li><strong>Avoid disk and network on the main thread</strong> during startup: no synchronous SharedPreferences reads of large files, no database queries before the first frame.</li>
+  <li><strong>Keep the first screen light.</strong> Show cached content or a skeleton quickly, then load the rest.</li>
+  <li><strong>Use the SplashScreen API properly</strong>, and don't extend the splash artificially to hide slow initialisation.</li>
+</ol>
+<figure class="code"><figcaption><span class="file">Lazy SDK initialisation with Hilt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">App</span> : <span class="tk-t">Application</span>() {
+    <span class="tk-a">@Inject</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> analytics: dagger.<span class="tk-t">Lazy</span>&lt;<span class="tk-t">Analytics</span>&gt;   <span class="tk-c">// created on first use, not at startup</span>
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate() {
+        <span class="tk-k">super</span>.onCreate()
+        <span class="tk-c">// Defer non-critical work until after the first frame is drawn.</span>
+        <span class="tk-t">Handler</span>(<span class="tk-t">Looper</span>.getMainLooper()).post {
+            <span class="tk-t">ProcessLifecycleOwner</span>.<span class="tk-k">get</span>().lifecycleScope.launch(<span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>) {
+                analytics.<span class="tk-k">get</span>().initialize()
+            }
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="baseline-profiles">2. Baseline Profiles</h2>
+<p>Android Runtime (ART) uses just-in-time compilation and profile-guided ahead-of-time compilation. A <strong>Baseline Profile</strong> ships a list of the classes and methods your critical user journeys need, so they're compiled ahead of time from the first launch instead of being interpreted. Android's documentation reports meaningful improvements in startup and rendering. Measure the gain in your own app with the benchmark above (<code>None</code> vs <code>Partial</code>).</p>
+<figure class="code"><figcaption><span class="file">baselineprofile/src/main/java/.../BaselineProfileGenerator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@RunWith</span>(<span class="tk-t">AndroidJUnit4</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">BaselineProfileGenerator</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> rule = <span class="tk-t">BaselineProfileRule</span>()
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> generate() = rule.collect(packageName = <span class="tk-s">"com.example.app"</span>) {
+        <span class="tk-c">// Critical user journey: launch, then scroll the main feed.</span>
+        pressHome()
+        startActivityAndWait()
+        device.findObject(<span class="tk-t">By</span>.res(<span class="tk-s">"feed_list"</span>))?.fling(<span class="tk-t">Direction</span>.<span class="tk-t">DOWN</span>)
+        device.waitForIdle()
+    }
+}</code></pre></figure>
+<p>Android Studio includes a <em>Baseline Profile Generator</em> module template that sets up the module and the Baseline Profile Gradle plugin for you. Generate the profile on a device or emulator, then commit the generated file.</p>
+<div class="tip"><b>Compose testTag to resource ID</b>
+<p>For UI Automator to find composables with <code>By.res(...)</code>, set <code>Modifier.semantics { testTagsAsResourceId = true }</code> near the root and add <code>Modifier.testTag("feed_list")</code> to the list.</p></div>
+
+<h2 id="rendering">3. Rendering and jank</h2>
+<p>To render smoothly at 60 Hz, each frame must be produced in about 16 ms, and less on 90 or 120 Hz displays. Dropped frames show up as jank during scrolling and animation.</p>
+<h3 id="compose-jank">Compose-specific fixes</h3>
+<figure class="code"><figcaption><span class="file">Compose performance patterns</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// 1. Stable keys and content types in lazy lists</span>
+<span class="tk-t">LazyColumn</span> {
+    items(items = posts, key = { it.id }, contentType = { it.type }) { post -&gt; <span class="tk-t">PostRow</span>(post) }
+}
+
+<span class="tk-c">// 2. Defer reads of fast-changing state to the layout/draw phase with lambda modifiers</span>
+<span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.offset { <span class="tk-t">IntOffset</span>(<span class="tk-n">0</span>, scrollState.<span class="tk-k">value</span> / <span class="tk-n">2</span>) })      <span class="tk-c">// ✅ no recomposition per pixel</span>
+<span class="tk-c">// Box(Modifier.offset(y = (scrollState.value / 2).dp))             // ❌ recomposes every scroll frame</span>
+
+<span class="tk-c">// 3. derivedStateOf when a calculation changes less often than its inputs</span>
+<span class="tk-k">val</span> showScrollToTop <span class="tk-k">by</span> remember { derivedStateOf { listState.firstVisibleItemIndex &gt; <span class="tk-n">5</span> } }
+
+<span class="tk-c">// 4. Remember expensive calculations</span>
+<span class="tk-k">val</span> sorted = remember(posts) { posts.sortedByDescending { it.score } }</code></pre></figure>
+<ul>
+  <li><strong>Prefer immutable, stable parameters</strong> (data classes with <code>val</code>s, immutable collections) so Compose can skip recomposing unchanged items. Use the Compose compiler reports to find unstable classes.</li>
+  <li><strong>Use Layout Inspector's recomposition counts</strong> to find composables that recompose more than expected.</li>
+  <li><strong>Load images at display size</strong> with an image library such as Coil or Glide, never full-resolution bitmaps into thumbnails.</li>
+</ul>
+<h3 id="view-jank">View-system fixes</h3>
+<ul>
+  <li>Flatten deep layouts (for example with ConstraintLayout) and avoid nested weights.</li>
+  <li>Use <code>DiffUtil</code> / <code>ListAdapter</code> and avoid <code>notifyDataSetChanged()</code>.</li>
+  <li>Never bind expensive work in <code>onBindViewHolder</code>.</li>
+</ul>
+
+<h2 id="anr">4. Responsiveness and ANRs</h2>
+<p>An ANR happens when the main thread is blocked for too long, for example for about five seconds while handling input. ANR rate is one of Google Play's <strong>core vitals</strong>, and exceeding Play's bad-behaviour thresholds can affect your app's visibility. The usual causes are I/O, locks or heavy computation on the main thread.</p>
+<figure class="code"><figcaption><span class="file">Catch main-thread I/O early with StrictMode (debug only)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">App</span> : <span class="tk-t">Application</span>() {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate() {
+        <span class="tk-k">if</span> (<span class="tk-t">BuildConfig</span>.<span class="tk-t">DEBUG</span>) {
+            <span class="tk-t">StrictMode</span>.setThreadPolicy(
+                <span class="tk-t">StrictMode</span>.<span class="tk-t">ThreadPolicy</span>.<span class="tk-t">Builder</span>()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .build()
+            )
+        }
+        <span class="tk-k">super</span>.onCreate()
+    }
+}</code></pre></figure>
+<p>The fix is almost always to move the work off the main thread with coroutines (<code>withContext(Dispatchers.IO)</code> or <code>Dispatchers.Default</code>), and to avoid <code>runBlocking</code> in app code. See <a href="../kotlin-coroutines-flow-android/index.html">Kotlin Coroutines and Flow Explained</a>.</p>
+
+<h2 id="memory">5. Memory</h2>
+<ul>
+  <li><strong>Find leaks with LeakCanary</strong> in debug builds. Common culprits are Activities captured by long-lived objects, unregistered listeners, and Views held by Fragments after <code>onDestroyView</code>.</li>
+  <li><strong>Never hold a <code>Context</code>, View or Activity in a ViewModel or singleton.</strong> Use the application context when you truly need one.</li>
+  <li><strong>Bitmaps are the biggest memory consumer</strong> in most apps. Downsample to display size, and let image libraries manage caching.</li>
+  <li><strong>Respond to <code>onTrimMemory</code></strong> by clearing caches when the system is under pressure.</li>
+</ul>
+
+<h2 id="battery-network">6. Battery and network</h2>
+<ul>
+  <li>Use <strong>WorkManager</strong> with constraints (unmetered network, charging) for deferrable background work, instead of custom wake locks and alarms.</li>
+  <li><strong>Batch and cache network requests.</strong> Every radio wake-up costs battery. Use HTTP caching and avoid polling. Prefer push (FCM) for updates.</li>
+  <li><strong>Stop location and sensor updates</strong> when the screen isn't visible, using lifecycle-aware collection.</li>
+</ul>
+
+<h2 id="size">7. App size</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">android {
+    buildTypes {
+        release {
+            isMinifyEnabled = <span class="tk-k">true</span>          <span class="tk-c">// R8: shrink, optimise, obfuscate code</span>
+            isShrinkResources = <span class="tk-k">true</span>        <span class="tk-c">// remove unused resources</span>
+            proguardFiles(getDefaultProguardFile(<span class="tk-s">"proguard-android-optimize.txt"</span>), <span class="tk-s">"proguard-rules.pro"</span>)
+        }
+    }
+}</code></pre></figure>
+<ul>
+  <li>Publish an <strong>Android App Bundle</strong> so Google Play delivers only the code and resources each device needs.</li>
+  <li>Inspect the output with the <strong>APK Analyzer</strong>. Large native libraries, unused fonts and uncompressed images are common surprises.</li>
+  <li>Prefer vector drawables and WebP or AVIF images where appropriate. Remove unused dependencies.</li>
+</ul>
+
+<h2 id="use-cases">Real-world scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Slow cold start after adding SDKs</h3><dl><dt>Diagnosis</dt><dd>A Perfetto trace shows several SDK initialisers in <code>Application.onCreate()</code>.</dd><dt>Fix</dt><dd>Lazy and deferred initialisation, plus a Baseline Profile for the launch journey.</dd><dt>Verify</dt><dd>The StartupBenchmark median improves and stays stable in CI.</dd></dl></div>
+  <div class="card usecase"><h3>Janky feed in Compose</h3><dl><dt>Diagnosis</dt><dd>Recomposition counts show every row recomposing on scroll; an unstable <code>List</code> parameter.</dd><dt>Fix</dt><dd>Stable keys, an immutable UI model, deferred state reads, and properly sized images.</dd><dt>Verify</dt><dd><code>FrameTimingMetric</code> shows fewer slow frames.</dd></dl></div>
+  <div class="card usecase"><h3>ANR spike after a release</h3><dl><dt>Diagnosis</dt><dd>Vitals ANR clusters point to a synchronous database read in a click handler.</dd><dt>Fix</dt><dd>Move the read to a suspend function and show a loading state.</dd><dt>Verify</dt><dd>StrictMode stays clean; the ANR rate falls in the next release.</dd></dl></div>
+</div>
+
+<h2 id="checklist">Performance checklist</h2>
+<ul>
+  <li>☐ Startup and scroll Macrobenchmarks exist and run on release-like builds</li>
+  <li>☐ Baseline Profile generated for critical journeys and committed</li>
+  <li>☐ No SDK initialisation that isn't needed for the first frame</li>
+  <li>☐ StrictMode enabled in debug; no main-thread disk or network</li>
+  <li>☐ LeakCanary in debug builds; no known leaks</li>
+  <li>☐ Lazy lists use stable keys; images loaded at display size</li>
+  <li>☐ R8 and resource shrinking enabled; App Bundle published</li>
+  <li>☐ Android vitals reviewed after every release</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What is a good cold start time?</summary><div><p>Faster is better, and Android vitals flags startups it considers excessive. Rather than chase a universal number, measure your current median on a mid-range device, set a target, and prevent regressions in CI.</p></div></details>
+  <details><summary>Do Baseline Profiles work for all users?</summary><div><p>They're delivered with your app through Google Play and applied by the Android Runtime on supported Android versions. Android's documentation lists the details. Measure the impact with Macrobenchmark using different compilation modes.</p></div></details>
+  <details><summary>Is Jetpack Compose slower than Views?</summary><div><p>Not inherently. Both can be fast or slow. Compose performance depends heavily on state handling and stability, and must be judged on release builds, ideally with Baseline Profiles.</p></div></details>
+  <details><summary>Should I add a performance-monitoring SDK?</summary><div><p>Android vitals and Crashlytics cover the essentials for many apps. Additional monitoring can help, but every SDK has its own startup and size cost, so measure it.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android performance work is a loop: <strong>observe field data, measure with Macrobenchmark, profile to find the cause, fix, and verify with the same benchmark</strong>. The highest-impact fixes are usually the same few: less work at startup, Baseline Profiles, nothing blocking the main thread, stable Compose state, sensibly sized images, and R8 for size.</p>
+<p>Next step: add the <code>StartupBenchmark</code> above to your project today and record your baseline number. Every optimisation after that becomes measurable. For the architecture that makes these fixes easier, read <a href="../clean-architecture-android/index.html">Clean Architecture in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/performance/overview" target="_blank" rel="noopener">App performance guide</a></li><li><a href="https://developer.android.com/topic/performance/vitals/launch-time" target="_blank" rel="noopener">App startup time</a></li><li><a href="https://developer.android.com/topic/performance/baselineprofiles/overview" target="_blank" rel="noopener">Baseline Profiles overview</a></li><li><a href="https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview" target="_blank" rel="noopener">Macrobenchmark</a></li><li><a href="https://developer.android.com/develop/ui/compose/performance" target="_blank" rel="noopener">Compose performance</a></li><li><a href="https://developer.android.com/topic/performance/vitals" target="_blank" rel="noopener">Android vitals</a></li><li><a href="https://developer.android.com/build/shrink-code" target="_blank" rel="noopener">Shrink, obfuscate and optimize your app (R8)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-performance-optimization-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-performance-optimization-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/clean-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Clean Architecture in Android: Practical Lessons</a></li><li><a href="../../android/jetpack-compose-vs-xml/index.html"><small>Jetpack Compose</small>Jetpack Compose vs XML: Which Should You Learn?</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li><li><a href="../../android/mvi-vs-mvvm-android/index.html"><small>Android Architecture and Clean Code</small>MVVM vs MVI: Which Android Architecture Should You Use?</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-app-performance-optimization/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-app-performance-optimization/&amp;text=Android App Performance Optimization Guide" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-app-performance-optimization/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#workflow">The workflow: measure, fix, verify</a></li><li><a href="#startup">1. Startup time</a></li><li><a href="#baseline-profiles">2. Baseline Profiles</a></li><li><a href="#rendering">3. Rendering and jank</a></li><li><a href="#anr">4. Responsiveness and ANRs</a></li><li><a href="#memory">5. Memory</a></li><li><a href="#battery-network">6. Battery and network</a></li><li><a href="#size">7. App size</a></li><li><a href="#use-cases">Real-world scenarios</a></li><li><a href="#checklist">Performance checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-performance-optimization-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-performance-optimization-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

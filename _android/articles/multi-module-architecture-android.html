@@ -1,0 +1,117 @@
+<!--meta
+{
+  "seo_title": "Multi-Module Android Architecture: Pros, Cons, Lessons",
+  "description": "Multi-module Android architecture explained: why modularize, feature vs core modules, api vs implementation, convention plugins, navigation between features, costs and lessons learned.",
+  "primary_keyword": "multi-module android architecture",
+  "keywords": ["android modularization", "feature modules android", "gradle convention plugins", "api vs implementation gradle", "android build time modules", "now in android modules"],
+  "lede": "Splitting an Android app into Gradle modules can speed up builds, enforce architecture and let teams work independently. It can also create slow syncs, circular-dependency headaches and boilerplate. Here are the real pros, the real costs, and the lessons that decide whether modularization pays off.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-modularization-strategies", "gradle-multi-module-build-optimization", "clean-architecture-android", "scaling-android-codebase-teams"],
+  "refs": [
+    ["Guide to Android app modularization", "https://developer.android.com/topic/modularization"],
+    ["Common modularization patterns", "https://developer.android.com/topic/modularization/patterns"],
+    ["Now in Android: modularization learning journey", "https://github.com/android/nowinandroid/blob/main/docs/ModularizationLearningJourney.md"],
+    ["Gradle: api and implementation", "https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_separation"]
+  ]
+}
+-->
+<p class="ad-lead">A single <code>:app</code> module is the right start for almost every project. As the app grows to dozens of screens and several developers, one module means every change recompiles everything, any class can depend on any other, and ownership is blurry. Modularization addresses those problems, at a price.</p>
+
+<h2 id="why">What modules give you</h2>
+<div class="cards">
+  <div class="card pros"><h4>Benefits</h4><ul><li><strong>Build speed:</strong> unchanged modules come from the cache, and builds can parallelise</li><li><strong>Enforced boundaries:</strong> the compiler blocks forbidden dependencies</li><li><strong>Encapsulation:</strong> <code>internal</code> hides implementation details</li><li><strong>Ownership:</strong> teams own modules</li><li><strong>Reuse:</strong> shared design system and core modules</li><li><strong>Dynamic delivery:</strong> optional on-demand feature modules</li></ul></div>
+  <div class="card cons"><h4>Costs</h4><ul><li>More Gradle configuration to maintain</li><li>Slower Gradle sync with many modules</li><li>Cross-feature navigation needs indirection</li><li>Visibility decisions (<code>api</code> vs <code>implementation</code>, <code>internal</code>)</li><li>Over-modularization makes simple changes touch many modules</li></ul></div>
+</div>
+
+<h2 id="structure">A typical structure</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mm-cap">
+  <svg viewBox="0 0 720 260" role="img" aria-labelledby="fig-mm-t fig-mm-d">
+    <title id="fig-mm-t">Feature and core module dependency graph</title>
+    <desc id="fig-mm-d">The app module depends on feature modules: home, search and settings. Feature modules depend on core modules: designsystem, data, domain and ui. Core data depends on core network and core database. Feature modules never depend on each other.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="300" y="10" width="120" height="40" rx="10"/><text class="d-w" x="360" y="35" text-anchor="middle">:app</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="100" y="80" width="150" height="40" rx="10"/><text class="d-t" x="175" y="105" text-anchor="middle">:feature:home</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="285" y="80" width="150" height="40" rx="10"/><text class="d-t" x="360" y="105" text-anchor="middle">:feature:search</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="470" y="80" width="150" height="40" rx="10"/><text class="d-t" x="545" y="105" text-anchor="middle">:feature:settings</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="20" y="150" width="160" height="40" rx="10"/><text class="d-t" x="100" y="175" text-anchor="middle">:core:designsystem</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="200" y="150" width="140" height="40" rx="10"/><text class="d-t" x="270" y="175" text-anchor="middle">:core:domain</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="360" y="150" width="140" height="40" rx="10"/><text class="d-t" x="430" y="175" text-anchor="middle">:core:data</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="520" y="150" width="180" height="40" rx="10"/><text class="d-t" x="610" y="175" text-anchor="middle">:core:ui / :core:model</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="290" y="215" width="140" height="36" rx="10"/><text class="d-s" x="360" y="238" text-anchor="middle">:core:network</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="450" y="215" width="140" height="36" rx="10"/><text class="d-s" x="520" y="238" text-anchor="middle">:core:database</text></g>
+    <path class="d-line" d="M330 50 L175 80 M360 50 V80 M390 50 L545 80 M175 120 L100 150 M175 120 L270 150 M360 120 L430 150 M545 120 L610 150 M430 190 L360 215 M430 190 L520 215"/>
+  </svg>
+  <figcaption id="fig-mm-cap">Dependencies flow downward. Features never depend on other features, which keeps each one independently buildable.</figcaption>
+</figure>
+
+<h2 id="api-impl">api vs implementation</h2>
+<code-block lang="kts" file="feature/search/build.gradle.kts">
+plugins { id("app.android.feature") }        // convention plugin (see below)
+
+dependencies {
+    implementation(project(":core:data"))       // used internally: NOT exposed to consumers
+    implementation(project(":core:designsystem"))
+    api(project(":core:model"))                 // types appear in this module's public API
+}
+</code-block>
+<p>Prefer <code>implementation</code>. It keeps dependencies from leaking to consumers and limits recompilation when they change. Use <code>api</code> only when a dependency's types appear in your module's public signatures.</p>
+
+<h2 id="convention">Convention plugins: avoid copy-pasted build files</h2>
+<code-block lang="kotlin" file="build-logic/convention/src/main/kotlin/AndroidFeatureConventionPlugin.kt">
+class AndroidFeatureConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) = with(target) {
+        pluginManager.apply("com.android.library")
+        pluginManager.apply("org.jetbrains.kotlin.android")
+        pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
+        extensions.configure<LibraryExtension> {
+            compileSdk = 36
+            defaultConfig.minSdk = 24
+            buildFeatures.compose = true
+        }
+        dependencies {
+            add("implementation", project(":core:designsystem"))
+            add("implementation", project(":core:ui"))
+        }
+    }
+}
+</code-block>
+<p>Each new feature module then needs only a few lines. Google's <em>Now in Android</em> sample uses this approach.</p>
+
+<h2 id="navigation">Navigating between features without coupling</h2>
+<p>If <code>:feature:home</code> needs to open search, it shouldn't depend on <code>:feature:search</code>. Common approaches:</p>
+<ul>
+  <li><strong>Route keys in a shared module</strong> (<code>:core:navigation</code>), with each feature providing its entries, and <code>:app</code> assembling the graph.</li>
+  <li><strong>Lambdas passed from <code>:app</code></strong>: <code>HomeScreen(onOpenSearch = { backStack.add(Search) })</code>.</li>
+</ul>
+
+<h2 id="lessons">Lessons learned</h2>
+<div class="cards">
+  <div class="card"><h4>Modularize for a reason</h4><p>Measure build times or identify ownership pain first. "Clean architecture says so" isn't enough.</p></div>
+  <div class="card"><h4>Start with core extraction</h4><p>Moving the design system, network and database into modules usually brings the biggest early gains.</p></div>
+  <div class="card"><h4>Watch the graph</h4><p>Visualise dependencies regularly. A "core:common" module that everything depends on becomes a bottleneck.</p></div>
+  <div class="card"><h4>Granularity is a trade-off</h4><p>Too few modules give little benefit. Too many give slow syncs and ceremony. Feature-sized modules are a good default.</p></div>
+</div>
+
+<h2 id="use-cases">When it pays off</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Situation</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>Solo developer, small app</td><td>Single module with clear packages</td></tr>
+    <tr><td>Growing app, slow incremental builds</td><td>Extract core modules, then the largest features</td></tr>
+    <tr><td>Several teams</td><td>Feature modules with owners; convention plugins; dependency rules in CI</td></tr>
+    <tr><td>Planning KMP</td><td>Pure-Kotlin domain and data modules that can become multiplatform</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does modularization always make builds faster?</summary><div><p>Incremental builds and CI with caching usually improve, but configuration and sync times can grow with the number of modules. Measure before and after.</p></div></details>
+  <details><summary>Should each layer be its own module?</summary><div><p>Not necessarily. Many teams split by feature first, and add layer modules (domain, data) where boundaries need enforcing.</p></div></details>
+  <details><summary>How do I wire DI across modules?</summary><div><p>Each module contributes Hilt modules installed in components, and the app module brings them together automatically through Hilt's aggregation.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Multi-module architecture trades build configuration effort for <strong>faster incremental builds, enforced boundaries and team ownership</strong>. Start simple, extract core modules first, use <code>implementation</code> by default and convention plugins for consistency, and never let features depend on each other.</p>
+<p>Next step: choose how to slice the app in <a href="../android-modularization-strategies/index.html">Modularization Strategies for Large Android Apps</a>.</p>

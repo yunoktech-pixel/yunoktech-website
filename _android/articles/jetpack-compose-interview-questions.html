@@ -1,0 +1,96 @@
+<!--meta
+{
+  "seo_title": "Jetpack Compose Interview Questions and Answers",
+  "description": "Jetpack Compose interview questions with clear answers: composition and phases, recomposition and stability, state, side effects, lazy lists, navigation, theming, testing and interop.",
+  "primary_keyword": "jetpack compose interview questions",
+  "keywords": ["compose interview questions answers", "recomposition interview", "compose stability strong skipping", "compose side effects interview", "compose state hoisting interview", "compose performance interview"],
+  "lede": "Compose questions now appear in almost every Android interview. Interviewers look for a solid mental model: what triggers recomposition, where state should live, how effects work, and how to keep UIs fast. Here are the common questions with answers you can explain confidently.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["android-interview-questions", "compose-state-management", "compose-side-effects", "compose-performance-optimization"],
+  "refs": [
+    ["Thinking in Compose", "https://developer.android.com/develop/ui/compose/mental-model"],
+    ["Compose phases", "https://developer.android.com/develop/ui/compose/phases"],
+    ["Stability in Compose", "https://developer.android.com/develop/ui/compose/performance/stability"],
+    ["Side-effects in Compose", "https://developer.android.com/develop/ui/compose/side-effects"]
+  ]
+}
+-->
+<p class="ad-lead">Most Compose interview questions test one idea from different angles: UI is a function of state, and Compose re-runs only what reads changed state. If you can explain that clearly, with phases, stability and effects, you can handle the follow-ups.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cq-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-cq-t fig-cq-d">
+    <title id="fig-cq-t">Core Compose mental model</title>
+    <desc id="fig-cq-d">State changes trigger recomposition of readers; each frame goes through composition, layout and drawing phases; unchanged stable inputs allow skipping.</desc>
+    <defs><marker id="cqm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H176 M326 70 H352 M502 70 H528" marker-end="url(#cqm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="40" width="130" height="60" rx="12"/><text class="d-t" x="85" y="66" text-anchor="middle">State write</text><text class="d-s" x="85" y="84" text-anchor="middle">snapshot</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="180" y="40" width="146" height="60" rx="12"/><text class="d-t" x="253" y="66" text-anchor="middle">Recompose readers</text><text class="d-s" x="253" y="84" text-anchor="middle">skip unchanged</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="356" y="40" width="146" height="60" rx="12"/><text class="d-t" x="429" y="66" text-anchor="middle">Layout</text><text class="d-s" x="429" y="84" text-anchor="middle">measure, place</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="532" y="40" width="168" height="60" rx="12"/><text class="d-t" x="616" y="66" text-anchor="middle">Draw</text><text class="d-s" x="616" y="84" text-anchor="middle">pixels</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Most answers below are consequences of this pipeline.</text>
+  </svg>
+  <figcaption id="fig-cq-cap">Explain this pipeline and you've answered half the interview.</figcaption>
+</figure>
+
+<h2 id="basics">Fundamentals</h2>
+<h3>What is a composable function?</h3>
+<p>A Kotlin function annotated with <code>@Composable</code> that describes UI. The compiler plugin transforms it so it can participate in composition, remember values, and be skipped or re-run.</p>
+<h3>What triggers recomposition?</h3>
+<p>Writes to Compose <code>State</code> objects that a composable read during its last execution. Only those readers (and children whose inputs changed) recompose.</p>
+<h3>Can composables run in any order or in parallel?</h3>
+<p>You must assume they can run in any order and be skipped or re-run frequently. That's why bodies must be side-effect free and idempotent.</p>
+
+<h2 id="state">State</h2>
+<h3>remember vs rememberSaveable vs ViewModel?</h3>
+<p><code>remember</code>: recomposition only. <code>rememberSaveable</code>: plus configuration changes and process death (Bundle). ViewModel: screen state across configuration changes, with business logic.</p>
+<h3>What is state hoisting, and how high should state go?</h3>
+<p>Pass <code>value</code> plus <code>onValueChange</code> instead of keeping state inside. Hoist to the lowest common ancestor that needs it, and keep business state in the ViewModel.</p>
+<h3>Why is <code>mutableStateOf(mutableListOf())</code> a bug?</h3>
+<p>Mutating the list doesn't write the State, so no recomposition happens. Use immutable lists with copy, or <code>mutableStateListOf</code>.</p>
+
+<h2 id="effects">Side effects</h2>
+<h3>When do you use LaunchedEffect vs rememberCoroutineScope?</h3>
+<p><code>LaunchedEffect(keys)</code> runs coroutines when entering composition or when keys change. <code>rememberCoroutineScope</code> launches coroutines from callbacks such as clicks.</p>
+<h3>What is DisposableEffect for?</h3>
+<p>Registering something with a guaranteed cleanup in <code>onDispose</code>, for example lifecycle observers and listeners.</p>
+<h3>What does rememberUpdatedState solve?</h3>
+<p>Long-running effects capturing a stale lambda or value. It gives access to the latest value without restarting the effect.</p>
+
+<h2 id="performance">Performance</h2>
+<h3>What is stability, and what is strong skipping?</h3>
+<p>Compose skips a composable when its parameters are equal and considered stable. Strong skipping (default in recent compiler versions) allows skipping with unstable parameters using instance equality, and auto-remembers lambdas.</p>
+<h3>How do you avoid recomposing on every scroll pixel?</h3>
+<p>Read scroll state in layout or draw lambdas (<code>Modifier.offset { }</code>, <code>graphicsLayer { }</code>), or derive booleans with <code>derivedStateOf</code>.</p>
+<code-block lang="kotlin" file="Classic interview snippet">
+val showButton by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
+</code-block>
+<h3>Why give lazy list items keys?</h3>
+<p>Stable identity preserves item state and scroll position on insertions, enables item animations, and avoids unnecessary recomposition.</p>
+
+<h2 id="other">Navigation, theming, testing, interop</h2>
+<h3>How does navigation work in Compose?</h3>
+<p>Navigation 3 keeps the back stack as Compose state rendered by <code>NavDisplay</code>. Navigation Compose (2.x) uses <code>NavHost</code> and <code>NavController</code> with type-safe routes. Pass IDs, not objects. See <a href="../compose-navigation/index.html">Navigation</a>.</p>
+<h3>How do you theme a Compose app?</h3>
+<p><code>MaterialTheme</code> with color schemes (optionally dynamic color), typography and shapes, plus custom tokens via <code>CompositionLocal</code>.</p>
+<h3>How do you test Compose?</h3>
+<p>The semantics tree with <code>createComposeRule</code>: finders, actions and assertions, plus screenshot tests for visuals.</p>
+<h3>How do Compose and Views interoperate?</h3>
+<p><code>ComposeView</code> hosts Compose inside Views, and <code>AndroidView</code> hosts Views inside Compose.</p>
+
+<h2 id="practical">Practical task tips</h2>
+<ul>
+  <li>Split Route (ViewModel) and Screen (stateless) composables.</li>
+  <li>Model state as a single immutable UiState, with loading, error and empty states.</li>
+  <li>Use keys in lazy lists, and keep composables small with a <code>modifier</code> parameter.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Will I be asked to write a custom layout?</summary><div><p>Occasionally for senior roles. Know the <code>Layout</code> measure-and-place pattern. See <a href="../compose-custom-layouts-drawing/index.html">Custom Layouts</a>.</p></div></details>
+  <details><summary>Do interviews still cover Views?</summary><div><p>Often both. Be ready to compare Compose with Views and to explain migration.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Compose interviews test the <strong>state → recomposition → phases</strong> model, state ownership, side-effect APIs and performance techniques. Explain them with small examples, and show you can build clean, stateless, testable screens.</p>
+<p>Next step: prepare system-level questions with <a href="../android-architecture-interview-questions/index.html">Android Architecture Interview Questions</a>.</p>

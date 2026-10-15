@@ -1,0 +1,117 @@
+<!--meta
+{
+  "seo_title": "Android Privacy, Accessibility and Reliability Guide",
+  "description": "Build Android apps users can trust: privacy by design (photo picker, minimal permissions, data safety), accessibility in Compose (semantics, touch targets, font scaling, TalkBack), and reliability (crash-free rate, ANRs, vitals).",
+  "primary_keyword": "android accessibility privacy reliability",
+  "keywords": ["compose accessibility semantics", "talkback testing android", "android photo picker privacy", "android vitals crash rate", "accessibility scanner android", "privacy by design android"],
+  "lede": "Three qualities determine whether people trust and keep your app: it respects their data, everyone can use it, and it doesn't crash or freeze. They're often treated as afterthoughts, but each has concrete practices and tools. Here's a practical guide to all three.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["android-permissions-privacy", "android-anr-errors", "android-analytics-crash-reporting", "large-screen-foldable-android"],
+  "refs": [
+    ["Accessibility in Compose", "https://developer.android.com/develop/ui/compose/accessibility"],
+    ["Test your app's accessibility", "https://developer.android.com/guide/topics/ui/accessibility/testing"],
+    ["Privacy on Android", "https://developer.android.com/privacy"],
+    ["Photo picker", "https://developer.android.com/training/data-storage/shared/photopicker"],
+    ["Android vitals", "https://developer.android.com/topic/performance/vitals"]
+  ]
+}
+-->
+<p class="ad-lead">Privacy, accessibility and reliability share a pattern: small decisions during development add up to a trustworthy app, and fixing them late is expensive. Build them into your definition of done.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-par-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-par-t fig-par-d">
+    <title id="fig-par-t">Three pillars of a trustworthy app</title>
+    <desc id="fig-par-d">Privacy: minimal data, scoped access, transparency. Accessibility: semantics, sizes, contrast, assistive tech. Reliability: crash-free, no ANRs, graceful errors. Together they build user trust.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="20" width="210" height="130" rx="14"/><text class="d-t" x="125" y="50" text-anchor="middle">Privacy</text><text class="d-s" x="125" y="80" text-anchor="middle">minimal data</text><text class="d-s" x="125" y="100" text-anchor="middle">scoped access</text><text class="d-s" x="125" y="120" text-anchor="middle">transparency</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="255" y="20" width="210" height="130" rx="14"/><text class="d-t" x="360" y="50" text-anchor="middle">Accessibility</text><text class="d-s" x="360" y="80" text-anchor="middle">semantics</text><text class="d-s" x="360" y="100" text-anchor="middle">sizes, contrast</text><text class="d-s" x="360" y="120" text-anchor="middle">assistive tech</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="490" y="20" width="210" height="130" rx="14"/><text class="d-t" x="595" y="50" text-anchor="middle">Reliability</text><text class="d-s" x="595" y="80" text-anchor="middle">crash-free</text><text class="d-s" x="595" y="100" text-anchor="middle">no ANRs</text><text class="d-s" x="595" y="120" text-anchor="middle">graceful errors</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="20" y="164" width="680" height="30" rx="8"/><text class="d-w" x="360" y="184" text-anchor="middle">→ user trust, ratings, retention</text></g>
+  </svg>
+  <figcaption id="fig-par-cap">Each pillar has measurable practices.</figcaption>
+</figure>
+
+<h2 id="privacy">Privacy by design</h2>
+<ul>
+  <li><strong>Ask for less:</strong> use the photo picker instead of storage permissions, approximate location when precise isn't needed, and system intents (camera, contacts picker) where possible.</li>
+  <li><strong>Ask in context:</strong> request permissions when the feature is used, with a clear rationale. See <a href="../android-permissions-privacy/index.html">Permissions and Privacy</a>.</li>
+  <li><strong>Collect and keep less:</strong> define retention and delete data you don't need.</li>
+  <li><strong>Be transparent:</strong> an accurate Play Data safety form and privacy policy, matching what SDKs collect too.</li>
+  <li><strong>Protect what you store:</strong> see <a href="../encrypted-data-storage-android/index.html">Encrypted Storage</a>.</li>
+</ul>
+<code-block lang="kotlin" file="Photo picker: no storage permission needed">
+val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    uri?.let(onImagePicked)
+}
+Button(onClick = {
+    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+}) { Text("Choose photo") }
+</code-block>
+
+<h2 id="accessibility">Accessibility in Compose</h2>
+<code-block lang="kotlin" file="Accessible components">
+// 1. Meaningful descriptions for icons that act
+IconButton(onClick = onFavorite) {
+    Icon(Icons.Default.Favorite, contentDescription = "Add to favourites")
+}
+// Decorative images: contentDescription = null
+
+// 2. Merge related content into one focusable item
+Row(Modifier.semantics(mergeDescendants = true) {}.clickable(onClick = onOpen)) {
+    Text(order.title); Text(order.status)
+}
+
+// 3. State descriptions for custom controls
+Box(Modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onToggle)
+    .semantics { stateDescription = if (checked) "On" else "Off" })
+
+// 4. Headings for screen reader navigation
+Text("Settings", Modifier.semantics { heading() }, style = MaterialTheme.typography.titleLarge)
+</code-block>
+<ul>
+  <li><strong>Touch targets</strong> at least 48×48dp (Material components handle this).</li>
+  <li><strong>Font scaling:</strong> use <code>sp</code> and test at the largest sizes (Android 14+ supports up to 200%). Avoid fixed heights that clip text.</li>
+  <li><strong>Contrast:</strong> meet WCAG contrast ratios. Don't rely on colour alone.</li>
+  <li><strong>Motion:</strong> respect the system "remove animations" setting.</li>
+</ul>
+
+<h2 id="a11y-testing">Testing accessibility</h2>
+<ul>
+  <li>Navigate your key flows with <strong>TalkBack</strong> and with <strong>Switch Access</strong> or a keyboard.</li>
+  <li>Run <strong>Accessibility Scanner</strong> on screens.</li>
+  <li>Compose UI tests can enable accessibility checks, and tests that find nodes by semantics help keep descriptions in place. See <a href="../compose-ui-testing/index.html">Compose UI Testing</a>.</li>
+  <li>Use the Play Console pre-launch report, which flags accessibility issues.</li>
+</ul>
+
+<h2 id="reliability">Reliability</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Area</th><th>Practice</th></tr></thead>
+  <tbody>
+    <tr><td>Crashes</td><td>Crash reporting, fix top clusters weekly, staged rollouts. See <a href="../android-analytics-crash-reporting/index.html">Crash Reporting</a>.</td></tr>
+    <tr><td>ANRs</td><td>Keep main thread free, use StrictMode in debug. See <a href="../android-anr-errors/index.html">ANR Errors</a>.</td></tr>
+    <tr><td>Errors</td><td>Typed errors, retry options, offline states. See <a href="../android-api-error-handling/index.html">API Error Handling</a>.</td></tr>
+    <tr><td>Vitals</td><td>Monitor Android vitals thresholds: bad behaviour can reduce Play visibility</td></tr>
+    <tr><td>Process death</td><td>Test "Don't keep activities" and restore state correctly</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="checklist">Definition-of-done checklist</h2>
+<ol class="steps">
+  <li>Only necessary permissions, requested in context. Data safety form updated.</li>
+  <li>TalkBack can complete the flow, and targets and contrast pass Accessibility Scanner.</li>
+  <li>Works at the largest font size and in dark mode.</li>
+  <li>Loading, empty, error and offline states handled.</li>
+  <li>No main-thread I/O. Survives rotation and process death.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is accessibility legally required?</summary><div><p>In many regions, accessibility laws apply to certain apps and organisations (for example the European Accessibility Act). Check what applies to you. Regardless, it widens your audience.</p></div></details>
+  <details><summary>What crash-free rate is good?</summary><div><p>Aim to stay well within Android vitals thresholds, and treat any regression as a release blocker. Many teams target very high crash-free user rates.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Trustworthy apps <strong>collect less and explain more</strong>, are <strong>usable with assistive technologies and large fonts</strong>, and <strong>don't crash or freeze</strong>. Put all three into your definition of done and test them like features.</p>
+<p>Next step: modernise older codebases with <a href="../migrate-legacy-android-modern-architecture/index.html">Migrating Legacy Apps to Modern Architecture</a>.</p>

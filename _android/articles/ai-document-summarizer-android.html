@@ -1,0 +1,162 @@
+<!--meta
+{
+  "seo_title": "Build an AI Document Summarizer App for Android",
+  "description": "Project guide: build an Android document summarizer that picks PDFs or text, extracts text, chunks long documents, summarizes with Gemini (on-device or cloud), streams results, and saves summaries with Room.",
+  "primary_keyword": "ai document summarizer android",
+  "keywords": ["summarize pdf android kotlin", "pdf text extraction android", "chunk long text llm", "map reduce summarization", "gemini summarize document", "android ai project"],
+  "lede": "A document summarizer is a great portfolio project: it combines file access, text extraction, chunking for long inputs, LLM calls, streaming UI and local storage. Here's a complete architecture and the key code for each part.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-text-summarization-android", "gemini-nano-ml-kit-genai-android", "streaming-ai-responses-compose", "room-database-kotlin"],
+  "refs": [
+    ["Storage Access Framework: open files", "https://developer.android.com/training/data-storage/shared/documents-files"],
+    ["PdfRenderer", "https://developer.android.com/reference/android/graphics/pdf/PdfRenderer"],
+    ["Firebase AI Logic: analyze documents", "https://firebase.google.com/docs/ai-logic/analyze-documents"],
+    ["ML Kit GenAI Summarization", "https://developers.google.com/ml-kit/genai/summarization/android"]
+  ]
+}
+-->
+<p class="ad-lead">Our <a href="../ai-text-summarization-android/index.html">AI Text Summarization</a> guide covers summarising a block of text. This project goes end to end: picking real documents, handling inputs longer than the model accepts, and building a usable app around it.</p>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ds-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-ds-t fig-ds-d">
+    <title id="fig-ds-t">Document summarizer pipeline</title>
+    <desc id="fig-ds-d">The user picks a document with the system file picker. A text extractor handles text files, or sends PDFs to a multimodal cloud model or OCR. A chunker splits long text. A summarizer creates chunk summaries then a final summary, streaming to the UI. Summaries are saved in Room.</desc>
+    <defs><marker id="dsm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 80 H150 M280 80 H300 M410 80 H430 M580 80 H600" marker-end="url(#dsm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="10" y="50" width="120" height="60" rx="12"/><text class="d-t" x="70" y="76" text-anchor="middle">Pick file</text><text class="d-s" x="70" y="94" text-anchor="middle">SAF</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="152" y="50" width="128" height="60" rx="12"/><text class="d-t" x="216" y="76" text-anchor="middle">Extract</text><text class="d-s" x="216" y="94" text-anchor="middle">text / PDF</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="302" y="50" width="108" height="60" rx="12"/><text class="d-t" x="356" y="76" text-anchor="middle">Chunk</text><text class="d-s" x="356" y="94" text-anchor="middle">if long</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="432" y="50" width="148" height="60" rx="12"/><text class="d-t" x="506" y="76" text-anchor="middle">Summarize</text><text class="d-s" x="506" y="94" text-anchor="middle">map → reduce</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="602" y="50" width="108" height="60" rx="12"/><text class="d-t" x="656" y="76" text-anchor="middle">Save</text><text class="d-s" x="656" y="94" text-anchor="middle">Room</text></g>
+    <text class="d-s" x="360" y="160" text-anchor="middle">UI: progress per stage · streamed final summary · history list</text>
+  </svg>
+  <figcaption id="fig-ds-cap">Each stage is a separate class you can test on its own.</figcaption>
+</figure>
+
+<h2 id="pick">1. Pick a document</h2>
+<code-block lang="kotlin" file="Open a document (no storage permission)">
+val openDoc = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    uri?.let(viewModel::onDocumentPicked)
+}
+Button(onClick = { openDoc.launch(arrayOf("application/pdf", "text/plain")) }) {
+    Text("Choose document")
+}
+</code-block>
+
+<h2 id="extract">2. Extract text</h2>
+<p>Plain text is easy. For PDFs, there are several options:</p>
+<ul>
+  <li><strong>Cloud multimodal model:</strong> send the PDF directly to Gemini through Firebase AI Logic, which accepts PDFs as inline data (within size limits). Simplest, and handles layout.</li>
+  <li><strong>On-device:</strong> render pages with <code>PdfRenderer</code> to bitmaps and run ML Kit text recognition. Private, but slower.</li>
+  <li><strong>A PDF text library:</strong> for text-based PDFs. Check licences.</li>
+</ul>
+<code-block lang="kotlin" file="TextExtractor.kt">
+class TextExtractor(private val context: Context, private val recognizer: TextRecognizer) {
+
+    suspend fun extract(uri: Uri): String = withContext(Dispatchers.IO) {
+        when (context.contentResolver.getType(uri)) {
+            "text/plain" -> context.contentResolver.openInputStream(uri)!!.bufferedReader().use { it.readText() }
+            "application/pdf" -> ocrPdf(uri)
+            else -> throw UnsupportedDocumentException()
+        }
+    }
+
+    private suspend fun ocrPdf(uri: Uri): String {
+        val pfd = context.contentResolver.openFileDescriptor(uri, "r") ?: return ""
+        return PdfRenderer(pfd).use { renderer ->
+            buildString {
+                for (i in 0 until minOf(renderer.pageCount, MAX_PAGES)) {
+                    renderer.openPage(i).use { page ->
+                        val bmp = Bitmap.createBitmap(page.width * 2, page.height * 2, Bitmap.Config.ARGB_8888)
+                        bmp.eraseColor(Color.WHITE)
+                        page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        appendLine(recognizer.process(InputImage.fromBitmap(bmp, 0)).await().text)
+                        bmp.recycle()
+                    }
+                }
+            }
+        }
+    }
+}
+</code-block>
+
+<h2 id="chunk">3. Chunk long text</h2>
+<p>Models have input limits (Gemini Nano summarisation accepts under ~4,000 tokens; cloud models accept far more, but cost grows with input). Split on paragraph boundaries:</p>
+<code-block lang="kotlin" file="Chunker.kt">
+fun chunk(text: String, maxChars: Int = 8_000): List<String> {
+    val chunks = mutableListOf<String>()
+    val current = StringBuilder()
+    for (para in text.split(Regex("\\n\\s*\\n"))) {
+        if (current.length + para.length > maxChars && current.isNotEmpty()) {
+            chunks += current.toString(); current.clear()
+        }
+        current.append(para.take(maxChars)).append("\n\n")
+    }
+    if (current.isNotBlank()) chunks += current.toString()
+    return chunks
+}
+// Character counts approximate tokens (~4 chars/token in English); keep a safety margin.
+</code-block>
+
+<h2 id="summarize">4. Map-reduce summarisation</h2>
+<code-block lang="kotlin" file="DocumentSummarizer.kt">
+class DocumentSummarizer(private val llm: Llm) {   // Llm: generate(prompt): String, stream(prompt): Flow<String>
+
+    fun summarize(text: String, onProgress: (Int, Int) -> Unit): Flow<String> = flow {
+        val chunks = chunk(text)
+        val partials = if (chunks.size == 1) chunks else chunks.mapIndexed { i, c ->
+            onProgress(i + 1, chunks.size)
+            llm.generate("Summarise this section in 5 bullet points. Use only the text.\n\n$c")
+        }
+        emitAll(
+            llm.stream(
+                "Combine these section summaries into one summary: a 2-sentence overview, " +
+                "then up to 8 bullet points. Don't add facts not present.\n\n" +
+                partials.joinToString("\n\n")
+            )
+        )
+    }
+}
+</code-block>
+<p>Run chunk summaries with limited parallelism to stay within rate limits, and stream only the final step. Render it as in <a href="../streaming-ai-responses-compose/index.html">Streaming in Compose</a>.</p>
+
+<h2 id="save">5. Save history</h2>
+<code-block lang="kotlin" file="SummaryEntity.kt">
+@Entity(tableName = "summaries")
+data class SummaryEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val title: String,
+    val summary: String,
+    val sourceChars: Int,
+    val modelSource: String,          // "on-device" or "cloud"
+    val createdAt: Long,
+)
+// Store the summary, not the full document, unless users need it (privacy + storage).
+</code-block>
+
+<h2 id="quality">Quality and trust</h2>
+<ul>
+  <li>Label summaries as AI-generated, and show which model source was used.</li>
+  <li>Prompt for faithfulness ("use only the text"), and spot-check with an evaluation set. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI</a>.</li>
+  <li>Disclose cloud processing, and offer on-device-only mode for sensitive documents.</li>
+  <li>Handle failures per stage with clear messages.</li>
+</ul>
+
+<h2 id="extensions">Extensions</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Ask the document</h3><p>Add Q&amp;A with retrieval. See <a href="../rag-android-apps/index.html">RAG on Android</a>.</p></div>
+  <div class="card usecase"><h3>Share target</h3><p>Accept shared text or files from other apps.</p></div>
+  <div class="card usecase"><h3>Background processing</h3><p>Long documents via WorkManager with a completion notification.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How long a document can I summarise?</summary><div><p>With map-reduce, length is limited mainly by time and cost. Cap pages or characters and tell users.</p></div></details>
+  <details><summary>Will scanned PDFs work?</summary><div><p>Yes, with OCR or a multimodal model, but quality depends on scan quality.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A solid summarizer <strong>picks files via SAF</strong>, <strong>extracts text</strong> (or sends PDFs to a multimodal model), <strong>chunks</strong> long inputs, summarises with <strong>map-reduce</strong>, <strong>streams</strong> the final result, and stores history, with clear AI labelling and privacy choices.</p>
+<p>Next project: <a href="../ai-photo-caption-generator-android/index.html">an AI Photo Caption Generator</a>.</p>

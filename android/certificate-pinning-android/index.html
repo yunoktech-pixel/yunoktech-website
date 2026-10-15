@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate Pinning in Android: Benefits and Limitations | Yunok Tech</title>
+  <meta name="description" content="Certificate pinning on Android explained: what it protects against, pinning via network security config and OkHttp, backup pins, rotation, expiry, risks of bricking your app and alternatives.">
+  <meta name="keywords" content="certificate pinning android, ssl pinning android, network security config pin-set, okhttp certificate pinner, public key pinning rotation, mitm protection android, pinning expiration">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/certificate-pinning-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/certificate-pinning-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Certificate Pinning in Android: Benefits and Limitations">
+  <meta property="og:description" content="Certificate pinning on Android explained: what it protects against, pinning via network security config and OkHttp, backup pins, rotation, expiry, risks of bricking your app and alternatives.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Certificate Pinning in Android: Benefits and Limitations">
+  <meta name="twitter:description" content="Certificate pinning on Android explained: what it protects against, pinning via network security config and OkHttp, backup pins, rotation, expiry, risks of bricking your app and alternatives.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Certificate Pinning: Benefits and Limitations", "description": "Certificate pinning on Android explained: what it protects against, pinning via network security config and OkHttp, backup pins, rotation, expiry, risks of bricking your app and alternatives.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android Security and Privacy", "keywords": "ssl pinning android, network security config pin-set, okhttp certificate pinner, public key pinning rotation, mitm protection android, pinning expiration", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/certificate-pinning-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Certificate Pinning: Benefits and Limitations", "item": "https://yunoktech.com/android/certificate-pinning-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Certificate Pinning: Benefits and Limitations</h1>
+    <p class="ad-lede">Certificate pinning makes your app trust only specific keys for your servers, which blocks some man-in-the-middle attacks. Done carelessly, it can also lock every user out of your app when a certificate rotates. Here's when pinning is worth it and how to do it safely.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#what">What pinning does and doesn&#x27;t protect</a></li><li><a href="#nsc">Pinning with Network Security Config</a></li><li><a href="#okhttp">Pinning with OkHttp</a></li><li><a href="#safe">Pinning safely</a></li><li><a href="#decide">Should you pin?</a></li><li><a href="#testing">Testing</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">TLS already authenticates your server through trusted certificate authorities (CAs). Pinning adds a stricter rule: even a valid certificate from a trusted CA is rejected unless its public key matches one you've pinned. That protects against mis-issued certificates and some interception setups, at the cost of operational risk.</p>
+
+<h2 id="what">What pinning does and doesn't protect</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-pin-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-pin-t fig-pin-d">
+    <title id="fig-pin-t">How certificate pinning changes trust decisions</title>
+    <desc id="fig-pin-d">Without pinning, any certificate chaining to a trusted CA is accepted, including a mis-issued one or one from a CA installed on a corporate or compromised device. With pinning, the connection is accepted only if the server's public key matches a pinned hash; otherwise it fails.</desc>
+    <text class="d-t" x="180" y="22" text-anchor="middle">Without pinning</text>
+    <rect class="d-green" x="40" y="34" width="280" height="40" rx="8"/><text class="d-s" x="180" y="58" text-anchor="middle">valid cert from your CA → ✓</text>
+    <rect class="d-amber" x="40" y="82" width="280" height="40" rx="8"/><text class="d-s" x="180" y="106" text-anchor="middle">mis-issued cert, trusted CA → ✓ (risk)</text>
+    <rect class="d-amber" x="40" y="130" width="280" height="40" rx="8"/><text class="d-s" x="180" y="154" text-anchor="middle">interception proxy CA → depends</text>
+    <text class="d-t" x="540" y="22" text-anchor="middle">With pinning</text>
+    <rect class="d-green" x="400" y="34" width="280" height="40" rx="8"/><text class="d-s" x="540" y="58" text-anchor="middle">key matches pin → ✓</text>
+    <rect class="d-red" x="400" y="82" width="280" height="40" rx="8"/><text class="d-s" x="540" y="106" text-anchor="middle">mis-issued cert → ✗ blocked</text>
+    <rect class="d-red" x="400" y="130" width="280" height="40" rx="8"/><text class="d-s" x="540" y="154" text-anchor="middle">your own rotated key, unpinned → ✗ outage!</text>
+  </svg>
+  <figcaption id="fig-pin-cap">Pinning blocks unexpected certificates, including your own if you forget to pin the new key.</figcaption>
+</figure>
+<p>Android apps targeting API 24+ already ignore user-installed CAs by default, which blocks many casual interception setups. Pinning additionally defends against mis-issued certificates from trusted CAs. It does <strong>not</strong> stop an attacker who controls the device and modifies your app.</p>
+
+<h2 id="nsc">Pinning with Network Security Config</h2>
+<figure class="code"><figcaption><span class="file">res/xml/network_security_config.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;network-security-config</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;domain-config</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;domain</span> <span class="tk-at">includeSubdomains</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>api.example.com<span class="tk-tag">&lt;/domain</span><span class="tk-tag">&gt;</span>
+        <span class="tk-c">&lt;!-- Expiration: after this date pinning is NOT enforced, so old app versions keep working --&gt;</span>
+        <span class="tk-tag">&lt;pin-set</span> <span class="tk-at">expiration</span>=<span class="tk-s">"2027-06-30"</span><span class="tk-tag">&gt;</span>
+            <span class="tk-c">&lt;!-- SHA-256 of the SubjectPublicKeyInfo: current key + at least one backup --&gt;</span>
+            <span class="tk-tag">&lt;pin</span> <span class="tk-at">digest</span>=<span class="tk-s">"SHA-256"</span><span class="tk-tag">&gt;</span><span class="tk-at">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</span>=<span class="tk-tag">&lt;/pin</span><span class="tk-tag">&gt;</span>
+            <span class="tk-tag">&lt;pin</span> <span class="tk-at">digest</span>=<span class="tk-s">"SHA-256"</span><span class="tk-tag">&gt;</span><span class="tk-at">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB</span>=<span class="tk-tag">&lt;/pin</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;/pin-set</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;/domain-config</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;/network-security-config</span><span class="tk-tag">&gt;</span></code></pre></figure>
+<p>The pin values above are placeholders. Compute real ones from your keys.</p>
+
+<h2 id="okhttp">Pinning with OkHttp</h2>
+<figure class="code"><figcaption><span class="file">CertificatePinner</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> pinner = <span class="tk-t">CertificatePinner</span>.<span class="tk-t">Builder</span>()
+    .add(<span class="tk-s">"api.example.com"</span>, <span class="tk-s">"sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="</span>)   <span class="tk-c">// current</span>
+    .add(<span class="tk-s">"api.example.com"</span>, <span class="tk-s">"sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="</span>)   <span class="tk-c">// backup</span>
+    .build()
+
+<span class="tk-k">val</span> client = <span class="tk-t">OkHttpClient</span>.<span class="tk-t">Builder</span>().certificatePinner(pinner).build()</code></pre></figure>
+<p>Prefer Network Security Config when possible: it's declarative, applies app-wide, and supports an expiration date.</p>
+
+<h2 id="safe">Pinning safely</h2>
+<ol class="steps">
+  <li><strong>Pin public keys, not certificates</strong>, and preferably an intermediate CA or your own key that you control across renewals.</li>
+  <li><strong>Always include backup pins</strong>: a second key you hold offline, or another CA you might move to.</li>
+  <li><strong>Set an expiration date</strong> so very old app versions don't break permanently.</li>
+  <li><strong>Coordinate with whoever manages certificates</strong>, such as the backend team or CDN, and document the rotation process.</li>
+  <li><strong>Monitor pinning failures</strong> and have a plan, such as a forced update, if something goes wrong.</li>
+</ol>
+
+<h2 id="decide">Should you pin?</h2>
+<div class="cards">
+  <div class="card pros"><h4>Consider pinning</h4><ul><li>Banking, payments, high-value targets</li><li>You control the certificate lifecycle</li><li>Strong operational processes</li></ul></div>
+  <div class="card cons"><h4>Probably don't</h4><ul><li>Third-party APIs or CDNs you don't control</li><li>No process for coordinated key rotation</li><li>Small teams where an outage risk outweighs the benefit</li></ul></div>
+</div>
+<p>For many apps, correct TLS, the default distrust of user CAs, server-side validation and <a href="../play-integrity-api-explained/index.html">Play Integrity</a> provide better risk reduction per unit of operational effort.</p>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Verify the pin values match the production chain before release, using a staging environment that mirrors production certificates.</li>
+  <li>Test that a deliberately wrong pin fails closed, and that debug overrides work for development proxies.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does pinning stop someone reverse engineering my API?</summary><div><p>Not reliably. An attacker controlling their own device can modify the app to remove pinning. Pinning protects honest users' connections, not your API from its own clients.</p></div></details>
+  <details><summary>What happens when my certificate renews?</summary><div><p>If the public key changes and isn't in your pin set, connections fail for every app version with the old pins. That's why key reuse, backup pins and expirations matter.</p></div></details>
+  <details><summary>Is pinning required by Google Play?</summary><div><p>No. It's an optional hardening measure.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Certificate pinning adds protection against <strong>mis-issued or unexpected certificates</strong>, but brings real <strong>outage risk</strong>. If you pin, pin public keys with backups and an expiration, coordinate rotations, and monitor. Otherwise, rely on solid TLS defaults and server-side controls.</p>
+<p>Next step: protect data at rest with <a href="../encrypted-data-storage-android/index.html">Encrypted Data Storage in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/privacy-and-security/security-config#CertificatePinning" target="_blank" rel="noopener">Network security configuration: pin a certificate</a></li><li><a href="https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp (CertificatePinner): official repository</a></li><li><a href="https://cheatsheetseries.owasp.org/cheatsheets/Pinning_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP: pinning cheat sheet</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcertificate-pinning-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcertificate-pinning-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li><li><a href="../../android/okhttp-interceptors/index.html"><small>APIs, Databases, and Backend Integration</small>OkHttp Interceptors Explained</a></li><li><a href="../../android/play-integrity-api-explained/index.html"><small>Android Security and Privacy</small>Play Integrity API Explained</a></li><li><a href="../../android/common-android-security-vulnerabilities/index.html"><small>Android Security and Privacy</small>Common Android Security Vulnerabilities</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/certificate-pinning-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/certificate-pinning-android/&amp;text=Certificate Pinning: Benefits and Limitations" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/certificate-pinning-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#what">What pinning does and doesn&#x27;t protect</a></li><li><a href="#nsc">Pinning with Network Security Config</a></li><li><a href="#okhttp">Pinning with OkHttp</a></li><li><a href="#safe">Pinning safely</a></li><li><a href="#decide">Should you pin?</a></li><li><a href="#testing">Testing</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcertificate-pinning-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcertificate-pinning-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

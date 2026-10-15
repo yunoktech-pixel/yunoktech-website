@@ -1,0 +1,157 @@
+<!--meta
+{
+  "seo_title": "State Management in Jetpack Compose: A Practical Guide",
+  "description": "Manage state in Jetpack Compose: mutableStateOf, remember, rememberSaveable, state holders, ViewModel with StateFlow, derivedStateOf, snapshotFlow and choosing where state lives.",
+  "primary_keyword": "jetpack compose state management",
+  "keywords": ["compose state", "mutableStateOf remember", "compose viewmodel stateflow", "derivedStateOf", "compose state holder class", "collectAsStateWithLifecycle"],
+  "lede": "Most Compose bugs are state bugs: values that reset, screens that don't update, or recompositions that never stop. This guide maps every kind of state in a Compose app to the right owner and API, with code for each.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["remember-vs-remembersaveable", "compose-state-hoisting", "viewmodel-stateflow-ui-state", "compose-side-effects"],
+  "refs": [
+    ["State and Jetpack Compose", "https://developer.android.com/develop/ui/compose/state"],
+    ["Where to hoist state", "https://developer.android.com/develop/ui/compose/state-hoisting"],
+    ["State holders and UI state", "https://developer.android.com/topic/architecture/ui-layer/stateholders"],
+    ["Compose and other libraries (ViewModel, Flow)", "https://developer.android.com/develop/ui/compose/libraries"]
+  ]
+}
+-->
+<p class="ad-lead">In Compose, the UI is derived from state. When it changes, affected composables recompose. That simple idea raises practical questions: where should each piece of state live? Should it survive rotation? Process death? Should it be shared? Answer those correctly and Compose feels effortless.</p>
+
+<h2 id="kinds">The kinds of state in a screen</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Kind</th><th>Example</th><th>Owner</th><th>API</th></tr></thead>
+  <tbody>
+    <tr><td>UI element state</td><td>Is this card expanded? Text field focus</td><td>The composable, or a plain state-holder class</td><td><code>remember</code> / <code>rememberSaveable</code></td></tr>
+    <tr><td>Screen UI state</td><td>Loaded articles, loading flag, error message</td><td>ViewModel</td><td><code>StateFlow</code> + <code>collectAsStateWithLifecycle</code></td></tr>
+    <tr><td>User input to preserve</td><td>Draft text, selected filters</td><td>ViewModel with <code>SavedStateHandle</code>, or <code>rememberSaveable</code></td><td>Survives process death</td></tr>
+    <tr><td>App data</td><td>Notes in the database, settings</td><td>Repository (Room, DataStore)</td><td><code>Flow</code> exposed upward</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-st-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-st-t fig-st-d">
+    <title id="fig-st-t">Where state lives in a Compose app</title>
+    <desc id="fig-st-d">From bottom to top: repositories own app data as Flows; the ViewModel combines them into a screen StateFlow; the screen composable collects it; small UI element state such as expanded flags is remembered inside components.</desc>
+    <defs><marker id="wl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="40" y="170" width="640" height="46" rx="12"/><text class="d-t" x="360" y="198" text-anchor="middle">Repositories: app data as Flow (Room, DataStore, network)</text></g>
+    <path class="d-flow" d="M360 170 V148" marker-end="url(#wl)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="140" y="100" width="440" height="46" rx="12"/><text class="d-t" x="360" y="128" text-anchor="middle">ViewModel: StateFlow&lt;ScreenUiState&gt; (+ SavedStateHandle)</text></g>
+    <path class="d-flow" d="M360 100 V80" marker-end="url(#wl)"/>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="220" y="34" width="280" height="44" rx="12"/><text class="d-t" x="360" y="61" text-anchor="middle">Screen composable: collects state</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="540" y="34" width="160" height="44" rx="12"/><text class="d-s" x="620" y="54" text-anchor="middle">components:</text><text class="d-s" x="620" y="70" text-anchor="middle">remember { expanded }</text></g>
+    <path class="d-line" d="M500 56 H536"/>
+  </svg>
+  <figcaption id="fig-st-cap">State lives at the lowest level that needs it, and is hoisted only as high as its users require.</figcaption>
+</figure>
+
+<h2 id="local">Local state with remember</h2>
+<code-block lang="kotlin" file="ExpandableCard.kt">
+@Composable
+fun ExpandableCard(title: String, body: String, modifier: Modifier = Modifier) {
+    var expanded by rememberSaveable { mutableStateOf(false) }   // survives rotation
+    Card(modifier.fillMaxWidth().clickable { expanded = !expanded }) {
+        Column(Modifier.padding(16.dp).animateContentSize()) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            if (expanded) Text(body, Modifier.padding(top = 8.dp))
+        }
+    }
+}
+</code-block>
+<p><code>mutableStateOf</code> creates an observable value. <code>remember</code> keeps it across recompositions. Without <code>remember</code>, every recomposition would create a fresh <code>false</code>.</p>
+
+<h2 id="viewmodel">Screen state in a ViewModel</h2>
+<code-block lang="kotlin" file="InboxViewModel.kt">
+data class InboxUiState(
+    val messages: List<Message> = emptyList(),
+    val filter: Filter = Filter.ALL,
+    val isRefreshing: Boolean = false,
+)
+
+class InboxViewModel(repo: MessageRepository, private val saved: SavedStateHandle) : ViewModel() {
+    private val filter = saved.getStateFlow("filter", Filter.ALL)   // restored after process death
+    private val refreshing = MutableStateFlow(false)
+
+    val uiState: StateFlow<InboxUiState> =
+        combine(repo.observeMessages(), filter, refreshing) { msgs, f, r ->
+            InboxUiState(msgs.filter(f::matches), f, r)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), InboxUiState())
+
+    fun setFilter(f: Filter) { saved["filter"] = f }
+}
+
+@Composable
+fun InboxRoute(viewModel: InboxViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    InboxScreen(state, onFilterChange = viewModel::setFilter)
+}
+</code-block>
+<p><code>Filter</code> needs to be storable in a Bundle, for example as an enum, for <code>SavedStateHandle</code> to save it.</p>
+
+<h2 id="state-holders">Plain state-holder classes for complex UI logic</h2>
+<p>When a component's UI logic grows (several related state values and rules), move it into a plain class remembered in composition. It's simpler than a ViewModel and still testable.</p>
+<code-block lang="kotlin" file="SearchBarState.kt">
+@Stable
+class SearchBarState(initialQuery: String) {
+    var query by mutableStateOf(initialQuery)
+        private set
+    var active by mutableStateOf(false)
+        private set
+    val showClear: Boolean get() = query.isNotEmpty()
+
+    fun onQueryChange(q: String) { query = q.take(100) }
+    fun clear() { query = "" }
+    fun activate(value: Boolean) { active = value }
+}
+
+@Composable
+fun rememberSearchBarState(initialQuery: String = ""): SearchBarState =
+    remember { SearchBarState(initialQuery) }
+</code-block>
+<p>Compose's own <code>LazyListState</code>, <code>ScrollState</code> and <code>DrawerState</code> follow exactly this pattern.</p>
+
+<h2 id="derived">Derived state</h2>
+<code-block lang="kotlin" file="derivedStateOf">
+val listState = rememberLazyListState()
+// Recompose readers only when the boolean flips, not on every scroll pixel.
+val showJumpToTop by remember { derivedStateOf { listState.firstVisibleItemIndex > 3 } }
+</code-block>
+<p>Use <code>derivedStateOf</code> when the input changes more often than the result. For simple derivations from parameters, plain computation, or <code>remember(key)</code> for expensive work, is enough.</p>
+
+<h2 id="snapshotflow">Turning Compose state into a Flow</h2>
+<code-block lang="kotlin" file="snapshotFlow">
+LaunchedEffect(listState) {
+    snapshotFlow { listState.firstVisibleItemIndex }
+        .distinctUntilChanged()
+        .collect { index -> analytics.log("scrolled_to", index) }
+}
+</code-block>
+
+<h2 id="use-cases">Real-world decisions</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Checkout form</h3><p>Field values and validation live in the ViewModel, with in-progress input in <code>SavedStateHandle</code> so process death doesn't wipe the form.</p></div>
+  <div class="card usecase"><h3>Photo carousel</h3><p>The current page index is UI element state in <code>rememberPagerState</code>, hoisted only if a parent needs to show "3 of 10".</p></div>
+  <div class="card usecase"><h3>Settings toggles</h3><p>App data in DataStore, exposed as a Flow and mapped to UI state in the ViewModel. Toggles call ViewModel functions.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><code>mutableStateOf</code> without <code>remember</code>, so state resets.</li>
+  <li>Using <code>collectAsState()</code> where <code>collectAsStateWithLifecycle()</code> is better on Android, since it stops collecting in the background.</li>
+  <li>Duplicating state, for example a copy of ViewModel data in a local <code>remember</code> that goes out of sync.</li>
+  <li>Mutable collections inside state (<code>mutableListOf</code> in a <code>mutableStateOf</code>). Changes inside the list aren't observed. Use immutable lists with copy, or <code>mutableStateListOf</code>.</li>
+  <li>Writing state during composition, which causes infinite recomposition loops.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need a ViewModel for every screen?</summary><div><p>For screens with business logic or data loading, yes. Purely presentational screens can rely on local state and parameters.</p></div></details>
+  <details><summary>StateFlow or Compose State in the ViewModel?</summary><div><p>Both work. StateFlow keeps ViewModels independent of Compose and integrates with Flow operators, so it's the most common choice. Compose <code>mutableStateOf</code> in ViewModels is also supported.</p></div></details>
+  <details><summary>How do I share state between two screens?</summary><div><p>Hoist it to a common owner, such as a ViewModel scoped to a navigation graph or the Activity, or move it into the data layer where both screens observe it.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Good Compose state management is about <strong>ownership</strong>: UI element state in <code>remember</code>/<code>rememberSaveable</code> or state-holder classes, screen state in a ViewModel's StateFlow, preserved input in <code>SavedStateHandle</code>, and app data in repositories. Keep a single source of truth for each value and let the UI derive from it.</p>
+<p>Next step: get the survival rules exactly right with <a href="../remember-vs-remembersaveable/index.html">remember vs rememberSaveable</a>.</p>

@@ -1,0 +1,154 @@
+<!--meta
+{
+  "seo_title": "Side Effects in Compose: LaunchedEffect and More",
+  "description": "Jetpack Compose side effects explained: LaunchedEffect, DisposableEffect, SideEffect, rememberCoroutineScope, rememberUpdatedState, produceState and snapshotFlow, with keys and pitfalls.",
+  "primary_keyword": "compose side effects",
+  "keywords": ["LaunchedEffect keys", "DisposableEffect onDispose", "SideEffect compose", "rememberCoroutineScope", "rememberUpdatedState", "produceState compose"],
+  "lede": "Composables should describe UI, not do work. But real screens must show snackbars, start animations, register listeners and log analytics. Compose's effect APIs let you run that work at the right moment, with automatic cleanup. Here's which one to use, and how keys control them.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-state-management", "composable-functions-explained", "flow-vs-stateflow-vs-sharedflow", "compose-state-hoisting"],
+  "refs": [
+    ["Side-effects in Compose", "https://developer.android.com/develop/ui/compose/side-effects"],
+    ["Lifecycle in Compose", "https://developer.android.com/develop/ui/compose/lifecycle"],
+    ["Compose and lifecycle-aware components", "https://developer.android.com/topic/libraries/architecture/compose"]
+  ]
+}
+-->
+<p class="ad-lead">A <strong>side effect</strong> is any change to the world outside a composable's own UI: a network call, an analytics event, a registered listener, a snackbar. Because composables may run many times, in any order, or be skipped, side effects in their bodies run unpredictably. The effect APIs give you control.</p>
+
+<h2 id="overview">Which effect API?</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>API</th><th>Runs</th><th>Cleanup</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>LaunchedEffect(keys)</code></td><td>A coroutine on entering composition; restarts when keys change</td><td>Coroutine cancelled on leave or restart</td><td>Suspend work tied to the composable: snackbars, animations, collecting events</td></tr>
+    <tr><td><code>rememberCoroutineScope()</code></td><td>When you launch from a callback</td><td>Scope cancelled on leave</td><td>Coroutines started by user events (onClick → scroll)</td></tr>
+    <tr><td><code>DisposableEffect(keys)</code></td><td>On enter; re-runs when keys change</td><td><code>onDispose { }</code> required</td><td>Register/unregister listeners, observers, callbacks</td></tr>
+    <tr><td><code>SideEffect</code></td><td>After every successful recomposition</td><td>None</td><td>Publishing Compose state to non-Compose objects</td></tr>
+    <tr><td><code>rememberUpdatedState</code></td><td>-</td><td>-</td><td>Read the latest lambda or value inside a long-running effect</td></tr>
+    <tr><td><code>produceState</code></td><td>Coroutine producing a State</td><td>Cancelled on leave</td><td>Converting non-Compose sources into State</td></tr>
+    <tr><td><code>snapshotFlow</code></td><td>-</td><td>-</td><td>Turning Compose state reads into a Flow</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-se-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-se-t fig-se-d">
+    <title id="fig-se-t">Lifecycle of LaunchedEffect with keys</title>
+    <desc id="fig-se-d">When the composable enters composition, LaunchedEffect starts a coroutine. If its key changes, the coroutine is cancelled and a new one starts. When the composable leaves composition, the coroutine is cancelled.</desc>
+    <defs><marker id="le" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H180 M330 70 H360 M510 70 H540" marker-end="url(#le)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="40" width="130" height="60" rx="12"/><text class="d-t" x="85" y="66" text-anchor="middle">Enter</text><text class="d-s" x="85" y="84" text-anchor="middle">start coroutine</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="184" y="40" width="146" height="60" rx="12"/><text class="d-t" x="257" y="66" text-anchor="middle">Recompose</text><text class="d-s" x="257" y="84" text-anchor="middle">same key → keep</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="364" y="40" width="146" height="60" rx="12"/><text class="d-t" x="437" y="66" text-anchor="middle">Key changes</text><text class="d-s" x="437" y="84" text-anchor="middle">cancel → restart</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="544" y="40" width="156" height="60" rx="12"/><text class="d-t" x="622" y="66" text-anchor="middle">Leave</text><text class="d-s" x="622" y="84" text-anchor="middle">cancel coroutine</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Keys = "restart this effect when these values change".</text>
+    <text class="d-s" x="360" y="160" text-anchor="middle">LaunchedEffect(Unit) runs once per entry into composition.</text>
+  </svg>
+  <figcaption id="fig-se-cap">Choosing keys is the most important decision for every effect.</figcaption>
+</figure>
+
+<h2 id="launched">LaunchedEffect</h2>
+<code-block lang="kotlin" file="Show a snackbar for a message in state">
+@Composable
+fun NotesScreen(state: NotesUiState, onMessageShown: () -> Unit) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    state.userMessage?.let { message ->
+        LaunchedEffect(message) {                 // restarts only for a new message
+            snackbarHostState.showSnackbar(message)
+            onMessageShown()
+        }
+    }
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding -> /* ... */ }
+}
+</code-block>
+
+<h2 id="scope">rememberCoroutineScope: effects from callbacks</h2>
+<code-block lang="kotlin" file="Scroll to top on click">
+val listState = rememberLazyListState()
+val scope = rememberCoroutineScope()
+
+FloatingActionButton(onClick = {
+    scope.launch { listState.animateScrollToItem(0) }   // launched by an event, not by composition
+}) { Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Scroll to top") }
+</code-block>
+<p>You can't call <code>LaunchedEffect</code> inside <code>onClick</code>, because callbacks aren't composable. Use the remembered scope instead.</p>
+
+<h2 id="disposable">DisposableEffect: register and clean up</h2>
+<code-block lang="kotlin" file="Observe lifecycle events">
+@Composable
+fun TrackScreenTime(screenName: String, onTimeSpent: (String, Long) -> Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentOnTimeSpent by rememberUpdatedState(onTimeSpent)   // always call the latest lambda
+
+    DisposableEffect(lifecycleOwner, screenName) {
+        var resumedAt = 0L
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> resumedAt = SystemClock.elapsedRealtime()
+                Lifecycle.Event.ON_PAUSE -> currentOnTimeSpent(screenName, SystemClock.elapsedRealtime() - resumedAt)
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }   // always paired
+    }
+}
+</code-block>
+<p>Lifecycle-runtime-compose also offers <code>LifecycleResumeEffect</code> and <code>LifecycleStartEffect</code> for these common cases.</p>
+
+<h2 id="updated">rememberUpdatedState: avoid stale lambdas</h2>
+<code-block lang="kotlin" file="Splash timeout">
+@Composable
+fun SplashTimeout(onTimeout: () -> Unit) {
+    val latestOnTimeout by rememberUpdatedState(onTimeout)
+    LaunchedEffect(Unit) {                 // don't restart the timer when the lambda changes...
+        delay(2_000)
+        latestOnTimeout()                  // ...but still call the newest one
+    }
+}
+</code-block>
+
+<h2 id="sideeffect">SideEffect and produceState</h2>
+<code-block lang="kotlin" file="SideEffect: sync Compose state outward">
+SideEffect { analytics.setUserProperty("theme", if (isDark) "dark" else "light") }
+</code-block>
+<code-block lang="kotlin" file="produceState: non-Compose source → State">
+@Composable
+fun rememberBatteryLevel(context: Context): State<Int?> = produceState<Int?>(initialValue = null, context) {
+    val receiver = object : BroadcastReceiver() {
+        override fun onReceive(c: Context, i: Intent) { value = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) }
+    }
+    ContextCompat.registerReceiver(context, receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED), ContextCompat.RECEIVER_NOT_EXPORTED)
+    awaitDispose { context.unregisterReceiver(receiver) }
+}
+</code-block>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Load data for an ID</h3><p><code>LaunchedEffect(id) { viewModel.load(id) }</code>, or better, let the ViewModel load from <code>SavedStateHandle</code> in <code>init</code>.</p></div>
+  <div class="card usecase"><h3>Location or sensor updates</h3><p><code>DisposableEffect</code>, or lifecycle effects, to start on resume and stop on pause.</p></div>
+  <div class="card usecase"><h3>One-time onboarding hint</h3><p><code>LaunchedEffect(Unit)</code> to show it, plus persistence so it doesn't show again.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><strong>Wrong keys:</strong> <code>LaunchedEffect(Unit)</code> when the effect depends on a changing ID, or keys that change every recomposition (new objects), which restarts constantly.</li>
+  <li><strong>Forgetting <code>onDispose</code> cleanup</strong>, which leaks listeners.</li>
+  <li><strong>Business logic in effects</strong> that belongs in the ViewModel.</li>
+  <li><strong>Writing state in <code>SideEffect</code></strong>, triggering endless recompositions.</li>
+  <li><strong>Collecting flows in <code>LaunchedEffect</code> without lifecycle awareness</strong>. Use <code>collectAsStateWithLifecycle</code> or <code>repeatOnLifecycle</code>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is LaunchedEffect(Unit) like onCreate?</summary><div><p>Roughly, but per composition entry, not per Activity. It runs again if the composable leaves and re-enters composition.</p></div></details>
+  <details><summary>Do effects survive configuration changes?</summary><div><p>No. The Activity is recreated, so composition restarts and effects run again. Keep long-running work in the ViewModel.</p></div></details>
+  <details><summary>Can I pass multiple keys?</summary><div><p>Yes, for example <code>LaunchedEffect(userId, filter)</code>. The effect restarts when any key changes.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Keep composable bodies pure and move work into the right effect: <strong>LaunchedEffect</strong> for suspend work tied to composition, <strong>rememberCoroutineScope</strong> for event-driven coroutines, <strong>DisposableEffect</strong> for register and cleanup, <strong>SideEffect</strong> for publishing state outward. Choose keys deliberately.</p>
+<p>Next step: make components reusable and testable with <a href="../compose-state-hoisting/index.html">State Hoisting</a>.</p>

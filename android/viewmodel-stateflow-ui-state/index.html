@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Managing UI State with ViewModel and StateFlow | Yunok Tech</title>
+  <meta name="description" content="Model and expose Android UI state with ViewModel and StateFlow: single UiState, sealed vs data class state, combine and stateIn, user messages, loading and errors, and tests.">
+  <meta name="keywords" content="viewmodel stateflow ui state, android ui state, stateflow viewmodel compose, stateIn whilesubscribed, combine flows viewmodel, ui state data class sealed, user messages android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/viewmodel-stateflow-ui-state/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/viewmodel-stateflow-ui-state/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Managing UI State with ViewModel and StateFlow">
+  <meta property="og:description" content="Model and expose Android UI state with ViewModel and StateFlow: single UiState, sealed vs data class state, combine and stateIn, user messages, loading and errors, and tests.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="Managing UI State with ViewModel and StateFlow">
+  <meta name="twitter:description" content="Model and expose Android UI state with ViewModel and StateFlow: single UiState, sealed vs data class state, combine and stateIn, user messages, loading and errors, and tests.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Managing UI State with ViewModel and StateFlow", "description": "Model and expose Android UI state with ViewModel and StateFlow: single UiState, sealed vs data class state, combine and stateIn, user messages, loading and errors, and tests.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Architecture and Clean Code", "keywords": "android ui state, stateflow viewmodel compose, stateIn whilesubscribed, combine flows viewmodel, ui state data class sealed, user messages android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/viewmodel-stateflow-ui-state/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Managing UI State with ViewModel and StateFlow", "item": "https://yunoktech.com/android/viewmodel-stateflow-ui-state/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">Managing UI State with ViewModel and StateFlow</h1>
+    <p class="ad-lede">A screen's UI state is everything the UI needs to render: data, loading flags, errors, input. How you model and expose it decides whether screens are predictable or full of edge-case bugs. Here are the patterns that work, with complete Kotlin code.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#principles">Principles</a></li><li><a href="#shape">Choosing the shape: sealed vs data class</a></li><li><a href="#combine">Building state from several sources</a></li><li><a href="#update">Imperative updates with update { }</a></li><li><a href="#messages">Messages and one-off events as state</a></li><li><a href="#ui">Consuming in Compose</a></li><li><a href="#testing">Testing state</a></li><li><a href="#use-cases">Patterns by screen type</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Bugs like "the spinner never disappears", "the error shows over the data" or "the list flickers empty on rotation" are state-modelling bugs. The fix isn't more if-statements in the UI. It's a better-shaped state object, exposed through a single, predictable stream.</p>
+
+<h2 id="principles">Principles</h2>
+<ul>
+  <li><strong>One <code>StateFlow&lt;UiState&gt;</code> per screen</strong>, which is the single source of truth for rendering.</li>
+  <li><strong>Immutable state</strong>: <code>data class</code> with <code>val</code>s, updated with <code>copy</code>.</li>
+  <li><strong>Make impossible states impossible</strong>: choose between sealed and data class deliberately.</li>
+  <li><strong>Derive, don't duplicate</strong>: compute values from sources rather than storing copies.</li>
+</ul>
+
+<h2 id="shape">Choosing the shape: sealed vs data class</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Screen behaviour</th><th>Shape</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Mutually exclusive modes</td><td>Sealed interface</td><td>Loading / Content / Error for a detail page</td></tr>
+    <tr><td>Fields that coexist</td><td>Data class</td><td>A list that stays visible while refreshing, with an optional message</td></tr>
+    <tr><td>Both</td><td>Data class containing a sealed field</td><td><code>FeedUiState(query, results: ResultsState)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="combine">Building state from several sources</h2>
+<figure class="code"><figcaption><span class="file">TasksViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">TasksUiState</span>(
+    <span class="tk-k">val</span> tasks: <span class="tk-t">List</span>&lt;<span class="tk-t">TaskUi</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> filter: <span class="tk-t">TaskFilter</span> = <span class="tk-t">TaskFilter</span>.<span class="tk-t">ALL</span>,
+    <span class="tk-k">val</span> isRefreshing: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> userMessage: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+    <span class="tk-k">val</span> isEmpty: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+)
+
+<span class="tk-a">@HiltViewModel</span>
+<span class="tk-k">class</span> <span class="tk-t">TasksViewModel</span> <span class="tk-a">@Inject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">TaskRepository</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> savedState: <span class="tk-t">SavedStateHandle</span>,
+) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> filter = savedState.getStateFlow(<span class="tk-s">"filter"</span>, <span class="tk-t">TaskFilter</span>.<span class="tk-t">ALL</span>)
+    <span class="tk-k">private</span> <span class="tk-k">val</span> refreshing = <span class="tk-t">MutableStateFlow</span>(<span class="tk-k">false</span>)
+    <span class="tk-k">private</span> <span class="tk-k">val</span> message = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">String</span>?&gt;(<span class="tk-k">null</span>)
+
+    <span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">TasksUiState</span>&gt; = combine(
+        repository.observeTasks(), filter, refreshing, message,
+    ) { tasks, f, isRefreshing, msg -&gt;
+        <span class="tk-k">val</span> visible = tasks.filter(f::matches).map(<span class="tk-t">Task</span>::toUi)
+        <span class="tk-t">TasksUiState</span>(visible, f, isRefreshing, msg, isEmpty = visible.isEmpty() &amp;&amp; !isRefreshing)
+    }.stateIn(
+        scope = viewModelScope,
+        started = <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>),
+        initialValue = <span class="tk-t">TasksUiState</span>(isRefreshing = <span class="tk-k">true</span>),
+    )
+
+    <span class="tk-k">fun</span> setFilter(f: <span class="tk-t">TaskFilter</span>) { savedState[<span class="tk-s">"filter"</span>] = f }
+
+    <span class="tk-k">fun</span> refresh() = viewModelScope.launch {
+        refreshing.<span class="tk-k">value</span> = <span class="tk-k">true</span>
+        <span class="tk-k">try</span> { repository.refresh() }
+        <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) { message.<span class="tk-k">value</span> = <span class="tk-s">"Couldn't sync. Showing saved tasks."</span> }
+        <span class="tk-k">finally</span> { refreshing.<span class="tk-k">value</span> = <span class="tk-k">false</span> }
+    }
+
+    <span class="tk-k">fun</span> messageShown() { message.<span class="tk-k">value</span> = <span class="tk-k">null</span> }
+}</code></pre></figure>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cb-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-cb-t fig-cb-d">
+    <title id="fig-cb-t">Combining sources into one UI state</title>
+    <desc id="fig-cb-d">Four sources, the repository's task Flow, the saved filter, a refreshing flag and a user message, are combined into one TasksUiState and exposed with stateIn as a single StateFlow collected by the screen.</desc>
+    <defs><marker id="cbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="10" width="170" height="36" rx="8"/><text class="d-s" x="105" y="33" text-anchor="middle">observeTasks()</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="56" width="170" height="36" rx="8"/><text class="d-s" x="105" y="79" text-anchor="middle">filter (SavedState)</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="102" width="170" height="36" rx="8"/><text class="d-s" x="105" y="125" text-anchor="middle">refreshing</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="148" width="170" height="36" rx="8"/><text class="d-s" x="105" y="171" text-anchor="middle">userMessage</text></g>
+    <path class="d-flow" d="M190 28 L290 92 M190 74 L290 96 M190 120 L290 100 M190 166 L290 104" marker-end="url(#cbm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="294" y="70" width="140" height="56" rx="12"/><text class="d-t" x="364" y="94" text-anchor="middle">combine</text><text class="d-s" x="364" y="112" text-anchor="middle">+ stateIn</text></g>
+    <path class="d-flow" d="M434 98 H496" marker-end="url(#cbm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="500" y="70" width="200" height="56" rx="12"/><text class="d-t" x="600" y="94" text-anchor="middle">StateFlow&lt;TasksUiState&gt;</text><text class="d-s" x="600" y="112" text-anchor="middle">→ collected by UI</text></g>
+  </svg>
+  <figcaption id="fig-cb-cap">Many inputs, one output. The UI never has to reconcile separate streams.</figcaption>
+</figure>
+
+<h2 id="update">Imperative updates with update { }</h2>
+<p>For state the ViewModel owns directly, such as form input, use a <code>MutableStateFlow</code> and <code>update</code>, which is atomic and safe under concurrency:</p>
+<figure class="code"><figcaption><span class="file">Form state</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">private</span> <span class="tk-k">val</span> _form = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">SignupForm</span>())
+<span class="tk-k">val</span> form: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SignupForm</span>&gt; = _form.asStateFlow()
+
+<span class="tk-k">fun</span> onEmailChange(email: <span class="tk-t">String</span>) = _form.update {
+    it.copy(email = email, emailError = <span class="tk-k">if</span> (email.isBlank() || <span class="tk-s">"@"</span> <span class="tk-k">in</span> email) <span class="tk-k">null</span> <span class="tk-k">else</span> <span class="tk-s">"Invalid email"</span>)
+}</code></pre></figure>
+
+<h2 id="messages">Messages and one-off events as state</h2>
+<p>Store user messages in state and clear them after display, as in <code>userMessage</code> and <code>messageShown()</code> above. Navigation can be modelled the same way (<code>navigateTo: Destination?</code>), or triggered directly by the UI after observing a result state. See <a href="../flow-vs-stateflow-vs-sharedflow/index.html">Flow vs StateFlow vs SharedFlow</a> for the trade-offs.</p>
+
+<h2 id="ui">Consuming in Compose</h2>
+<figure class="code"><figcaption><span class="file">TasksRoute.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">TasksRoute</span>(viewModel: <span class="tk-t">TasksViewModel</span> = hiltViewModel()) {
+    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+    <span class="tk-k">val</span> snackbar = remember { <span class="tk-t">SnackbarHostState</span>() }
+
+    state.userMessage?.let { msg -&gt;
+        <span class="tk-t">LaunchedEffect</span>(msg) { snackbar.showSnackbar(msg); viewModel.messageShown() }
+    }
+    <span class="tk-t">TasksScreen</span>(state, snackbar, onFilter = viewModel::setFilter, onRefresh = viewModel::refresh)
+}</code></pre></figure>
+
+<h2 id="testing">Testing state</h2>
+<figure class="code"><figcaption><span class="file">TasksViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `failed refresh keeps tasks and shows message`() = runTest {
+    <span class="tk-k">val</span> repo = <span class="tk-t">FakeTaskRepository</span>(tasks = listOf(task(<span class="tk-s">"Write tests"</span>)), refreshFails = <span class="tk-k">true</span>)
+    <span class="tk-k">val</span> vm = <span class="tk-t">TasksViewModel</span>(repo, <span class="tk-t">SavedStateHandle</span>())
+    backgroundScope.launch(<span class="tk-t">UnconfinedTestDispatcher</span>(testScheduler)) { vm.uiState.collect {} }
+
+    vm.refresh(); advanceUntilIdle()
+
+    with(vm.uiState.<span class="tk-k">value</span>) {
+        assertEquals(<span class="tk-n">1</span>, tasks.size)
+        assertEquals(<span class="tk-s">"Couldn't sync. Showing saved tasks."</span>, userMessage)
+        assertFalse(isRefreshing)
+    }
+}</code></pre></figure>
+<p>Collecting in <code>backgroundScope</code> activates <code>WhileSubscribed</code> upstreams during the test.</p>
+
+<h2 id="use-cases">Patterns by screen type</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Detail screen</h3><p>Sealed: Loading, Content(item) or Error(message, canRetry).</p></div>
+  <div class="card usecase"><h3>List with refresh</h3><p>Data class: items, isRefreshing and message. Items stay visible during refresh.</p></div>
+  <div class="card usecase"><h3>Multi-step form</h3><p>Data class per step plus a sealed submission status. Input is kept in SavedStateHandle.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Several public StateFlows for one screen that the UI must combine.</li>
+  <li>Emitting new state objects with identical content in tight loops, which wastes recomposition.</li>
+  <li><code>SharingStarted.Eagerly</code> for screen state, keeping work alive when invisible.</li>
+  <li>UI-toolkit types (Compose <code>Color</code>, <code>Painter</code>) in UiState. Use semantic values and resource IDs.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should formatting happen in the ViewModel?</summary><div><p>Simple display formatting (dates, prices) in the ViewModel or a UI mapper keeps composables simple and testable. Locale-sensitive formatting can also live in composables if it depends on the configuration.</p></div></details>
+  <details><summary>Is a big UiState bad for performance?</summary><div><p>Usually not. Compose skips parts whose inputs are unchanged. Split state only if unrelated parts update at very high frequency.</p></div></details>
+  <details><summary>Compose State or StateFlow in the ViewModel?</summary><div><p>Both are supported. StateFlow is toolkit-agnostic and integrates with Flow operators, which is why it's the most common choice.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Expose <strong>one immutable StateFlow per screen</strong>, shape it to rule out impossible combinations, build it with <code>combine</code> and <code>stateIn(WhileSubscribed)</code>, and treat messages as consumable state. Screens become simple renderers, and ViewModels become easy to test.</p>
+<p>Next step: see the principle behind all this in <a href="../unidirectional-data-flow-android/index.html">Unidirectional Data Flow in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/architecture/ui-layer" target="_blank" rel="noopener">UI layer</a></li><li><a href="https://developer.android.com/topic/architecture/ui-layer/stateholders" target="_blank" rel="noopener">State holders and UI state</a></li><li><a href="https://developer.android.com/topic/architecture/ui-layer/events" target="_blank" rel="noopener">UI events</a></li><li><a href="https://developer.android.com/kotlin/flow/stateflow-and-sharedflow" target="_blank" rel="noopener">StateFlow and SharedFlow</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dviewmodel-stateflow-ui-state-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dviewmodel-stateflow-ui-state-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/mvvm-architecture-android/index.html"><small>Android Architecture and Clean Code</small>MVVM Architecture in Android Explained</a></li><li><a href="../../android/flow-vs-stateflow-vs-sharedflow/index.html"><small>Kotlin Programming</small>Flow vs StateFlow vs SharedFlow</a></li><li><a href="../../android/unidirectional-data-flow-android/index.html"><small>Android Architecture and Clean Code</small>Unidirectional Data Flow in Android</a></li><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/viewmodel-stateflow-ui-state/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/viewmodel-stateflow-ui-state/&amp;text=Managing UI State with ViewModel and StateFlow" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/viewmodel-stateflow-ui-state/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#principles">Principles</a></li><li><a href="#shape">Choosing the shape: sealed vs data class</a></li><li><a href="#combine">Building state from several sources</a></li><li><a href="#update">Imperative updates with update { }</a></li><li><a href="#messages">Messages and one-off events as state</a></li><li><a href="#ui">Consuming in Compose</a></li><li><a href="#testing">Testing state</a></li><li><a href="#use-cases">Patterns by screen type</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dviewmodel-stateflow-ui-state-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dviewmodel-stateflow-ui-state-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

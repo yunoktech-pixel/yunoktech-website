@@ -1,0 +1,110 @@
+<!--meta
+{
+  "seo_title": "Using AI to Write Kotlin Code Responsibly",
+  "description": "Use AI to write Kotlin for Android responsibly: where AI helps, where it fails, idiomatic Kotlin review points, coroutine and null-safety pitfalls, licensing, security and team policies.",
+  "primary_keyword": "ai write kotlin code",
+  "keywords": ["ai generated kotlin review", "responsible ai coding", "kotlin code quality ai", "ai coding policy team", "ai code licensing", "ai coroutine bugs"],
+  "lede": "AI can write Kotlin faster than you can type it. The responsibility for whether that code is correct, secure, maintainable and legally usable stays with you. Here's a practical framework for using AI on Kotlin code without lowering your standards.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["verify-ai-generated-android-code", "ai-code-review-android", "better-prompts-ai-coding-tools", "kotlin-coroutines-flow-android"],
+  "refs": [
+    ["Kotlin coding conventions", "https://kotlinlang.org/docs/coding-conventions.html"],
+    ["Android Kotlin style guide", "https://developer.android.com/kotlin/style-guide"],
+    ["Coroutines best practices", "https://developer.android.com/kotlin/coroutines/coroutines-best-practices"],
+    ["Gemini in Android Studio: data and privacy", "https://developer.android.com/studio/gemini/data-and-privacy"]
+  ]
+}
+-->
+<p class="ad-lead">Responsible AI-assisted coding isn't about whether you use AI. It's about keeping ownership: you understand every line you merge, you can debug it at 2 a.m., and it meets the same bar as code you wrote yourself.</p>
+
+<h2 id="where">Where AI helps and where it struggles</h2>
+<div class="cards">
+  <div class="card pros"><h4>Strong at</h4><ul><li>Boilerplate: mappers, DTOs, DAO methods</li><li>Converting Java to Kotlin (with review)</li><li>Explaining unfamiliar code and APIs</li><li>Drafting tests and edge-case lists</li><li>Standard patterns (Retrofit interface, Room entity)</li></ul></div>
+  <div class="card cons"><h4>Weak at</h4><ul><li>Your project's specific conventions (without rules)</li><li>Current library versions and new APIs</li><li>Lifecycle, threading and process death subtleties</li><li>Security-sensitive code</li><li>Business rules it hasn't been told</li></ul></div>
+</div>
+
+<h2 id="loop">A responsible loop</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rl-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-rl-t fig-rl-d">
+    <title id="fig-rl-t">Responsible AI coding loop</title>
+    <desc id="fig-rl-d">Specify the task with constraints and context; generate a small change; read and understand every line; verify with build, tests and lint; then commit with clear ownership. If any step fails, iterate.</desc>
+    <defs><marker id="rlm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#rlm)"/>
+    <path class="d-dash" d="M495 100 V150 H70 V104" marker-end="url(#rlm)"/><text class="d-s" x="282" y="168" text-anchor="middle">failed review or tests → refine and repeat</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Specify</text><text class="d-s" x="70" y="84" text-anchor="middle">constraints</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">Generate</text><text class="d-s" x="212" y="84" text-anchor="middle">small diff</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Understand</text><text class="d-s" x="352" y="84" text-anchor="middle">every line</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Verify</text><text class="d-s" x="497" y="84" text-anchor="middle">build, test, lint</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="12"/><text class="d-w" x="647" y="66" text-anchor="middle">Own it</text><text class="d-w" x="647" y="84" text-anchor="middle">commit</text></g>
+  </svg>
+  <figcaption id="fig-rl-cap">Small diffs keep understanding and verification possible.</figcaption>
+</figure>
+
+<h2 id="kotlin-review">Kotlin review points for AI output</h2>
+<code-block lang="kotlin" file="Typical AI Kotlin issues and fixes">
+// 1. Swallowed cancellation
+try { repo.sync() } catch (e: Exception) { log(e) }              // ❌ catches CancellationException
+try { repo.sync() } catch (e: IOException) { log(e) }            // ✅ specific
+
+// 2. Wrong scope
+GlobalScope.launch { repo.sync() }                                // ❌ leaks, ignores lifecycle
+viewModelScope.launch { repo.sync() }                             // ✅
+
+// 3. Null handling by force
+val name = user!!.profile!!.name                                  // ❌ crash-prone
+val name = user?.profile?.name ?: return                          // ✅ model absence
+
+// 4. Mutable state exposure
+val items = MutableStateFlow(listOf<Item>())                      // ❌ public mutable
+private val _items = MutableStateFlow(listOf<Item>())             // ✅ backing property
+val items: StateFlow<List<Item>> = _items.asStateFlow()
+
+// 5. Blocking on main
+runBlocking { repo.load() }                                       // ❌ ANR risk
+</code-block>
+<p>A fuller checklist is in <a href="../verify-ai-generated-android-code/index.html">How to Verify AI-Generated Android Code</a>.</p>
+
+<h2 id="versions">Versions and APIs: trust, but verify</h2>
+<ul>
+  <li>Check dependency versions against official release pages. Models often suggest outdated or non-existent versions.</li>
+  <li>Watch for deprecated APIs (AsyncTask, <code>onActivityResult</code>, old Google Sign-In) and ask for the modern alternative.</li>
+  <li>If the AI references a method you don't recognise, open the API reference before using it.</li>
+</ul>
+
+<h2 id="security">Security and privacy</h2>
+<ul>
+  <li>Never paste secrets, customer data or proprietary algorithms into tools that aren't approved by your organisation.</li>
+  <li>Use context exclusion (<code>.aiexclude</code>) for sensitive files in Android Studio.</li>
+  <li>Review generated code for hard-coded keys, disabled certificate checks, logging of personal data, and exported components.</li>
+</ul>
+
+<h2 id="licensing">Licensing and provenance</h2>
+<p>Generated code may resemble existing open-source code. Follow your organisation's policy: some require attribution checks or limit use for large verbatim-looking snippets. When in doubt, prefer small, idiomatic generated code you fully understand over large blocks.</p>
+
+<h2 id="team-policy">A lightweight team policy</h2>
+<ol class="steps">
+  <li>Approved tools and tiers (with data terms reviewed).</li>
+  <li>What must never be shared with AI tools.</li>
+  <li>Shared rules files (AGENTS.md or equivalent) in the repository.</li>
+  <li>The author owns AI-assisted code exactly as if hand-written. Reviews apply the same standard.</li>
+  <li>Tests are required for AI-generated logic.</li>
+</ol>
+
+<h2 id="use-cases">Good uses in daily Android work</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Mapper boilerplate</h3><p>Generate DTO→domain mappers, then add tests for edge cases.</p></div>
+  <div class="card usecase"><h3>Learning an API</h3><p>Ask for an explanation with a small example, then read the official docs.</p></div>
+  <div class="card usecase"><h3>Refactors</h3><p>Small, mechanical refactors with diffs reviewed and tests run.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should juniors use AI coding tools?</summary><div><p>Yes, as tutors and accelerators, but they should write and understand code themselves first. Interviews and production debugging require real understanding.</p></div></details>
+  <details><summary>Do I need to disclose AI usage in code?</summary><div><p>Follow your organisation's policy. Many teams don't require markers, but all require the same review and testing standards.</p></div></details>
+  <details><summary>Will AI-generated code pass code review?</summary><div><p>Only if it meets your standards. Reviewers should ask the same questions as for any code: correctness, lifecycle, security, tests, readability.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use AI for speed, keep human <strong>ownership</strong>: specify clearly, generate small diffs, understand every line, verify with builds and tests, watch Kotlin-specific pitfalls, protect secrets, and follow a simple team policy.</p>
+<p>Next step: let AI draft tests safely with <a href="../ai-unit-test-generation-android/index.html">AI-Assisted Unit Test Generation</a>.</p>

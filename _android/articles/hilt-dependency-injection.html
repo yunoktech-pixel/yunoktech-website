@@ -1,0 +1,167 @@
+<!--meta
+{
+  "seo_title": "Dependency Injection with Hilt in Android (Guide)",
+  "description": "Learn Hilt dependency injection for Android: setup, @Inject, modules, @Binds vs @Provides, scopes and components, ViewModels, qualifiers, assisted injection and testing.",
+  "primary_keyword": "hilt dependency injection android",
+  "keywords": ["hilt tutorial", "hiltViewModel", "hilt module binds provides", "hilt scopes singleton", "hilt testing", "dagger hilt android"],
+  "lede": "Dependency injection sounds abstract until you try to test a ViewModel that creates its own Retrofit client. Hilt, Android's recommended DI library built on Dagger, wires your object graph at compile time with very little code. Here's how to set it up and use it well.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["repository-pattern-android", "mvvm-architecture-android", "multi-module-architecture-android", "testing-viewmodels-coroutines-flow"],
+  "refs": [
+    ["Dependency injection with Hilt", "https://developer.android.com/training/dependency-injection/hilt-android"],
+    ["Hilt and Jetpack integrations", "https://developer.android.com/training/dependency-injection/hilt-jetpack"],
+    ["Hilt testing guide", "https://developer.android.com/training/dependency-injection/hilt-testing"],
+    ["Dagger Hilt documentation", "https://dagger.dev/hilt/"]
+  ]
+}
+-->
+<p class="ad-lead">Dependency injection (DI) means objects <em>receive</em> their dependencies instead of creating them. A ViewModel that receives a <code>WeatherRepository</code> can be given a fake in tests and the real one in the app. Hilt automates the wiring and manages object lifetimes tied to Android components.</p>
+
+<h2 id="why">Why DI, and why Hilt</h2>
+<code-block lang="kotlin" file="Without DI: hard to test and change">
+class WeatherViewModel : ViewModel() {
+    private val repository = WeatherRepositoryImpl(
+        Retrofit.Builder().baseUrl(BASE_URL).build().create(WeatherApi::class.java),
+        Room.databaseBuilder(/* needs a Context... */).build().weatherDao(),
+    )
+}
+</code-block>
+<code-block lang="kotlin" file="With DI: dependencies are parameters">
+@HiltViewModel
+class WeatherViewModel @Inject constructor(
+    private val repository: WeatherRepository,
+) : ViewModel()
+</code-block>
+<p>Hilt generates the Dagger code at compile time, so wiring errors are caught at build time and there's no reflection at runtime. It also understands Android lifecycles: Application, Activity, ViewModel, Fragment and Service.</p>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="build.gradle.kts (app)">
+plugins {
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
+}
+dependencies {
+    implementation("com.google.dagger:hilt-android:<hilt-version>")
+    ksp("com.google.dagger:hilt-compiler:<hilt-version>")
+    implementation("androidx.hilt:hilt-navigation-compose:<version>")   // hiltViewModel() in Compose
+}
+</code-block>
+<code-block lang="kotlin" file="App.kt and MainActivity.kt">
+@HiltAndroidApp
+class App : Application()
+
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() { /* ... */ }
+</code-block>
+
+<h2 id="graph">How Hilt builds the graph</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-hg-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-hg-t fig-hg-d">
+    <title id="fig-hg-t">Hilt component hierarchy and scopes</title>
+    <desc id="fig-hg-d">SingletonComponent lives as long as the application and holds singletons such as Retrofit, OkHttp, the Room database and repositories. ActivityRetainedComponent survives configuration changes. ViewModelComponent creates ViewModel dependencies. ActivityComponent and FragmentComponent are tied to UI lifecycles.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="200" y="10" width="320" height="50" rx="12"/><text class="d-t" x="360" y="32" text-anchor="middle">SingletonComponent  @Singleton</text><text class="d-s" x="360" y="50" text-anchor="middle">OkHttp, Retrofit, Room, repositories</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="200" y="80" width="320" height="44" rx="12"/><text class="d-t" x="360" y="107" text-anchor="middle">ActivityRetainedComponent  @ActivityRetainedScoped</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="40" y="150" width="280" height="56" rx="12"/><text class="d-t" x="180" y="174" text-anchor="middle">ViewModelComponent</text><text class="d-s" x="180" y="192" text-anchor="middle">@ViewModelScoped, SavedStateHandle</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="400" y="150" width="280" height="56" rx="12"/><text class="d-t" x="540" y="174" text-anchor="middle">ActivityComponent → Fragment…</text><text class="d-s" x="540" y="192" text-anchor="middle">@ActivityScoped, UI-bound objects</text></g>
+    <path class="d-line" d="M360 60 V80 M300 124 L180 150 M420 124 L540 150"/>
+  </svg>
+  <figcaption id="fig-hg-cap">Child components can use anything from their parents. Scope an object to the shortest lifetime that makes sense.</figcaption>
+</figure>
+
+<h2 id="modules">Modules: teaching Hilt to create things</h2>
+<p>Classes you own get <code>@Inject constructor</code>. For interfaces and third-party classes, write modules:</p>
+<code-block lang="kotlin" file="di/NetworkModule.kt">
+@Module
+@InstallIn(SingletonComponent::class)
+object NetworkModule {
+
+    @Provides @Singleton
+    fun provideOkHttp(): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .build()
+
+    @Provides @Singleton
+    fun provideRetrofit(client: OkHttpClient, json: Json): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.example.com/")
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+
+    @Provides @Singleton
+    fun provideJson(): Json = Json { ignoreUnknownKeys = true }
+
+    @Provides
+    fun provideWeatherApi(retrofit: Retrofit): WeatherApi = retrofit.create(WeatherApi::class.java)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+    @Binds @Singleton
+    abstract fun bindWeatherRepository(impl: DefaultWeatherRepository): WeatherRepository
+}
+</code-block>
+<div class="tip"><b>@Binds vs @Provides</b><p>Use <code>@Binds</code> to map an interface to an implementation that has an <code>@Inject</code> constructor. It's less code and more efficient. Use <code>@Provides</code> when you must call builders or factories.</p></div>
+
+<h2 id="qualifiers">Qualifiers: two of the same type</h2>
+<code-block lang="kotlin" file="Dispatcher qualifiers">
+@Qualifier @Retention(AnnotationRetention.BINARY) annotation class IoDispatcher
+@Qualifier @Retention(AnnotationRetention.BINARY) annotation class DefaultDispatcher
+
+@Module @InstallIn(SingletonComponent::class)
+object DispatchersModule {
+    @Provides @IoDispatcher fun io(): CoroutineDispatcher = Dispatchers.IO
+    @Provides @DefaultDispatcher fun default(): CoroutineDispatcher = Dispatchers.Default
+}
+
+class ImageRepository @Inject constructor(@IoDispatcher private val io: CoroutineDispatcher)
+</code-block>
+
+<h2 id="compose">ViewModels in Compose</h2>
+<code-block lang="kotlin" file="Screen">
+@Composable
+fun WeatherRoute(viewModel: WeatherViewModel = hiltViewModel()) { /* ... */ }
+</code-block>
+<p>For runtime arguments that aren't in <code>SavedStateHandle</code>, Hilt supports <strong>assisted injection</strong> for ViewModels with <code>@AssistedInject</code> and an assisted factory. Check the Hilt docs for the current Compose API.</p>
+
+<h2 id="testing">Testing</h2>
+<code-block lang="kotlin" file="Replace bindings in instrumented tests">
+@UninstallModules(RepositoryModule::class)
+@HiltAndroidTest
+class WeatherScreenTest {
+    @get:Rule(order = 0) val hilt = HiltAndroidRule(this)
+    @get:Rule(order = 1) val compose = createAndroidComposeRule<MainActivity>()
+
+    @BindValue @JvmField val repo: WeatherRepository = FakeWeatherRepository()
+
+    @Test fun showsForecast() { /* ... */ }
+}
+</code-block>
+<p>For plain unit tests you often don't need Hilt at all: construct the ViewModel directly with fakes. That's the main benefit of constructor injection.</p>
+
+<h2 id="use-cases">Practical guidance</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Small app</h3><p>Hilt with a few modules: network, database, repositories. Most classes use <code>@Inject constructor</code>.</p></div>
+  <div class="card usecase"><h3>Multi-module app</h3><p>Each module contributes its own Hilt modules, and the <code>:app</code> module assembles the graph.</p></div>
+  <div class="card usecase"><h3>KMP or lighter needs</h3><p>Consider Koin or manual DI. Hilt is Android-only and annotation-based.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Scoping everything <code>@Singleton</code>, which keeps objects alive forever. Scope only what must be shared.</li>
+  <li>Injecting Activity Context into singletons, which leaks. Use <code>@ApplicationContext</code>.</li>
+  <li>Field injection everywhere. Prefer constructor injection, and use field injection only in Android classes Hilt instantiates.</li>
+  <li>Huge modules providing everything. Split them by feature or layer.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Hilt or Koin?</summary><div><p>Hilt does compile-time validation and is Google's recommendation for Android. Koin is a lightweight runtime DSL that works on Kotlin Multiplatform. Both are viable, so choose based on platform and team preference.</p></div></details>
+  <details><summary>Does Hilt slow down builds?</summary><div><p>Annotation processing adds build time. Using KSP instead of kapt helps, and modularisation limits recompilation.</p></div></details>
+  <details><summary>Is manual DI ever better?</summary><div><p>For very small apps or libraries, a simple manual container can be enough. Hilt pays off as the graph grows.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Hilt gives Android apps <strong>compile-time-checked dependency injection</strong> with lifecycle-aware scopes. Use constructor injection, <code>@Binds</code> for interfaces, <code>@Provides</code> for builders, qualifiers for duplicate types, and the shortest sensible scope.</p>
+<p>Next step: decide where business logic lives in <a href="../android-use-cases-domain-layer/index.html">Use Cases and Domain Layers</a>.</p>

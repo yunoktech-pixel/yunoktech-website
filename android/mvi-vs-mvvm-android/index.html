@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MVVM vs MVI in Android: Which Architecture to Use? | Yunok Tech</title>
+  <meta name="description" content="MVVM vs MVI for Android explained with Kotlin and Compose code: state, events, reducers, one-off effects, testing and when each pattern fits your app.">
+  <meta name="keywords" content="mvvm vs mvi android, mvi architecture android, mvvm architecture android, android architecture patterns, unidirectional data flow, viewmodel stateflow, mvi reducer kotlin, jetpack compose architecture">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/mvi-vs-mvvm-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/mvi-vs-mvvm-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="MVVM vs MVI in Android: Which Architecture to Use?">
+  <meta property="og:description" content="MVVM vs MVI for Android explained with Kotlin and Compose code: state, events, reducers, one-off effects, testing and when each pattern fits your app.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="MVVM vs MVI in Android: Which Architecture to Use?">
+  <meta name="twitter:description" content="MVVM vs MVI for Android explained with Kotlin and Compose code: state, events, reducers, one-off effects, testing and when each pattern fits your app.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "MVVM vs MVI: Which Android Architecture Should You Use?", "description": "MVVM vs MVI for Android explained with Kotlin and Compose code: state, events, reducers, one-off effects, testing and when each pattern fits your app.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Architecture and Clean Code", "keywords": "mvi architecture android, mvvm architecture android, android architecture patterns, unidirectional data flow, viewmodel stateflow, mvi reducer kotlin, jetpack compose architecture", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/mvi-vs-mvvm-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "MVVM vs MVI: Which Android Architecture Should You Use?", "item": "https://yunoktech.com/android/mvi-vs-mvvm-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">MVVM vs MVI: Which Android Architecture Should You Use?</h1>
+    <p class="ad-lede">MVVM and MVI both put a ViewModel between your UI and your data, and in Compose apps they look more alike than most blog posts admit. Here's exactly where they differ, the same screen in both styles, and how to choose.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>6 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#definitions">What MVVM and MVI actually mean on Android</a></li><li><a href="#example">One feature, two implementations</a></li><li><a href="#one-off-events">The hard part: one-off events</a></li><li><a href="#testing">Testing: where MVI shines</a></li><li><a href="#comparison">MVVM vs MVI at a glance</a></li><li><a href="#use-cases">When to use which: real scenarios</a></li><li><a href="#mistakes">Common mistakes with both patterns</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Ask five Android developers whether they use MVVM or MVI and you'll get five definitions. Some teams call any app with a ViewModel "MVVM". Others call any app with a <code>sealed class Intent</code> "MVI". The arguments are often about naming, not engineering.</p>
+<p>This article cuts through that. It's for intermediate developers who already know ViewModels and StateFlow and want to decide how to structure screen logic. You'll see the precise difference between the two patterns, the same feature implemented both ways, how each handles one-off events such as navigation and snackbars, and how they affect testing.</p>
+
+<h2 id="definitions">What MVVM and MVI actually mean on Android</h2>
+<h3 id="mvvm">MVVM (Model–View–ViewModel)</h3>
+<p>The <strong>View</strong> (Activity, Fragment or composable) observes state exposed by a <strong>ViewModel</strong>, and calls ViewModel functions in response to user actions. The <strong>Model</strong> is your data and business layer (repositories, use cases). In modern Android MVVM, the ViewModel usually exposes a single <code>StateFlow&lt;UiState&gt;</code> and public functions like <code>onSearchChange(query)</code> or <code>retry()</code>.</p>
+<h3 id="mvi">MVI (Model–View–Intent)</h3>
+<p>MVI makes the flow even stricter. Every user action is an <strong>Intent</strong> (an object, not a function call; unrelated to Android's <code>Intent</code> class). All intents go through <strong>one entry point</strong>. State changes happen in a <strong>reducer</strong>, a pure function <code>(oldState, result) -&gt; newState</code>. The View renders one immutable <strong>state</strong> object.</p>
+
+<div class="note"><b>The honest overlap</b>
+<p>Google's recommended architecture, a ViewModel exposing immutable UI state through <code>StateFlow</code> with events flowing up from the UI, is already <em>unidirectional data flow</em>. MVVM done this way is very close to MVI. The real difference is <strong>how strictly you formalise intents and state transitions</strong>.</p></div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mvi-cap">
+  <svg viewBox="0 0 720 300" role="img" aria-labelledby="fig-mvi-title fig-mvi-desc">
+    <title id="fig-mvi-title">MVVM and MVI data flow compared</title>
+    <desc id="fig-mvi-desc">Top: in MVVM, the View calls several ViewModel functions, each updating a StateFlow that the View observes. Bottom: in MVI, the View sends Intent objects to a single process function; results pass through a reducer that produces a new State, which the View renders, and side effects go out through a separate effect channel.</desc>
+    <defs><marker id="m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">MVVM</text>
+    <rect class="d-blue" x="20" y="36" width="130" height="80" rx="12"/><text class="d-t" x="85" y="80" text-anchor="middle">View</text>
+    <rect class="d-violet" x="300" y="36" width="190" height="80" rx="12"/><text class="d-t" x="395" y="62" text-anchor="middle">ViewModel</text><text class="d-s" x="395" y="82" text-anchor="middle">onQueryChange() · retry()</text><text class="d-s" x="395" y="100" text-anchor="middle">onItemClick()</text>
+    <rect class="d-box" x="560" y="50" width="140" height="52" rx="12"/><text class="d-t" x="630" y="81" text-anchor="middle">StateFlow</text>
+    <path class="d-line" d="M150 60 H296" marker-end="url(#m1)"/><text class="d-s" x="222" y="54" text-anchor="middle">function calls</text>
+    <path class="d-line" d="M490 76 H556" marker-end="url(#m1)"/>
+    <path class="d-line" d="M630 102 V130 H85 V120" marker-end="url(#m1)"/><text class="d-s" x="360" y="146" text-anchor="middle">observe state</text>
+
+    <text class="d-t" x="20" y="180">MVI</text>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="194" width="110" height="70" rx="12"/><text class="d-t" x="75" y="234" text-anchor="middle">View</text></g>
+    <path class="d-flow" d="M130 214 H176" marker-end="url(#m1)"/><text class="d-s" x="153" y="206" text-anchor="middle">Intent</text>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="180" y="194" width="120" height="70" rx="12"/><text class="d-t" x="240" y="226" text-anchor="middle">process()</text><text class="d-s" x="240" y="244" text-anchor="middle">single entry</text></g>
+    <path class="d-flow" d="M300 229 H346" marker-end="url(#m1)"/>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="350" y="194" width="130" height="70" rx="12"/><text class="d-t" x="415" y="226" text-anchor="middle">reduce()</text><text class="d-s" x="415" y="244" text-anchor="middle">pure function</text></g>
+    <path class="d-flow" d="M480 229 H526" marker-end="url(#m1)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="530" y="194" width="110" height="70" rx="12"/><text class="d-t" x="585" y="234" text-anchor="middle">State</text></g>
+    <path class="d-flow" d="M585 264 V284 H75 V268" marker-end="url(#m1)"/>
+    <path class="d-dash" d="M240 194 V176 H660 V200" marker-end="url(#m1)"/><text class="d-s" x="660" y="216" text-anchor="middle">Effect</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M130 214 H180 L300 229 H585 V284 H75 V268');--dur:3.2s"/>
+  </svg>
+  <figcaption id="fig-mvi-cap">MVVM uses several entry points that update state. MVI routes everything through one entry point and a pure reducer, and sends one-off effects (navigation, toasts) through a separate channel.</figcaption>
+</figure>
+
+<h2 id="example">One feature, two implementations</h2>
+<p>The feature: a product search screen. The user types a query, results load after a short debounce, failures show an error with a retry button, and tapping a product navigates to its details. A shared repository interface keeps the comparison fair:</p>
+<figure class="code"><figcaption><span class="file">ProductRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Product</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> name: <span class="tk-t">String</span>, <span class="tk-k">val</span> price: <span class="tk-t">Double</span>)
+
+<span class="tk-k">interface</span> <span class="tk-t">ProductRepository</span> {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt;   <span class="tk-c">// throws IOException on network failure</span>
+}</code></pre></figure>
+
+<h3 id="mvvm-code">MVVM implementation</h3>
+<figure class="code"><figcaption><span class="file">SearchViewModel.kt (MVVM)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">SearchUiState</span>(
+    <span class="tk-k">val</span> query: <span class="tk-t">String</span> = <span class="tk-s">""</span>,
+    <span class="tk-k">val</span> isLoading: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> results: <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> error: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+)
+
+<span class="tk-k">class</span> <span class="tk-t">SearchViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">ProductRepository</span>) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _uiState = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">SearchUiState</span>())
+    <span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SearchUiState</span>&gt; = _uiState.asStateFlow()
+
+    <span class="tk-c">// One-off navigation events: buffered so they aren't lost, consumed once.</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _navigation = <span class="tk-t">Channel</span>&lt;<span class="tk-t">String</span>&gt;(<span class="tk-t">Channel</span>.<span class="tk-t">BUFFERED</span>)
+    <span class="tk-k">val</span> navigation: <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt; = _navigation.receiveAsFlow()
+
+    <span class="tk-k">private</span> <span class="tk-k">var</span> searchJob: <span class="tk-t">Job</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-k">fun</span> onQueryChange(query: <span class="tk-t">String</span>) {
+        _uiState.update { it.copy(query = query) }
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(<span class="tk-n">300</span>)                 <span class="tk-c">// debounce: only search after typing pauses</span>
+            search(query)
+        }
+    }
+
+    <span class="tk-k">fun</span> retry() {
+        viewModelScope.launch { search(_uiState.<span class="tk-k">value</span>.query) }
+    }
+
+    <span class="tk-k">fun</span> onProductClick(product: <span class="tk-t">Product</span>) {
+        viewModelScope.launch { _navigation.send(product.id) }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>) {
+        <span class="tk-k">if</span> (query.isBlank()) {
+            _uiState.update { it.copy(results = emptyList(), error = <span class="tk-k">null</span>, isLoading = <span class="tk-k">false</span>) }
+            <span class="tk-k">return</span>
+        }
+        _uiState.update { it.copy(isLoading = <span class="tk-k">true</span>, error = <span class="tk-k">null</span>) }
+        <span class="tk-k">try</span> {
+            <span class="tk-k">val</span> results = repository.search(query)
+            _uiState.update { it.copy(isLoading = <span class="tk-k">false</span>, results = results) }
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            _uiState.update { it.copy(isLoading = <span class="tk-k">false</span>, error = <span class="tk-s">"Couldn't load results. Check your connection."</span>) }
+        }
+    }
+}</code></pre></figure>
+<p>This is clear and idiomatic. Each user action has a named function, state is immutable, and it is easy to read top to bottom. The weakness shows up as screens grow. State changes are scattered across many functions, so understanding every way <code>isLoading</code> can change means reading the whole class.</p>
+
+<h3 id="mvi-code">MVI implementation</h3>
+<figure class="code"><figcaption><span class="file">SearchContract.kt (MVI)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Everything the user can do</span>
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SearchIntent</span> {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">QueryChanged</span>(<span class="tk-k">val</span> query: <span class="tk-t">String</span>) : <span class="tk-t">SearchIntent</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Retry</span> : <span class="tk-t">SearchIntent</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ProductClicked</span>(<span class="tk-k">val</span> product: <span class="tk-t">Product</span>) : <span class="tk-t">SearchIntent</span>
+}
+
+<span class="tk-c">// Everything that can happen as a result (internal to the ViewModel)</span>
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SearchResult</span> {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">QueryUpdated</span>(<span class="tk-k">val</span> query: <span class="tk-t">String</span>) : <span class="tk-t">SearchResult</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Loading</span> : <span class="tk-t">SearchResult</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Loaded</span>(<span class="tk-k">val</span> products: <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt;) : <span class="tk-t">SearchResult</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Failed</span>(<span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">SearchResult</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Cleared</span> : <span class="tk-t">SearchResult</span>
+}
+
+<span class="tk-c">// One-off effects the UI should perform exactly once</span>
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SearchEffect</span> {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">OpenProduct</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>) : <span class="tk-t">SearchEffect</span>
+}
+
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">SearchState</span>(
+    <span class="tk-k">val</span> query: <span class="tk-t">String</span> = <span class="tk-s">""</span>,
+    <span class="tk-k">val</span> isLoading: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> results: <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> error: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+)
+
+<span class="tk-c">// Pure: no coroutines, no repository, trivially unit-testable.</span>
+<span class="tk-k">fun</span> reduce(state: <span class="tk-t">SearchState</span>, result: <span class="tk-t">SearchResult</span>): <span class="tk-t">SearchState</span> = <span class="tk-k">when</span> (result) {
+    <span class="tk-k">is</span> <span class="tk-t">SearchResult</span>.<span class="tk-t">QueryUpdated</span> -&gt; state.copy(query = result.query)
+    <span class="tk-t">SearchResult</span>.<span class="tk-t">Loading</span> -&gt; state.copy(isLoading = <span class="tk-k">true</span>, error = <span class="tk-k">null</span>)
+    <span class="tk-k">is</span> <span class="tk-t">SearchResult</span>.<span class="tk-t">Loaded</span> -&gt; state.copy(isLoading = <span class="tk-k">false</span>, results = result.products)
+    <span class="tk-k">is</span> <span class="tk-t">SearchResult</span>.<span class="tk-t">Failed</span> -&gt; state.copy(isLoading = <span class="tk-k">false</span>, error = result.message)
+    <span class="tk-t">SearchResult</span>.<span class="tk-t">Cleared</span> -&gt; state.copy(isLoading = <span class="tk-k">false</span>, results = emptyList(), error = <span class="tk-k">null</span>)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">SearchMviViewModel.kt (MVI)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SearchMviViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">ProductRepository</span>) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _state = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">SearchState</span>())
+    <span class="tk-k">val</span> state: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SearchState</span>&gt; = _state.asStateFlow()
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _effects = <span class="tk-t">Channel</span>&lt;<span class="tk-t">SearchEffect</span>&gt;(<span class="tk-t">Channel</span>.<span class="tk-t">BUFFERED</span>)
+    <span class="tk-k">val</span> effects: <span class="tk-t">Flow</span>&lt;<span class="tk-t">SearchEffect</span>&gt; = _effects.receiveAsFlow()
+
+    <span class="tk-k">private</span> <span class="tk-k">var</span> searchJob: <span class="tk-t">Job</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-c">// The single entry point for everything the UI does.</span>
+    <span class="tk-k">fun</span> process(intent: <span class="tk-t">SearchIntent</span>) {
+        <span class="tk-k">when</span> (intent) {
+            <span class="tk-k">is</span> <span class="tk-t">SearchIntent</span>.<span class="tk-t">QueryChanged</span> -&gt; {
+                emit(<span class="tk-t">SearchResult</span>.<span class="tk-t">QueryUpdated</span>(intent.query))
+                searchJob?.cancel()
+                searchJob = viewModelScope.launch {
+                    delay(<span class="tk-n">300</span>)
+                    search(intent.query)
+                }
+            }
+            <span class="tk-t">SearchIntent</span>.<span class="tk-t">Retry</span> -&gt; viewModelScope.launch { search(_state.<span class="tk-k">value</span>.query) }
+            <span class="tk-k">is</span> <span class="tk-t">SearchIntent</span>.<span class="tk-t">ProductClicked</span> -&gt;
+                viewModelScope.launch { _effects.send(<span class="tk-t">SearchEffect</span>.<span class="tk-t">OpenProduct</span>(intent.product.id)) }
+        }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>) {
+        <span class="tk-k">if</span> (query.isBlank()) <span class="tk-k">return</span> emit(<span class="tk-t">SearchResult</span>.<span class="tk-t">Cleared</span>)
+        emit(<span class="tk-t">SearchResult</span>.<span class="tk-t">Loading</span>)
+        <span class="tk-k">try</span> {
+            emit(<span class="tk-t">SearchResult</span>.<span class="tk-t">Loaded</span>(repository.search(query)))
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            emit(<span class="tk-t">SearchResult</span>.<span class="tk-t">Failed</span>(<span class="tk-s">"Couldn't load results. Check your connection."</span>))
+        }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> emit(result: <span class="tk-t">SearchResult</span>) = _state.update { reduce(it, result) }
+}</code></pre></figure>
+<p>It's more code. In return, every possible state transition is listed in one <code>when</code> expression, the reducer can be tested without coroutines, and you could log every intent and result to reconstruct exactly how a user reached a buggy state.</p>
+
+<h3 id="compose-ui">The Compose UI barely changes</h3>
+<figure class="code"><figcaption><span class="file">SearchScreen.kt (MVI version)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">SearchScreen</span>(
+    viewModel: <span class="tk-t">SearchMviViewModel</span>,
+    onOpenProduct: (<span class="tk-t">String</span>) -&gt; <span class="tk-t">Unit</span>,
+) {
+    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.state.collectAsStateWithLifecycle()
+    <span class="tk-k">val</span> lifecycleOwner = <span class="tk-t">LocalLifecycleOwner</span>.current
+
+    <span class="tk-c">// Collect one-off effects only while the screen is visible.</span>
+    <span class="tk-t">LaunchedEffect</span>(viewModel, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(<span class="tk-t">Lifecycle</span>.<span class="tk-t">State</span>.<span class="tk-t">STARTED</span>) {
+            viewModel.effects.collect { effect -&gt;
+                <span class="tk-k">when</span> (effect) {
+                    <span class="tk-k">is</span> <span class="tk-t">SearchEffect</span>.<span class="tk-t">OpenProduct</span> -&gt; onOpenProduct(effect.id)
+                }
+            }
+        }
+    }
+
+    <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.fillMaxSize().padding(<span class="tk-n">16</span>.dp)) {
+        <span class="tk-t">OutlinedTextField</span>(
+            <span class="tk-k">value</span> = state.query,
+            onValueChange = { viewModel.process(<span class="tk-t">SearchIntent</span>.<span class="tk-t">QueryChanged</span>(it)) },
+            label = { <span class="tk-t">Text</span>(<span class="tk-s">"Search products"</span>) },
+            modifier = <span class="tk-t">Modifier</span>.fillMaxWidth(),
+        )
+        <span class="tk-k">when</span> {
+            state.isLoading -&gt; <span class="tk-t">CircularProgressIndicator</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">24</span>.dp))
+            state.error != <span class="tk-k">null</span> -&gt; <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.padding(top = <span class="tk-n">16</span>.dp)) {
+                <span class="tk-t">Text</span>(state.error!!, color = <span class="tk-t">MaterialTheme</span>.colorScheme.error)
+                <span class="tk-t">TextButton</span>(onClick = { viewModel.process(<span class="tk-t">SearchIntent</span>.<span class="tk-t">Retry</span>) }) { <span class="tk-t">Text</span>(<span class="tk-s">"Retry"</span>) }
+            }
+            <span class="tk-k">else</span> -&gt; <span class="tk-t">LazyColumn</span> {
+                items(state.results, key = { it.id }) { product -&gt;
+                    <span class="tk-t">ListItem</span>(
+                        headlineContent = { <span class="tk-t">Text</span>(product.name) },
+                        supportingContent = { <span class="tk-t">Text</span>(<span class="tk-s">"₹%.2f"</span>.format(product.price)) },
+                        modifier = <span class="tk-t">Modifier</span>.clickable { viewModel.process(<span class="tk-t">SearchIntent</span>.<span class="tk-t">ProductClicked</span>(product)) },
+                    )
+                }
+            }
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="one-off-events">The hard part: one-off events</h2>
+<p>Navigation, snackbars and toasts are the classic pain point in both patterns. If you store "navigate to product 42" in state, rotating the device may navigate again. If you use a hot <code>SharedFlow</code> without a buffer, events emitted while the UI isn't collecting are lost. Teams typically choose one of two approaches:</p>
+<ul>
+  <li><strong>A buffered <code>Channel</code> exposed as a Flow</strong>, as in the examples above, collected with <code>repeatOnLifecycle</code>. Simple and widely used. In rare edge cases an event can still be dropped if it is delivered exactly as the collector is cancelled, so keep effects idempotent and non-critical.</li>
+  <li><strong>Model the event as state and "consume" it.</strong> Store, for example, <code>userMessage: String?</code> in UI state and call <code>onMessageShown()</code> after displaying it. This is the approach Android's architecture guidance recommends, because state can't be lost.</li>
+</ul>
+<p>Whichever you choose, choose it <em>once</em> for the whole codebase.</p>
+
+<h2 id="testing">Testing: where MVI shines</h2>
+<figure class="code"><figcaption><span class="file">SearchReducerTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SearchReducerTest</span> {
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `failure stops loading and shows error`() {
+        <span class="tk-k">val</span> loading = <span class="tk-t">SearchState</span>(query = <span class="tk-s">"phone"</span>, isLoading = <span class="tk-k">true</span>)
+        <span class="tk-k">val</span> result = reduce(loading, <span class="tk-t">SearchResult</span>.<span class="tk-t">Failed</span>(<span class="tk-s">"offline"</span>))
+        assertFalse(result.isLoading)
+        assertEquals(<span class="tk-s">"offline"</span>, result.error)
+        assertEquals(<span class="tk-s">"phone"</span>, result.query)   <span class="tk-c">// unrelated fields untouched</span>
+    }
+}</code></pre></figure>
+<p>Reducer tests are plain JUnit: no dispatchers, no fakes, no waiting. MVVM ViewModels are also very testable with <code>runTest</code> and a fake repository, but you test transitions <em>through</em> the async code rather than in isolation.</p>
+
+<h2 id="comparison">MVVM vs MVI at a glance</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>MVVM (with UDF)</th><th>MVI</th></tr></thead>
+  <tbody>
+    <tr><td>User actions</td><td>Public functions</td><td>Sealed Intent objects, one entry point</td></tr>
+    <tr><td>State updates</td><td>Anywhere in the ViewModel</td><td>Only via a reducer</td></tr>
+    <tr><td>Boilerplate</td><td>Low</td><td>Medium–high (Intent, Result, Effect, State)</td></tr>
+    <tr><td>Traceability</td><td>Good</td><td>Excellent: every transition is enumerable and loggable</td></tr>
+    <tr><td>Learning curve</td><td>Gentle</td><td>Steeper; teams need shared conventions</td></tr>
+    <tr><td>Best for</td><td>Most screens, CRUD apps, small and medium teams</td><td>Complex, highly interactive screens; large teams wanting strict consistency</td></tr>
+    <tr><td>Risk</td><td>State logic gets scattered as screens grow</td><td>Ceremony on simple screens; over-engineering</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">When to use which: real scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Settings or profile screen</h3><p><strong>MVVM.</strong> A handful of actions and simple state. MVI's Intent/Result layers would add files without adding clarity.</p></div>
+  <div class="card usecase"><h3>Checkout, chat or editor</h3><p><strong>MVI.</strong> Many interacting events (payment status, validation, retries, real-time updates) where an explicit reducer prevents impossible state combinations.</p></div>
+  <div class="card usecase"><h3>Mixed codebase, many teams</h3><p><strong>MVVM with UDF rules as the baseline</strong>, and MVI-style reducers allowed for complex screens. Consistency of state exposure matters more than the label.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes with both patterns</h2>
+<ul>
+  <li><strong>Multiple mutable state streams</strong> (<code>isLoading</code>, <code>results</code>, <code>error</code> as separate flows). They can disagree with each other. Prefer one immutable state object per screen.</li>
+  <li><strong>Exposing <code>MutableStateFlow</code></strong> publicly. The UI could then mutate state, which breaks unidirectional flow.</li>
+  <li><strong>Side effects inside the reducer</strong>, such as network calls, logging or navigation. Reducers must be pure.</li>
+  <li><strong>Passing Context or Views into the ViewModel</strong>, which leaks Activities across configuration changes.</li>
+  <li><strong>Choosing MVI for the résumé</strong> rather than for the screen's complexity.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is MVI better than MVVM?</summary><div><p>Neither is universally better. MVI gives stricter, more traceable state transitions at the cost of boilerplate. MVVM with a single immutable state is simpler and sufficient for most screens.</p></div></details>
+  <details><summary>Does Google recommend MVVM or MVI?</summary><div><p>Google's architecture guide doesn't mandate either name. It recommends state holders (usually ViewModels) exposing immutable UI state with unidirectional data flow. Both patterns can follow that guidance.</p></div></details>
+  <details><summary>Do I need a library for MVI?</summary><div><p>No. As shown above, Kotlin sealed types, StateFlow and a reducer function are enough. Libraries can add conventions and tooling, but also dependencies to maintain.</p></div></details>
+  <details><summary>Can I mix MVVM and MVI in one app?</summary><div><p>Yes, as long as the team agrees where each is used. A common approach is MVVM by default, with reducers for complex screens.</p></div></details>
+  <details><summary>Where do use cases fit?</summary><div><p>Use cases belong to an optional domain layer below the ViewModel. They are independent of whether the ViewModel follows MVVM or MVI. See <a href="../clean-architecture-android/index.html">Clean Architecture in Android</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>MVVM and MVI aren't rival philosophies. They are two levels of strictness on the same unidirectional data flow. Start with <strong>MVVM and a single immutable UI state</strong>. Move to <strong>MVI's intents and reducers</strong> when a screen's state transitions get hard to reason about, and agree on one approach to one-off events across the whole team.</p>
+<p>Next step: take one of your existing ViewModels and list every way its state can change. If the list is short, MVVM is serving you well. If it's long and scattered, extract a reducer. Then read <a href="../clean-architecture-android/index.html">Clean Architecture in Android: Practical Lessons</a> to structure the layers beneath the ViewModel.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li><li><a href="https://developer.android.com/topic/architecture/ui-layer" target="_blank" rel="noopener">UI layer: state holders and UI state</a></li><li><a href="https://developer.android.com/topic/architecture/ui-layer/events" target="_blank" rel="noopener">UI events</a></li><li><a href="https://developer.android.com/kotlin/flow/stateflow-and-sharedflow" target="_blank" rel="noopener">StateFlow and SharedFlow</a></li><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing Kotlin coroutines on Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmvi-vs-mvvm-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmvi-vs-mvvm-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/clean-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Clean Architecture in Android: Practical Lessons</a></li><li><a href="../../android/jetpack-compose-vs-xml/index.html"><small>Jetpack Compose</small>Jetpack Compose vs XML: Which Should You Learn?</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li><li><a href="../../android/android-developer-roadmap-beginners/index.html"><small>Android Development for Beginners</small>Android Development Roadmap for Beginners in 2026</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/mvi-vs-mvvm-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/mvi-vs-mvvm-android/&amp;text=MVVM vs MVI: Which Android Architecture Should You Use?" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/mvi-vs-mvvm-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#definitions">What MVVM and MVI actually mean on Android</a></li><li><a href="#example">One feature, two implementations</a></li><li><a href="#one-off-events">The hard part: one-off events</a></li><li><a href="#testing">Testing: where MVI shines</a></li><li><a href="#comparison">MVVM vs MVI at a glance</a></li><li><a href="#use-cases">When to use which: real scenarios</a></li><li><a href="#mistakes">Common mistakes with both patterns</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmvi-vs-mvvm-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmvi-vs-mvvm-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

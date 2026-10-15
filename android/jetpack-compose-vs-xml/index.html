@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jetpack Compose vs XML: Which Should You Learn? | Yunok Tech</title>
+  <meta name="description" content="Jetpack Compose vs XML layouts compared: mental model, code, state, performance, interop and migration, with clear advice for beginners and existing apps.">
+  <meta name="keywords" content="jetpack compose vs xml, compose vs xml views, should i learn jetpack compose or xml, jetpack compose advantages, migrate xml to compose, ComposeView AndroidView interop, declarative ui android, recomposition explained">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/jetpack-compose-vs-xml/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/jetpack-compose-vs-xml/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Jetpack Compose vs XML: Which Should You Learn?">
+  <meta property="og:description" content="Jetpack Compose vs XML layouts compared: mental model, code, state, performance, interop and migration, with clear advice for beginners and existing apps.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Jetpack Compose vs XML: Which Should You Learn?">
+  <meta name="twitter:description" content="Jetpack Compose vs XML layouts compared: mental model, code, state, performance, interop and migration, with clear advice for beginners and existing apps.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Jetpack Compose vs XML: Which Should You Learn?", "description": "Jetpack Compose vs XML layouts compared: mental model, code, state, performance, interop and migration, with clear advice for beginners and existing apps.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Jetpack Compose", "keywords": "compose vs xml views, should i learn jetpack compose or xml, jetpack compose advantages, migrate xml to compose, ComposeView AndroidView interop, declarative ui android, recomposition explained", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/jetpack-compose-vs-xml/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Jetpack Compose vs XML: Which Should You Learn?", "item": "https://yunoktech.com/android/jetpack-compose-vs-xml/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Jetpack Compose vs XML: Which Should You Learn?</h1>
+    <p class="ad-lede">Compose and XML Views both build Android UIs, but they think about UI in opposite ways. This guide shows the same screen in both, explains recomposition, covers performance and interop, and tells you which to learn first.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>6 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#quick-verdict">Quick verdict</a></li><li><a href="#mental-model">Imperative vs declarative: the core difference</a></li><li><a href="#same-screen">The same screen, built both ways</a></li><li><a href="#comparison">Compose vs XML comparison table</a></li><li><a href="#performance">Performance: what&#x27;s actually true</a></li><li><a href="#interop">Interop: you don&#x27;t have to choose all-or-nothing</a></li><li><a href="#use-cases">Real-world decisions</a></li><li><a href="#migration-steps">A practical migration path from XML to Compose</a></li><li><a href="#mistakes">Common mistakes when moving to Compose</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">If you open a five-year-old Android project, you'll find <code>activity_main.xml</code>, <code>findViewById</code> or View Binding, RecyclerView adapters and Fragments. Open a project started recently and you'll likely see <code>@Composable</code> functions and no layout XML at all. Both are "Android UI", but they work very differently.</p>
+<p>This article is for beginners deciding what to learn and for developers on XML-based apps deciding whether and how to adopt Compose. You'll see the same screen built both ways, understand <em>why</em> Compose behaves as it does, and get a realistic view of performance, interop and migration.</p>
+
+<h2 id="quick-verdict">Quick verdict</h2>
+<div class="key"><b>Which should you learn?</b>
+<p><strong>Learn Jetpack Compose first.</strong> Google recommends it for new Android UI, new Material 3 components and adaptive layout APIs are Compose-first, and it requires less code for most screens. <strong>Learn enough XML to maintain existing screens</strong>, because many production apps are partly migrated and will be for years.</p></div>
+
+<h2 id="mental-model">Imperative vs declarative: the core difference</h2>
+<p>With <strong>XML Views</strong> you build a tree of View objects once (by inflating XML), then <em>mutate</em> them over time: <code>textView.text = ...</code>, <code>button.isEnabled = false</code>, <code>progress.visibility = View.GONE</code>. Your code is responsible for keeping every view consistent with the data. This is <em>imperative</em> UI.</p>
+<p>With <strong>Compose</strong> you write functions that <em>describe</em> the UI for the current state. When state changes, Compose calls the affected functions again. This is called <strong>recomposition</strong>. It then updates only what changed. You never call setters on widgets. This is <em>declarative</em> UI: <code>UI = f(state)</code>.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-recomp-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-recomp-title fig-recomp-desc">
+    <title id="fig-recomp-title">Imperative View updates compared with Compose recomposition</title>
+    <desc id="fig-recomp-desc">Top: with Views, an event leads your code to manually update a TextView, a Button and a ProgressBar. Bottom: with Compose, an event changes state, Compose re-runs the composables that read that state, and the screen updates.</desc>
+    <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">XML Views (imperative)</text>
+    <rect class="d-amber" x="20" y="36" width="120" height="50" rx="10"/><text class="d-t" x="80" y="66" text-anchor="middle">Event</text>
+    <path class="d-line" d="M140 61 H180" marker-end="url(#c1)"/>
+    <rect class="d-box" x="184" y="36" width="170" height="50" rx="10"/><text class="d-s" x="269" y="58" text-anchor="middle">your code mutates</text><text class="d-s" x="269" y="74" text-anchor="middle">each view by hand</text>
+    <path class="d-line" d="M354 50 H400 M354 61 H400 M354 72 H400" marker-end="url(#c1)"/>
+    <rect class="d-box" x="404" y="30" width="96" height="22" rx="6"/><text class="d-s" x="452" y="45" text-anchor="middle">textView.text</text>
+    <rect class="d-box" x="404" y="54" width="96" height="22" rx="6"/><text class="d-s" x="452" y="69" text-anchor="middle">button.enabled</text>
+    <rect class="d-box" x="404" y="78" width="96" height="22" rx="6"/><text class="d-s" x="452" y="93" text-anchor="middle">progress.visible</text>
+    <text class="d-s" x="520" y="66">easy to forget one → inconsistent UI</text>
+
+    <text class="d-t" x="20" y="146">Jetpack Compose (declarative)</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="160" width="120" height="50" rx="10"/><text class="d-t" x="80" y="190" text-anchor="middle">Event</text></g>
+    <path class="d-flow" d="M140 185 H180" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="184" y="160" width="140" height="50" rx="10"/><text class="d-t" x="254" y="182" text-anchor="middle">State changes</text><text class="d-s" x="254" y="199" text-anchor="middle">isLoading = true</text></g>
+    <path class="d-flow" d="M324 185 H364" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="368" y="160" width="160" height="50" rx="10"/><text class="d-t" x="448" y="182" text-anchor="middle">Recomposition</text><text class="d-s" x="448" y="199" text-anchor="middle">re-run readers of state</text></g>
+    <path class="d-flow" d="M528 185 H568" marker-end="url(#c1)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="572" y="160" width="130" height="50" rx="10"/><text class="d-t" x="637" y="182" text-anchor="middle">UI = f(state)</text><text class="d-s" x="637" y="199" text-anchor="middle">always consistent</text></g>
+    <circle class="d-dot" r="6" style="offset-path:path('M140 185 H572');--dur:2.4s"/>
+  </svg>
+  <figcaption id="fig-recomp-cap">With Views, consistency is your job. With Compose, the UI is derived from state, so a forgotten update can't leave a stale widget on screen.</figcaption>
+</figure>
+
+<h2 id="same-screen">The same screen, built both ways</h2>
+<p>Let's build a simple login form: email field, a button that is enabled only when the email looks valid, and a loading spinner while signing in.</p>
+
+<h3 id="xml-version">XML + View Binding version</h3>
+<figure class="code"><figcaption><span class="file">res/layout/activity_login.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;LinearLayout</span> <span class="tk-at">xmlns:android</span>=<span class="tk-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="tk-at">android:layout_width</span>=<span class="tk-s">"match_parent"</span>
+    <span class="tk-at">android:layout_height</span>=<span class="tk-s">"match_parent"</span>
+    <span class="tk-at">android:orientation</span>=<span class="tk-s">"vertical"</span>
+    <span class="tk-at">android:padding</span>=<span class="tk-s">"16dp"</span><span class="tk-tag">&gt;</span>
+
+    <span class="tk-tag">&lt;EditText</span>
+        <span class="tk-at">android:id</span>=<span class="tk-s">"@+id/emailInput"</span>
+        <span class="tk-at">android:layout_width</span>=<span class="tk-s">"match_parent"</span>
+        <span class="tk-at">android:layout_height</span>=<span class="tk-s">"wrap_content"</span>
+        <span class="tk-at">android:hint</span>=<span class="tk-s">"@string/email"</span>
+        <span class="tk-at">android:inputType</span>=<span class="tk-s">"textEmailAddress"</span> <span class="tk-tag">/&gt;</span>
+
+    <span class="tk-tag">&lt;Button</span>
+        <span class="tk-at">android:id</span>=<span class="tk-s">"@+id/signInButton"</span>
+        <span class="tk-at">android:layout_width</span>=<span class="tk-s">"match_parent"</span>
+        <span class="tk-at">android:layout_height</span>=<span class="tk-s">"wrap_content"</span>
+        <span class="tk-at">android:enabled</span>=<span class="tk-s">"false"</span>
+        <span class="tk-at">android:text</span>=<span class="tk-s">"@string/sign_in"</span> <span class="tk-tag">/&gt;</span>
+
+    <span class="tk-tag">&lt;ProgressBar</span>
+        <span class="tk-at">android:id</span>=<span class="tk-s">"@+id/progress"</span>
+        <span class="tk-at">android:layout_width</span>=<span class="tk-s">"wrap_content"</span>
+        <span class="tk-at">android:layout_height</span>=<span class="tk-s">"wrap_content"</span>
+        <span class="tk-at">android:layout_gravity</span>=<span class="tk-s">"center_horizontal"</span>
+        <span class="tk-at">android:visibility</span>=<span class="tk-s">"gone"</span> <span class="tk-tag">/&gt;</span>
+<span class="tk-tag">&lt;/LinearLayout</span><span class="tk-tag">&gt;</span></code></pre></figure>
+<figure class="code"><figcaption><span class="file">LoginActivity.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">LoginActivity</span> : <span class="tk-t">AppCompatActivity</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> binding: <span class="tk-t">ActivityLoginBinding</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> viewModel: <span class="tk-t">LoginViewModel</span> <span class="tk-k">by</span> viewModels()
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate(savedInstanceState: <span class="tk-t">Bundle</span>?) {
+        <span class="tk-k">super</span>.onCreate(savedInstanceState)
+        binding = <span class="tk-t">ActivityLoginBinding</span>.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.emailInput.doAfterTextChanged { viewModel.onEmailChange(it.toString()) }
+        binding.signInButton.setOnClickListener { viewModel.signIn() }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(<span class="tk-t">Lifecycle</span>.<span class="tk-t">State</span>.<span class="tk-t">STARTED</span>) {
+                viewModel.uiState.collect { state -&gt;
+                    <span class="tk-c">// Every view must be updated manually for every state.</span>
+                    binding.signInButton.isEnabled = state.canSubmit
+                    binding.progress.isVisible = state.isLoading
+                    binding.emailInput.isEnabled = !state.isLoading
+                }
+            }
+        }
+    }
+}</code></pre></figure>
+
+<h3 id="compose-version">Compose version</h3>
+<figure class="code"><figcaption><span class="file">LoginScreen.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">LoginScreen</span>(viewModel: <span class="tk-t">LoginViewModel</span> = viewModel()) {
+    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+    <span class="tk-t">LoginContent</span>(
+        state = state,
+        onEmailChange = viewModel::onEmailChange,
+        onSignIn = viewModel::signIn,
+    )
+}
+
+<span class="tk-c">// Stateless and previewable: everything it shows comes from parameters.</span>
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">LoginContent</span>(
+    state: <span class="tk-t">LoginUiState</span>,
+    onEmailChange: (<span class="tk-t">String</span>) -&gt; <span class="tk-t">Unit</span>,
+    onSignIn: () -&gt; <span class="tk-t">Unit</span>,
+    modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>,
+) {
+    <span class="tk-t">Column</span>(modifier.fillMaxSize().padding(<span class="tk-n">16</span>.dp)) {
+        <span class="tk-t">OutlinedTextField</span>(
+            <span class="tk-k">value</span> = state.email,
+            onValueChange = onEmailChange,
+            label = { <span class="tk-t">Text</span>(stringResource(<span class="tk-t">R</span>.string.email)) },
+            enabled = !state.isLoading,
+            keyboardOptions = <span class="tk-t">KeyboardOptions</span>(keyboardType = <span class="tk-t">KeyboardType</span>.<span class="tk-t">Email</span>),
+            modifier = <span class="tk-t">Modifier</span>.fillMaxWidth(),
+        )
+        <span class="tk-t">Button</span>(
+            onClick = onSignIn,
+            enabled = state.canSubmit,
+            modifier = <span class="tk-t">Modifier</span>.fillMaxWidth().padding(top = <span class="tk-n">8</span>.dp),
+        ) { <span class="tk-t">Text</span>(stringResource(<span class="tk-t">R</span>.string.sign_in)) }
+
+        <span class="tk-k">if</span> (state.isLoading) {
+            <span class="tk-t">CircularProgressIndicator</span>(<span class="tk-t">Modifier</span>.align(<span class="tk-t">Alignment</span>.<span class="tk-t">CenterHorizontally</span>).padding(top = <span class="tk-n">16</span>.dp))
+        }
+    }
+}
+
+<span class="tk-a">@Preview</span>(showBackground = <span class="tk-k">true</span>)
+<span class="tk-a">@Composable</span>
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">LoginPreview</span>() {
+    <span class="tk-t">LoginContent</span>(<span class="tk-t">LoginUiState</span>(email = <span class="tk-s">"dev@example.com"</span>, canSubmit = <span class="tk-k">true</span>), {}, {})
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">LoginViewModel.kt (shared by both versions)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">LoginUiState</span>(
+    <span class="tk-k">val</span> email: <span class="tk-t">String</span> = <span class="tk-s">""</span>,
+    <span class="tk-k">val</span> canSubmit: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> isLoading: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+)
+
+<span class="tk-k">class</span> <span class="tk-t">LoginViewModel</span> : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _uiState = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">LoginUiState</span>())
+    <span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">LoginUiState</span>&gt; = _uiState.asStateFlow()
+
+    <span class="tk-k">fun</span> onEmailChange(email: <span class="tk-t">String</span>) = _uiState.update {
+        it.copy(email = email, canSubmit = <span class="tk-t">Patterns</span>.<span class="tk-t">EMAIL_ADDRESS</span>.matcher(email).matches())
+    }
+
+    <span class="tk-k">fun</span> signIn() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = <span class="tk-k">true</span>) }
+            delay(<span class="tk-n">1_500</span>) <span class="tk-c">// stand-in for a real authentication call</span>
+            _uiState.update { it.copy(isLoading = <span class="tk-k">false</span>) }
+        }
+    }
+}</code></pre></figure>
+<p>The ViewModel is identical. That's a useful insight: <strong>good architecture is UI-toolkit independent</strong>. The difference is in the UI layer. The XML version spreads the UI across two files and requires manual syncing for every property. The Compose version keeps structure and behaviour together, and the <code>if (state.isLoading)</code> line <em>is</em> the visibility logic.</p>
+
+<h2 id="comparison">Compose vs XML comparison table</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Jetpack Compose</th><th>XML Views</th></tr></thead>
+  <tbody>
+    <tr><td>Paradigm</td><td>Declarative, UI = f(state)</td><td>Imperative, mutate view objects</td></tr>
+    <tr><td>Language</td><td>Kotlin only</td><td>XML + Kotlin or Java</td></tr>
+    <tr><td>Lists</td><td><code>LazyColumn</code>, a few lines</td><td>RecyclerView + Adapter + ViewHolder + DiffUtil</td></tr>
+    <tr><td>Custom components</td><td>A function</td><td>Custom View class, attrs.xml, measure/draw overrides</td></tr>
+    <tr><td>Animations</td><td><code>animate*AsState</code>, <code>AnimatedVisibility</code></td><td>Animators, transitions, MotionLayout</td></tr>
+    <tr><td>Previews</td><td>@Preview with any state you pass</td><td>Layout editor, limited for dynamic state</td></tr>
+    <tr><td>Theming</td><td>MaterialTheme in Kotlin, dynamic color</td><td>XML themes and styles</td></tr>
+    <tr><td>Testing</td><td>Semantics-based Compose test APIs</td><td>Espresso</td></tr>
+    <tr><td>Maturity</td><td>Stable since 2021, very active development</td><td>Over 15 years mature, stable, in maintenance</td></tr>
+    <tr><td>Where you'll see it</td><td>New apps and new screens</td><td>Existing apps and older tutorials</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="performance">Performance: what's actually true</h2>
+<p>Both can produce smooth, 60fps-or-better UIs, and both can be made slow. The failure modes are different:</p>
+<ul>
+  <li><strong>XML</strong> problems are usually deep or nested layouts causing expensive measure passes, overdraw, and inefficient RecyclerView adapters.</li>
+  <li><strong>Compose</strong> problems are usually <em>unnecessary recomposition</em>: reading rapidly changing state too high in the tree, unstable parameters that prevent skipping, or heavy work inside composable bodies.</li>
+  <li><strong>Debug builds of Compose apps are noticeably slower</strong> than release builds, because of interpretation, debugging hooks and missing R8 optimisation. Always judge Compose performance on a release build, ideally with Baseline Profiles.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">Avoiding unnecessary recomposition</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// ❌ Reads scroll state on every frame at the top of the screen → whole screen recomposes while scrolling.</span>
+<span class="tk-k">val</span> showButton = listState.firstVisibleItemIndex &gt; <span class="tk-n">0</span>
+
+<span class="tk-c">// ✅ derivedStateOf only notifies readers when the boolean result actually changes.</span>
+<span class="tk-k">val</span> showButton <span class="tk-k">by</span> remember { derivedStateOf { listState.firstVisibleItemIndex &gt; <span class="tk-n">0</span> } }</code></pre></figure>
+
+<h2 id="interop">Interop: you don't have to choose all-or-nothing</h2>
+<p>Compose was designed for gradual adoption. You can put Compose inside a View hierarchy with <code>ComposeView</code>, and put a View inside Compose with <code>AndroidView</code>:</p>
+<figure class="code"><figcaption><span class="file">Compose inside an existing Fragment</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ProfileFragment</span> : <span class="tk-t">Fragment</span>() {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreateView(inflater: <span class="tk-t">LayoutInflater</span>, container: <span class="tk-t">ViewGroup</span>?, savedInstanceState: <span class="tk-t">Bundle</span>?): <span class="tk-t">View</span> =
+        <span class="tk-t">ComposeView</span>(requireContext()).apply {
+            <span class="tk-c">// Dispose the composition when the Fragment's view is destroyed.</span>
+            setViewCompositionStrategy(<span class="tk-t">ViewCompositionStrategy</span>.<span class="tk-t">DisposeOnViewTreeLifecycleDestroyed</span>)
+            setContent { <span class="tk-t">MaterialTheme</span> { <span class="tk-t">ProfileScreen</span>() } }
+        }
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">A classic View inside Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">LegacyChart</span>(points: <span class="tk-t">List</span>&lt;<span class="tk-t">Float</span>&gt;, modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>) {
+    <span class="tk-t">AndroidView</span>(
+        factory = { context -&gt; <span class="tk-t">LineChartView</span>(context) },   <span class="tk-c">// created once</span>
+        update = { view -&gt; view.setPoints(points) },         <span class="tk-c">// called when points change</span>
+        modifier = modifier,
+    )
+}</code></pre></figure>
+
+<h2 id="use-cases">Real-world decisions</h2>
+<div class="cards">
+  <div class="card usecase"><h3>New app, small team</h3><dl><dt>Situation</dt><dd>Greenfield product, Android only.</dd><dt>Choice</dt><dd>100% Compose.</dd><dt>Why</dt><dd>Less code, faster iteration with previews, modern components.</dd><dt>Trade-off</dt><dd>The team must learn state and recomposition properly to avoid performance traps.</dd></dl></div>
+  <div class="card usecase"><h3>Large XML app with a release every two weeks</h3><dl><dt>Situation</dt><dd>Hundreds of XML screens, active feature work.</dd><dt>Choice</dt><dd>New screens in Compose; migrate old screens only when redesigned.</dd><dt>Why</dt><dd>Interop allows incremental adoption with no feature freeze.</dd><dt>Trade-off</dt><dd>Two UI systems and two theming setups for a while; keep design tokens in sync.</dd></dl></div>
+  <div class="card usecase"><h3>Complex custom View already working</h3><dl><dt>Situation</dt><dd>A mature, tested custom chart or map View.</dd><dt>Choice</dt><dd>Keep it; wrap with <code>AndroidView</code> inside Compose screens.</dd><dt>Why</dt><dd>Rewriting working, complex drawing code adds risk without user benefit.</dd><dt>Trade-off</dt><dd>That component won't benefit from Compose tooling until rewritten.</dd></dl></div>
+</div>
+
+<h2 id="migration-steps">A practical migration path from XML to Compose</h2>
+<ol class="steps">
+  <li><strong>Set up Compose and a shared theme.</strong> Add the Compose BOM and create a Compose <code>MaterialTheme</code> that matches your XML theme's colours and typography.</li>
+  <li><strong>Build new screens in Compose</strong> and host them with <code>ComposeView</code> or in a Compose navigation graph.</li>
+  <li><strong>Migrate leaf components</strong> such as list items, cards and dialogs, starting with the simplest ones.</li>
+  <li><strong>Move whole screens</strong> when they're due for a redesign, keeping ViewModels unchanged.</li>
+  <li><strong>Finally migrate navigation</strong> to Navigation Compose once most screens are composables.</li>
+</ol>
+
+<h2 id="mistakes">Common mistakes when moving to Compose</h2>
+<ul>
+  <li><strong>Treating composables like Views</strong>: trying to hold references to them or "update" them. Change state instead.</li>
+  <li><strong>Doing work in the composable body</strong>: network calls, database queries or object allocation on every recomposition. Use the ViewModel, <code>remember</code>, or effects such as <code>LaunchedEffect</code>.</li>
+  <li><strong>Forgetting <code>remember</code></strong>: <code>var count = mutableStateOf(0)</code> without <code>remember</code> resets on every recomposition.</li>
+  <li><strong>Hoisting no state at all, or all of it.</strong> Keep UI-element state (an expanded flag) local, and keep screen/business state in the ViewModel.</li>
+  <li><strong>Judging performance in debug builds.</strong> Measure release builds.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is XML deprecated in Android?</summary><div><p>No. XML Views are still supported and used in many apps. Google's recommendation for <em>new</em> UI development is Compose, and new UI features tend to arrive in Compose first.</p></div></details>
+  <details><summary>Is Jetpack Compose production-ready?</summary><div><p>Yes. Compose has been stable since 2021 and is used in many large production apps. Like any toolkit, it needs correct state handling to perform well.</p></div></details>
+  <details><summary>Do I need to learn XML to get an Android job?</summary><div><p>Often yes, at least to read and maintain it, because many company codebases are mixed. Learn Compose deeply first and XML enough to work on existing screens.</p></div></details>
+  <details><summary>Does Compose increase APK size?</summary><div><p>Compose adds library code. With R8 shrinking in release builds, the impact is usually moderate, and migrating fully can offset it by removing View-based dependencies. Measure your own app with the APK Analyzer.</p></div></details>
+  <details><summary>Can Compose and XML share the same ViewModel?</summary><div><p>Yes. ViewModels don't depend on the UI toolkit, which is why the login example above reuses the same ViewModel for both versions.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>XML Views ask you to keep the UI in sync with data by hand. Compose derives the UI from state and keeps it in sync for you. For new work, that makes <strong>Compose the clear first choice</strong>. Your XML knowledge stays valuable for the many apps still in transition, and the interop APIs mean you never need a risky big-bang rewrite.</p>
+<p>Next step: build the login screen above in Compose, then add an error message to <code>LoginUiState</code> and display it. It's the simplest way to feel the declarative model. Then read <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a> to see how that state should be structured as screens grow.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/compose" target="_blank" rel="noopener">Jetpack Compose overview</a></li><li><a href="https://developer.android.com/develop/ui/compose/mental-model" target="_blank" rel="noopener">Thinking in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/migrate/interoperability-apis" target="_blank" rel="noopener">Interoperability APIs (Compose in Views, Views in Compose)</a></li><li><a href="https://developer.android.com/develop/ui/compose/migrate/strategy" target="_blank" rel="noopener">Migration strategy to Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/performance/bestpractices" target="_blank" rel="noopener">Compose performance best practices</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djetpack-compose-vs-xml-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djetpack-compose-vs-xml-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-developer-roadmap-beginners/index.html"><small>Android Development for Beginners</small>Android Development Roadmap for Beginners in 2026</a></li><li><a href="../../android/mvi-vs-mvvm-android/index.html"><small>Android Architecture and Clean Code</small>MVVM vs MVI: Which Android Architecture Should You Use?</a></li><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/jetpack-compose-vs-xml/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/jetpack-compose-vs-xml/&amp;text=Jetpack Compose vs XML: Which Should You Learn?" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/jetpack-compose-vs-xml/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#quick-verdict">Quick verdict</a></li><li><a href="#mental-model">Imperative vs declarative: the core difference</a></li><li><a href="#same-screen">The same screen, built both ways</a></li><li><a href="#comparison">Compose vs XML comparison table</a></li><li><a href="#performance">Performance: what&#x27;s actually true</a></li><li><a href="#interop">Interop: you don&#x27;t have to choose all-or-nothing</a></li><li><a href="#use-cases">Real-world decisions</a></li><li><a href="#migration-steps">A practical migration path from XML to Compose</a></li><li><a href="#mistakes">Common mistakes when moving to Compose</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djetpack-compose-vs-xml-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djetpack-compose-vs-xml-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

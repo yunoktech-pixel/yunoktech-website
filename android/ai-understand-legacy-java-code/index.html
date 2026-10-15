@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Using AI to Understand Legacy Java Android Code | Yunok Tech</title>
+  <meta name="description" content="Use AI assistants to understand legacy Java Android code: mapping modules, explaining classes and flows, finding risks, drafting characterization tests and planning safe Kotlin migration.">
+  <meta name="keywords" content="ai understand legacy code android, legacy java android ai, explain code with ai, ai codebase onboarding, java to kotlin ai, characterization tests ai, asynctask migration ai">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-understand-legacy-java-code/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-understand-legacy-java-code/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Using AI to Understand Legacy Java Android Code">
+  <meta property="og:description" content="Use AI assistants to understand legacy Java Android code: mapping modules, explaining classes and flows, finding risks, drafting characterization tests and planning safe Kotlin migration.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="AI Tools for Android Developers">
+  <meta name="twitter:title" content="Using AI to Understand Legacy Java Android Code">
+  <meta name="twitter:description" content="Use AI assistants to understand legacy Java Android code: mapping modules, explaining classes and flows, finding risks, drafting characterization tests and planning safe Kotlin migration.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Using AI to Understand Legacy Java Code", "description": "Use AI assistants to understand legacy Java Android code: mapping modules, explaining classes and flows, finding risks, drafting characterization tests and planning safe Kotlin migration.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "AI Tools for Android Developers", "keywords": "legacy java android ai, explain code with ai, ai codebase onboarding, java to kotlin ai, characterization tests ai, asynctask migration ai", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-understand-legacy-java-code/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Using AI to Understand Legacy Java Code", "item": "https://yunoktech.com/android/ai-understand-legacy-java-code/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-tools">AI Tools for Android Developers</a></nav>
+    <span class="ad-chip">🛠️ AI Tools for Android Developers</span>
+    <h1 id="article-title">Using AI to Understand Legacy Java Code</h1>
+    <p class="ad-lede">Joining a team with a ten-year-old Java Android app, 2,000-line Activities and no documentation is daunting. AI assistants can speed up comprehension dramatically, if you use them to build understanding rather than to rewrite blindly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#approach">A comprehension-first approach</a></li><li><a href="#prompts">Prompts for each step</a></li><li><a href="#verify">Verify what AI tells you</a></li><li><a href="#tests">Characterization tests with AI help</a></li><li><a href="#migrate">Then migrate safely</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Legacy code is code that works and that people are afraid to change. The fear comes from not knowing what it does or what depends on it. AI can explain code at the speed you can read, generate maps of flows, and draft tests that capture current behaviour.</p>
+
+<h2 id="approach">A comprehension-first approach</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-lc-t fig-lc-d">
+    <title id="fig-lc-t">Using AI to understand legacy code before changing it</title>
+    <desc id="fig-lc-d">First map the codebase at a high level, then trace one user flow end to end, then explain key classes and their side effects, then list risks and hidden dependencies, then capture behaviour with characterization tests, and only then refactor or migrate in small steps.</desc>
+    <defs><marker id="lcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H124 M224 70 H238 M338 70 H352 M452 70 H466 M566 70 H580" marker-end="url(#lcm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="100" height="60" rx="10"/><text class="d-t" x="60" y="74" text-anchor="middle">Map</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="128" y="40" width="96" height="60" rx="10"/><text class="d-t" x="176" y="66" text-anchor="middle">Trace</text><text class="d-s" x="176" y="84" text-anchor="middle">one flow</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="242" y="40" width="96" height="60" rx="10"/><text class="d-t" x="290" y="66" text-anchor="middle">Explain</text><text class="d-s" x="290" y="84" text-anchor="middle">classes</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="356" y="40" width="96" height="60" rx="10"/><text class="d-t" x="404" y="66" text-anchor="middle">Risks</text><text class="d-s" x="404" y="84" text-anchor="middle">hidden deps</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="470" y="40" width="96" height="60" rx="10"/><text class="d-t" x="518" y="66" text-anchor="middle">Capture</text><text class="d-s" x="518" y="84" text-anchor="middle">tests</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="10"/><text class="d-w" x="647" y="66" text-anchor="middle">Change</text><text class="d-w" x="647" y="84" text-anchor="middle">small steps</text></g>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Verify AI explanations by stepping through with the debugger.</text>
+  </svg>
+  <figcaption id="fig-lc-cap">Understanding before changing. AI accelerates each step, but the order matters.</figcaption>
+</figure>
+
+<h2 id="prompts">Prompts for each step</h2>
+<figure class="code"><figcaption><span class="file">1. Map</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Based on these files (manifest, build.gradle, package list), describe the app's main modules,
+entry points (Activities, Services, Receivers), networking and storage approach, and third-party SDKs.
+Flag anything deprecated (AsyncTask, Loaders, legacy support libraries).</code></pre></figure>
+<figure class="code"><figcaption><span class="file">2. Trace a flow</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Trace what happens from tapping "Place order" in CheckoutActivity to the confirmation screen:
+list each class/method in order, which thread it runs on, network calls, database writes and
+any static/global state touched. Mark places where errors are swallowed.</code></pre></figure>
+<figure class="code"><figcaption><span class="file">3-4. Explain and assess risk</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Explain OrderManager.java: responsibilities, inputs/outputs, side effects, thread safety.
+Then list risks if we change it: callers, static state, implicit ordering, reflection, and
+behaviour that tests should capture before refactoring.</code></pre></figure>
+
+<h2 id="verify">Verify what AI tells you</h2>
+<ul>
+  <li>Step through the traced flow with the <strong>debugger</strong>. AI can misread callbacks and dynamic dispatch.</li>
+  <li>Use Android Studio's <strong>Find Usages</strong> and call hierarchy to confirm dependencies.</li>
+  <li>Check runtime behaviour in Logcat. Legacy code often depends on side effects that static reading misses.</li>
+</ul>
+
+<h2 id="tests">Characterization tests with AI help</h2>
+<figure class="code"><figcaption><span class="file">Capturing current Java behaviour from Kotlin tests</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">LegacyDiscountCalculatorTest</span> {
+    <span class="tk-c">// Generated as drafts by AI from reading the Java source, then verified by running them.</span>
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> `discount above <span class="tk-n">100</span> percent <span class="tk-k">is</span> clamped to zero price`() {
+        assertEquals(<span class="tk-n">0.0</span>, <span class="tk-t">LegacyDiscountCalculator</span>.apply(<span class="tk-n">500.0</span>, <span class="tk-n">120</span>), <span class="tk-n">0.001</span>)
+    }
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> `negative price returns zero (legacy behaviour, keep <span class="tk-k">for</span> now)`() {
+        assertEquals(<span class="tk-n">0.0</span>, <span class="tk-t">LegacyDiscountCalculator</span>.apply(-<span class="tk-n">10.0</span>, <span class="tk-n">10</span>), <span class="tk-n">0.001</span>)
+    }
+}</code></pre></figure>
+<p>Characterization tests record what the code <em>does</em>, not what it <em>should</em> do. Confirm odd behaviours with the product team before "fixing" them.</p>
+
+<h2 id="migrate">Then migrate safely</h2>
+<ol class="steps">
+  <li>Convert one class to Kotlin (Android Studio's converter or AI), keeping behaviour identical.</li>
+  <li>Run the characterization tests, then improve idioms (nullability, data classes) in a separate commit.</li>
+  <li>Extract logic from Activities into ViewModels and repositories. See <a href="../refactor-legacy-android-apps/index.html">Refactoring Legacy Apps</a>.</li>
+</ol>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Onboarding</h3><p>New developers generate a codebase map and flow traces in their first week, verified with a mentor.</p></div>
+  <div class="card usecase"><h3>Bug fixing in unknown code</h3><p>Explain the module, add a characterization test, fix, keep the test.</p></div>
+  <div class="card usecase"><h3>Migration planning</h3><p>AI inventories deprecated APIs and risky classes to prioritise the roadmap.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I paste the whole codebase into an AI chat?</summary><div><p>Usually not effective, and possibly against policy. Use IDE-integrated tools with project context, focused on specific modules, and follow data-sharing rules.</p></div></details>
+  <details><summary>Is AI-converted Kotlin idiomatic?</summary><div><p>Often not. Expect <code>!!</code>, <code>lateinit</code> overuse and Java-style patterns. Convert first, then refactor idioms with tests in place.</p></div></details>
+  <details><summary>What if the AI explanation is wrong?</summary><div><p>That's why you verify with the debugger and tests. Treat explanations as hypotheses.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI turns legacy comprehension from weeks into days: <strong>map, trace, explain, assess risk and capture behaviour</strong>, all verified with the debugger and tests, before making small, safe changes.</p>
+<p>Next step: modernise the UI layer with <a href="../ai-migrate-xml-to-compose/index.html">AI-Assisted Migration from XML to Jetpack Compose</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/gemini/overview" target="_blank" rel="noopener">Gemini in Android Studio</a></li><li><a href="https://developer.android.com/kotlin/add-kotlin" target="_blank" rel="noopener">Add Kotlin to an existing app</a></li><li><a href="https://developer.android.com/kotlin/add-kotlin#convert" target="_blank" rel="noopener">Convert Java to Kotlin in Android Studio</a></li><li><a href="https://developer.android.com/training/testing/fundamentals" target="_blank" rel="noopener">Fundamentals of testing</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-understand-legacy-java-code-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-understand-legacy-java-code-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>AI coding tools multiply what you already know. The stronger your Kotlin, Compose and architecture foundation, the better you can judge, fix and ship what these tools suggest.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/refactor-legacy-android-apps/index.html"><small>Android Architecture and Clean Code</small>How to Refactor Legacy Android Applications</a></li><li><a href="../../android/migrate-legacy-android-modern-architecture/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Migrating Legacy Android Apps to Modern Architecture</a></li><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/ai-unit-test-generation-android/index.html"><small>AI Tools for Android Developers</small>AI-Assisted Unit Test Generation for Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-understand-legacy-java-code/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-understand-legacy-java-code/&amp;text=Using AI to Understand Legacy Java Code" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-understand-legacy-java-code/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#approach">A comprehension-first approach</a></li><li><a href="#prompts">Prompts for each step</a></li><li><a href="#verify">Verify what AI tells you</a></li><li><a href="#tests">Characterization tests with AI help</a></li><li><a href="#migrate">Then migrate safely</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-understand-legacy-java-code-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-understand-legacy-java-code-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

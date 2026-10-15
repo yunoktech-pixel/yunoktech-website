@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming AI Responses in Jetpack Compose (Kotlin) | Yunok Tech</title>
+  <meta name="description" content="Render streaming LLM responses in Jetpack Compose: UI state for streaming, appending chunks efficiently, auto-scroll, stop and retry, cancellation, markdown rendering, accessibility and testing.">
+  <meta name="keywords" content="streaming ai responses compose, stream llm response android, gemini generatecontentstream compose, chat ui auto scroll compose, cancel ai generation kotlin, typing effect compose, flow streaming viewmodel">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/streaming-ai-responses-compose/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/streaming-ai-responses-compose/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Streaming AI Responses in Jetpack Compose (Kotlin)">
+  <meta property="og:description" content="Render streaming LLM responses in Jetpack Compose: UI state for streaming, appending chunks efficiently, auto-scroll, stop and retry, cancellation, markdown rendering, accessibility and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Streaming AI Responses in Jetpack Compose (Kotlin)">
+  <meta name="twitter:description" content="Render streaming LLM responses in Jetpack Compose: UI state for streaming, appending chunks efficiently, auto-scroll, stop and retry, cancellation, markdown rendering, accessibility and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Streaming AI Responses in Jetpack Compose", "description": "Render streaming LLM responses in Jetpack Compose: UI state for streaming, appending chunks efficiently, auto-scroll, stop and retry, cancellation, markdown rendering, accessibility and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "stream llm response android, gemini generatecontentstream compose, chat ui auto scroll compose, cancel ai generation kotlin, typing effect compose, flow streaming viewmodel", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/streaming-ai-responses-compose/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Streaming AI Responses in Jetpack Compose", "item": "https://yunoktech.com/android/streaming-ai-responses-compose/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Streaming AI Responses in Jetpack Compose</h1>
+    <p class="ad-lede">Streaming makes AI feel fast: users see the first words in a fraction of a second instead of waiting for the full answer. Doing it well in Compose means modelling streaming state, appending efficiently, auto-scrolling politely, and letting users stop.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#states">Streaming states</a></li><li><a href="#viewmodel">ViewModel: accumulate and cancel</a></li><li><a href="#ui">Compose UI</a></li><li><a href="#scroll">Auto-scroll politely</a></li><li><a href="#performance">Performance tips</a></li><li><a href="#markdown">Markdown and partial content</a></li><li><a href="#testing">Testing</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A streamed response is a Flow of text chunks. The ViewModel accumulates them into UI state, and Compose renders the growing text. The details make the difference: what happens when users stop, rotate, scroll up or hit an error halfway.</p>
+
+<h2 id="states">Streaming states</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-str-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-str-t fig-str-d">
+    <title id="fig-str-t">State machine for a streamed response</title>
+    <desc id="fig-str-d">Idle moves to Waiting when the user sends. Waiting moves to Streaming when the first chunk arrives. Streaming moves to Done when the stream completes, Stopped when the user cancels, or Failed on error. Failed and Stopped can retry, returning to Waiting.</desc>
+    <defs><marker id="strm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 80 H156 M270 80 H306 M440 60 H516 M440 80 H516 M440 100 H516" marker-end="url(#strm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="55" width="100" height="50" rx="12"/><text class="d-t" x="70" y="85" text-anchor="middle">Idle</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="160" y="55" width="110" height="50" rx="12"/><text class="d-t" x="215" y="85" text-anchor="middle">Waiting</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="310" y="50" width="130" height="60" rx="12"/><text class="d-t" x="375" y="85" text-anchor="middle">Streaming</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="20" width="180" height="36" rx="10"/><text class="d-s" x="610" y="43" text-anchor="middle">Done</text>
+    <rect class="d-violet" x="520" y="62" width="180" height="36" rx="10"/><text class="d-s" x="610" y="85" text-anchor="middle">Stopped (partial kept)</text>
+    <rect class="d-red" x="520" y="104" width="180" height="36" rx="10"/><text class="d-s" x="610" y="127" text-anchor="middle">Failed (partial + retry)</text></g>
+    <text class="d-s" x="360" y="180" text-anchor="middle">Show "Stop" while Waiting/Streaming; "Retry" after Stopped/Failed.</text>
+  </svg>
+  <figcaption id="fig-str-cap">Model every state explicitly, including partial results.</figcaption>
+</figure>
+
+<h2 id="viewmodel">ViewModel: accumulate and cancel</h2>
+<figure class="code"><figcaption><span class="file">StreamingViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">ReplyState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Idle</span> : <span class="tk-t">ReplyState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Waiting</span> : <span class="tk-t">ReplyState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Streaming</span>(<span class="tk-k">val</span> text: <span class="tk-t">String</span>) : <span class="tk-t">ReplyState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Done</span>(<span class="tk-k">val</span> text: <span class="tk-t">String</span>) : <span class="tk-t">ReplyState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Stopped</span>(<span class="tk-k">val</span> text: <span class="tk-t">String</span>) : <span class="tk-t">ReplyState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Failed</span>(<span class="tk-k">val</span> partial: <span class="tk-t">String</span>, <span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">ReplyState</span>
+}
+
+<span class="tk-k">class</span> <span class="tk-t">StreamingViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> ai: <span class="tk-t">TextStreamer</span>) : <span class="tk-t">ViewModel</span>() {   <span class="tk-c">// TextStreamer: (String) -&gt; Flow&lt;String&gt;</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _state = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">ReplyState</span>&gt;(<span class="tk-t">ReplyState</span>.<span class="tk-t">Idle</span>)
+    <span class="tk-k">val</span> state: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">ReplyState</span>&gt; = _state.asStateFlow()
+
+    <span class="tk-k">private</span> <span class="tk-k">var</span> job: <span class="tk-t">Job</span>? = <span class="tk-k">null</span>
+    <span class="tk-k">private</span> <span class="tk-k">var</span> lastPrompt = <span class="tk-s">""</span>
+
+    <span class="tk-k">fun</span> send(prompt: <span class="tk-t">String</span>) {
+        lastPrompt = prompt
+        job?.cancel()
+        _state.<span class="tk-k">value</span> = <span class="tk-t">ReplyState</span>.<span class="tk-t">Waiting</span>
+        job = viewModelScope.launch {
+            <span class="tk-k">val</span> buffer = <span class="tk-t">StringBuilder</span>()
+            <span class="tk-k">try</span> {
+                ai.stream(prompt).collect { chunk -&gt;
+                    buffer.append(chunk)
+                    _state.<span class="tk-k">value</span> = <span class="tk-t">ReplyState</span>.<span class="tk-t">Streaming</span>(buffer.toString())
+                }
+                _state.<span class="tk-k">value</span> = <span class="tk-t">ReplyState</span>.<span class="tk-t">Done</span>(buffer.toString())
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">CancellationException</span>) {
+                _state.<span class="tk-k">value</span> = <span class="tk-t">ReplyState</span>.<span class="tk-t">Stopped</span>(buffer.toString())
+                <span class="tk-k">throw</span> e                                           <span class="tk-c">// always rethrow cancellation</span>
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">Exception</span>) {
+                _state.<span class="tk-k">value</span> = <span class="tk-t">ReplyState</span>.<span class="tk-t">Failed</span>(buffer.toString(), <span class="tk-s">"Response interrupted"</span>)
+            }
+        }
+    }
+
+    <span class="tk-k">fun</span> stop() { job?.cancel() }                <span class="tk-c">// cancels the Flow, which cancels the network call</span>
+    <span class="tk-k">fun</span> retry() = send(lastPrompt)
+}</code></pre></figure>
+<div class="callout tip"><b>Cancellation saves money</b><p>Cancelling the collecting coroutine cancels the underlying HTTP stream, so the provider stops generating (and billing) tokens. Make sure your client implementation propagates cancellation.</p></div>
+
+<h2 id="ui">Compose UI</h2>
+<figure class="code"><figcaption><span class="file">ReplyCard.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ReplyCard</span>(state: <span class="tk-t">ReplyState</span>, onStop: () -&gt; <span class="tk-t">Unit</span>, onRetry: () -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-k">val</span> text = <span class="tk-k">when</span> (state) {
+        <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Streaming</span> -&gt; state.text
+        <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Done</span> -&gt; state.text
+        <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Stopped</span> -&gt; state.text
+        <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Failed</span> -&gt; state.partial
+        <span class="tk-k">else</span> -&gt; <span class="tk-s">""</span>
+    }
+    <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.fillMaxWidth().padding(<span class="tk-n">16</span>.dp)) {
+        <span class="tk-k">when</span> (state) {
+            <span class="tk-t">ReplyState</span>.<span class="tk-t">Waiting</span> -&gt; <span class="tk-t">LinearProgressIndicator</span>(<span class="tk-t">Modifier</span>.fillMaxWidth())
+            <span class="tk-k">else</span> -&gt; <span class="tk-t">Text</span>(
+                text = text,
+                modifier = <span class="tk-t">Modifier</span>.semantics {
+                    <span class="tk-c">// Announce once when complete rather than on every chunk</span>
+                    <span class="tk-k">if</span> (state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Done</span>) liveRegion = <span class="tk-t">LiveRegionMode</span>.<span class="tk-t">Polite</span>
+                },
+            )
+        }
+        <span class="tk-t">Row</span>(<span class="tk-t">Modifier</span>.padding(top = <span class="tk-n">8</span>.dp), horizontalArrangement = <span class="tk-t">Arrangement</span>.spacedBy(<span class="tk-n">8</span>.dp)) {
+            <span class="tk-k">if</span> (state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Waiting</span> || state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Streaming</span>)
+                <span class="tk-t">OutlinedButton</span>(onClick = onStop) { <span class="tk-t">Text</span>(<span class="tk-s">"Stop"</span>) }
+            <span class="tk-k">if</span> (state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Failed</span> || state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Stopped</span>)
+                <span class="tk-t">TextButton</span>(onClick = onRetry) { <span class="tk-t">Text</span>(<span class="tk-s">"Retry"</span>) }
+        }
+        <span class="tk-k">if</span> (state <span class="tk-k">is</span> <span class="tk-t">ReplyState</span>.<span class="tk-t">Failed</span>) <span class="tk-t">Text</span>(state.message, color = <span class="tk-t">MaterialTheme</span>.colorScheme.error)
+    }
+}</code></pre></figure>
+
+<h2 id="scroll">Auto-scroll politely</h2>
+<p>In a chat list, follow the stream only if the user is already at the bottom. Don't yank them back while they're reading earlier messages:</p>
+<figure class="code"><figcaption><span class="file">Follow the stream</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> listState = rememberLazyListState()
+<span class="tk-k">val</span> atBottom <span class="tk-k">by</span> remember {
+    derivedStateOf {
+        <span class="tk-k">val</span> last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+        last == <span class="tk-k">null</span> || last.index &gt;= listState.layoutInfo.totalItemsCount - <span class="tk-n">1</span>
+    }
+}
+<span class="tk-t">LaunchedEffect</span>(lastMessageText.length) {
+    <span class="tk-k">if</span> (atBottom &amp;&amp; messages.isNotEmpty()) listState.scrollToItem(messages.lastIndex, <span class="tk-t">Int</span>.<span class="tk-t">MAX_VALUE</span> / <span class="tk-n">2</span>)
+}</code></pre></figure>
+
+<h2 id="performance">Performance tips</h2>
+<ul>
+  <li>Chunks can arrive many times per second. If rendering markdown is expensive, throttle updates (for example with <code>sample(50)</code>) or render plain text while streaming and format when done.</li>
+  <li>Use a <code>StringBuilder</code> in the ViewModel, not repeated string concatenation in composables.</li>
+  <li>Give list items stable keys.</li>
+</ul>
+
+<h2 id="markdown">Markdown and partial content</h2>
+<p>Models often emit markdown. Partial markdown (an unclosed code block) can render oddly mid-stream. Options: render plain text while streaming and markdown on Done, or use a renderer tolerant of incomplete input. Never render model output as HTML in a WebView without sanitisation.</p>
+
+<h2 id="testing">Testing</h2>
+<figure class="code"><figcaption><span class="file">StreamingViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> stop_keepsPartialText() = runTest {
+    <span class="tk-k">val</span> chunks = <span class="tk-t">Channel</span>&lt;<span class="tk-t">String</span>&gt;()
+    <span class="tk-k">val</span> vm = <span class="tk-t">StreamingViewModel</span>(<span class="tk-t">TextStreamer</span> { chunks.consumeAsFlow() })
+    vm.send(<span class="tk-s">"hi"</span>)
+    chunks.send(<span class="tk-s">"Hel"</span>); chunks.send(<span class="tk-s">"lo"</span>)
+    runCurrent()
+    vm.stop()
+    runCurrent()
+    assertEquals(<span class="tk-t">ReplyState</span>.<span class="tk-t">Stopped</span>(<span class="tk-s">"Hello"</span>), vm.state.<span class="tk-k">value</span>)
+}</code></pre></figure>
+<p>Set the Main dispatcher to a test dispatcher in tests (for example with a <code>MainDispatcherRule</code>). See <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I add a fake typing animation?</summary><div><p>Real streaming already looks like typing. Artificial delays slow users down. Show text as it arrives.</p></div></details>
+  <details><summary>What survives rotation?</summary><div><p>The ViewModel keeps collecting across configuration changes, so the stream continues. Process death loses it; persist completed messages.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Stream AI responses by <strong>accumulating chunks in a ViewModel</strong>, modelling <strong>waiting, streaming, done, stopped and failed</strong> states, supporting <strong>Stop</strong> through cancellation, auto-scrolling only when users are at the bottom, and keeping rendering efficient.</p>
+<p>Next step: build a complete project with <a href="../ai-document-summarizer-android/index.html">an AI Document Summarizer</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/generate-text" target="_blank" rel="noopener">Firebase AI Logic: stream responses</a></li><li><a href="https://developer.android.com/kotlin/flow/stateflow-and-sharedflow" target="_blank" rel="noopener">StateFlow and SharedFlow</a></li><li><a href="https://developer.android.com/develop/ui/compose/lists" target="_blank" rel="noopener">Lists in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/accessibility/semantics" target="_blank" rel="noopener">Semantics: live regions</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dstreaming-ai-responses-compose-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dstreaming-ai-responses-compose-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-chatbot-jetpack-compose/index.html"><small>Android AI and Generative AI</small>Build an AI Chatbot Using Kotlin and Jetpack Compose</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/openai-api-android-patterns/index.html"><small>Android AI Projects and Production</small>OpenAI API Integration Patterns for Android</a></li><li><a href="../../android/viewmodel-stateflow-ui-state/index.html"><small>Android Architecture and Clean Code</small>Managing UI State with ViewModel and StateFlow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/streaming-ai-responses-compose/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/streaming-ai-responses-compose/&amp;text=Streaming AI Responses in Jetpack Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/streaming-ai-responses-compose/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#states">Streaming states</a></li><li><a href="#viewmodel">ViewModel: accumulate and cancel</a></li><li><a href="#ui">Compose UI</a></li><li><a href="#scroll">Auto-scroll politely</a></li><li><a href="#performance">Performance tips</a></li><li><a href="#markdown">Markdown and partial content</a></li><li><a href="#testing">Testing</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dstreaming-ai-responses-compose-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dstreaming-ai-responses-compose-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

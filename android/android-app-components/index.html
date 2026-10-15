@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android App Components: Activities, Services, Receivers | Yunok Tech</title>
+  <meta name="description" content="The four Android app components explained with Kotlin: Activities, Services, Broadcast Receivers and Content Providers, plus intents, the manifest, and when to use WorkManager instead.">
+  <meta name="keywords" content="android app components, activity service broadcast receiver content provider, android intents explained, android manifest components, exported components, foreground service android, single activity architecture">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-app-components/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-app-components/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android App Components: Activities, Services, Receivers">
+  <meta property="og:description" content="The four Android app components explained with Kotlin: Activities, Services, Broadcast Receivers and Content Providers, plus intents, the manifest, and when to use WorkManager instead.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Development for Beginners">
+  <meta name="twitter:title" content="Android App Components: Activities, Services, Receivers">
+  <meta name="twitter:description" content="The four Android app components explained with Kotlin: Activities, Services, Broadcast Receivers and Content Providers, plus intents, the manifest, and when to use WorkManager instead.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android App Components: Activities, Services, and Receivers", "description": "The four Android app components explained with Kotlin: Activities, Services, Broadcast Receivers and Content Providers, plus intents, the manifest, and when to use WorkManager instead.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android Development for Beginners", "keywords": "activity service broadcast receiver content provider, android intents explained, android manifest components, exported components, foreground service android, single activity architecture", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-app-components/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android App Components: Activities, Services, and Receivers", "item": "https://yunoktech.com/android/android-app-components/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#beginners">Android Development for Beginners</a></nav>
+    <span class="ad-chip">🌱 Android Development for Beginners</span>
+    <h1 id="article-title">Android App Components: Activities, Services, and Receivers</h1>
+    <p class="ad-lede">Android apps don't have a single main() function. The system starts your app through four kinds of components declared in the manifest. Knowing what each one is for, and what replaced the old patterns, prevents crashes, battery drain and security holes.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>4 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#overview">The four components at a glance</a></li><li><a href="#activities">Activities: screens the user interacts with</a></li><li><a href="#intents">Intents: messages between components</a></li><li><a href="#services">Services: work without a UI</a></li><li><a href="#receivers">Broadcast Receivers: reacting to events</a></li><li><a href="#providers">Content Providers: sharing data</a></li><li><a href="#comparison">Which component should I use?</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A console program starts at <code>main()</code> and runs until it ends. An Android app is different. The system can enter it from many doors: the launcher icon, a notification, a shared photo, a scheduled job, another app asking for data. Those doors are <strong>app components</strong>.</p>
+<p>This guide explains the four component types, how <strong>intents</strong> connect them, how the <strong>manifest</strong> declares them, and which modern APIs you should use instead of patterns that are now discouraged.</p>
+
+<h2 id="overview">The four components at a glance</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-c-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-c-t fig-c-d">
+    <title id="fig-c-t">The four Android app components and their entry points</title>
+    <desc id="fig-c-d">The Android system can enter an app through an Activity for a screen the user sees, a Service for long-running work, a Broadcast Receiver for system-wide events, and a Content Provider for sharing structured data. All are declared in AndroidManifest.xml.</desc>
+    <defs><marker id="c2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-dark" x="290" y="10" width="140" height="44" rx="12"/><text class="d-w" x="360" y="37" text-anchor="middle">Android system</text>
+    <path class="d-flow" d="M330 54 L95 112 M350 54 L275 112 M370 54 L445 112 M390 54 L625 112" marker-end="url(#c2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="116" width="150" height="80" rx="12"/><text class="d-t" x="95" y="142" text-anchor="middle">Activity</text><text class="d-s" x="95" y="162" text-anchor="middle">a screen / UI entry</text><text class="d-s" x="95" y="180" text-anchor="middle">launcher, deep link</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="200" y="116" width="150" height="80" rx="12"/><text class="d-t" x="275" y="142" text-anchor="middle">Service</text><text class="d-s" x="275" y="162" text-anchor="middle">work without UI</text><text class="d-s" x="275" y="180" text-anchor="middle">e.g. music playback</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="370" y="116" width="150" height="80" rx="12"/><text class="d-t" x="445" y="142" text-anchor="middle">Broadcast Receiver</text><text class="d-s" x="445" y="162" text-anchor="middle">reacts to events</text><text class="d-s" x="445" y="180" text-anchor="middle">e.g. boot, locale</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="550" y="116" width="150" height="80" rx="12"/><text class="d-t" x="625" y="142" text-anchor="middle">Content Provider</text><text class="d-s" x="625" y="162" text-anchor="middle">shares data</text><text class="d-s" x="625" y="180" text-anchor="middle">e.g. FileProvider</text></g>
+    <text class="d-s" x="360" y="220" text-anchor="middle">All four are declared in AndroidManifest.xml</text>
+  </svg>
+  <figcaption id="fig-c-cap">Each component is an independent entry point the system can start, possibly in a fresh process.</figcaption>
+</figure>
+
+<h2 id="activities">Activities: screens the user interacts with</h2>
+<p>An <strong>Activity</strong> provides a window for UI. Modern apps commonly use a <strong>single-Activity architecture</strong>: one Activity hosts Jetpack Compose, and navigation between screens happens inside Compose rather than by launching new Activities.</p>
+<figure class="code"><figcaption><span class="file">MainActivity.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">MainActivity</span> : <span class="tk-t">ComponentActivity</span>() {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate(savedInstanceState: <span class="tk-t">Bundle</span>?) {
+        <span class="tk-k">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent { <span class="tk-t">AppTheme</span> { <span class="tk-t">AppNavHost</span>() } }   <span class="tk-c">// all screens are composables</span>
+    }
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml (excerpt)</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;activity</span>
+    <span class="tk-at">android:name</span>=<span class="tk-s">".MainActivity"</span>
+    <span class="tk-at">android:exported</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;intent-filter</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;action</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.action.MAIN"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;category</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.category.LAUNCHER"</span> <span class="tk-tag">/&gt;</span>
+    <span class="tk-tag">&lt;/intent-filter</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;/activity</span><span class="tk-tag">&gt;</span></code></pre></figure>
+<p><code>android:exported="true"</code> lets other apps, including the launcher, start this Activity. Since Android 12, any component with an intent filter must declare <code>exported</code> explicitly.</p>
+
+<h2 id="intents">Intents: messages between components</h2>
+<figure class="code"><figcaption><span class="file">Explicit and implicit intents</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Explicit: start a specific component in your app</span>
+startActivity(<span class="tk-t">Intent</span>(context, <span class="tk-t">SettingsActivity</span>::<span class="tk-k">class</span>.java))
+
+<span class="tk-c">// Implicit: ask the system for any app that can handle an action</span>
+<span class="tk-k">val</span> share = <span class="tk-t">Intent</span>(<span class="tk-t">Intent</span>.<span class="tk-t">ACTION_SEND</span>).apply {
+    type = <span class="tk-s">"text/plain"</span>
+    putExtra(<span class="tk-t">Intent</span>.<span class="tk-t">EXTRA_TEXT</span>, <span class="tk-s">"Check out this article: https://yunoktech.com/android/"</span>)
+}
+startActivity(<span class="tk-t">Intent</span>.createChooser(share, <span class="tk-s">"Share via"</span>))</code></pre></figure>
+
+<h2 id="services">Services: work without a UI</h2>
+<p>A <strong>Service</strong> runs work that isn't tied to a screen. Modern Android restricts background execution heavily to protect battery, so plain background services are rarely appropriate. Today's guidance:</p>
+<ul>
+  <li><strong>User-visible ongoing work</strong> (music playback, navigation, an active call, a workout): a <strong>foreground service</strong> with a notification and a declared foreground service type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</li>
+  <li><strong>Deferrable, guaranteed work</strong> (sync, uploads, cleanup): <strong>WorkManager</strong>. See <a href="../workmanager-background-work/index.html">Background Work with WorkManager</a>.</li>
+  <li><strong>Work that only matters while the user is on screen</strong>: coroutines in <code>viewModelScope</code>, with no Service needed.</li>
+</ul>
+
+<h2 id="receivers">Broadcast Receivers: reacting to events</h2>
+<p>A <strong>BroadcastReceiver</strong> responds to system or app events, such as the device finishing boot, a locale change or a download completing. Since Android 8, most implicit broadcasts can't be received by manifest-declared receivers. Register them at runtime while your app is active instead:</p>
+<figure class="code"><figcaption><span class="file">Runtime-registered receiver</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">BatteryMonitor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> context: <span class="tk-t">Context</span>) {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> receiver = <span class="tk-k">object</span> : <span class="tk-t">BroadcastReceiver</span>() {
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> onReceive(context: <span class="tk-t">Context</span>, intent: <span class="tk-t">Intent</span>) {
+            <span class="tk-k">val</span> level = intent.getIntExtra(<span class="tk-t">BatteryManager</span>.<span class="tk-t">EXTRA_LEVEL</span>, -<span class="tk-n">1</span>)
+            <span class="tk-t">Log</span>.d(<span class="tk-s">"Battery"</span>, <span class="tk-s">"Level: $level"</span>)
+        }
+    }
+
+    <span class="tk-k">fun</span> start() = <span class="tk-t">ContextCompat</span>.registerReceiver(
+        context, receiver,
+        <span class="tk-t">IntentFilter</span>(<span class="tk-t">Intent</span>.<span class="tk-t">ACTION_BATTERY_CHANGED</span>),
+        <span class="tk-t">ContextCompat</span>.<span class="tk-t">RECEIVER_NOT_EXPORTED</span>,     <span class="tk-c">// don't accept broadcasts from other apps</span>
+    )
+
+    <span class="tk-k">fun</span> stop() = context.unregisterReceiver(receiver)
+}</code></pre></figure>
+<div class="warn"><b>Keep onReceive short</b>
+<p><code>onReceive()</code> runs on the main thread and must finish quickly. For longer work, enqueue a WorkManager job.</p></div>
+
+<h2 id="providers">Content Providers: sharing data</h2>
+<p>A <strong>ContentProvider</strong> exposes data to other apps through <code>content://</code> URIs with fine-grained permissions. Most apps never write one, but nearly all use <strong>FileProvider</strong> to share files securely, for example sending a photo to a camera app or a PDF to an email app:</p>
+<figure class="code"><figcaption><span class="file">Share a file securely</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> file = <span class="tk-t">File</span>(context.cacheDir, <span class="tk-s">"invoice.pdf"</span>)
+<span class="tk-k">val</span> uri = <span class="tk-t">FileProvider</span>.getUriForFile(context, <span class="tk-s">"${context.packageName}.fileprovider"</span>, file)
+<span class="tk-k">val</span> intent = <span class="tk-t">Intent</span>(<span class="tk-t">Intent</span>.<span class="tk-t">ACTION_SEND</span>).apply {
+    type = <span class="tk-s">"application/pdf"</span>
+    putExtra(<span class="tk-t">Intent</span>.<span class="tk-t">EXTRA_STREAM</span>, uri)
+    addFlags(<span class="tk-t">Intent</span>.<span class="tk-t">FLAG_GRANT_READ_URI_PERMISSION</span>)   <span class="tk-c">// temporary access just for this file</span>
+}
+context.startActivity(<span class="tk-t">Intent</span>.createChooser(intent, <span class="tk-s">"Send invoice"</span>))</code></pre></figure>
+
+<h2 id="comparison">Which component should I use?</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Use</th><th>Avoid</th></tr></thead>
+  <tbody>
+    <tr><td>A screen</td><td>A composable inside your single Activity</td><td>An Activity per screen in new apps</td></tr>
+    <tr><td>Sync data every few hours</td><td>WorkManager periodic work</td><td>A background Service with alarms</td></tr>
+    <tr><td>Play audio with the screen off</td><td>Foreground service (media playback type), Media3</td><td>An unrestricted background service</td></tr>
+    <tr><td>React to network changes in the UI</td><td>ConnectivityManager callbacks as a Flow</td><td>A manifest CONNECTIVITY_CHANGE receiver</td></tr>
+    <tr><td>Share a file with another app</td><td>FileProvider</td><td><code>file://</code> URIs (blocked on modern Android)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><strong>Exporting components unnecessarily.</strong> Every exported component is an attack surface. Set <code>exported="false"</code> unless other apps must reach it.</li>
+  <li><strong>Long work in <code>onReceive()</code></strong>, causing ANRs.</li>
+  <li><strong>Using Services for periodic background work</strong> instead of WorkManager.</li>
+  <li><strong>Passing large objects in intent extras</strong>, which can crash with <code>TransactionTooLargeException</code>. Pass IDs instead.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is a Fragment an app component?</summary><div><p>No. Fragments are UI building blocks hosted inside an Activity, and the system can't start them directly. In Compose apps, composables usually replace Fragments.</p></div></details>
+  <details><summary>Is the Application class a component?</summary><div><p>Not one of the four, but it's created before any component in your process and is often used for app-wide setup.</p></div></details>
+  <details><summary>Do I still need multiple Activities?</summary><div><p>Sometimes: for distinct entry points such as a share target or a settings screen launched from system settings. Most navigation can live in one Activity.</p></div></details>
+  <details><summary>What replaced IntentService and JobIntentService?</summary><div><p>WorkManager for deferrable work, and coroutines for work tied to the UI. Both older classes are deprecated.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android enters your app through four doors: <strong>Activities</strong> (UI), <strong>Services</strong> (ongoing work), <strong>Broadcast Receivers</strong> (events) and <strong>Content Providers</strong> (data sharing), connected by <strong>intents</strong> and declared in the <strong>manifest</strong>. Modern apps use one Activity with Compose, WorkManager for background work, and FileProvider for sharing, and they export as little as possible.</p>
+<p>Next step: open your app's manifest and check every <code>exported</code> attribute. Then read <a href="../workmanager-background-work/index.html">Background Work with WorkManager</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/guide/components/fundamentals" target="_blank" rel="noopener">Application fundamentals: app components</a></li><li><a href="https://developer.android.com/guide/components/intents-filters" target="_blank" rel="noopener">Intents and intent filters</a></li><li><a href="https://developer.android.com/develop/background-work/services" target="_blank" rel="noopener">Services overview</a></li><li><a href="https://developer.android.com/develop/background-work/background-tasks/broadcasts" target="_blank" rel="noopener">Broadcasts overview</a></li><li><a href="https://developer.android.com/guide/topics/providers/content-providers" target="_blank" rel="noopener">Content providers</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-components-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-components-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/how-android-app-works-internally/index.html"><small>Android Development for Beginners</small>How an Android App Works Internally</a></li><li><a href="../../android/android-foreground-services/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Android Services and Foreground Services</a></li><li><a href="../../android/workmanager-background-work/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Background Work with WorkManager</a></li><li><a href="../../android/deep-links-app-links-android/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Deep Links, App Links, and Android App Actions</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-app-components/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-app-components/&amp;text=Android App Components: Activities, Services, and Receivers" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-app-components/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#overview">The four components at a glance</a></li><li><a href="#activities">Activities: screens the user interacts with</a></li><li><a href="#intents">Intents: messages between components</a></li><li><a href="#services">Services: work without a UI</a></li><li><a href="#receivers">Broadcast Receivers: reacting to events</a></li><li><a href="#providers">Content Providers: sharing data</a></li><li><a href="#comparison">Which component should I use?</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-components-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-app-components-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

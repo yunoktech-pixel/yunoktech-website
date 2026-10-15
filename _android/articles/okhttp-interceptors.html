@@ -1,0 +1,158 @@
+<!--meta
+{
+  "seo_title": "OkHttp Interceptors Explained (Android, Kotlin)",
+  "description": "OkHttp interceptors explained: application vs network interceptors, auth headers, token refresh with Authenticator, logging, caching, retries and testing, with safe Kotlin examples.",
+  "primary_keyword": "okhttp interceptor",
+  "keywords": ["okhttp authenticator token refresh", "application vs network interceptor", "okhttp logging interceptor", "add header okhttp kotlin", "okhttp cache interceptor", "retrofit interceptor"],
+  "lede": "Interceptors let you inspect and modify every HTTP request and response in one place: auth headers, logging, caching headers, metrics. Used carefully, they remove duplication. Used carelessly, they cause infinite loops and leaked tokens.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["retrofit-android-guide", "secure-token-storage-android", "android-caching-strategies", "android-api-error-handling"],
+  "refs": [
+    ["OkHttp (interceptors, authenticators): official repository and docs", "https://github.com/square/okhttp"],
+    ["Retrofit (official repository)", "https://github.com/square/retrofit"]
+  ]
+}
+-->
+<p class="ad-lead">Every request needs an <code>Authorization</code> header. Every response should be logged in debug builds. A 401 should trigger a token refresh. Writing that in each Retrofit method would be absurd. Interceptors do it once for every call.</p>
+
+<h2 id="chain">The interceptor chain</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ok-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ok-t fig-ok-d">
+    <title id="fig-ok-t">OkHttp application and network interceptor chain</title>
+    <desc id="fig-ok-d">A request from Retrofit passes through application interceptors such as auth and logging, then OkHttp's internal retry, bridge, cache and connect steps, then network interceptors, and finally reaches the server. The response returns back through the same chain in reverse.</desc>
+    <defs><marker id="okm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H130 M260 70 H280 M440 70 H460 M590 70 H610" marker-end="url(#okm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="100" height="60" rx="12"/><text class="d-t" x="60" y="74" text-anchor="middle">Retrofit</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="134" y="40" width="126" height="60" rx="12"/><text class="d-t" x="197" y="64" text-anchor="middle">Application</text><text class="d-s" x="197" y="82" text-anchor="middle">auth, logging</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="284" y="40" width="156" height="60" rx="12"/><text class="d-t" x="362" y="64" text-anchor="middle">OkHttp internals</text><text class="d-s" x="362" y="82" text-anchor="middle">retry · cache · connect</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="464" y="40" width="126" height="60" rx="12"/><text class="d-t" x="527" y="64" text-anchor="middle">Network</text><text class="d-s" x="527" y="82" text-anchor="middle">sees wire request</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="614" y="40" width="96" height="60" rx="12"/><text class="d-t" x="662" y="74" text-anchor="middle">Server</text></g>
+    <path class="d-dash" d="M662 100 V150 H60 V104" marker-end="url(#okm)"/><text class="d-s" x="360" y="168" text-anchor="middle">response travels back through the chain</text>
+  </svg>
+  <figcaption id="fig-ok-cap">Application interceptors run once per call, even when served from cache. Network interceptors run for each actual network request, including redirects.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Application (<code>addInterceptor</code>)</th><th>Network (<code>addNetworkInterceptor</code>)</th></tr></thead>
+  <tbody>
+    <tr><td>Runs</td><td>Once per call</td><td>Per network request (redirects, retries)</td></tr>
+    <tr><td>Cached responses</td><td>Sees them</td><td>Not invoked</td></tr>
+    <tr><td>Sees</td><td>Request as your code built it</td><td>Final request on the wire (with Host and compression headers)</td></tr>
+    <tr><td>Typical use</td><td>Auth headers, app logging, metrics</td><td>Rewriting cache headers, low-level debugging</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="auth">Adding an auth header</h2>
+<code-block lang="kotlin" file="AuthInterceptor.kt">
+class AuthInterceptor(private val tokens: TokenStore) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val original = chain.request()
+        // Skip endpoints that must not carry the token (e.g. login).
+        if (original.header("No-Auth") != null) {
+            return chain.proceed(original.newBuilder().removeHeader("No-Auth").build())
+        }
+        val token = tokens.accessToken() ?: return chain.proceed(original)
+        return chain.proceed(original.newBuilder().header("Authorization", "Bearer $token").build())
+    }
+}
+</code-block>
+
+<h2 id="refresh">Token refresh with Authenticator</h2>
+<p>For 401 responses, OkHttp's <code>Authenticator</code> is designed for exactly this: it's called with the failed response and may return a new request to retry.</p>
+<code-block lang="kotlin" file="TokenAuthenticator.kt">
+class TokenAuthenticator(
+    private val tokens: TokenStore,
+    private val refreshApi: RefreshApi,          // separate client WITHOUT this authenticator
+) : Authenticator {
+
+    override fun authenticate(route: Route?, response: Response): Request? {
+        // Give up after one retry to avoid infinite loops.
+        if (responseCount(response) >= 2) return null
+
+        synchronized(this) {
+            val current = tokens.accessToken()
+            val sentToken = response.request.header("Authorization")?.removePrefix("Bearer ")
+            // Another thread may have refreshed already: just retry with the new token.
+            if (current != null && current != sentToken) {
+                return response.request.newBuilder().header("Authorization", "Bearer $current").build()
+            }
+            val refreshed = runCatching { refreshApi.refreshBlocking(tokens.refreshToken() ?: return null) }
+                .getOrNull() ?: run { tokens.clear(); return null }   // refresh failed → sign out
+            tokens.save(refreshed.accessToken, refreshed.refreshToken)
+            return response.request.newBuilder().header("Authorization", "Bearer ${refreshed.accessToken}").build()
+        }
+    }
+
+    private fun responseCount(response: Response): Int {
+        var r: Response? = response; var count = 1
+        while (r?.priorResponse != null) { count++; r = r.priorResponse }
+        return count
+    }
+}
+</code-block>
+<div class="warn"><b>Authenticator runs on OkHttp's thread</b><p>It's synchronous, so the refresh call must be blocking. Use a separate OkHttp client for refresh so the refresh request can't itself trigger the authenticator. Store tokens securely. See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p></div>
+
+<h2 id="logging">Logging safely</h2>
+<code-block lang="kotlin" file="Debug-only logging with redaction">
+val logging = HttpLoggingInterceptor().apply {
+    level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+    redactHeader("Authorization")
+    redactHeader("Cookie")
+}
+</code-block>
+
+<h2 id="headers">Common headers and metrics</h2>
+<code-block lang="kotlin" file="Client info + timing">
+class ClientInfoInterceptor(private val appVersion: String, private val metrics: Metrics) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+            .header("X-App-Version", appVersion)
+            .header("Accept-Language", Locale.getDefault().toLanguageTag())
+            .build()
+        val start = System.nanoTime()
+        val response = chain.proceed(request)
+        metrics.record(request.url.encodedPath, response.code, (System.nanoTime() - start) / 1_000_000)
+        return response
+    }
+}
+</code-block>
+
+<h2 id="setup">Wiring it up</h2>
+<code-block lang="kotlin" file="OkHttpClient">
+val client = OkHttpClient.Builder()
+    .cache(Cache(File(context.cacheDir, "http"), 20L * 1024 * 1024))   // 20 MB HTTP cache
+    .addInterceptor(ClientInfoInterceptor(BuildConfig.VERSION_NAME, metrics))
+    .addInterceptor(AuthInterceptor(tokenStore))
+    .authenticator(TokenAuthenticator(tokenStore, refreshApi))
+    .addInterceptor(logging)                                          // last: logs final headers
+    .build()
+</code-block>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Multi-tenant APIs</h3><p>Add a tenant or region header from the current session.</p></div>
+  <div class="card usecase"><h3>Offline cache control</h3><p>When offline, rewrite requests to accept stale cached responses. See <a href="../android-caching-strategies/index.html">Caching Strategies</a>.</p></div>
+  <div class="card usecase"><h3>Debug tools</h3><p>Debug-only interceptors for mocking endpoints or inspecting traffic.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Refreshing tokens inside an interceptor with the same client, causing recursion and deadlocks.</li>
+  <li>No retry limit on 401, giving infinite loops.</li>
+  <li>Logging tokens or personal data in release builds.</li>
+  <li>Reading the response body in an interceptor without re-creating it. Bodies can be consumed only once, so use <code>peekBody</code>.</li>
+  <li>Blocking calls (DataStore reads) on every request without caching the value in memory.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I retry failed requests in an interceptor?</summary><div><p>OkHttp already retries some connection failures. Application-level retries with backoff are usually clearer in the repository, where you know whether a request is idempotent.</p></div></details>
+  <details><summary>Can interceptors be suspend functions?</summary><div><p>No. The OkHttp interceptor API is synchronous. Keep the work quick, and cache values you need.</p></div></details>
+  <details><summary>How do I test interceptors?</summary><div><p>Build an OkHttp client with the interceptor against MockWebServer, enqueue responses, and assert on recorded requests.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Interceptors centralise <strong>headers, logging, metrics and cache control</strong>, while the <strong>Authenticator</strong> handles 401 token refresh safely with a retry limit and a separate refresh client. Keep them fast, redact secrets, and order them deliberately.</p>
+<p>Next step: turn failures into good UX with <a href="../android-api-error-handling/index.html">Handling API Errors and Network Failures</a>.</p>

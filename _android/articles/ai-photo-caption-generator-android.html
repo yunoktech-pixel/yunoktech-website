@@ -1,0 +1,139 @@
+<!--meta
+{
+  "seo_title": "Build an AI Photo Caption Generator for Android",
+  "description": "Project guide: an Android app that generates captions and alt text for photos using Gemini multimodal via Firebase AI Logic, with on-device ML Kit image description, photo picker, image downscaling, tone options and sharing.",
+  "primary_keyword": "ai photo caption generator android",
+  "keywords": ["gemini image to text android", "multimodal gemini kotlin", "image caption app kotlin", "alt text generator android", "photo picker compose", "ml kit image description"],
+  "lede": "Pick a photo, choose a tone, get three caption ideas and accessible alt text. This project teaches multimodal prompting, image handling, structured output and responsible UX. Here's how to build it with Compose and Gemini.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-image-description-android", "gemini-api-android-kotlin", "on-device-image-text-processing", "responsible-ai-ux-android"],
+  "refs": [
+    ["Firebase AI Logic: analyze images", "https://firebase.google.com/docs/ai-logic/analyze-images"],
+    ["Firebase AI Logic: structured output", "https://firebase.google.com/docs/ai-logic/generate-structured-output"],
+    ["Photo picker", "https://developer.android.com/training/data-storage/shared/photopicker"],
+    ["ML Kit GenAI Image Description", "https://developers.google.com/ml-kit/genai/image-description/android"]
+  ]
+}
+-->
+<p class="ad-lead">Our <a href="../ai-image-description-android/index.html">AI Image Description</a> guide covers describing images. This project builds a complete app around it: caption styles, structured multi-option output, an on-device path, and sharing.</p>
+
+<h2 id="flow">App flow</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-pc-t fig-pc-d">
+    <title id="fig-pc-t">Photo caption generator flow</title>
+    <desc id="fig-pc-d">The user picks a photo with the photo picker and chooses a tone. The app downscales the image, sends it with a prompt to Gemini requesting structured JSON with three captions and alt text, validates the result, and shows options the user can edit, copy or share.</desc>
+    <defs><marker id="pcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 80 H150 M270 80 H290 M420 80 H440 M570 80 H590" marker-end="url(#pcm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="10" y="50" width="120" height="60" rx="12"/><text class="d-t" x="70" y="76" text-anchor="middle">Pick photo</text><text class="d-s" x="70" y="94" text-anchor="middle">+ tone</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="152" y="50" width="118" height="60" rx="12"/><text class="d-t" x="211" y="76" text-anchor="middle">Downscale</text><text class="d-s" x="211" y="94" text-anchor="middle">~1024 px</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="292" y="50" width="128" height="60" rx="12"/><text class="d-t" x="356" y="76" text-anchor="middle">Gemini</text><text class="d-s" x="356" y="94" text-anchor="middle">image + prompt</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="442" y="50" width="128" height="60" rx="12"/><text class="d-t" x="506" y="76" text-anchor="middle">JSON</text><text class="d-s" x="506" y="94" text-anchor="middle">validate</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="592" y="50" width="118" height="60" rx="12"/><text class="d-t" x="651" y="76" text-anchor="middle">Edit</text><text class="d-s" x="651" y="94" text-anchor="middle">copy, share</text></g>
+  </svg>
+  <figcaption id="fig-pc-cap">Users always review and edit before sharing.</figcaption>
+</figure>
+
+<h2 id="pick">1. Pick and downscale</h2>
+<code-block lang="kotlin" file="Load a downscaled bitmap">
+suspend fun loadScaled(context: Context, uri: Uri, maxSide: Int = 1024): Bitmap =
+    withContext(Dispatchers.IO) {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
+        ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
+            val (w, h) = info.size.width to info.size.height
+            val scale = maxSide.toFloat() / maxOf(w, h)
+            if (scale < 1f) decoder.setTargetSize((w * scale).toInt(), (h * scale).toInt())
+            decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+        }
+    }
+</code-block>
+<p>Downscaling reduces upload time, tokens and cost, with little effect on caption quality. Use the photo picker for selection. See <a href="../android-privacy-accessibility-reliability/index.html">Privacy and Accessibility</a>.</p>
+
+<h2 id="structured">2. Ask for structured output</h2>
+<code-block lang="kotlin" file="CaptionGenerator.kt">
+@Serializable
+data class CaptionResult(val captions: List<String>, val altText: String)
+
+class CaptionGenerator(private val json: Json = Json { ignoreUnknownKeys = true }) {
+
+    private val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.8-flash",                                   // check current models
+        generationConfig = generationConfig {
+            responseMimeType = "application/json"
+            responseSchema = Schema.obj(
+                mapOf(
+                    "captions" to Schema.array(Schema.string()),
+                    "altText" to Schema.string(),
+                )
+            )
+            temperature = 0.8f
+        },
+    )
+
+    suspend fun generate(image: Bitmap, tone: Tone): CaptionResult {
+        val response = model.generateContent(content {
+            image(image)
+            text(
+                "Write 3 short social media captions for this photo in a ${tone.label} tone " +
+                "(max 120 characters each, at most 2 hashtags). Also write factual alt text " +
+                "(max 150 characters) describing what is visible. Don't guess identities of people."
+            )
+        })
+        val result = json.decodeFromString<CaptionResult>(response.text ?: error("Empty response"))
+        return result.copy(
+            captions = result.captions.map { it.take(150).trim() }.filter { it.isNotEmpty() }.take(3),
+            altText = result.altText.take(200).trim(),
+        )
+    }
+}
+
+enum class Tone(val label: String) { FUN("fun"), PROFESSIONAL("professional"), POETIC("poetic"), MINIMAL("minimal") }
+</code-block>
+
+<h2 id="on-device">3. On-device alternative</h2>
+<p>On supported devices, ML Kit GenAI Image Description (beta) produces a short description with Gemini Nano, privately and offline. Use it for alt text and offer cloud captions as an option, or use hybrid inference. See <a href="../gemini-nano-vs-cloud-gemini/index.html">Nano vs Cloud</a>.</p>
+
+<h2 id="ui">4. UI</h2>
+<code-block lang="kotlin" file="CaptionOptions.kt">
+@Composable
+fun CaptionOptions(result: CaptionResult, onShare: (String) -> Unit) {
+    var selected by rememberSaveable { mutableIntStateOf(0) }
+    var edited by rememberSaveable(selected) { mutableStateOf(result.captions.getOrElse(selected) { "" }) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("AI suggestions. Review before posting.", style = MaterialTheme.typography.labelMedium)
+        result.captions.forEachIndexed { i, caption ->
+            FilterChip(selected = i == selected, onClick = { selected = i }, label = { Text(caption, maxLines = 2) })
+        }
+        OutlinedTextField(value = edited, onValueChange = { edited = it }, label = { Text("Caption") })
+        Text("Alt text: ${result.altText}", style = MaterialTheme.typography.bodySmall)
+        Button(onClick = { onShare(edited) }) { Text("Share") }
+    }
+}
+</code-block>
+
+<h2 id="responsible">Responsible design</h2>
+<ul>
+  <li>Instruct the model not to identify people or infer sensitive traits (age, ethnicity, health).</li>
+  <li>Let users edit everything, and never auto-post.</li>
+  <li>Disclose that photos are sent to a cloud service, unless processing is on-device.</li>
+  <li>Handle safety blocks gracefully ("Couldn't caption this photo").</li>
+  <li>See <a href="../responsible-ai-ux-android/index.html">Responsible AI UX</a>.</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>JSON parse errors:</strong> use a response schema, <code>ignoreUnknownKeys</code>, and catch failures with a retry.</li>
+  <li><strong>Slow uploads:</strong> downscale, and compress if you send bytes.</li>
+  <li><strong>OOM on large photos:</strong> decode with a target size, as shown.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can it caption multiple photos?</summary><div><p>Yes. Send several images in one request for a carousel caption, within the model's limits.</p></div></details>
+  <details><summary>How do I keep costs low?</summary><div><p>Downscale images, use a Flash-class model, cap output tokens, and rate-limit per user.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A caption generator combines the <strong>photo picker</strong>, <strong>downscaling</strong>, <strong>multimodal Gemini</strong> with <strong>structured JSON output</strong>, validation, and an <strong>editable</strong> UI, plus on-device alt text where available and clear responsible-AI choices.</p>
+<p>Next project: <a href="../ai-voice-notes-app-android/index.html">an AI Voice-Notes App</a>.</p>

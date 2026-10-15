@@ -1,0 +1,178 @@
+<!--meta
+{
+  "seo_title": "MVVM Architecture in Android Explained (Kotlin)",
+  "description": "MVVM in Android explained with Kotlin and Compose: Model, View and ViewModel roles, UI state with StateFlow, events, repositories, lifecycle, testing and common anti-patterns.",
+  "primary_keyword": "mvvm architecture android",
+  "keywords": ["mvvm android kotlin", "android viewmodel explained", "mvvm jetpack compose", "model view viewmodel", "android architecture components", "mvvm example android"],
+  "lede": "MVVM is the default architecture of modern Android apps, recommended in spirit by Google's architecture guide and supported by Jetpack's ViewModel. This guide explains each role precisely, builds a complete feature, and lists the anti-patterns that quietly undermine it.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["mvi-vs-mvvm-android", "viewmodel-stateflow-ui-state", "repository-pattern-android", "clean-architecture-android"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["ViewModel overview", "https://developer.android.com/topic/libraries/architecture/viewmodel"],
+    ["UI layer", "https://developer.android.com/topic/architecture/ui-layer"],
+    ["Data layer", "https://developer.android.com/topic/architecture/data-layer"]
+  ]
+}
+-->
+<p class="ad-lead">Before architecture guidance existed, many Android apps put everything in Activities: network calls, database queries, validation and UI updates in one 2,000-line class that crashed on rotation and couldn't be tested. MVVM splits those responsibilities so each part has one job and can change independently.</p>
+
+<h2 id="roles">The three roles</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mv-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-mv-t fig-mv-d">
+    <title id="fig-mv-t">MVVM roles and data flow on Android</title>
+    <desc id="fig-mv-d">The View (Compose screen) observes UI state from the ViewModel and calls ViewModel functions on user actions. The ViewModel holds and transforms UI state and calls the Model layer, repositories, which fetch and store data from network and database.</desc>
+    <defs><marker id="mvm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="60" width="170" height="80" rx="14"/><text class="d-t" x="105" y="94" text-anchor="middle">View</text><text class="d-s" x="105" y="114" text-anchor="middle">Compose screen</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="275" y="60" width="170" height="80" rx="14"/><text class="d-t" x="360" y="94" text-anchor="middle">ViewModel</text><text class="d-s" x="360" y="114" text-anchor="middle">StateFlow&lt;UiState&gt;</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="530" y="60" width="170" height="80" rx="14"/><text class="d-t" x="615" y="94" text-anchor="middle">Model</text><text class="d-s" x="615" y="114" text-anchor="middle">repositories, data</text></g>
+    <path class="d-flow" d="M190 82 H271" marker-end="url(#mvm)"/><text class="d-s" x="230" y="74" text-anchor="middle">events</text>
+    <path class="d-flow" d="M275 118 H194" marker-end="url(#mvm)"/><text class="d-s" x="232" y="136" text-anchor="middle">state</text>
+    <path class="d-flow" d="M445 82 H526" marker-end="url(#mvm)"/><text class="d-s" x="486" y="74" text-anchor="middle">calls</text>
+    <path class="d-flow" d="M530 118 H449" marker-end="url(#mvm)"/><text class="d-s" x="490" y="136" text-anchor="middle">data / Flow</text>
+  </svg>
+  <figcaption id="fig-mv-cap">The View never talks to the Model directly, and the ViewModel never references the View.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Role</th><th>Responsibility</th><th>Must NOT</th></tr></thead>
+  <tbody>
+    <tr><td><strong>View</strong></td><td>Render state; forward user actions</td><td>Contain business logic, fetch data, hold important state</td></tr>
+    <tr><td><strong>ViewModel</strong></td><td>Hold screen state; apply presentation logic; call the data layer; survive configuration changes</td><td>Reference Activity, Fragment, View or Context; know about Compose specifics</td></tr>
+    <tr><td><strong>Model</strong></td><td>Data and business rules: repositories, data sources, optionally use cases</td><td>Know which screen uses it</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="feature">A complete feature: weather screen</h2>
+<code-block lang="kotlin" file="Model: WeatherRepository.kt">
+data class Forecast(val city: String, val tempC: Int, val condition: String, val fetchedAt: Long)
+
+interface WeatherRepository {
+    suspend fun getForecast(city: String): Forecast       // throws IOException on network failure
+}
+</code-block>
+<code-block lang="kotlin" file="ViewModel: WeatherViewModel.kt">
+sealed interface WeatherUiState {
+    data object Idle : WeatherUiState
+    data object Loading : WeatherUiState
+    data class Success(val title: String, val temperature: String, val condition: String) : WeatherUiState
+    data class Error(val message: String) : WeatherUiState
+}
+
+@HiltViewModel
+class WeatherViewModel @Inject constructor(
+    private val repository: WeatherRepository,
+    private val savedState: SavedStateHandle,
+) : ViewModel() {
+
+    val city: StateFlow<String> = savedState.getStateFlow("city", "Chandigarh")
+
+    private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
+    val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+
+    init { refresh() }
+
+    fun onCityChange(value: String) { savedState["city"] = value }
+
+    fun refresh() {
+        val target = city.value.trim()
+        if (target.isEmpty()) return
+        viewModelScope.launch {
+            _uiState.value = WeatherUiState.Loading
+            _uiState.value = try {
+                val f = repository.getForecast(target)
+                // Presentation logic lives here: formatting for display
+                WeatherUiState.Success(title = f.city, temperature = "${f.tempC}°C", condition = f.condition)
+            } catch (e: IOException) {
+                WeatherUiState.Error("Couldn't load weather. Check your connection.")
+            }
+        }
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="View: WeatherScreen.kt">
+@Composable
+fun WeatherRoute(viewModel: WeatherViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val city by viewModel.city.collectAsStateWithLifecycle()
+    WeatherScreen(state, city, viewModel::onCityChange, viewModel::refresh)
+}
+
+@Composable
+fun WeatherScreen(state: WeatherUiState, city: String, onCityChange: (String) -> Unit, onRefresh: () -> Unit) {
+    Column(Modifier.padding(16.dp)) {
+        OutlinedTextField(city, onCityChange, label = { Text("City") }, singleLine = true)
+        Button(onClick = onRefresh, Modifier.padding(vertical = 8.dp)) { Text("Get weather") }
+        when (state) {
+            WeatherUiState.Idle -> Unit
+            WeatherUiState.Loading -> CircularProgressIndicator()
+            is WeatherUiState.Success -> Column {
+                Text(state.title, style = MaterialTheme.typography.headlineSmall)
+                Text(state.temperature, style = MaterialTheme.typography.displayMedium)
+                Text(state.condition)
+            }
+            is WeatherUiState.Error -> Text(state.message, color = MaterialTheme.colorScheme.error)
+        }
+    }
+}
+</code-block>
+
+<h2 id="lifecycle">Why the ViewModel matters on Android</h2>
+<ul>
+  <li><strong>Survives configuration changes:</strong> rotation recreates the Activity, but the same ViewModel instance and its in-flight coroutines continue.</li>
+  <li><strong><code>viewModelScope</code></strong> cancels work when the screen is gone for good.</li>
+  <li><strong><code>SavedStateHandle</code></strong> restores small state after process death.</li>
+</ul>
+
+<h2 id="testing">Testing the ViewModel</h2>
+<code-block lang="kotlin" file="WeatherViewModelTest.kt">
+class WeatherViewModelTest {
+    @get:Rule val mainRule = MainDispatcherRule()
+
+    private class FakeRepo(var fail: Boolean = false) : WeatherRepository {
+        override suspend fun getForecast(city: String) =
+            if (fail) throw IOException() else Forecast(city, 31, "Sunny", 0)
+    }
+
+    @Test fun `success formats temperature`() = runTest {
+        val vm = WeatherViewModel(FakeRepo(), SavedStateHandle())
+        advanceUntilIdle()
+        assertEquals("31°C", (vm.uiState.value as WeatherUiState.Success).temperature)
+    }
+
+    @Test fun `network failure shows error`() = runTest {
+        val vm = WeatherViewModel(FakeRepo(fail = true), SavedStateHandle())
+        advanceUntilIdle()
+        assertTrue(vm.uiState.value is WeatherUiState.Error)
+    }
+}
+</code-block>
+
+<h2 id="use-cases">MVVM in different apps</h2>
+<div class="cards">
+  <div class="card usecase"><h3>CRUD and content apps</h3><p>MVVM with one UiState per screen is usually all the architecture you need.</p></div>
+  <div class="card usecase"><h3>Complex interactive screens</h3><p>Keep MVVM but formalise state transitions, moving toward <a href="../mvi-vs-mvvm-android/index.html">MVI</a>.</p></div>
+  <div class="card usecase"><h3>Large codebases</h3><p>MVVM in the UI layer, plus a domain layer and modules underneath. See <a href="../clean-architecture-android/index.html">Clean Architecture</a>.</p></div>
+</div>
+
+<h2 id="anti-patterns">Anti-patterns</h2>
+<ul>
+  <li><strong>God ViewModel:</strong> one ViewModel for many screens, or 1,000 lines of logic. Split by screen and move business rules down.</li>
+  <li><strong>Context in ViewModel:</strong> leaks. Need strings? Expose resource IDs or use a resource provider abstraction.</li>
+  <li><strong>Multiple mutable state streams</strong> that can contradict each other.</li>
+  <li><strong>View pulls data</strong>: composables calling repositories directly.</li>
+  <li><strong>ViewModel imports Compose types</strong> such as <code>Color</code> or <code>TextUnit</code>, which couples logic to the UI toolkit.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is MVVM required by Google?</summary><div><p>Google's guide recommends a UI layer with state holders (typically ViewModels), unidirectional data flow and a data layer. That matches MVVM, without mandating the name.</p></div></details>
+  <details><summary>One ViewModel per screen or per composable?</summary><div><p>Generally one per screen (navigation destination). Small components get state via parameters.</p></div></details>
+  <details><summary>LiveData or StateFlow?</summary><div><p>StateFlow is the common choice for new Kotlin code. LiveData remains supported, especially in View-based apps.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>MVVM on Android means <strong>Views render state and forward events</strong>, <strong>ViewModels own screen state and presentation logic</strong>, and the <strong>Model layer owns data and business rules</strong>. Keep Context out of ViewModels, expose a single immutable UiState, and test ViewModels with fakes.</p>
+<p>Next step: implement the Model side properly with the <a href="../repository-pattern-android/index.html">Repository Pattern</a>.</p>

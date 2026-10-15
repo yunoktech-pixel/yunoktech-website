@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OkHttp Interceptors Explained (Android, Kotlin) | Yunok Tech</title>
+  <meta name="description" content="OkHttp interceptors explained: application vs network interceptors, auth headers, token refresh with Authenticator, logging, caching, retries and testing, with safe Kotlin examples.">
+  <meta name="keywords" content="okhttp interceptor, okhttp authenticator token refresh, application vs network interceptor, okhttp logging interceptor, add header okhttp kotlin, okhttp cache interceptor, retrofit interceptor">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/okhttp-interceptors/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/okhttp-interceptors/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="OkHttp Interceptors Explained (Android, Kotlin)">
+  <meta property="og:description" content="OkHttp interceptors explained: application vs network interceptors, auth headers, token refresh with Authenticator, logging, caching, retries and testing, with safe Kotlin examples.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="OkHttp Interceptors Explained (Android, Kotlin)">
+  <meta name="twitter:description" content="OkHttp interceptors explained: application vs network interceptors, auth headers, token refresh with Authenticator, logging, caching, retries and testing, with safe Kotlin examples.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "OkHttp Interceptors Explained", "description": "OkHttp interceptors explained: application vs network interceptors, auth headers, token refresh with Authenticator, logging, caching, retries and testing, with safe Kotlin examples.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "okhttp authenticator token refresh, application vs network interceptor, okhttp logging interceptor, add header okhttp kotlin, okhttp cache interceptor, retrofit interceptor", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/okhttp-interceptors/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "OkHttp Interceptors Explained", "item": "https://yunoktech.com/android/okhttp-interceptors/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">OkHttp Interceptors Explained</h1>
+    <p class="ad-lede">Interceptors let you inspect and modify every HTTP request and response in one place: auth headers, logging, caching headers, metrics. Used carefully, they remove duplication. Used carelessly, they cause infinite loops and leaked tokens.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#chain">The interceptor chain</a></li><li><a href="#auth">Adding an auth header</a></li><li><a href="#refresh">Token refresh with Authenticator</a></li><li><a href="#logging">Logging safely</a></li><li><a href="#headers">Common headers and metrics</a></li><li><a href="#setup">Wiring it up</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Every request needs an <code>Authorization</code> header. Every response should be logged in debug builds. A 401 should trigger a token refresh. Writing that in each Retrofit method would be absurd. Interceptors do it once for every call.</p>
+
+<h2 id="chain">The interceptor chain</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ok-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ok-t fig-ok-d">
+    <title id="fig-ok-t">OkHttp application and network interceptor chain</title>
+    <desc id="fig-ok-d">A request from Retrofit passes through application interceptors such as auth and logging, then OkHttp's internal retry, bridge, cache and connect steps, then network interceptors, and finally reaches the server. The response returns back through the same chain in reverse.</desc>
+    <defs><marker id="okm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H130 M260 70 H280 M440 70 H460 M590 70 H610" marker-end="url(#okm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="100" height="60" rx="12"/><text class="d-t" x="60" y="74" text-anchor="middle">Retrofit</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="134" y="40" width="126" height="60" rx="12"/><text class="d-t" x="197" y="64" text-anchor="middle">Application</text><text class="d-s" x="197" y="82" text-anchor="middle">auth, logging</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="284" y="40" width="156" height="60" rx="12"/><text class="d-t" x="362" y="64" text-anchor="middle">OkHttp internals</text><text class="d-s" x="362" y="82" text-anchor="middle">retry · cache · connect</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="464" y="40" width="126" height="60" rx="12"/><text class="d-t" x="527" y="64" text-anchor="middle">Network</text><text class="d-s" x="527" y="82" text-anchor="middle">sees wire request</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="614" y="40" width="96" height="60" rx="12"/><text class="d-t" x="662" y="74" text-anchor="middle">Server</text></g>
+    <path class="d-dash" d="M662 100 V150 H60 V104" marker-end="url(#okm)"/><text class="d-s" x="360" y="168" text-anchor="middle">response travels back through the chain</text>
+  </svg>
+  <figcaption id="fig-ok-cap">Application interceptors run once per call, even when served from cache. Network interceptors run for each actual network request, including redirects.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Application (<code>addInterceptor</code>)</th><th>Network (<code>addNetworkInterceptor</code>)</th></tr></thead>
+  <tbody>
+    <tr><td>Runs</td><td>Once per call</td><td>Per network request (redirects, retries)</td></tr>
+    <tr><td>Cached responses</td><td>Sees them</td><td>Not invoked</td></tr>
+    <tr><td>Sees</td><td>Request as your code built it</td><td>Final request on the wire (with Host and compression headers)</td></tr>
+    <tr><td>Typical use</td><td>Auth headers, app logging, metrics</td><td>Rewriting cache headers, low-level debugging</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="auth">Adding an auth header</h2>
+<figure class="code"><figcaption><span class="file">AuthInterceptor.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">AuthInterceptor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> tokens: <span class="tk-t">TokenStore</span>) : <span class="tk-t">Interceptor</span> {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> intercept(chain: <span class="tk-t">Interceptor</span>.<span class="tk-t">Chain</span>): <span class="tk-t">Response</span> {
+        <span class="tk-k">val</span> original = chain.request()
+        <span class="tk-c">// Skip endpoints that must not carry the token (e.g. login).</span>
+        <span class="tk-k">if</span> (original.header(<span class="tk-s">"No-Auth"</span>) != <span class="tk-k">null</span>) {
+            <span class="tk-k">return</span> chain.proceed(original.newBuilder().removeHeader(<span class="tk-s">"No-Auth"</span>).build())
+        }
+        <span class="tk-k">val</span> token = tokens.accessToken() ?: <span class="tk-k">return</span> chain.proceed(original)
+        <span class="tk-k">return</span> chain.proceed(original.newBuilder().header(<span class="tk-s">"Authorization"</span>, <span class="tk-s">"Bearer $token"</span>).build())
+    }
+}</code></pre></figure>
+
+<h2 id="refresh">Token refresh with Authenticator</h2>
+<p>For 401 responses, OkHttp's <code>Authenticator</code> is designed for exactly this: it's called with the failed response and may return a new request to retry.</p>
+<figure class="code"><figcaption><span class="file">TokenAuthenticator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">TokenAuthenticator</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> tokens: <span class="tk-t">TokenStore</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> refreshApi: <span class="tk-t">RefreshApi</span>,          <span class="tk-c">// separate client WITHOUT this authenticator</span>
+) : <span class="tk-t">Authenticator</span> {
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> authenticate(route: <span class="tk-t">Route</span>?, response: <span class="tk-t">Response</span>): <span class="tk-t">Request</span>? {
+        <span class="tk-c">// Give up after one retry to avoid infinite loops.</span>
+        <span class="tk-k">if</span> (responseCount(response) &gt;= <span class="tk-n">2</span>) <span class="tk-k">return</span> <span class="tk-k">null</span>
+
+        synchronized(<span class="tk-k">this</span>) {
+            <span class="tk-k">val</span> current = tokens.accessToken()
+            <span class="tk-k">val</span> sentToken = response.request.header(<span class="tk-s">"Authorization"</span>)?.removePrefix(<span class="tk-s">"Bearer "</span>)
+            <span class="tk-c">// Another thread may have refreshed already: just retry with the new token.</span>
+            <span class="tk-k">if</span> (current != <span class="tk-k">null</span> &amp;&amp; current != sentToken) {
+                <span class="tk-k">return</span> response.request.newBuilder().header(<span class="tk-s">"Authorization"</span>, <span class="tk-s">"Bearer $current"</span>).build()
+            }
+            <span class="tk-k">val</span> refreshed = runCatching { refreshApi.refreshBlocking(tokens.refreshToken() ?: <span class="tk-k">return</span> <span class="tk-k">null</span>) }
+                .getOrNull() ?: run { tokens.clear(); <span class="tk-k">return</span> <span class="tk-k">null</span> }   <span class="tk-c">// refresh failed → sign out</span>
+            tokens.save(refreshed.accessToken, refreshed.refreshToken)
+            <span class="tk-k">return</span> response.request.newBuilder().header(<span class="tk-s">"Authorization"</span>, <span class="tk-s">"Bearer ${refreshed.accessToken}"</span>).build()
+        }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> responseCount(response: <span class="tk-t">Response</span>): <span class="tk-t">Int</span> {
+        <span class="tk-k">var</span> r: <span class="tk-t">Response</span>? = response; <span class="tk-k">var</span> count = <span class="tk-n">1</span>
+        <span class="tk-k">while</span> (r?.priorResponse != <span class="tk-k">null</span>) { count++; r = r.priorResponse }
+        <span class="tk-k">return</span> count
+    }
+}</code></pre></figure>
+<div class="warn"><b>Authenticator runs on OkHttp's thread</b><p>It's synchronous, so the refresh call must be blocking. Use a separate OkHttp client for refresh so the refresh request can't itself trigger the authenticator. Store tokens securely. See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p></div>
+
+<h2 id="logging">Logging safely</h2>
+<figure class="code"><figcaption><span class="file">Debug-only logging with redaction</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> logging = <span class="tk-t">HttpLoggingInterceptor</span>().apply {
+    level = <span class="tk-k">if</span> (<span class="tk-t">BuildConfig</span>.<span class="tk-t">DEBUG</span>) <span class="tk-t">HttpLoggingInterceptor</span>.<span class="tk-t">Level</span>.<span class="tk-t">BODY</span> <span class="tk-k">else</span> <span class="tk-t">HttpLoggingInterceptor</span>.<span class="tk-t">Level</span>.<span class="tk-t">NONE</span>
+    redactHeader(<span class="tk-s">"Authorization"</span>)
+    redactHeader(<span class="tk-s">"Cookie"</span>)
+}</code></pre></figure>
+
+<h2 id="headers">Common headers and metrics</h2>
+<figure class="code"><figcaption><span class="file">Client info + timing</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ClientInfoInterceptor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> appVersion: <span class="tk-t">String</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> metrics: <span class="tk-t">Metrics</span>) : <span class="tk-t">Interceptor</span> {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> intercept(chain: <span class="tk-t">Interceptor</span>.<span class="tk-t">Chain</span>): <span class="tk-t">Response</span> {
+        <span class="tk-k">val</span> request = chain.request().newBuilder()
+            .header(<span class="tk-s">"X-App-Version"</span>, appVersion)
+            .header(<span class="tk-s">"Accept-Language"</span>, <span class="tk-t">Locale</span>.getDefault().toLanguageTag())
+            .build()
+        <span class="tk-k">val</span> start = <span class="tk-t">System</span>.nanoTime()
+        <span class="tk-k">val</span> response = chain.proceed(request)
+        metrics.record(request.url.encodedPath, response.code, (<span class="tk-t">System</span>.nanoTime() - start) / <span class="tk-n">1_000_000</span>)
+        <span class="tk-k">return</span> response
+    }
+}</code></pre></figure>
+
+<h2 id="setup">Wiring it up</h2>
+<figure class="code"><figcaption><span class="file">OkHttpClient</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> client = <span class="tk-t">OkHttpClient</span>.<span class="tk-t">Builder</span>()
+    .cache(<span class="tk-t">Cache</span>(<span class="tk-t">File</span>(context.cacheDir, <span class="tk-s">"http"</span>), <span class="tk-n">20L</span> * <span class="tk-n">1024</span> * <span class="tk-n">1024</span>))   <span class="tk-c">// 20 MB HTTP cache</span>
+    .addInterceptor(<span class="tk-t">ClientInfoInterceptor</span>(<span class="tk-t">BuildConfig</span>.<span class="tk-t">VERSION_NAME</span>, metrics))
+    .addInterceptor(<span class="tk-t">AuthInterceptor</span>(tokenStore))
+    .authenticator(<span class="tk-t">TokenAuthenticator</span>(tokenStore, refreshApi))
+    .addInterceptor(logging)                                          <span class="tk-c">// last: logs final headers</span>
+    .build()</code></pre></figure>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Multi-tenant APIs</h3><p>Add a tenant or region header from the current session.</p></div>
+  <div class="card usecase"><h3>Offline cache control</h3><p>When offline, rewrite requests to accept stale cached responses. See <a href="../android-caching-strategies/index.html">Caching Strategies</a>.</p></div>
+  <div class="card usecase"><h3>Debug tools</h3><p>Debug-only interceptors for mocking endpoints or inspecting traffic.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Refreshing tokens inside an interceptor with the same client, causing recursion and deadlocks.</li>
+  <li>No retry limit on 401, giving infinite loops.</li>
+  <li>Logging tokens or personal data in release builds.</li>
+  <li>Reading the response body in an interceptor without re-creating it. Bodies can be consumed only once, so use <code>peekBody</code>.</li>
+  <li>Blocking calls (DataStore reads) on every request without caching the value in memory.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I retry failed requests in an interceptor?</summary><div><p>OkHttp already retries some connection failures. Application-level retries with backoff are usually clearer in the repository, where you know whether a request is idempotent.</p></div></details>
+  <details><summary>Can interceptors be suspend functions?</summary><div><p>No. The OkHttp interceptor API is synchronous. Keep the work quick, and cache values you need.</p></div></details>
+  <details><summary>How do I test interceptors?</summary><div><p>Build an OkHttp client with the interceptor against MockWebServer, enqueue responses, and assert on recorded requests.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Interceptors centralise <strong>headers, logging, metrics and cache control</strong>, while the <strong>Authenticator</strong> handles 401 token refresh safely with a retry limit and a separate refresh client. Keep them fast, redact secrets, and order them deliberately.</p>
+<p>Next step: turn failures into good UX with <a href="../android-api-error-handling/index.html">Handling API Errors and Network Failures</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp (interceptors, authenticators): official repository and docs</a></li><li><a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit (official repository)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dokhttp-interceptors-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dokhttp-interceptors-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/retrofit-android-guide/index.html"><small>APIs, Databases, and Backend Integration</small>Retrofit in Android: Complete Guide</a></li><li><a href="../../android/secure-token-storage-android/index.html"><small>APIs, Databases, and Backend Integration</small>Secure Token Storage and API Authentication</a></li><li><a href="../../android/android-caching-strategies/index.html"><small>APIs, Databases, and Backend Integration</small>Caching Strategies for Android Apps</a></li><li><a href="../../android/android-api-error-handling/index.html"><small>APIs, Databases, and Backend Integration</small>Handling API Errors and Network Failures</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/okhttp-interceptors/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/okhttp-interceptors/&amp;text=OkHttp Interceptors Explained" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/okhttp-interceptors/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#chain">The interceptor chain</a></li><li><a href="#auth">Adding an auth header</a></li><li><a href="#refresh">Token refresh with Authenticator</a></li><li><a href="#logging">Logging safely</a></li><li><a href="#headers">Common headers and metrics</a></li><li><a href="#setup">Wiring it up</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dokhttp-interceptors-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dokhttp-interceptors-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!--meta
+{
+  "seo_title": "Migrate Legacy Android Apps to Modern Architecture",
+  "description": "A step-by-step plan to migrate legacy Android apps (Java, AsyncTask, god Activities, XML) to modern architecture: strangler pattern, repositories, ViewModels, coroutines, Hilt, Compose interop and measuring progress.",
+  "primary_keyword": "migrate legacy android app",
+  "keywords": ["modernize android app", "strangler fig pattern android", "asynctask to coroutines", "god activity refactor", "xml to compose migration", "android tech debt migration plan"],
+  "lede": "Legacy apps still earn money, so you can't stop and rewrite. The safest path is incremental: wrap, extract and replace piece by piece, shipping every step. Here's a migration plan that works on real codebases.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["refactor-legacy-android-apps", "ai-understand-legacy-java-code", "ai-migrate-xml-to-compose", "mvvm-architecture-android"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Migrate to Compose", "https://developer.android.com/develop/ui/compose/migrate"],
+    ["Kotlin coroutines on Android", "https://developer.android.com/kotlin/coroutines"],
+    ["Add Kotlin to an existing app", "https://developer.android.com/kotlin/add-kotlin"]
+  ]
+}
+-->
+<p class="ad-lead"><a href="../refactor-legacy-android-apps/index.html">Refactoring Legacy Apps</a> covers safe, local refactoring techniques. This article is the bigger picture: a sequenced migration from a legacy stack to modern Android architecture, without a rewrite.</p>
+
+<h2 id="before-after">From where to where</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Legacy</th><th>Modern target</th></tr></thead>
+  <tbody>
+    <tr><td>Java</td><td>Kotlin (new code first)</td></tr>
+    <tr><td>Logic in Activities/Fragments</td><td>ViewModels + repositories (+ use cases where useful)</td></tr>
+    <tr><td>AsyncTask, callbacks, RxJava</td><td>Coroutines and Flow</td></tr>
+    <tr><td>Singletons, manual wiring</td><td>Hilt</td></tr>
+    <tr><td>XML layouts, findViewById</td><td>Compose (screen by screen)</td></tr>
+    <tr><td>SQLiteOpenHelper</td><td>Room</td></tr>
+    <tr><td>SharedPreferences</td><td>DataStore</td></tr>
+    <tr><td>Single module</td><td>Modules by feature/layer when size justifies</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="strangler">The strangler approach</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mig-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-mig-t fig-mig-d">
+    <title id="fig-mig-t">Strangler migration over time</title>
+    <desc id="fig-mig-d">At first the legacy code handles nearly everything. Over successive releases, new modern components wrap and replace legacy parts feature by feature, until the legacy code is small and finally removed.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="20" y="40" width="150" height="110" rx="12"/><text class="d-t" x="95" y="100" text-anchor="middle">Legacy</text><text class="d-s" x="95" y="175" text-anchor="middle">Release 1</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-red" x="200" y="40" width="150" height="70" rx="12"/><rect class="d-green" x="200" y="110" width="150" height="40" rx="12"/><text class="d-s" x="275" y="80" text-anchor="middle">Legacy</text><text class="d-s" x="275" y="135" text-anchor="middle">Modern</text><text class="d-s" x="275" y="175" text-anchor="middle">Release 4</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-red" x="380" y="40" width="150" height="35" rx="12"/><rect class="d-green" x="380" y="75" width="150" height="75" rx="12"/><text class="d-s" x="455" y="62" text-anchor="middle">Legacy</text><text class="d-s" x="455" y="117" text-anchor="middle">Modern</text><text class="d-s" x="455" y="175" text-anchor="middle">Release 10</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="560" y="40" width="150" height="110" rx="12"/><text class="d-t" x="635" y="100" text-anchor="middle">Modern</text><text class="d-s" x="635" y="175" text-anchor="middle">Later</text></g>
+  </svg>
+  <figcaption id="fig-mig-cap">Every release ships; the modern part grows as the legacy part shrinks.</figcaption>
+</figure>
+
+<h2 id="plan">The migration sequence</h2>
+<ol class="steps">
+  <li><strong>Foundations:</strong> update Gradle, AGP and dependencies; enable Kotlin; add crash reporting and CI with tests. See <a href="../android-ci-cd-github-actions/index.html">CI/CD</a>.</li>
+  <li><strong>Safety net:</strong> characterization tests around critical flows (login, checkout), plus a few UI smoke tests.</li>
+  <li><strong>Data layer first:</strong> introduce repositories that wrap existing data code, so screens stop talking to databases and network directly.</li>
+  <li><strong>ViewModels:</strong> move screen logic out of Activities/Fragments, starting with the most-changed screens.</li>
+  <li><strong>Async:</strong> replace AsyncTask/callbacks with coroutines at the repository boundary.</li>
+  <li><strong>DI:</strong> add Hilt and migrate singletons gradually.</li>
+  <li><strong>UI:</strong> new screens in Compose; migrate existing screens when they need significant changes.</li>
+  <li><strong>Storage:</strong> Room and DataStore migrations with data-migration tests.</li>
+</ol>
+
+<h2 id="example">Example: wrapping a callback API</h2>
+<code-block lang="kotlin" file="Bridge legacy callbacks to coroutines">
+// Legacy Java API: LegacyApi.fetchUser(id, Callback<User>)
+class UserRepository @Inject constructor(private val legacy: LegacyApi) {
+
+    suspend fun getUser(id: String): User = suspendCancellableCoroutine { cont ->
+        val call = legacy.fetchUser(id, object : LegacyApi.Callback<User> {
+            override fun onSuccess(user: User) { cont.resume(user) }
+            override fun onError(t: Throwable) { cont.resumeWithException(t) }
+        })
+        cont.invokeOnCancellation { call.cancel() }   // propagate cancellation
+    }
+}
+// Screens now call repository.getUser() from a ViewModel; LegacyApi can be replaced later.
+</code-block>
+
+<h2 id="compose-interop">Compose interop during migration</h2>
+<code-block lang="kotlin" file="Compose inside an existing Fragment">
+class OrdersFragment : Fragment() {
+    private val viewModel: OrdersViewModel by viewModels()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, s: Bundle?) =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent { AppTheme { OrdersScreen(viewModel) } }
+        }
+}
+</code-block>
+<p>Keep the Fragment and navigation for now, and replace the UI inside. Migrate navigation later. See <a href="../ai-migrate-xml-to-compose/index.html">XML to Compose with AI</a>.</p>
+
+<h2 id="measure">Measure progress meaningfully</h2>
+<ul>
+  <li>Crash-free rate and ANR rate in migrated areas.</li>
+  <li>Lead time for changes in migrated vs legacy features.</li>
+  <li>Test coverage on critical flows.</li>
+  <li>Avoid vanity metrics like "% Kotlin files" as the main goal.</li>
+</ul>
+
+<h2 id="pitfalls">Pitfalls</h2>
+<div class="cards">
+  <div class="card cons"><h3>Big-bang rewrite</h3><p>Months without shipping, feature parity gaps, new bugs. Usually avoid.</p></div>
+  <div class="card cons"><h3>Mixing refactors with features</h3><p>Hard to review and roll back. Keep them separate.</p></div>
+  <div class="card cons"><h3>Two patterns forever</h3><p>Set a direction and a rule ("touched screens get migrated") so migration finishes.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>When is a rewrite justified?</summary><div><p>Rarely: when the platform or product fundamentally changes, or the codebase is small. Even then, consider rewriting module by module.</p></div></details>
+  <details><summary>Can AI speed up migration?</summary><div><p>Yes, for explaining code, drafting conversions and tests. Verify carefully. See <a href="../ai-understand-legacy-java-code/index.html">AI for Legacy Java</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Migrate incrementally: <strong>foundations and tests first</strong>, then <strong>repositories, ViewModels, coroutines, Hilt, Compose and modern storage</strong>, shipping every step and measuring outcomes that matter.</p>
+<p>Next step: learn how senior engineers make these decisions in <a href="../android-engineering-tradeoffs/index.html">Engineering Trade-offs in Android</a>.</p>

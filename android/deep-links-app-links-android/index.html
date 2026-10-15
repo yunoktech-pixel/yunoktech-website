@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deep Links and Android App Links: Complete Guide | Yunok Tech</title>
+  <meta name="description" content="Implement deep links and verified Android App Links: intent filters, assetlinks.json, autoVerify, handling links in Compose Navigation, testing with adb, troubleshooting verification and security.">
+  <meta name="keywords" content="android app links, deep links android, assetlinks.json, autoverify android, compose navigation deep link, test deep link adb, app links verification failed">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/deep-links-app-links-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/deep-links-app-links-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Deep Links and Android App Links: Complete Guide">
+  <meta property="og:description" content="Implement deep links and verified Android App Links: intent filters, assetlinks.json, autoVerify, handling links in Compose Navigation, testing with adb, troubleshooting verification and security.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Advanced Android Engineering and Emerging Technology">
+  <meta name="twitter:title" content="Deep Links and Android App Links: Complete Guide">
+  <meta name="twitter:description" content="Implement deep links and verified Android App Links: intent filters, assetlinks.json, autoVerify, handling links in Compose Navigation, testing with adb, troubleshooting verification and security.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Deep Links, App Links, and Android App Actions", "description": "Implement deep links and verified Android App Links: intent filters, assetlinks.json, autoVerify, handling links in Compose Navigation, testing with adb, troubleshooting verification and security.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Advanced Android Engineering and Emerging Technology", "keywords": "deep links android, assetlinks.json, autoverify android, compose navigation deep link, test deep link adb, app links verification failed", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/deep-links-app-links-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Deep Links, App Links, and Android App Actions", "item": "https://yunoktech.com/android/deep-links-app-links-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#advanced">Advanced Android Engineering and Emerging Technology</a></nav>
+    <span class="ad-chip">⚙️ Advanced Android Engineering and Emerging Technology</span>
+    <h1 id="article-title">Deep Links, App Links, and Android App Actions</h1>
+    <p class="ad-lede">A link in an email, a QR code or a notification should open the exact screen in your app, not a browser. Deep links make that possible, and verified Android App Links make it seamless and secure. Here's how to set them up end to end.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#types">Deep links vs App Links</a></li><li><a href="#manifest">Step 1: Intent filter</a></li><li><a href="#assetlinks">Step 2: Publish assetlinks.json</a></li><li><a href="#handle">Step 3: Handle the link</a></li><li><a href="#test">Step 4: Test</a></li><li><a href="#security">Security</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">There are three kinds of links that can open your app: custom-scheme deep links (<code>myapp://</code>), unverified web links (which show a disambiguation dialog or open the browser), and verified Android App Links that open your app directly because you've proved you own the domain.</p>
+
+<h2 id="types">Deep links vs App Links</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-dl-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-dl-t fig-dl-d">
+    <title id="fig-dl-t">How Android resolves a link</title>
+    <desc id="fig-dl-d">A user taps https://example.com/product/42. If the app has a verified App Link for example.com, Android opens the app directly. Otherwise the link opens in the browser or a chooser. Custom scheme links like myapp://product/42 only work if an app handles that scheme, and have no ownership verification.</desc>
+    <defs><marker id="dlm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M210 100 H260 M440 70 H490 M440 140 H490" marker-end="url(#dlm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="70" width="190" height="60" rx="12"/><text class="d-t" x="115" y="96" text-anchor="middle">Tap link</text><text class="d-s" x="115" y="114" text-anchor="middle">https://example.com/p/42</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="262" y="70" width="178" height="60" rx="12"/><text class="d-t" x="351" y="96" text-anchor="middle">Domain verified</text><text class="d-s" x="351" y="114" text-anchor="middle">for this app?</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="492" y="40" width="210" height="56" rx="12"/><text class="d-t" x="597" y="66" text-anchor="middle">Yes → open app</text><text class="d-s" x="597" y="84" text-anchor="middle">directly</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="492" y="112" width="210" height="56" rx="12"/><text class="d-t" x="597" y="138" text-anchor="middle">No → browser</text><text class="d-s" x="597" y="156" text-anchor="middle">(or chooser)</text></g>
+  </svg>
+  <figcaption id="fig-dl-cap">Since Android 12, unverified web links open in the browser by default.</figcaption>
+</figure>
+
+<h2 id="manifest">Step 1: Intent filter</h2>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;activity</span> <span class="tk-at">android:name</span>=<span class="tk-s">".MainActivity"</span> <span class="tk-at">android:exported</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>
+    <span class="tk-tag">&lt;intent-filter</span> <span class="tk-at">android:autoVerify</span>=<span class="tk-s">"true"</span><span class="tk-tag">&gt;</span>
+        <span class="tk-tag">&lt;action</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.action.VIEW"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;category</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.category.DEFAULT"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;category</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.intent.category.BROWSABLE"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;data</span> <span class="tk-at">android:scheme</span>=<span class="tk-s">"https"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;data</span> <span class="tk-at">android:host</span>=<span class="tk-s">"example.com"</span> <span class="tk-tag">/&gt;</span>
+        <span class="tk-tag">&lt;data</span> <span class="tk-at">android:pathPrefix</span>=<span class="tk-s">"/product/"</span> <span class="tk-tag">/&gt;</span>
+    <span class="tk-tag">&lt;/intent-filter</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;/activity</span><span class="tk-tag">&gt;</span></code></pre></figure>
+
+<h2 id="assetlinks">Step 2: Publish assetlinks.json</h2>
+<p>Host this at <code>https://example.com/.well-known/assetlinks.json</code>, served over HTTPS with <code>Content-Type: application/json</code> and no redirects:</p>
+<figure class="code"><figcaption><span class="file">.well-known/assetlinks.json</span><span class="lang">JSON</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-json">[{
+  <span class="tk-s">"relation"</span>: [<span class="tk-s">"delegate_permission/common.handle_all_urls"</span>],
+  <span class="tk-s">"target"</span>: {
+    <span class="tk-s">"namespace"</span>: <span class="tk-s">"android_app"</span>,
+    <span class="tk-s">"package_name"</span>: <span class="tk-s">"com.example.shop"</span>,
+    <span class="tk-s">"sha256_cert_fingerprints"</span>: [
+      <span class="tk-s">"AB:CD:...:EF"</span>
+    ]
+  }
+}]</code></pre></figure>
+<div class="callout warn"><b>Use the right fingerprint</b><p>With Play App Signing, use the <em>app signing key</em> fingerprint from Play Console (Setup → App signing), not only your upload key. Include your debug key's fingerprint separately if you want verification in debug builds.</p></div>
+
+<h2 id="handle">Step 3: Handle the link</h2>
+<p>With Navigation Compose, declare deep links on destinations:</p>
+<figure class="code"><figcaption><span class="file">Navigation Compose deep link</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Product</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>)
+
+composable&lt;<span class="tk-t">Product</span>&gt;(
+    deepLinks = listOf(navDeepLink&lt;<span class="tk-t">Product</span>&gt;(basePath = <span class="tk-s">"https://example.com/product"</span>))
+) { entry -&gt;
+    <span class="tk-k">val</span> product = entry.toRoute&lt;<span class="tk-t">Product</span>&gt;()
+    <span class="tk-t">ProductScreen</span>(product.id)
+}</code></pre></figure>
+<p>Or handle intents manually (for example with Navigation 3 or custom routing):</p>
+<figure class="code"><figcaption><span class="file">Manual parsing</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> parseDeepLink(uri: <span class="tk-t">Uri</span>?): <span class="tk-t">AppRoute</span>? {
+    <span class="tk-k">if</span> (uri?.host != <span class="tk-s">"example.com"</span>) <span class="tk-k">return</span> <span class="tk-k">null</span>
+    <span class="tk-k">val</span> segments = uri.pathSegments
+    <span class="tk-k">return</span> <span class="tk-k">when</span> {
+        segments.size == <span class="tk-n">2</span> &amp;&amp; segments[<span class="tk-n">0</span>] == <span class="tk-s">"product"</span> -&gt; <span class="tk-t">AppRoute</span>.<span class="tk-t">Product</span>(segments[<span class="tk-n">1</span>])
+        <span class="tk-k">else</span> -&gt; <span class="tk-k">null</span>
+    }
+}
+<span class="tk-c">// Call from onCreate(intent) and onNewIntent(intent)</span></code></pre></figure>
+
+<h2 id="test">Step 4: Test</h2>
+<figure class="code"><figcaption><span class="file">adb commands</span><span class="lang">Shell</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-bash"><span class="tk-c"># Open a link</span>
+adb shell am start -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d <span class="tk-s">"https://example.com/product/42"</span>
+
+<span class="tk-c"># Check verification state</span>
+adb shell pm get-app-links com.example.shop
+
+<span class="tk-c"># Re-run verification after fixing assetlinks.json</span>
+adb shell pm verify-app-links --re-verify com.example.shop</code></pre></figure>
+<p>Android Studio's App Links Assistant also helps generate and validate these files.</p>
+
+<h2 id="security">Security</h2>
+<ul>
+  <li>Treat link parameters as untrusted input: validate IDs and never perform sensitive actions (payments, deletes) directly from a link without confirmation.</li>
+  <li>Require authentication before showing protected content.</li>
+  <li>Prefer verified App Links over custom schemes, which any app can claim.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Marketing emails</h3><p>Links open product pages in the app when installed, the website otherwise.</p></div>
+  <div class="card usecase"><h3>Notifications</h3><p>Use the same routes for notification taps and links, so navigation logic is shared.</p></div>
+  <div class="card usecase"><h3>Password reset</h3><p>Verified links route reset tokens safely into the app.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Verification fails:</strong> wrong fingerprint, a redirect on assetlinks.json, the wrong content type, or a host in the intent filter not covered by the file. Every host listed must verify.</li>
+  <li><strong>Link opens browser in debug:</strong> the debug signing key isn't in assetlinks.json.</li>
+  <li><strong>Screen opens twice:</strong> handle <code>onNewIntent</code> and set an appropriate launch mode.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are Firebase Dynamic Links still an option?</summary><div><p>No. Firebase Dynamic Links has been shut down. Use App Links with your own domain, plus a web fallback.</p></div></details>
+  <details><summary>Do I need a website?</summary><div><p>For verified App Links, yes: you need a domain you control to host assetlinks.json.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>verified App Links</strong>: add an intent filter with <code>autoVerify</code>, publish a correct <strong>assetlinks.json</strong> with the app signing fingerprint, route links through your navigation, test with <code>adb</code>, and validate parameters as untrusted input.</p>
+<p>Next step: extend your app to the home screen with <a href="../android-app-widgets-shortcuts/index.html">App Widgets and Shortcuts</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/app-links" target="_blank" rel="noopener">About deep links and App Links</a></li><li><a href="https://developer.android.com/training/app-links/about" target="_blank" rel="noopener">Add Android App Links</a></li><li><a href="https://developer.android.com/training/app-links/verify-android-applinks" target="_blank" rel="noopener">Verify Android App Links</a></li><li><a href="https://developers.google.com/digital-asset-links/v1/getting-started" target="_blank" rel="noopener">Digital Asset Links</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddeep-links-app-links-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddeep-links-app-links-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-navigation/index.html"><small>Jetpack Compose</small>Navigation in Jetpack Compose</a></li><li><a href="../../android/android-app-components/index.html"><small>Android Development for Beginners</small>Android App Components: Activities, Services, and Receivers</a></li><li><a href="../../android/firebase-cloud-messaging-push-notifications/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Cloud Messaging and Push Notifications</a></li><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/deep-links-app-links-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/deep-links-app-links-android/&amp;text=Deep Links, App Links, and Android App Actions" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/deep-links-app-links-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#types">Deep links vs App Links</a></li><li><a href="#manifest">Step 1: Intent filter</a></li><li><a href="#assetlinks">Step 2: Publish assetlinks.json</a></li><li><a href="#handle">Step 3: Handle the link</a></li><li><a href="#test">Step 4: Test</a></li><li><a href="#security">Security</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddeep-links-app-links-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddeep-links-app-links-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

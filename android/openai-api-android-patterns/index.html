@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI API Integration Patterns for Android Apps | Yunok Tech</title>
+  <meta name="description" content="Integrate OpenAI models in Android apps safely: backend proxy architecture, never shipping API keys, authenticating users, streaming via SSE, provider-agnostic interfaces, rate limits, moderation and cost control.">
+  <meta name="keywords" content="openai api android, openai android kotlin, chatgpt api android app, openai backend proxy, stream openai responses android, openai api key security mobile, llm provider abstraction">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/openai-api-android-patterns/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/openai-api-android-patterns/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="OpenAI API Integration Patterns for Android Apps">
+  <meta property="og:description" content="Integrate OpenAI models in Android apps safely: backend proxy architecture, never shipping API keys, authenticating users, streaming via SSE, provider-agnostic interfaces, rate limits, moderation and cost control.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="OpenAI API Integration Patterns for Android Apps">
+  <meta name="twitter:description" content="Integrate OpenAI models in Android apps safely: backend proxy architecture, never shipping API keys, authenticating users, streaming via SSE, provider-agnostic interfaces, rate limits, moderation and cost control.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "OpenAI API Integration Patterns for Android", "description": "Integrate OpenAI models in Android apps safely: backend proxy architecture, never shipping API keys, authenticating users, streaming via SSE, provider-agnostic interfaces, rate limits, moderation and cost control.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "openai android kotlin, chatgpt api android app, openai backend proxy, stream openai responses android, openai api key security mobile, llm provider abstraction", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/openai-api-android-patterns/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "OpenAI API Integration Patterns for Android", "item": "https://yunoktech.com/android/openai-api-android-patterns/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">OpenAI API Integration Patterns for Android</h1>
+    <p class="ad-lede">Calling OpenAI directly from an Android app means shipping your secret API key to every user, and anyone can extract it. The production pattern is a backend proxy you control. Here's the architecture, the Android side, and how to stay provider-agnostic.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architecture">The proxy architecture</a></li><li><a href="#backend">What the backend does</a></li><li><a href="#android">The Android side: a provider-agnostic interface</a></li><li><a href="#sse">Streaming from your backend (SSE)</a></li><li><a href="#costs">Cost and rate limits</a></li><li><a href="#compare">OpenAI via proxy vs Firebase AI Logic</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">OpenAI's API (and similar provider APIs) is designed for server-to-server use with a secret key. Unlike Firebase AI Logic, which pairs with App Check for client apps, OpenAI keys must stay on your server. The Android app talks to <em>your</em> backend, which talks to OpenAI.</p>
+
+<div class="callout warn"><b>Never put the API key in the app</b><p>Not in code, <code>BuildConfig</code>, resources, native libraries or obfuscated strings. APKs can be decompiled and traffic inspected. See <a href="../secure-api-keys-android/index.html">Securing API Keys</a>.</p></div>
+
+<h2 id="architecture">The proxy architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-oai-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-oai-t fig-oai-d">
+    <title id="fig-oai-t">Android app to backend proxy to OpenAI</title>
+    <desc id="fig-oai-d">The Android app sends a request with the user's auth token and an integrity token to your backend. The backend verifies the user, enforces quotas, builds the prompt with server-side instructions, and calls OpenAI with the secret key. It streams the response back to the app and logs usage and cost.</desc>
+    <defs><marker id="oaim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M190 80 H246 M470 80 H526" marker-end="url(#oaim)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="170" height="80" rx="12"/><text class="d-t" x="105" y="70" text-anchor="middle">Android app</text><text class="d-s" x="105" y="90" text-anchor="middle">user token</text><text class="d-s" x="105" y="106" text-anchor="middle">+ integrity token</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="250" y="30" width="220" height="100" rx="12"/><text class="d-t" x="360" y="56" text-anchor="middle">Your backend</text><text class="d-s" x="360" y="78" text-anchor="middle">auth · quotas · prompt</text><text class="d-s" x="360" y="96" text-anchor="middle">moderation · logging</text><text class="d-s" x="360" y="114" text-anchor="middle">secret key here only</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-dark" x="530" y="40" width="170" height="80" rx="12"/><text class="d-w" x="615" y="76" text-anchor="middle">OpenAI API</text><text class="d-w" x="615" y="96" text-anchor="middle">(or other provider)</text></g>
+    <text class="d-s" x="360" y="170" text-anchor="middle">The app never sees the provider key; the backend can switch providers freely.</text>
+  </svg>
+  <figcaption id="fig-oai-cap">The backend is your control point for security, cost and provider choice.</figcaption>
+</figure>
+
+<h2 id="backend">What the backend does</h2>
+<ol class="steps">
+  <li><strong>Authenticate the user</strong> (for example a Firebase Auth ID token) and optionally verify a Play Integrity token.</li>
+  <li><strong>Enforce quotas and rate limits</strong> per user and plan.</li>
+  <li><strong>Own the prompt:</strong> system instructions and model choice live on the server, so the client sends only user input.</li>
+  <li><strong>Validate and moderate</strong> input and output as your use case requires.</li>
+  <li><strong>Stream</strong> the provider response back to the client.</li>
+  <li><strong>Log usage</strong> (tokens, latency, errors) without storing sensitive content unless needed. See <a href="../ai-privacy-data-retention/index.html">AI Data Retention</a>.</li>
+</ol>
+
+<h2 id="android">The Android side: a provider-agnostic interface</h2>
+<figure class="code"><figcaption><span class="file">AiChatService.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">/** The app depends on this, not on any provider SDK. */</span>
+<span class="tk-k">interface</span> <span class="tk-t">AiChatService</span> {
+    <span class="tk-k">fun</span> stream(conversationId: <span class="tk-t">String</span>, userMessage: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">ChatEvent</span>&gt;
+}
+
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">ChatEvent</span> {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Delta</span>(<span class="tk-k">val</span> text: <span class="tk-t">String</span>) : <span class="tk-t">ChatEvent</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Done</span>(<span class="tk-k">val</span> messageId: <span class="tk-t">String</span>) : <span class="tk-t">ChatEvent</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Error</span>(<span class="tk-k">val</span> kind: <span class="tk-t">ErrorKind</span>) : <span class="tk-t">ChatEvent</span>
+}
+<span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">ErrorKind</span> { <span class="tk-t">RATE_LIMITED</span>, <span class="tk-t">QUOTA_EXCEEDED</span>, <span class="tk-t">UNAVAILABLE</span>, <span class="tk-t">BLOCKED</span>, <span class="tk-t">NETWORK</span> }</code></pre></figure>
+
+<h2 id="sse">Streaming from your backend (SSE)</h2>
+<p>If your backend relays tokens as Server-Sent Events, OkHttp's SSE module consumes them as a Flow:</p>
+<figure class="code"><figcaption><span class="file">BackendChatService.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">BackendChatService</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> client: <span class="tk-t">OkHttpClient</span>,              <span class="tk-c">// with an auth interceptor adding the user's token</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> baseUrl: <span class="tk-t">String</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> json: <span class="tk-t">Json</span>,
+) : <span class="tk-t">AiChatService</span> {
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> stream(conversationId: <span class="tk-t">String</span>, userMessage: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">ChatEvent</span>&gt; = callbackFlow {
+        <span class="tk-k">val</span> body = json.encodeToString(<span class="tk-t">ChatRequest</span>(conversationId, userMessage))
+            .toRequestBody(<span class="tk-s">"application/json"</span>.toMediaType())
+        <span class="tk-k">val</span> request = <span class="tk-t">Request</span>.<span class="tk-t">Builder</span>().url(<span class="tk-s">"$baseUrl/v1/chat/stream"</span>).post(body).build()
+
+        <span class="tk-k">val</span> source = <span class="tk-t">EventSources</span>.createFactory(client).newEventSource(request, <span class="tk-k">object</span> : <span class="tk-t">EventSourceListener</span>() {
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onEvent(es: <span class="tk-t">EventSource</span>, id: <span class="tk-t">String</span>?, type: <span class="tk-t">String</span>?, <span class="tk-k">data</span>: <span class="tk-t">String</span>) {
+                <span class="tk-k">when</span> (type) {
+                    <span class="tk-s">"delta"</span> -&gt; trySend(<span class="tk-t">ChatEvent</span>.<span class="tk-t">Delta</span>(json.decodeFromString&lt;<span class="tk-t">Delta</span>&gt;(<span class="tk-k">data</span>).text))
+                    <span class="tk-s">"done"</span> -&gt; { trySend(<span class="tk-t">ChatEvent</span>.<span class="tk-t">Done</span>(<span class="tk-k">data</span>)); close() }
+                }
+            }
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onFailure(es: <span class="tk-t">EventSource</span>, t: <span class="tk-t">Throwable</span>?, response: <span class="tk-t">Response</span>?) {
+                trySend(<span class="tk-t">ChatEvent</span>.<span class="tk-t">Error</span>(response?.code.toErrorKind()))
+                close()
+            }
+        })
+        awaitClose { source.cancel() }               <span class="tk-c">// cancels the HTTP call when the collector stops</span>
+    }
+}
+
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">Int</span>?.toErrorKind() = <span class="tk-k">when</span> (<span class="tk-k">this</span>) {
+    <span class="tk-n">429</span> -&gt; <span class="tk-t">ErrorKind</span>.<span class="tk-t">RATE_LIMITED</span>
+    <span class="tk-n">402</span>, <span class="tk-n">403</span> -&gt; <span class="tk-t">ErrorKind</span>.<span class="tk-t">QUOTA_EXCEEDED</span>
+    <span class="tk-k">null</span> -&gt; <span class="tk-t">ErrorKind</span>.<span class="tk-t">NETWORK</span>
+    <span class="tk-k">else</span> -&gt; <span class="tk-t">ErrorKind</span>.<span class="tk-t">UNAVAILABLE</span>
+}</code></pre></figure>
+<p>Collect this in a ViewModel and render it as in <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Compose</a>.</p>
+
+<h2 id="costs">Cost and rate limits</h2>
+<ul>
+  <li>Cap max output tokens and conversation history length on the server.</li>
+  <li>Choose smaller models for simple tasks, and route by task.</li>
+  <li>Return clear 429 or quota errors, and show helpful UI (wait, or upgrade).</li>
+  <li>Track cost per user and feature. See <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI Costs</a>.</li>
+</ul>
+
+<h2 id="compare">OpenAI via proxy vs Firebase AI Logic</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>OpenAI via your backend</th><th>Gemini via Firebase AI Logic</th></tr></thead>
+  <tbody>
+    <tr><td>Client security</td><td>Your auth + backend</td><td>App Check + Firebase</td></tr>
+    <tr><td>Backend needed</td><td>Yes</td><td>No (optional)</td></tr>
+    <tr><td>Prompt control</td><td>Fully server-side</td><td>Client (or server prompt templates)</td></tr>
+    <tr><td>Provider flexibility</td><td>High</td><td>Gemini models</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is there an official OpenAI Android SDK?</summary><div><p>OpenAI publishes official SDKs for several server languages, including Java/Kotlin for the JVM, but they're intended for server use with secret keys. On Android, call your own backend.</p></div></details>
+  <details><summary>Can I use ephemeral keys?</summary><div><p>Some provider features (such as realtime sessions) support short-lived client tokens issued by your server. Your backend still mints them after authenticating the user.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Integrate OpenAI through a <strong>backend proxy</strong> that holds the key, authenticates users, owns prompts, enforces quotas and streams responses. On Android, depend on a <strong>provider-agnostic interface</strong> and stream with SSE.</p>
+<p>Next step: render those streams beautifully with <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Jetpack Compose</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://platform.openai.com/docs/api-reference" target="_blank" rel="noopener">OpenAI API reference</a></li><li><a href="https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety" target="_blank" rel="noopener">OpenAI: best practices for API key safety</a></li><li><a href="https://platform.openai.com/docs/guides/streaming-responses" target="_blank" rel="noopener">OpenAI streaming responses</a></li><li><a href="https://developer.android.com/google/play/integrity" target="_blank" rel="noopener">Play Integrity API</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dopenai-api-android-patterns-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dopenai-api-android-patterns-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/secure-cloud-ai-api-android/index.html"><small>Android AI and Generative AI</small>Integrating Cloud AI APIs Securely in Android</a></li><li><a href="../../android/secure-api-keys-android/index.html"><small>Android Security and Privacy</small>Secure API Keys and Secrets in Android Apps</a></li><li><a href="../../android/gemini-vs-openai-vs-open-source-models/index.html"><small>Android AI and Generative AI</small>AI Model Selection: Gemini, OpenAI, and Open-Source Models</a></li><li><a href="../../android/streaming-ai-responses-compose/index.html"><small>Android AI Projects and Production</small>Streaming AI Responses in Jetpack Compose</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/openai-api-android-patterns/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/openai-api-android-patterns/&amp;text=OpenAI API Integration Patterns for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/openai-api-android-patterns/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architecture">The proxy architecture</a></li><li><a href="#backend">What the backend does</a></li><li><a href="#android">The Android side: a provider-agnostic interface</a></li><li><a href="#sse">Streaming from your backend (SSE)</a></li><li><a href="#costs">Cost and rate limits</a></li><li><a href="#compare">OpenAI via proxy vs Firebase AI Logic</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dopenai-api-android-patterns-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dopenai-api-android-patterns-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!--meta
+{
+  "seo_title": "Function Calling and Tool Use in AI-Powered Android Apps",
+  "description": "Implement function calling with Gemini in Android: declare tools, handle function calls, return results, validate arguments, confirm sensitive actions and secure tool execution in Kotlin.",
+  "primary_keyword": "function calling android gemini",
+  "keywords": ["gemini function calling kotlin", "llm tool use android", "firebase ai logic tools", "ai agent actions app", "validate llm arguments", "human in the loop ai"],
+  "lede": "Function calling lets a model decide that it needs your app's data or actions, such as checking an order, finding a store or creating a reminder, and request them in a structured way. Your code stays in control: it validates, executes and returns results. Here's how to do it safely in Kotlin.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["rag-android-apps", "prompt-injection-android-ai", "ai-chatbot-jetpack-compose", "android-appfunctions-ai-ecosystem"],
+  "refs": [
+    ["Firebase AI Logic: function calling", "https://firebase.google.com/docs/ai-logic/function-calling?platform=android"],
+    ["Gemini API: function calling", "https://ai.google.dev/gemini-api/docs/function-calling"],
+    ["OWASP LLM Top 10: excessive agency", "https://owasp.org/www-project-top-10-for-large-language-model-applications/"]
+  ]
+}
+-->
+<p class="ad-lead">A support chatbot that can only talk is limited. One that can <em>look up your order</em> is useful. Function calling bridges the two: you describe functions to the model, it returns a structured request to call one with arguments, your code runs it, and the model uses the result to answer.</p>
+
+<h2 id="flow">The function-calling loop</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fc-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-fc-t fig-fc-d">
+    <title id="fig-fc-t">Function calling loop</title>
+    <desc id="fig-fc-d">The user asks where their order is. The app sends the message plus tool declarations to the model. The model replies with a function call getOrderStatus with orderId A1042. The app validates the arguments and checks authorisation, calls its own API, and sends the function result back to the model. The model writes the final answer for the user.</desc>
+    <defs><marker id="fcm2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="20" width="200" height="50" rx="10"/><text class="d-s" x="120" y="42" text-anchor="middle">"Where is order A1042?"</text><text class="d-s" x="120" y="58" text-anchor="middle">+ tool declarations</text></g>
+    <path class="d-flow" d="M220 45 H286" marker-end="url(#fcm2)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="290" y="20" width="160" height="50" rx="10"/><text class="d-t" x="370" y="50" text-anchor="middle">Model</text></g>
+    <path class="d-flow" d="M450 45 H516" marker-end="url(#fcm2)"/>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="520" y="20" width="180" height="50" rx="10"/><text class="d-s" x="610" y="40" text-anchor="middle">functionCall:</text><text class="d-s" x="610" y="56" text-anchor="middle">getOrderStatus(A1042)</text></g>
+    <path class="d-flow" d="M610 70 V104" marker-end="url(#fcm2)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="480" y="108" width="220" height="56" rx="10"/><text class="d-s" x="590" y="130" text-anchor="middle">YOUR code: validate, authorise,</text><text class="d-s" x="590" y="148" text-anchor="middle">call your API</text></g>
+    <path class="d-flow" d="M480 136 H454" marker-end="url(#fcm2)"/>
+    <g class="d-step" style="--i:4"><rect class="d-violet" x="290" y="108" width="160" height="56" rx="10"/><text class="d-s" x="370" y="130" text-anchor="middle">functionResponse</text><text class="d-s" x="370" y="148" text-anchor="middle">→ model</text></g>
+    <path class="d-flow" d="M290 136 H224" marker-end="url(#fcm2)"/>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="20" y="108" width="200" height="56" rx="10"/><text class="d-w" x="120" y="130" text-anchor="middle">"It's out for delivery,</text><text class="d-w" x="120" y="148" text-anchor="middle">arriving today."</text></g>
+    <text class="d-s" x="360" y="206" text-anchor="middle">The model never executes anything. It only asks; your code decides.</text>
+  </svg>
+  <figcaption id="fig-fc-cap">Function calling is structured intent extraction plus a loop. The authority stays with your code.</figcaption>
+</figure>
+
+<h2 id="declare">Declaring tools (Firebase AI Logic, Kotlin)</h2>
+<code-block lang="kotlin" file="Tools.kt">
+val getOrderStatus = FunctionDeclaration(
+    name = "getOrderStatus",
+    description = "Get the delivery status of one of the signed-in user's orders.",
+    parameters = mapOf("orderId" to Schema.string("Order ID like A1042")),
+)
+
+val findNearestStore = FunctionDeclaration(
+    name = "findNearestStore",
+    description = "Find the nearest store to the user's current city.",
+    parameters = mapOf("city" to Schema.string("City name, e.g. Mohali")),
+)
+
+val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+    modelName = "gemini-3.8-flash",                      // check current names
+    tools = listOf(Tool.functionDeclarations(listOf(getOrderStatus, findNearestStore))),
+    systemInstruction = content { text("You help with orders and stores. Use tools for facts; never guess order data.") },
+)
+</code-block>
+
+<h2 id="handle">Handling calls and returning results</h2>
+<code-block lang="kotlin" file="ToolRunner.kt">
+class ToolRunner(
+    private val orders: OrderRepository,         // only returns the CURRENT user's orders
+    private val stores: StoreRepository,
+) {
+    suspend fun run(call: FunctionCallPart): JsonObject = when (call.name) {
+        "getOrderStatus" -> {
+            val id = call.args["orderId"]?.jsonPrimitive?.contentOrNull
+                ?.takeIf { it.matches(Regex("^[A-Z][0-9]{3,10}$")) }          // validate arguments
+                ?: return error("Invalid order ID")
+            val order = orders.findForCurrentUser(id) ?: return error("Order not found")
+            buildJsonObject { put("status", order.status.name); put("eta", order.eta?.toString()) }
+        }
+        "findNearestStore" -> {
+            val city = call.args["city"]?.jsonPrimitive?.contentOrNull?.take(60) ?: return error("City required")
+            val store = stores.nearest(city) ?: return error("No store found")
+            buildJsonObject { put("name", store.name); put("address", store.address) }
+        }
+        else -> error("Unknown function")                                       // allow-list
+    }
+
+    private fun error(msg: String) = buildJsonObject { put("error", msg) }
+}
+
+suspend fun ask(chat: Chat, runner: ToolRunner, userText: String): String {
+    var response = chat.sendMessage(userText)
+    repeat(3) {                                                                 // cap the loop
+        val calls = response.functionCalls
+        if (calls.isEmpty()) return response.text.orEmpty()
+        val results = calls.map { FunctionResponsePart(it.name, runner.run(it)) }
+        response = chat.sendMessage(content(role = "function") { results.forEach { part(it) } })
+    }
+    return response.text ?: "Sorry, I couldn't complete that."
+}
+// val chat = model.startChat()
+</code-block>
+<p>Class and property names follow the Firebase AI Logic Kotlin SDK. Check the function-calling docs for your version, since details such as role names and part types can change.</p>
+
+<h2 id="safety">Safety rules for tool use</h2>
+<ul>
+  <li><strong>Allow-list</strong> functions, and never execute arbitrary names or code from the model.</li>
+  <li><strong>Validate every argument</strong> (type, format, ranges), just like untrusted user input.</li>
+  <li><strong>Authorise in your code</strong>: the tool queries only the signed-in user's data.</li>
+  <li><strong>Confirm sensitive actions</strong>: payments, cancellations, sending messages and deleting data need an explicit user confirmation in the UI, not just model intent.</li>
+  <li><strong>Limit the loop</strong>: cap iterations and time.</li>
+  <li><strong>Read-only first</strong>: start with lookups, and add actions carefully.</li>
+</ul>
+<code-block lang="kotlin" file="Human-in-the-loop for actions">
+sealed interface PendingAction {
+    data class CancelOrder(val orderId: String) : PendingAction
+}
+// The tool doesn't cancel; it returns {"requiresConfirmation": true} and the UI shows:
+// "Cancel order A1042? [Cancel order] [Keep order]". Only the button triggers the real API call.
+</code-block>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Support assistant</h3><p>Order status, return eligibility and store lookup, all read-only with user scoping.</p></div>
+  <div class="card usecase"><h3>Voice commands</h3><p>"Remind me at 6" → <code>createReminder(time, title)</code> → confirm → create.</p></div>
+  <div class="card usecase"><h3>Smart filters</h3><p>"Show red shoes under 3000" → <code>applyFilters(...)</code>, which only changes UI state.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can the model call functions on its own without my code?</summary><div><p>No. The model only returns a request. Nothing runs unless your code executes it.</p></div></details>
+  <details><summary>Function calling or structured output?</summary><div><p>Structured output returns data in a schema in one step. Function calling lets the model decide <em>whether and which</em> tool to use, often over multiple turns.</p></div></details>
+  <details><summary>How does this relate to Android AppFunctions?</summary><div><p>AppFunctions let your app expose functions to system-level AI agents. In-app function calling is your own assistant calling your own code. See <a href="../android-appfunctions-ai-ecosystem/index.html">AppFunctions</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Function calling turns AI from a talker into a helper: <strong>declare narrow tools, validate and authorise every call in your code, return structured results, cap the loop, and require user confirmation for actions</strong>. The model proposes, and your app decides.</p>
+<p>Next step: measure and improve answer quality with <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses and Reducing Hallucinations</a>.</p>

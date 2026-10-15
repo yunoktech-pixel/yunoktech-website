@@ -1,0 +1,136 @@
+<!--meta
+{
+  "seo_title": "Kotlin Generics and Reified Types Explained",
+  "description": "Kotlin generics for Android developers: type parameters, constraints, variance (in/out), star projection, type erasure and reified type parameters with practical examples.",
+  "primary_keyword": "kotlin generics reified",
+  "keywords": ["kotlin generics variance", "kotlin in out keywords", "reified type parameter", "type erasure kotlin", "kotlin star projection", "generic repository android"],
+  "lede": "Generics let you write one piece of code that works safely with many types: a Result wrapper, a cache, a paging helper. Variance and type erasure confuse many developers. This guide explains them with Android examples, and shows how reified types solve erasure for inline functions.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-extension-higher-order-functions", "kotlin-delegation", "kotlin-interview-questions-experienced", "android-design-patterns"],
+  "refs": [
+    ["Generics: in, out, where", "https://kotlinlang.org/docs/generics.html"],
+    ["Inline functions: reified type parameters", "https://kotlinlang.org/docs/inline-functions.html#reified-type-parameters"],
+    ["kotlinx.serialization", "https://kotlinlang.org/docs/serialization.html"]
+  ]
+}
+-->
+<p class="ad-lead">You've used generics since your first <code>List&lt;String&gt;</code>. Writing your own is a different matter: why can't you pass a <code>List&lt;Dog&gt;</code> where a <code>MutableList&lt;Animal&gt;</code> is expected? Why does <code>T::class</code> fail inside a function? This guide answers those questions with code you'd actually write in an Android app.</p>
+
+<h2 id="basics">Type parameters and constraints</h2>
+<code-block lang="kotlin" file="A typed result wrapper">
+sealed interface Outcome<out T> {
+    data class Success<T>(val value: T) : Outcome<T>
+    data class Failure(val error: Throwable) : Outcome<Nothing>
+}
+
+inline fun <T, R> Outcome<T>.map(transform: (T) -> R): Outcome<R> = when (this) {
+    is Outcome.Success -> Outcome.Success(transform(value))
+    is Outcome.Failure -> this
+}
+
+suspend fun <T> runCatchingIo(block: suspend () -> T): Outcome<T> =
+    try { Outcome.Success(block()) } catch (e: IOException) { Outcome.Failure(e) }
+</code-block>
+<p><code>Failure</code> uses <code>Nothing</code>, the type with no values and a subtype of everything. Thanks to <code>out T</code> (covariance, explained next), an <code>Outcome&lt;Nothing&gt;</code> is usable as an <code>Outcome&lt;User&gt;</code>.</p>
+<code-block lang="kotlin" file="Upper-bound constraints">
+fun <T : Comparable<T>> List<T>.secondLargest(): T? = sortedDescending().getOrNull(1)
+
+// Multiple bounds with where
+fun <T> persist(item: T) where T : Parcelable, T : Identifiable { /* ... */ }
+</code-block>
+
+<h2 id="variance">Variance: in and out</h2>
+<p>Variance answers a question: if <code>Dog</code> is a subtype of <code>Animal</code>, is <code>Box&lt;Dog&gt;</code> a subtype of <code>Box&lt;Animal&gt;</code>? It depends on whether the box <em>produces</em> or <em>consumes</em> values.</p>
+<figure class="diagram" role="group" aria-labelledby="fig-v-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-v-t fig-v-d">
+    <title id="fig-v-t">Covariance with out and contravariance with in</title>
+    <desc id="fig-v-d">With out T, a producer of Dog can be used as a producer of Animal, because reading a Dog as an Animal is safe. With in T, a consumer of Animal can be used as a consumer of Dog, because anything that accepts any Animal accepts a Dog.</desc>
+    <rect class="d-green" x="20" y="20" width="320" height="140" rx="14"/><text class="d-t" x="180" y="48" text-anchor="middle">out T: producer (covariant)</text>
+    <text class="d-s" x="180" y="78" text-anchor="middle">List&lt;Dog&gt; → usable as List&lt;Animal&gt;</text>
+    <text class="d-s" x="180" y="100" text-anchor="middle">T only returned, never accepted</text>
+    <text class="d-s" x="180" y="122" text-anchor="middle">e.g. List&lt;out E&gt;, Flow&lt;out T&gt;</text>
+    <rect class="d-violet" x="380" y="20" width="320" height="140" rx="14"/><text class="d-t" x="540" y="48" text-anchor="middle">in T: consumer (contravariant)</text>
+    <text class="d-s" x="540" y="78" text-anchor="middle">Comparator&lt;Animal&gt; → usable as Comparator&lt;Dog&gt;</text>
+    <text class="d-s" x="540" y="100" text-anchor="middle">T only accepted, never returned</text>
+    <text class="d-s" x="540" y="122" text-anchor="middle">e.g. Comparable&lt;in T&gt;, (T) -&gt; Unit</text>
+  </svg>
+  <figcaption id="fig-v-cap">"Producer out, consumer in." A <code>MutableList</code> does both, so it is invariant: <code>MutableList&lt;Dog&gt;</code> is <em>not</em> a <code>MutableList&lt;Animal&gt;</code>.</figcaption>
+</figure>
+<code-block lang="kotlin" file="Why MutableList is invariant">
+val dogs: MutableList<Dog> = mutableListOf(Dog())
+// val animals: MutableList<Animal> = dogs     // ❌ compile error, and here's why:
+// animals.add(Cat())                          // would put a Cat into a list of Dogs!
+
+val readOnly: List<Animal> = dogs              // ✅ List<out E> only produces: safe
+</code-block>
+<p>Kotlin uses <strong>declaration-site variance</strong> (<code>interface Source&lt;out T&gt;</code>). You can also use <strong>use-site variance</strong> (<code>fun copy(from: Array&lt;out Any&gt;, to: Array&lt;Any&gt;)</code>) for classes you don't control.</p>
+
+<h2 id="star">Star projection</h2>
+<p><code>List&lt;*&gt;</code> means "a list of some specific but unknown type". You can read elements as <code>Any?</code> but can't add anything. It's useful when you only need type-independent operations, such as <code>size</code>.</p>
+
+<h2 id="erasure">Type erasure</h2>
+<p>On the JVM and Android, generic type arguments are <strong>erased at runtime</strong>: a <code>List&lt;String&gt;</code> and a <code>List&lt;Int&gt;</code> are both just <code>List</code>. So this doesn't compile:</p>
+<code-block lang="kotlin" file="Erasure">
+fun <T> isOfType(value: Any): Boolean = value is T     // ❌ Cannot check for instance of erased type: T
+</code-block>
+
+<h2 id="reified">Reified type parameters</h2>
+<p>In an <code>inline</code> function, the compiler copies the body to each call site, where the concrete type is known. Mark the parameter <code>reified</code> and you can use <code>T</code> at runtime:</p>
+<code-block lang="kotlin" file="Reified helpers in Android">
+inline fun <reified T> Any.isOfType(): Boolean = this is T
+
+// Start an Activity without passing ::class.java
+inline fun <reified A : Activity> Context.startActivity(configure: Intent.() -> Unit = {}) {
+    startActivity(Intent(this, A::class.java).apply(configure))
+}
+// context.startActivity<SettingsActivity> { putExtra("tab", "privacy") }
+
+// Filter a mixed feed by type
+inline fun <reified T> List<FeedItem>.only(): List<T> = filterIsInstance<T>()
+
+// Decode JSON without passing a serializer explicitly (kotlinx.serialization)
+inline fun <reified T> String.decode(json: Json = Json { ignoreUnknownKeys = true }): T =
+    json.decodeFromString<T>(this)
+</code-block>
+<p>Libraries use this widely: Hilt's <code>hiltViewModel&lt;T&gt;()</code>, Koin's <code>get&lt;T&gt;()</code> and kotlinx.serialization's <code>decodeFromString&lt;T&gt;()</code> all rely on reified generics.</p>
+
+<h2 id="generic-repo">A practical generic: an in-memory cache</h2>
+<code-block lang="kotlin" file="TimedCache.kt">
+class TimedCache<K : Any, V : Any>(
+    private val ttlMillis: Long,
+    private val now: () -> Long = { System.currentTimeMillis() },
+) {
+    private data class Entry<V>(val value: V, val storedAt: Long)
+    private val map = mutableMapOf<K, Entry<V>>()
+    private val mutex = Mutex()
+
+    suspend fun getOrLoad(key: K, load: suspend (K) -> V): V = mutex.withLock {
+        map[key]?.takeIf { now() - it.storedAt < ttlMillis }?.value
+            ?: load(key).also { map[key] = Entry(it, now()) }
+    }
+}
+
+// val profiles = TimedCache<String, Profile>(ttlMillis = 60_000)
+// profiles.getOrLoad(userId) { api.getProfile(it) }
+</code-block>
+<p>Holding the mutex during <code>load</code> keeps it simple but serialises loads. For high concurrency you'd lock per key.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Over-generalising: a <code>BaseRepository&lt;T, ID, DTO, ENTITY&gt;</code> that every feature fights against. Generic code should remove duplication, not create puzzles.</li>
+  <li>Using <code>Any</code> and casts instead of type parameters.</li>
+  <li>Forgetting that <code>reified</code> requires <code>inline</code>, and that inline functions can't be called from Java with the reified behaviour.</li>
+  <li>Unchecked casts (<code>as List&lt;User&gt;</code>) that hide erasure problems until runtime.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's the difference between T, T? and T : Any?</summary><div><p>A type parameter <code>T</code> may itself be nullable unless bounded by <code>T : Any</code>. <code>T?</code> explicitly allows null. Use <code>T : Any</code> when you need non-null values.</p></div></details>
+  <details><summary>Is Kotlin's <code>out</code> the same as Java's <code>? extends</code>?</summary><div><p>Yes in meaning. <code>out T</code> corresponds to <code>? extends T</code>, and <code>in T</code> to <code>? super T</code>. Kotlin adds declaration-site variance so you rarely need wildcards.</p></div></details>
+  <details><summary>Do reified functions increase app size?</summary><div><p>Inline functions duplicate their body at each call site, so keep them small. R8 also optimises in release builds.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Generics give you reusable, type-safe code. <strong>Variance</strong> (<code>out</code> for producers, <code>in</code> for consumers) explains which substitutions are safe. <strong>Erasure</strong> removes type arguments at runtime, and <strong>reified</strong> parameters in inline functions bring them back where you need them.</p>
+<p>Next step: reuse behaviour without inheritance using <a href="../kotlin-delegation/index.html">Kotlin Delegation and Property Delegates</a>.</p>

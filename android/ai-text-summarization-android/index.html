@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add AI-Powered Text Summarization to an Android App | Yunok Tech</title>
+  <meta name="description" content="Add text summarization to Android apps: on-device ML Kit Summarization, cloud Gemini for long documents, chunking with map-reduce, streaming summaries in Compose, caching and accuracy.">
+  <meta name="keywords" content="ai text summarization android, summarize text android kotlin, ml kit summarization, gemini summarize long document, map reduce summarization, streaming summary compose, tl;dr feature android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-text-summarization-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-text-summarization-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Add AI-Powered Text Summarization to an Android App">
+  <meta property="og:description" content="Add text summarization to Android apps: on-device ML Kit Summarization, cloud Gemini for long documents, chunking with map-reduce, streaming summaries in Compose, caching and accuracy.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Add AI-Powered Text Summarization to an Android App">
+  <meta name="twitter:description" content="Add text summarization to Android apps: on-device ML Kit Summarization, cloud Gemini for long documents, chunking with map-reduce, streaming summaries in Compose, caching and accuracy.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Add AI-Powered Text Summarization to an Android App", "description": "Add text summarization to Android apps: on-device ML Kit Summarization, cloud Gemini for long documents, chunking with map-reduce, streaming summaries in Compose, caching and accuracy.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "summarize text android kotlin, ml kit summarization, gemini summarize long document, map reduce summarization, streaming summary compose, tl;dr feature android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-text-summarization-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Add AI-Powered Text Summarization to an Android App", "item": "https://yunoktech.com/android/ai-text-summarization-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Add AI-Powered Text Summarization to an Android App</h1>
+    <p class="ad-lede">Long articles, chat threads and meeting notes are where users most want a quick summary. This guide shows how to add summarization to an Android app: on-device for short private text, cloud for long documents, chunking strategies, streaming UI and accuracy safeguards.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#routing">Choose the engine by input size and sensitivity</a></li><li><a href="#on-device">On-device summarization</a></li><li><a href="#cloud">Cloud summarization with a structured prompt</a></li><li><a href="#chunking">Chunking long text (map-reduce)</a></li><li><a href="#ui">Streaming UI and trust</a></li><li><a href="#caching">Caching and cost</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#pitfalls">Accuracy pitfalls</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A good summary saves time. A bad one misleads, which is worse than no summary. Summarization quality depends on three things: choosing the right model for the input length, structuring long inputs sensibly, and making it easy for users to check the source.</p>
+
+<h2 id="routing">Choose the engine by input size and sensitivity</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Input</th><th>Engine</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Short, private text (notes, chats) in a supported language</td><td>ML Kit Summarization (Gemini Nano)</td><td>On-device, free per request, offline</td></tr>
+    <tr><td>Long documents (reports, PDFs)</td><td>Cloud Gemini (long context)</td><td>Large context windows, better reasoning</td></tr>
+    <tr><td>Very long or many documents</td><td>Chunk + map-reduce, or a backend pipeline</td><td>Bounded cost and latency per call</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mr-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-mr-t fig-mr-d">
+    <title id="fig-mr-t">Map-reduce summarization of a long document</title>
+    <desc id="fig-mr-d">A long document is split into chunks at paragraph boundaries. Each chunk is summarized in parallel in the map step. The partial summaries are combined and summarized again in the reduce step to produce the final summary.</desc>
+    <defs><marker id="mrm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="80" width="120" height="60" rx="12"/><text class="d-t" x="70" y="106" text-anchor="middle">Document</text><text class="d-s" x="70" y="124" text-anchor="middle">40 pages</text></g>
+    <path class="d-flow" d="M130 110 L196 40 M130 110 H196 M130 110 L196 180" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="200" y="20" width="110" height="40" rx="8"/><text class="d-s" x="255" y="45" text-anchor="middle">chunk 1</text><rect class="d-box" x="200" y="90" width="110" height="40" rx="8"/><text class="d-s" x="255" y="115" text-anchor="middle">chunk 2</text><rect class="d-box" x="200" y="160" width="110" height="40" rx="8"/><text class="d-s" x="255" y="185" text-anchor="middle">chunk n</text></g>
+    <path class="d-flow" d="M310 40 H366 M310 110 H366 M310 180 H366" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="370" y="20" width="120" height="40" rx="8"/><text class="d-s" x="430" y="45" text-anchor="middle">summary 1</text><rect class="d-violet" x="370" y="90" width="120" height="40" rx="8"/><text class="d-s" x="430" y="115" text-anchor="middle">summary 2</text><rect class="d-violet" x="370" y="160" width="120" height="40" rx="8"/><text class="d-s" x="430" y="185" text-anchor="middle">summary n</text></g>
+    <path class="d-flow" d="M490 40 L556 104 M490 110 H556 M490 180 L556 116" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="560" y="80" width="150" height="60" rx="12"/><text class="d-t" x="635" y="106" text-anchor="middle">Final summary</text><text class="d-s" x="635" y="124" text-anchor="middle">reduce step</text></g>
+  </svg>
+  <figcaption id="fig-mr-cap">Map-reduce keeps each request small. With long-context models you may not need it, but it's the fallback when inputs exceed limits or budgets.</figcaption>
+</figure>
+
+<h2 id="on-device">On-device summarization</h2>
+<p>For short text, the ML Kit Summarization API is the simplest option. See the full lifecycle (status check, download, streaming) in <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI</a>. Remember its documented constraints: input under roughly 4,000 tokens, a few supported languages, foreground-only use and supported devices.</p>
+
+<h2 id="cloud">Cloud summarization with a structured prompt</h2>
+<figure class="code"><figcaption><span class="file">CloudSummarizer.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">CloudSummarizer</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> model = <span class="tk-t">Firebase</span>.ai(backend = <span class="tk-t">GenerativeBackend</span>.googleAI()).generativeModel(
+        modelName = <span class="tk-s">"gemini-3.8-flash"</span>,             <span class="tk-c">// check current model names</span>
+        generationConfig = generationConfig { temperature = <span class="tk-n">0.2f</span>; maxOutputTokens = <span class="tk-n">600</span> },
+        systemInstruction = content {
+            text(
+                <span class="tk-s">"Summarize the provided document faithfully. Use only information in the document. "</span> +
+                <span class="tk-s">"If something is unclear, say so. Output 3-5 bullet points, then one line 'Action items:' if any."</span>
+            )
+        },
+    )
+
+    <span class="tk-k">fun</span> summarizeStream(document: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt; =
+        model.generateContentStream(<span class="tk-s">"&lt;document&gt;\n$document\n&lt;/document&gt;"</span>).mapNotNull { it.text }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>): <span class="tk-t">String</span> = model.generateContent(<span class="tk-s">"&lt;document&gt;\n$text\n&lt;/document&gt;"</span>).text.orEmpty()
+}</code></pre></figure>
+
+<h2 id="chunking">Chunking long text (map-reduce)</h2>
+<figure class="code"><figcaption><span class="file">MapReduceSummarizer.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">MapReduceSummarizer</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> summarizer: <span class="tk-t">CloudSummarizer</span>) {
+
+    <span class="tk-c">/** Split at paragraph boundaries into chunks of at most [maxChars]. */</span>
+    <span class="tk-k">fun</span> chunk(text: <span class="tk-t">String</span>, maxChars: <span class="tk-t">Int</span> = <span class="tk-n">12_000</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; {
+        <span class="tk-k">val</span> chunks = mutableListOf&lt;<span class="tk-t">String</span>&gt;()
+        <span class="tk-k">val</span> current = <span class="tk-t">StringBuilder</span>()
+        text.split(<span class="tk-s">"\n\n"</span>).forEach { paragraph -&gt;
+            <span class="tk-k">if</span> (current.length + paragraph.length &gt; maxChars &amp;&amp; current.isNotEmpty()) {
+                chunks += current.toString(); current.clear()
+            }
+            current.append(paragraph).append(<span class="tk-s">"\n\n"</span>)
+        }
+        <span class="tk-k">if</span> (current.isNotBlank()) chunks += current.toString()
+        <span class="tk-k">return</span> chunks
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>): <span class="tk-t">String</span> = coroutineScope {
+        <span class="tk-k">val</span> parts = chunk(text)
+        <span class="tk-k">if</span> (parts.size == <span class="tk-n">1</span>) <span class="tk-k">return</span><span class="tk-a">@coroutineScope</span> summarizer.summarize(parts.single())
+        <span class="tk-k">val</span> partials = parts
+            .chunked(<span class="tk-n">4</span>)                                          <span class="tk-c">// limit parallelism (rate limits)</span>
+            .flatMap { batch -&gt; batch.map { async { summarizer.summarize(it) } }.awaitAll() }
+        summarizer.summarize(partials.joinToString(<span class="tk-s">"\n\n"</span>))      <span class="tk-c">// reduce step</span>
+    }
+}</code></pre></figure>
+<p>Character counts are only a rough proxy for tokens. If you need exact limits, use the SDK's token-counting API. Very large paragraphs may also need splitting.</p>
+
+<h2 id="ui">Streaming UI and trust</h2>
+<figure class="code"><figcaption><span class="file">SummaryPanel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">SummaryPanel</span>(summary: <span class="tk-t">String</span>, isStreaming: <span class="tk-t">Boolean</span>, onViewSource: () -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-t">Card</span>(<span class="tk-t">Modifier</span>.fillMaxWidth()) {
+        <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">16</span>.dp)) {
+            <span class="tk-t">Text</span>(<span class="tk-s">"AI summary"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.titleSmall)
+            <span class="tk-t">Text</span>(summary, <span class="tk-t">Modifier</span>.padding(vertical = <span class="tk-n">8</span>.dp))
+            <span class="tk-k">if</span> (isStreaming) <span class="tk-t">LinearProgressIndicator</span>(<span class="tk-t">Modifier</span>.fillMaxWidth())
+            <span class="tk-t">Text</span>(<span class="tk-s">"Summaries can miss or misstate details."</span>, style = <span class="tk-t">MaterialTheme</span>.typography.labelSmall)
+            <span class="tk-t">TextButton</span>(onClick = onViewSource) { <span class="tk-t">Text</span>(<span class="tk-s">"Read the full text"</span>) }
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="caching">Caching and cost</h2>
+<ul>
+  <li>Cache summaries keyed by a content hash plus prompt version, so the same document isn't summarized twice.</li>
+  <li>Summarize on demand (button), not automatically for every item.</li>
+  <li>Limit output length and choose a fast model tier for short inputs. See <a href="../ai-tokens-latency-cost-mobile/index.html">Tokens, Latency and Cost</a>.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Chat catch-up</h3><p>"Summarise the last 200 messages" on-device for privacy, where supported.</p></div>
+  <div class="card usecase"><h3>Long reports</h3><p>Cloud summarization with action items, streamed as it generates.</p></div>
+  <div class="card usecase"><h3>Reading list</h3><p>Cached TL;DRs for saved articles, generated when the user taps "Summarise".</p></div>
+</div>
+
+<h2 id="pitfalls">Accuracy pitfalls</h2>
+<ul>
+  <li>Summaries can omit critical caveats. Offer "read full text" and avoid summaries for legal or medical decisions.</li>
+  <li>Models may add plausible but absent facts. Instruct "use only the document", keep temperature low, and evaluate with real samples.</li>
+  <li>Map-reduce can lose cross-chunk context. Use overlap, or long-context models when possible.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I summarize PDFs?</summary><div><p>Extract text first (on-device PDF text extraction or a backend), or send the PDF to a multimodal cloud model that accepts documents. See <a href="../ai-document-summarizer-android/index.html">AI Document Summarizer</a>.</p></div></details>
+  <details><summary>How do I support Hindi and other languages?</summary><div><p>Check language support per engine. Cloud models generally support more languages than current on-device summarization.</p></div></details>
+  <details><summary>Should I store summaries?</summary><div><p>Caching improves cost and speed, but treat summaries as derived personal data, and delete them with the source.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Route summarization by <strong>length and sensitivity</strong>: on-device for short private text, cloud long-context models for big documents, and map-reduce when inputs exceed limits. Stream results, label them as AI-generated, link back to the source, and cache to control cost.</p>
+<p>Next step: summarize images instead of text with <a href="../ai-image-description-android/index.html">Image Understanding and Description</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developers.google.com/ml-kit/genai/summarization/android" target="_blank" rel="noopener">ML Kit GenAI Summarization</a></li><li><a href="https://firebase.google.com/docs/ai-logic/generate-text?platform=android" target="_blank" rel="noopener">Firebase AI Logic: generate text</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Gemini models and context windows</a></li><li><a href="https://ai.google.dev/gemini-api/docs/long-context" target="_blank" rel="noopener">Gemini API: long context</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-text-summarization-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-text-summarization-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/gemini-nano-ml-kit-genai-android/index.html"><small>Android AI and Generative AI</small>Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works</a></li><li><a href="../../android/ai-document-summarizer-android/index.html"><small>Android AI Projects and Production</small>Build an AI Document Summarizer for Android</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/ai-tokens-latency-cost-mobile/index.html"><small>Android AI and Generative AI</small>AI Tokens, Latency, and Cost Optimization for Mobile Apps</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-text-summarization-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-text-summarization-android/&amp;text=Add AI-Powered Text Summarization to an Android App" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-text-summarization-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#routing">Choose the engine by input size and sensitivity</a></li><li><a href="#on-device">On-device summarization</a></li><li><a href="#cloud">Cloud summarization with a structured prompt</a></li><li><a href="#chunking">Chunking long text (map-reduce)</a></li><li><a href="#ui">Streaming UI and trust</a></li><li><a href="#caching">Caching and cost</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#pitfalls">Accuracy pitfalls</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-text-summarization-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-text-summarization-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

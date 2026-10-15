@@ -1,0 +1,144 @@
+<!--meta
+{
+  "seo_title": "Kotlin Collections and Functional Programming Guide",
+  "description": "Master Kotlin collections for Android: map, filter, groupBy, associate, fold, partition, sorting, sequences, immutability and performance, with practical UI-state examples.",
+  "primary_keyword": "kotlin collections",
+  "keywords": ["kotlin map filter", "kotlin groupby associateby", "kotlin sequences vs lists", "kotlin fold reduce", "functional programming kotlin android", "immutable list kotlin"],
+  "lede": "Most Android screens are lists transformed into other lists: API results into UI models, items grouped by date, totals summed, duplicates removed. Kotlin's collection API turns these transformations into short, readable pipelines, if you know the right operators.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-basics-android", "kotlin-extension-higher-order-functions", "kotlin-data-sealed-enum-classes", "compose-performance-optimization"],
+  "refs": [
+    ["Collections overview", "https://kotlinlang.org/docs/collections-overview.html"],
+    ["Collection transformations", "https://kotlinlang.org/docs/collection-transformations.html"],
+    ["Grouping", "https://kotlinlang.org/docs/collection-grouping.html"],
+    ["Sequences", "https://kotlinlang.org/docs/sequences.html"],
+    ["kotlinx.collections.immutable", "https://github.com/Kotlin/kotlinx.collections.immutable"]
+  ]
+}
+-->
+<p class="ad-lead">An imperative loop that filters, sorts, groups and maps a list can easily take 25 lines and three mutable variables. The same logic as a Kotlin collection pipeline is often five lines, with no mutation and clear intent. This guide covers the operators you'll use constantly in Android code, and when to reach for sequences or immutable collections.</p>
+
+<h2 id="read-only">Read-only vs mutable collections</h2>
+<code-block lang="kotlin" file="Read-only by default">
+val tags: List<String> = listOf("kotlin", "compose")         // read-only interface
+val cart: MutableList<String> = mutableListOf("p1")           // mutable
+val updated = tags + "flow"                                   // creates a NEW list
+</code-block>
+<p><code>List</code> is a <em>read-only view</em>, not a deep guarantee of immutability. The underlying object might be mutable elsewhere. For UI state, create new lists rather than mutating, and consider <code>kotlinx.collections.immutable</code> (<code>persistentListOf</code>, <code>ImmutableList</code>) when you want truly immutable types that Compose treats as stable.</p>
+
+<h2 id="pipeline">A real pipeline: API data to UI sections</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-p-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-p-t fig-p-d">
+    <title id="fig-p-t">Collection pipeline from transactions to grouped UI sections</title>
+    <desc id="fig-p-d">A list of transactions passes through filter to remove failed ones, sortedByDescending by time, groupBy date, and map to UI section models.</desc>
+    <defs><marker id="cp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 70 H146 M266 70 H292 M432 70 H458 M568 70 H594" marker-end="url(#cp)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="110" height="60" rx="12"/><text class="d-t" x="65" y="66" text-anchor="middle">List&lt;Txn&gt;</text><text class="d-s" x="65" y="84" text-anchor="middle">from API/Room</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="150" y="40" width="116" height="60" rx="12"/><text class="d-t" x="208" y="66" text-anchor="middle">filter</text><text class="d-s" x="208" y="84" text-anchor="middle">drop failed</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="296" y="40" width="136" height="60" rx="12"/><text class="d-t" x="364" y="66" text-anchor="middle">sortedByDesc</text><text class="d-s" x="364" y="84" text-anchor="middle">newest first</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-box" x="462" y="40" width="106" height="60" rx="12"/><text class="d-t" x="515" y="66" text-anchor="middle">groupBy</text><text class="d-s" x="515" y="84" text-anchor="middle">by date</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="598" y="40" width="112" height="60" rx="12"/><text class="d-t" x="654" y="66" text-anchor="middle">map</text><text class="d-s" x="654" y="84" text-anchor="middle">→ sections</text></g>
+  </svg>
+  <figcaption id="fig-p-cap">Each operator does one job and returns a new collection. Read the pipeline top to bottom like a sentence.</figcaption>
+</figure>
+<code-block lang="kotlin" file="TransactionsMapper.kt">
+data class Txn(val id: String, val amountPaise: Long, val status: String, val at: LocalDateTime)
+data class TxnSection(val date: LocalDate, val totalPaise: Long, val items: List<Txn>)
+
+fun toSections(txns: List<Txn>): List<TxnSection> =
+    txns
+        .filter { it.status != "FAILED" }
+        .sortedByDescending { it.at }
+        .groupBy { it.at.toLocalDate() }          // Map<LocalDate, List<Txn>>, insertion-ordered
+        .map { (date, items) -> TxnSection(date, items.sumOf { it.amountPaise }, items) }
+</code-block>
+<code-block lang="kotlin" file="Rendering the sections in Compose">
+LazyColumn {
+    sections.forEach { section ->
+        stickyHeader(key = section.date) { DateHeader(section.date, section.totalPaise) }
+        items(section.items, key = { it.id }) { txn -> TxnRow(txn) }
+    }
+}
+</code-block>
+
+<h2 id="operators">The operators you'll use most</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Goal</th><th>Operator</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Transform each item</td><td><code>map</code>, <code>mapNotNull</code></td><td><code>dtos.mapNotNull { it.toDomainOrNull() }</code></td></tr>
+    <tr><td>Keep matching items</td><td><code>filter</code>, <code>filterIsInstance</code></td><td><code>items.filterIsInstance&lt;Video&gt;()</code></td></tr>
+    <tr><td>Find one</td><td><code>firstOrNull</code>, <code>find</code></td><td><code>users.firstOrNull { it.id == id }</code></td></tr>
+    <tr><td>Check</td><td><code>any</code>, <code>all</code>, <code>none</code></td><td><code>cart.any { it.qty == 0 }</code></td></tr>
+    <tr><td>Aggregate</td><td><code>sumOf</code>, <code>count</code>, <code>maxByOrNull</code>, <code>fold</code></td><td><code>cart.sumOf { it.qty * it.price }</code></td></tr>
+    <tr><td>Index by key</td><td><code>associateBy</code>, <code>associate</code></td><td><code>products.associateBy { it.id }</code></td></tr>
+    <tr><td>Group</td><td><code>groupBy</code>, <code>partition</code></td><td><code>val (done, todo) = tasks.partition { it.done }</code></td></tr>
+    <tr><td>Deduplicate</td><td><code>distinct</code>, <code>distinctBy</code></td><td><code>messages.distinctBy { it.id }</code></td></tr>
+    <tr><td>Sort</td><td><code>sortedBy</code>, <code>sortedWith(compareBy…)</code></td><td><code>sortedWith(compareBy({ it.priority }, { it.title }))</code></td></tr>
+    <tr><td>Split into pages</td><td><code>chunked</code>, <code>windowed</code></td><td><code>ids.chunked(50)</code> for batched API calls</td></tr>
+    <tr><td>Combine two lists</td><td><code>zip</code></td><td><code>labels.zip(values)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="fold">fold and reduce</h2>
+<code-block lang="kotlin" file="fold builds a result from a starting value">
+data class Stats(val count: Int = 0, val totalPaise: Long = 0, val refunds: Int = 0)
+
+val stats = txns.fold(Stats()) { acc, t ->
+    acc.copy(
+        count = acc.count + 1,
+        totalPaise = acc.totalPaise + t.amountPaise,
+        refunds = acc.refunds + if (t.status == "REFUNDED") 1 else 0,
+    )
+}
+</code-block>
+<p>Prefer specific operators (<code>sumOf</code>, <code>count</code>) when they fit. Use <code>fold</code> when you compute several values in one pass.</p>
+
+<h2 id="lookups">Efficient lookups: avoid O(n²)</h2>
+<code-block lang="kotlin" file="Joining two lists">
+// ❌ For each order, scan all products: slow for large lists
+val rows = orders.map { o -> o to products.first { it.id == o.productId } }
+
+// ✅ Build a map once, then O(1) lookups
+val productsById = products.associateBy { it.id }
+val rows2 = orders.mapNotNull { o -> productsById[o.productId]?.let { p -> o to p } }
+</code-block>
+
+<h2 id="sequences">Sequences: lazy evaluation</h2>
+<p>List operations are <em>eager</em>: each step creates a full intermediate list. <code>asSequence()</code> makes them <em>lazy</em>, processing one element at a time through the whole chain, and stopping early when possible.</p>
+<code-block lang="kotlin" file="When sequences help">
+val firstTenMatches = hugeList.asSequence()
+    .filter { it.matches(query) }
+    .map { it.toUi() }
+    .take(10)              // stops as soon as 10 are found
+    .toList()
+</code-block>
+<p>Use sequences for large collections with several steps, or when you short-circuit with <code>take</code> or <code>first</code>. For small lists (typical UI lists of tens or hundreds of items), plain lists are usually just as fast and simpler.</p>
+
+<h2 id="android-tips">Android-specific tips</h2>
+<ul>
+  <li><strong>Transform data outside composables</strong>, in the ViewModel or with <code>remember(key)</code>, so pipelines don't rerun on every recomposition.</li>
+  <li><strong>Move heavy processing off the main thread</strong> (<code>withContext(Dispatchers.Default)</code>) for thousands of items.</li>
+  <li><strong>Prefer SQL for filtering and aggregating large datasets</strong> in Room, rather than loading everything into memory and filtering in Kotlin.</li>
+</ul>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>first { }</code> when nothing may match, which throws <code>NoSuchElementException</code>. Use <code>firstOrNull</code>.</li>
+  <li>Mutating a list while iterating over it.</li>
+  <li>Chaining <code>filter</code> then <code>count</code> when <code>count { }</code> does it in one pass.</li>
+  <li>Exposing <code>MutableList</code> in UI state.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are functional operators slower than for loops?</summary><div><p>Collection operators are inline functions, so lambdas don't allocate objects. Each step does create a new list, which rarely matters at UI-list sizes. Measure before optimising, and use sequences or a single loop for hot paths.</p></div></details>
+  <details><summary>What's the difference between map and forEach?</summary><div><p><code>map</code> returns a new transformed collection. <code>forEach</code> returns nothing and is for side effects.</p></div></details>
+  <details><summary>Does groupBy preserve order?</summary><div><p>Yes. It returns a <code>LinkedHashMap</code> in which keys appear in first-encounter order, which is why sorting before grouping works.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Kotlin's collection API lets you express data transformations as <strong>small, readable, mutation-free pipelines</strong>. Learn the dozen core operators, build maps for lookups, use sequences for large or short-circuiting chains, and keep heavy transformations out of composables.</p>
+<p>Next step: write your own reusable operators with <a href="../kotlin-extension-higher-order-functions/index.html">Extension and Higher-Order Functions</a>.</p>

@@ -1,0 +1,131 @@
+<!--meta
+{
+  "seo_title": "OpenAI API Integration Patterns for Android Apps",
+  "description": "Integrate OpenAI models in Android apps safely: backend proxy architecture, never shipping API keys, authenticating users, streaming via SSE, provider-agnostic interfaces, rate limits, moderation and cost control.",
+  "primary_keyword": "openai api android",
+  "keywords": ["openai android kotlin", "chatgpt api android app", "openai backend proxy", "stream openai responses android", "openai api key security mobile", "llm provider abstraction"],
+  "lede": "Calling OpenAI directly from an Android app means shipping your secret API key to every user, and anyone can extract it. The production pattern is a backend proxy you control. Here's the architecture, the Android side, and how to stay provider-agnostic.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["secure-cloud-ai-api-android", "secure-api-keys-android", "gemini-vs-openai-vs-open-source-models", "streaming-ai-responses-compose"],
+  "refs": [
+    ["OpenAI API reference", "https://platform.openai.com/docs/api-reference"],
+    ["OpenAI: best practices for API key safety", "https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety"],
+    ["OpenAI streaming responses", "https://platform.openai.com/docs/guides/streaming-responses"],
+    ["Play Integrity API", "https://developer.android.com/google/play/integrity"]
+  ]
+}
+-->
+<p class="ad-lead">OpenAI's API (and similar provider APIs) is designed for server-to-server use with a secret key. Unlike Firebase AI Logic, which pairs with App Check for client apps, OpenAI keys must stay on your server. The Android app talks to <em>your</em> backend, which talks to OpenAI.</p>
+
+<div class="callout warn"><b>Never put the API key in the app</b><p>Not in code, <code>BuildConfig</code>, resources, native libraries or obfuscated strings. APKs can be decompiled and traffic inspected. See <a href="../secure-api-keys-android/index.html">Securing API Keys</a>.</p></div>
+
+<h2 id="architecture">The proxy architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-oai-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-oai-t fig-oai-d">
+    <title id="fig-oai-t">Android app to backend proxy to OpenAI</title>
+    <desc id="fig-oai-d">The Android app sends a request with the user's auth token and an integrity token to your backend. The backend verifies the user, enforces quotas, builds the prompt with server-side instructions, and calls OpenAI with the secret key. It streams the response back to the app and logs usage and cost.</desc>
+    <defs><marker id="oaim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M190 80 H246 M470 80 H526" marker-end="url(#oaim)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="170" height="80" rx="12"/><text class="d-t" x="105" y="70" text-anchor="middle">Android app</text><text class="d-s" x="105" y="90" text-anchor="middle">user token</text><text class="d-s" x="105" y="106" text-anchor="middle">+ integrity token</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="250" y="30" width="220" height="100" rx="12"/><text class="d-t" x="360" y="56" text-anchor="middle">Your backend</text><text class="d-s" x="360" y="78" text-anchor="middle">auth · quotas · prompt</text><text class="d-s" x="360" y="96" text-anchor="middle">moderation · logging</text><text class="d-s" x="360" y="114" text-anchor="middle">secret key here only</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-dark" x="530" y="40" width="170" height="80" rx="12"/><text class="d-w" x="615" y="76" text-anchor="middle">OpenAI API</text><text class="d-w" x="615" y="96" text-anchor="middle">(or other provider)</text></g>
+    <text class="d-s" x="360" y="170" text-anchor="middle">The app never sees the provider key; the backend can switch providers freely.</text>
+  </svg>
+  <figcaption id="fig-oai-cap">The backend is your control point for security, cost and provider choice.</figcaption>
+</figure>
+
+<h2 id="backend">What the backend does</h2>
+<ol class="steps">
+  <li><strong>Authenticate the user</strong> (for example a Firebase Auth ID token) and optionally verify a Play Integrity token.</li>
+  <li><strong>Enforce quotas and rate limits</strong> per user and plan.</li>
+  <li><strong>Own the prompt:</strong> system instructions and model choice live on the server, so the client sends only user input.</li>
+  <li><strong>Validate and moderate</strong> input and output as your use case requires.</li>
+  <li><strong>Stream</strong> the provider response back to the client.</li>
+  <li><strong>Log usage</strong> (tokens, latency, errors) without storing sensitive content unless needed. See <a href="../ai-privacy-data-retention/index.html">AI Data Retention</a>.</li>
+</ol>
+
+<h2 id="android">The Android side: a provider-agnostic interface</h2>
+<code-block lang="kotlin" file="AiChatService.kt">
+/** The app depends on this, not on any provider SDK. */
+interface AiChatService {
+    fun stream(conversationId: String, userMessage: String): Flow<ChatEvent>
+}
+
+sealed interface ChatEvent {
+    data class Delta(val text: String) : ChatEvent
+    data class Done(val messageId: String) : ChatEvent
+    data class Error(val kind: ErrorKind) : ChatEvent
+}
+enum class ErrorKind { RATE_LIMITED, QUOTA_EXCEEDED, UNAVAILABLE, BLOCKED, NETWORK }
+</code-block>
+
+<h2 id="sse">Streaming from your backend (SSE)</h2>
+<p>If your backend relays tokens as Server-Sent Events, OkHttp's SSE module consumes them as a Flow:</p>
+<code-block lang="kotlin" file="BackendChatService.kt">
+class BackendChatService(
+    private val client: OkHttpClient,              // with an auth interceptor adding the user's token
+    private val baseUrl: String,
+    private val json: Json,
+) : AiChatService {
+
+    override fun stream(conversationId: String, userMessage: String): Flow<ChatEvent> = callbackFlow {
+        val body = json.encodeToString(ChatRequest(conversationId, userMessage))
+            .toRequestBody("application/json".toMediaType())
+        val request = Request.Builder().url("$baseUrl/v1/chat/stream").post(body).build()
+
+        val source = EventSources.createFactory(client).newEventSource(request, object : EventSourceListener() {
+            override fun onEvent(es: EventSource, id: String?, type: String?, data: String) {
+                when (type) {
+                    "delta" -> trySend(ChatEvent.Delta(json.decodeFromString<Delta>(data).text))
+                    "done" -> { trySend(ChatEvent.Done(data)); close() }
+                }
+            }
+            override fun onFailure(es: EventSource, t: Throwable?, response: Response?) {
+                trySend(ChatEvent.Error(response?.code.toErrorKind()))
+                close()
+            }
+        })
+        awaitClose { source.cancel() }               // cancels the HTTP call when the collector stops
+    }
+}
+
+private fun Int?.toErrorKind() = when (this) {
+    429 -> ErrorKind.RATE_LIMITED
+    402, 403 -> ErrorKind.QUOTA_EXCEEDED
+    null -> ErrorKind.NETWORK
+    else -> ErrorKind.UNAVAILABLE
+}
+</code-block>
+<p>Collect this in a ViewModel and render it as in <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Compose</a>.</p>
+
+<h2 id="costs">Cost and rate limits</h2>
+<ul>
+  <li>Cap max output tokens and conversation history length on the server.</li>
+  <li>Choose smaller models for simple tasks, and route by task.</li>
+  <li>Return clear 429 or quota errors, and show helpful UI (wait, or upgrade).</li>
+  <li>Track cost per user and feature. See <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI Costs</a>.</li>
+</ul>
+
+<h2 id="compare">OpenAI via proxy vs Firebase AI Logic</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>OpenAI via your backend</th><th>Gemini via Firebase AI Logic</th></tr></thead>
+  <tbody>
+    <tr><td>Client security</td><td>Your auth + backend</td><td>App Check + Firebase</td></tr>
+    <tr><td>Backend needed</td><td>Yes</td><td>No (optional)</td></tr>
+    <tr><td>Prompt control</td><td>Fully server-side</td><td>Client (or server prompt templates)</td></tr>
+    <tr><td>Provider flexibility</td><td>High</td><td>Gemini models</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is there an official OpenAI Android SDK?</summary><div><p>OpenAI publishes official SDKs for several server languages, including Java/Kotlin for the JVM, but they're intended for server use with secret keys. On Android, call your own backend.</p></div></details>
+  <details><summary>Can I use ephemeral keys?</summary><div><p>Some provider features (such as realtime sessions) support short-lived client tokens issued by your server. Your backend still mints them after authenticating the user.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Integrate OpenAI through a <strong>backend proxy</strong> that holds the key, authenticates users, owns prompts, enforces quotas and streams responses. On Android, depend on a <strong>provider-agnostic interface</strong> and stream with SSE.</p>
+<p>Next step: render those streams beautifully with <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Jetpack Compose</a>.</p>

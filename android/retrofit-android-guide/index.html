@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retrofit in Android: Complete Guide with Kotlin | Yunok Tech</title>
+  <meta name="description" content="Use Retrofit in Android with Kotlin coroutines: setup, kotlinx.serialization, defining endpoints, path and query params, POST bodies, headers, OkHttp config, errors and testing with MockWebServer.">
+  <meta name="keywords" content="retrofit android, retrofit kotlin coroutines, retrofit kotlinx serialization, retrofit suspend function, retrofit post request, okhttp retrofit setup, mockwebserver retrofit test">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/retrofit-android-guide/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/retrofit-android-guide/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Retrofit in Android: Complete Guide with Kotlin">
+  <meta property="og:description" content="Use Retrofit in Android with Kotlin coroutines: setup, kotlinx.serialization, defining endpoints, path and query params, POST bodies, headers, OkHttp config, errors and testing with MockWebServer.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Retrofit in Android: Complete Guide with Kotlin">
+  <meta name="twitter:description" content="Use Retrofit in Android with Kotlin coroutines: setup, kotlinx.serialization, defining endpoints, path and query params, POST bodies, headers, OkHttp config, errors and testing with MockWebServer.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Retrofit in Android: Complete Guide", "description": "Use Retrofit in Android with Kotlin coroutines: setup, kotlinx.serialization, defining endpoints, path and query params, POST bodies, headers, OkHttp config, errors and testing with MockWebServer.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "retrofit kotlin coroutines, retrofit kotlinx serialization, retrofit suspend function, retrofit post request, okhttp retrofit setup, mockwebserver retrofit test", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/retrofit-android-guide/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Retrofit in Android: Complete Guide", "item": "https://yunoktech.com/android/retrofit-android-guide/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Retrofit in Android: Complete Guide</h1>
+    <p class="ad-lede">Retrofit turns an HTTP API into a Kotlin interface. Combined with coroutines and kotlinx.serialization, a network call becomes a single suspend function. This guide covers setup, every common request type, configuration, error handling and testing.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#how">How Retrofit works</a></li><li><a href="#setup">Setup</a></li><li><a href="#models">Models</a></li><li><a href="#interface">Defining the API</a></li><li><a href="#build">Building the client</a></li><li><a href="#calling">Calling from a repository</a></li><li><a href="#errors">Errors</a></li><li><a href="#testing">Testing with MockWebServer</a></li><li><a href="#use-cases">Common real-world needs</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Most Android apps talk to a REST API. Writing raw HTTP code (building URLs, encoding JSON, parsing responses, handling threads) is repetitive and error-prone. Retrofit, from Square, generates all of that from an annotated interface, and it's the most widely used HTTP client in the Android ecosystem.</p>
+
+<h2 id="how">How Retrofit works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rf-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-rf-t fig-rf-d">
+    <title id="fig-rf-t">Retrofit request pipeline</title>
+    <desc id="fig-rf-d">Your code calls a suspend function on an annotated interface. Retrofit builds an HTTP request, the converter serialises the body, OkHttp sends it through interceptors to the server, and the response JSON is deserialised back into a Kotlin data class.</desc>
+    <defs><marker id="rfm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 60 H164 M296 60 H320 M452 60 H476 M590 60 H614" marker-end="url(#rfm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="130" height="60" rx="12"/><text class="d-t" x="75" y="56" text-anchor="middle">api.getUser(id)</text><text class="d-s" x="75" y="74" text-anchor="middle">suspend call</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="168" y="30" width="128" height="60" rx="12"/><text class="d-t" x="232" y="56" text-anchor="middle">Retrofit</text><text class="d-s" x="232" y="74" text-anchor="middle">builds request</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="324" y="30" width="128" height="60" rx="12"/><text class="d-t" x="388" y="56" text-anchor="middle">OkHttp</text><text class="d-s" x="388" y="74" text-anchor="middle">interceptors</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-box" x="480" y="30" width="110" height="60" rx="12"/><text class="d-t" x="535" y="64" text-anchor="middle">Server</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="618" y="30" width="92" height="60" rx="12"/><text class="d-t" x="664" y="56" text-anchor="middle">UserDto</text><text class="d-s" x="664" y="74" text-anchor="middle">parsed</text></g>
+    <text class="d-s" x="360" y="130" text-anchor="middle">Converter (kotlinx.serialization) handles JSON ↔ data classes</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">OkHttp does the network work off the main thread</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M140 60 H618');--dur:2.4s"/>
+  </svg>
+  <figcaption id="fig-rf-cap">You write the interface; Retrofit, a converter and OkHttp do the rest.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">plugins { id(<span class="tk-s">"org.jetbrains.kotlin.plugin.serialization"</span>) }
+dependencies {
+    implementation(<span class="tk-s">"com.squareup.retrofit2:retrofit:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"com.squareup.retrofit2:converter-kotlinx-serialization:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"com.squareup.okhttp3:okhttp:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"com.squareup.okhttp3:logging-interceptor:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"org.jetbrains.kotlinx:kotlinx-serialization-json:&lt;version&gt;"</span>)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;uses-permission</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.permission.INTERNET"</span> <span class="tk-tag">/&gt;</span></code></pre></figure>
+
+<h2 id="models">Models</h2>
+<figure class="code"><figcaption><span class="file">Dtos.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">UserDto</span>(
+    <span class="tk-k">val</span> id: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> name: <span class="tk-t">String</span>,
+    <span class="tk-a">@SerialName</span>(<span class="tk-s">"avatar_url"</span>) <span class="tk-k">val</span> avatarUrl: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,   <span class="tk-c">// map snake_case, tolerate missing</span>
+)
+
+<span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">CreatePostRequest</span>(<span class="tk-k">val</span> title: <span class="tk-t">String</span>, <span class="tk-k">val</span> body: <span class="tk-t">String</span>, <span class="tk-k">val</span> tags: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; = emptyList())
+
+<span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">PostDto</span>(<span class="tk-k">val</span> id: <span class="tk-t">Long</span>, <span class="tk-k">val</span> title: <span class="tk-t">String</span>, <span class="tk-k">val</span> body: <span class="tk-t">String</span>)</code></pre></figure>
+
+<h2 id="interface">Defining the API</h2>
+<figure class="code"><figcaption><span class="file">BlogApi.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">BlogApi</span> {
+    <span class="tk-a">@GET</span>(<span class="tk-s">"users/{id}"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> getUser(<span class="tk-a">@Path</span>(<span class="tk-s">"id"</span>) id: <span class="tk-t">String</span>): <span class="tk-t">UserDto</span>
+
+    <span class="tk-a">@GET</span>(<span class="tk-s">"posts"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> getPosts(
+        <span class="tk-a">@Query</span>(<span class="tk-s">"page"</span>) page: <span class="tk-t">Int</span>,
+        <span class="tk-a">@Query</span>(<span class="tk-s">"limit"</span>) limit: <span class="tk-t">Int</span> = <span class="tk-n">20</span>,
+        <span class="tk-a">@Query</span>(<span class="tk-s">"tag"</span>) tag: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,          <span class="tk-c">// null query params are omitted</span>
+    ): <span class="tk-t">List</span>&lt;<span class="tk-t">PostDto</span>&gt;
+
+    <span class="tk-a">@POST</span>(<span class="tk-s">"posts"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> createPost(<span class="tk-a">@Body</span> request: <span class="tk-t">CreatePostRequest</span>): <span class="tk-t">PostDto</span>
+
+    <span class="tk-a">@DELETE</span>(<span class="tk-s">"posts/{id}"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> deletePost(<span class="tk-a">@Path</span>(<span class="tk-s">"id"</span>) id: <span class="tk-t">Long</span>): <span class="tk-t">Response</span>&lt;<span class="tk-t">Unit</span>&gt;   <span class="tk-c">// Response&lt;T&gt; when you need status/headers</span>
+
+    <span class="tk-a">@Multipart</span>
+    <span class="tk-a">@POST</span>(<span class="tk-s">"uploads"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> upload(<span class="tk-a">@Part</span> file: <span class="tk-t">MultipartBody</span>.<span class="tk-t">Part</span>): <span class="tk-t">UploadResult</span>
+}</code></pre></figure>
+
+<h2 id="build">Building the client</h2>
+<figure class="code"><figcaption><span class="file">NetworkModule.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">object</span> <span class="tk-t">Network</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> json = <span class="tk-t">Json</span> {
+        ignoreUnknownKeys = <span class="tk-k">true</span>      <span class="tk-c">// new server fields won't crash old app versions</span>
+        explicitNulls = <span class="tk-k">false</span>
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> okHttp = <span class="tk-t">OkHttpClient</span>.<span class="tk-t">Builder</span>()
+        .connectTimeout(<span class="tk-n">15</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">SECONDS</span>)
+        .readTimeout(<span class="tk-n">30</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">SECONDS</span>)
+        .addInterceptor(<span class="tk-t">HttpLoggingInterceptor</span>().apply {
+            level = <span class="tk-k">if</span> (<span class="tk-t">BuildConfig</span>.<span class="tk-t">DEBUG</span>) <span class="tk-t">HttpLoggingInterceptor</span>.<span class="tk-t">Level</span>.<span class="tk-t">BODY</span> <span class="tk-k">else</span> <span class="tk-t">HttpLoggingInterceptor</span>.<span class="tk-t">Level</span>.<span class="tk-t">NONE</span>
+        })
+        .build()
+
+    <span class="tk-k">val</span> blogApi: <span class="tk-t">BlogApi</span> = <span class="tk-t">Retrofit</span>.<span class="tk-t">Builder</span>()
+        .baseUrl(<span class="tk-s">"https://api.example.com/v1/"</span>)     <span class="tk-c">// must end with "/"</span>
+        .client(okHttp)
+        .addConverterFactory(json.asConverterFactory(<span class="tk-s">"application/json"</span>.toMediaType()))
+        .build()
+        .create(<span class="tk-t">BlogApi</span>::<span class="tk-k">class</span>.java)
+}</code></pre></figure>
+<p>In a real app, provide these through Hilt as singletons. See <a href="../hilt-dependency-injection/index.html">Hilt</a>. Never log bodies or auth headers in release builds.</p>
+
+<h2 id="calling">Calling from a repository</h2>
+<figure class="code"><figcaption><span class="file">PostRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">PostRepository</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">BlogApi</span>) {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> latestPosts(page: <span class="tk-t">Int</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">Post</span>&gt; = api.getPosts(page).map { it.toDomain() }
+}</code></pre></figure>
+<p>Retrofit's suspend functions are main-safe: OkHttp performs the I/O on its own threads, so you can call them from <code>viewModelScope</code> directly.</p>
+
+<h2 id="errors">Errors</h2>
+<ul>
+  <li><strong>Non-2xx responses</strong> throw <code>HttpException</code> (with <code>code()</code>) when the return type isn't <code>Response&lt;T&gt;</code>.</li>
+  <li><strong>Network failures</strong> (no connection, timeouts) throw <code>IOException</code>.</li>
+  <li><strong>Malformed JSON</strong> throws a <code>SerializationException</code>.</li>
+</ul>
+<p>Map these to user-friendly states in one place. See <a href="../android-api-error-handling/index.html">Handling API Errors and Network Failures</a>.</p>
+
+<h2 id="testing">Testing with MockWebServer</h2>
+<figure class="code"><figcaption><span class="file">BlogApiTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">BlogApiTest</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> server = <span class="tk-t">MockWebServer</span>()
+    <span class="tk-k">private</span> <span class="tk-k">lateinit</span> <span class="tk-k">var</span> api: <span class="tk-t">BlogApi</span>
+
+    <span class="tk-a">@Before</span> <span class="tk-k">fun</span> setUp() {
+        server.start()
+        api = <span class="tk-t">Retrofit</span>.<span class="tk-t">Builder</span>()
+            .baseUrl(server.url(<span class="tk-s">"/"</span>))
+            .addConverterFactory(<span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }.asConverterFactory(<span class="tk-s">"application/json"</span>.toMediaType()))
+            .build().create(<span class="tk-t">BlogApi</span>::<span class="tk-k">class</span>.java)
+    }
+    <span class="tk-a">@After</span> <span class="tk-k">fun</span> tearDown() = server.shutdown()
+
+    <span class="tk-a">@Test</span> <span class="tk-k">fun</span> `parses user and ignores unknown fields`() = runTest {
+        server.enqueue(<span class="tk-t">MockResponse</span>().setBody(<span class="tk-s">"""{"id":"7","name":"Asha","extra":true}"""</span>))
+        <span class="tk-k">val</span> user = api.getUser(<span class="tk-s">"7"</span>)
+        assertEquals(<span class="tk-s">"Asha"</span>, user.name)
+        assertEquals(<span class="tk-s">"/users/7"</span>, server.takeRequest().path)
+    }
+}</code></pre></figure>
+
+<h2 id="use-cases">Common real-world needs</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Auth headers</h3><p>An OkHttp interceptor adds the token, and an authenticator refreshes it on 401. See <a href="../okhttp-interceptors/index.html">OkHttp Interceptors</a>.</p></div>
+  <div class="card usecase"><h3>Pagination</h3><p>Query params for page and cursor, wired into <a href="../paging-3-pagination/index.html">Paging 3</a>.</p></div>
+  <div class="card usecase"><h3>File uploads</h3><p><code>@Multipart</code> with a request body streamed from a <code>ContentResolver</code> URI.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Creating a new Retrofit or OkHttp instance per request, which wastes connection pools and caches.</li>
+  <li>Base URL without a trailing slash, or leading slashes in endpoint paths, which produce surprising URL resolution.</li>
+  <li>Strict JSON parsing without <code>ignoreUnknownKeys</code>, so new server fields crash old app versions.</li>
+  <li>Using DTOs directly in UI state. Map them to domain models.</li>
+  <li>Logging sensitive data in production.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Gson, Moshi or kotlinx.serialization?</summary><div><p>For Kotlin-first apps, kotlinx.serialization respects default values and nullability and works with Kotlin Multiplatform. Moshi is also solid. Gson ignores Kotlin nullability and defaults, so it's less suited to new Kotlin code.</p></div></details>
+  <details><summary>Do I need Dispatchers.IO for Retrofit calls?</summary><div><p>No. Suspend Retrofit functions are already main-safe.</p></div></details>
+  <details><summary>How do I cancel a request?</summary><div><p>Cancel the coroutine. Retrofit cancels the underlying OkHttp call automatically.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Retrofit + OkHttp + kotlinx.serialization + coroutines give you <strong>type-safe, concise, main-safe networking</strong>. Share one configured client, tolerate unknown JSON fields, map DTOs to domain models, handle errors centrally, and test with MockWebServer.</p>
+<p>Next step: build a complete flow around it in <a href="../rest-api-kotlin-coroutines/index.html">REST API Integration with Kotlin and Coroutines</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit (official repository)</a></li><li><a href="https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp (official repository)</a></li><li><a href="https://kotlinlang.org/docs/serialization.html" target="_blank" rel="noopener">kotlinx.serialization</a></li><li><a href="https://developer.android.com/develop/connectivity/network-ops/connecting" target="_blank" rel="noopener">Connect to the network (Android)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dretrofit-android-guide-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dretrofit-android-guide-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/rest-api-kotlin-coroutines/index.html"><small>APIs, Databases, and Backend Integration</small>REST API Integration with Kotlin and Coroutines</a></li><li><a href="../../android/okhttp-interceptors/index.html"><small>APIs, Databases, and Backend Integration</small>OkHttp Interceptors Explained</a></li><li><a href="../../android/android-api-error-handling/index.html"><small>APIs, Databases, and Backend Integration</small>Handling API Errors and Network Failures</a></li><li><a href="../../android/retrofit-vs-ktor-client/index.html"><small>APIs, Databases, and Backend Integration</small>Retrofit vs Ktor Client for Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/retrofit-android-guide/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/retrofit-android-guide/&amp;text=Retrofit in Android: Complete Guide" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/retrofit-android-guide/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#how">How Retrofit works</a></li><li><a href="#setup">Setup</a></li><li><a href="#models">Models</a></li><li><a href="#interface">Defining the API</a></li><li><a href="#build">Building the client</a></li><li><a href="#calling">Calling from a repository</a></li><li><a href="#errors">Errors</a></li><li><a href="#testing">Testing with MockWebServer</a></li><li><a href="#use-cases">Common real-world needs</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dretrofit-android-guide-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dretrofit-android-guide-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

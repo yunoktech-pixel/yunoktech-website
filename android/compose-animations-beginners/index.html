@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jetpack Compose Animations for Beginners | Yunok Tech</title>
+  <meta name="description" content="Learn Jetpack Compose animations step by step: animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, Crossfade, updateTransition, infinite transitions and specs.">
+  <meta name="keywords" content="jetpack compose animations, animateFloatAsState, AnimatedVisibility compose, AnimatedContent, animateContentSize, compose spring tween, compose animation tutorial">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/compose-animations-beginners/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/compose-animations-beginners/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Jetpack Compose Animations for Beginners">
+  <meta property="og:description" content="Learn Jetpack Compose animations step by step: animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, Crossfade, updateTransition, infinite transitions and specs.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Jetpack Compose Animations for Beginners">
+  <meta name="twitter:description" content="Learn Jetpack Compose animations step by step: animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, Crossfade, updateTransition, infinite transitions and specs.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Jetpack Compose Animations for Beginners", "description": "Learn Jetpack Compose animations step by step: animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, Crossfade, updateTransition, infinite transitions and specs.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Jetpack Compose", "keywords": "animateFloatAsState, AnimatedVisibility compose, AnimatedContent, animateContentSize, compose spring tween, compose animation tutorial", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/compose-animations-beginners/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Jetpack Compose Animations for Beginners", "item": "https://yunoktech.com/android/compose-animations-beginners/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Jetpack Compose Animations for Beginners</h1>
+    <p class="ad-lede">Good animation explains change: where something came from, what just happened, what's loading. Compose makes most animations a one-line change. This guide starts with the simplest APIs and builds up, with guidance on motion that helps rather than distracts.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#choose">Which API should you use?</a></li><li><a href="#as-state">1. animate*AsState: animate a single value</a></li><li><a href="#visibility">2. AnimatedVisibility: enter and exit</a></li><li><a href="#content">3. AnimatedContent: swap content</a></li><li><a href="#size">4. animateContentSize: smooth expand and collapse</a></li><li><a href="#transition">5. updateTransition: coordinate several values</a></li><li><a href="#infinite">6. Infinite animations: use sparingly</a></li><li><a href="#specs">Animation specs in one minute</a></li><li><a href="#accessibility">Motion and accessibility</a></li><li><a href="#use-cases">Where animation helps users</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">In the View system, animating meant ObjectAnimators, listeners and careful cleanup. In Compose, animation follows the same idea as everything else: you change <strong>state</strong>, and the animation APIs smoothly move the UI from the old value to the new one.</p>
+
+<h2 id="choose">Which API should you use?</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-an-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-an-t fig-an-d">
+    <title id="fig-an-t">Choosing a Compose animation API</title>
+    <desc id="fig-an-d">If a composable appears or disappears, use AnimatedVisibility. If content swaps based on state, use AnimatedContent or Crossfade. If size changes, use animateContentSize. If a single value such as color, size or alpha changes, use animate as state. If several values change together with one state, use updateTransition. If it repeats forever, use rememberInfiniteTransition.</desc>
+    <rect class="d-green" x="10" y="10" width="225" height="60" rx="10"/><text class="d-t" x="122" y="36" text-anchor="middle">Appear / disappear</text><text class="d-s" x="122" y="56" text-anchor="middle">AnimatedVisibility</text>
+    <rect class="d-green" x="247" y="10" width="225" height="60" rx="10"/><text class="d-t" x="359" y="36" text-anchor="middle">Content swaps</text><text class="d-s" x="359" y="56" text-anchor="middle">AnimatedContent · Crossfade</text>
+    <rect class="d-green" x="484" y="10" width="225" height="60" rx="10"/><text class="d-t" x="596" y="36" text-anchor="middle">Size changes</text><text class="d-s" x="596" y="56" text-anchor="middle">Modifier.animateContentSize()</text>
+    <rect class="d-blue" x="10" y="84" width="225" height="60" rx="10"/><text class="d-t" x="122" y="110" text-anchor="middle">One value changes</text><text class="d-s" x="122" y="130" text-anchor="middle">animate*AsState</text>
+    <rect class="d-blue" x="247" y="84" width="225" height="60" rx="10"/><text class="d-t" x="359" y="110" text-anchor="middle">Many values, one state</text><text class="d-s" x="359" y="130" text-anchor="middle">updateTransition</text>
+    <rect class="d-blue" x="484" y="84" width="225" height="60" rx="10"/><text class="d-t" x="596" y="110" text-anchor="middle">Repeats forever</text><text class="d-s" x="596" y="130" text-anchor="middle">rememberInfiniteTransition</text>
+    <rect class="d-violet" x="130" y="158" width="460" height="50" rx="10"/><text class="d-t" x="360" y="180" text-anchor="middle">Gesture-driven / fully custom</text><text class="d-s" x="360" y="198" text-anchor="middle">Animatable (coroutine-based)</text>
+  </svg>
+  <figcaption id="fig-an-cap">Start with the highest-level API that fits. Drop to <code>Animatable</code> only for gestures or custom choreography.</figcaption>
+</figure>
+
+<h2 id="as-state">1. animate*AsState: animate a single value</h2>
+<figure class="code"><figcaption><span class="file">Favourite button</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">FavoriteButton</span>(isFavorite: <span class="tk-t">Boolean</span>, onToggle: () -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-k">val</span> scale <span class="tk-k">by</span> animateFloatAsState(
+        targetValue = <span class="tk-k">if</span> (isFavorite) <span class="tk-n">1.2f</span> <span class="tk-k">else</span> <span class="tk-n">1f</span>,
+        animationSpec = spring(dampingRatio = <span class="tk-t">Spring</span>.<span class="tk-t">DampingRatioMediumBouncy</span>),
+        label = <span class="tk-s">"favoriteScale"</span>,
+    )
+    <span class="tk-k">val</span> tint <span class="tk-k">by</span> animateColorAsState(
+        targetValue = <span class="tk-k">if</span> (isFavorite) <span class="tk-t">Color</span>(0xFFE11D48) <span class="tk-k">else</span> <span class="tk-t">MaterialTheme</span>.colorScheme.onSurfaceVariant,
+        label = <span class="tk-s">"favoriteTint"</span>,
+    )
+    <span class="tk-t">IconButton</span>(onClick = onToggle) {
+        <span class="tk-t">Icon</span>(
+            imageVector = <span class="tk-k">if</span> (isFavorite) <span class="tk-t">Icons</span>.<span class="tk-t">Filled</span>.<span class="tk-t">Favorite</span> <span class="tk-k">else</span> <span class="tk-t">Icons</span>.<span class="tk-t">Outlined</span>.<span class="tk-t">FavoriteBorder</span>,
+            contentDescription = <span class="tk-k">if</span> (isFavorite) <span class="tk-s">"Remove from favourites"</span> <span class="tk-k">else</span> <span class="tk-s">"Add to favourites"</span>,
+            tint = tint,
+            modifier = <span class="tk-t">Modifier</span>.graphicsLayer { scaleX = scale; scaleY = scale },
+        )
+    }
+}</code></pre></figure>
+<p>Change the target and Compose animates to it, even if it changes again mid-animation. Using <code>graphicsLayer</code> applies the scale in the draw phase, which is cheaper than changing layout size.</p>
+
+<h2 id="visibility">2. AnimatedVisibility: enter and exit</h2>
+<figure class="code"><figcaption><span class="file">Error banner</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">AnimatedVisibility</span>(
+    visible = state.error != <span class="tk-k">null</span>,
+    enter = slideInVertically { -it } + fadeIn(),
+    exit = slideOutVertically { -it } + fadeOut(),
+) {
+    <span class="tk-t">ErrorBanner</span>(message = state.error.orEmpty(), onRetry = onRetry)
+}</code></pre></figure>
+
+<h2 id="content">3. AnimatedContent: swap content</h2>
+<figure class="code"><figcaption><span class="file">Animated counter</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">AnimatedContent</span>(
+    targetState = cartCount,
+    transitionSpec = {
+        <span class="tk-k">if</span> (targetState &gt; initialState) slideInVertically { it } + fadeIn() togetherWith slideOutVertically { -it } + fadeOut()
+        <span class="tk-k">else</span> slideInVertically { -it } + fadeIn() togetherWith slideOutVertically { it } + fadeOut()
+    },
+    label = <span class="tk-s">"cartCount"</span>,
+) { count -&gt; <span class="tk-t">Text</span>(<span class="tk-s">"$count"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.titleLarge) }</code></pre></figure>
+
+<h2 id="size">4. animateContentSize: smooth expand and collapse</h2>
+<figure class="code"><figcaption><span class="file">Expandable text</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">var</span> expanded <span class="tk-k">by</span> remember { mutableStateOf(<span class="tk-k">false</span>) }
+<span class="tk-t">Text</span>(
+    text = longDescription,
+    maxLines = <span class="tk-k">if</span> (expanded) <span class="tk-t">Int</span>.<span class="tk-t">MAX_VALUE</span> <span class="tk-k">else</span> <span class="tk-n">3</span>,
+    overflow = <span class="tk-t">TextOverflow</span>.<span class="tk-t">Ellipsis</span>,
+    modifier = <span class="tk-t">Modifier</span>.animateContentSize().clickable { expanded = !expanded },
+)</code></pre></figure>
+
+<h2 id="transition">5. updateTransition: coordinate several values</h2>
+<figure class="code"><figcaption><span class="file">Selectable card</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> transition = updateTransition(targetState = selected, label = <span class="tk-s">"cardSelection"</span>)
+<span class="tk-k">val</span> elevation <span class="tk-k">by</span> transition.animateDp(label = <span class="tk-s">"elevation"</span>) { <span class="tk-k">if</span> (it) <span class="tk-n">8</span>.dp <span class="tk-k">else</span> <span class="tk-n">1</span>.dp }
+<span class="tk-k">val</span> borderWidth <span class="tk-k">by</span> transition.animateDp(label = <span class="tk-s">"border"</span>) { <span class="tk-k">if</span> (it) <span class="tk-n">2</span>.dp <span class="tk-k">else</span> <span class="tk-n">0</span>.dp }
+<span class="tk-k">val</span> bg <span class="tk-k">by</span> transition.animateColor(label = <span class="tk-s">"bg"</span>) {
+    <span class="tk-k">if</span> (it) <span class="tk-t">MaterialTheme</span>.colorScheme.primaryContainer <span class="tk-k">else</span> <span class="tk-t">MaterialTheme</span>.colorScheme.surface
+}</code></pre></figure>
+
+<h2 id="infinite">6. Infinite animations: use sparingly</h2>
+<figure class="code"><figcaption><span class="file">Skeleton shimmer alpha</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> infinite = rememberInfiniteTransition(label = <span class="tk-s">"skeleton"</span>)
+<span class="tk-k">val</span> alpha <span class="tk-k">by</span> infinite.animateFloat(
+    initialValue = <span class="tk-n">0.4f</span>, targetValue = <span class="tk-n">0.9f</span>,
+    animationSpec = infiniteRepeatable(tween(<span class="tk-n">800</span>), <span class="tk-t">RepeatMode</span>.<span class="tk-t">Reverse</span>),
+    label = <span class="tk-s">"skeletonAlpha"</span>,
+)
+<span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.fillMaxWidth().height(<span class="tk-n">16</span>.dp).graphicsLayer { <span class="tk-k">this</span>.alpha = alpha }.background(<span class="tk-t">Color</span>.<span class="tk-t">LightGray</span>))</code></pre></figure>
+
+<h2 id="specs">Animation specs in one minute</h2>
+<ul>
+  <li><strong><code>spring()</code></strong>: physics-based and the default for most APIs. It handles interruptions naturally.</li>
+  <li><strong><code>tween(durationMillis, easing)</code></strong>: a fixed duration with an easing curve. Good for fades.</li>
+  <li><strong><code>keyframes { }</code></strong>: specific values at specific times.</li>
+</ul>
+
+<h2 id="accessibility">Motion and accessibility</h2>
+<p>Some users enable <em>Remove animations</em> in system settings. Compose's animation system respects the device's animator duration scale. Keep motion purposeful: short UI transitions (roughly 150–300 ms) feel responsive. Never hide essential information inside an animation, and avoid large, continuous movement.</p>
+
+<h2 id="use-cases">Where animation helps users</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Feedback</h3><p>A heart scaling on tap confirms the action happened.</p></div>
+  <div class="card usecase"><h3>Continuity</h3><p>Expanding cards and list item animations show where content went.</p></div>
+  <div class="card usecase"><h3>Status</h3><p>Skeleton placeholders and progress indicators set expectations while loading.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Animating layout-affecting values (padding, size) every frame when a <code>graphicsLayer</code> transform would be cheaper.</li>
+  <li>Infinite animations left running off-screen or behind dialogs.</li>
+  <li>Omitting <code>label</code>, which makes Animation Preview and the inspector harder to use.</li>
+  <li>Over-animating: everything bouncing distracts and slows users down.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I preview animations?</summary><div><p>Yes. Android Studio's Animation Preview lets you inspect and scrub transitions, which is where labels help.</p></div></details>
+  <details><summary>How do I animate between screens?</summary><div><p>Navigation libraries provide enter and exit transitions, and shared element transitions are available in Compose for matching elements across screens.</p></div></details>
+  <details><summary>Are Compose animations performant?</summary><div><p>Yes, when they animate draw-phase properties (alpha, translation, scale via <code>graphicsLayer</code>) and avoid recomposing large trees every frame.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Compose animation is state-driven: change the state and let <strong>animate*AsState, AnimatedVisibility, AnimatedContent, animateContentSize, updateTransition</strong> or an infinite transition interpolate. Prefer high-level APIs, draw-phase transforms and purposeful, short motion.</p>
+<p>Next step: make your app look polished and personal with <a href="../material3-theming-dynamic-color/index.html">Material 3 Theming and Dynamic Colors</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/animation/introduction" target="_blank" rel="noopener">Animations in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/animation/choose-api" target="_blank" rel="noopener">Choose an animation API</a></li><li><a href="https://developer.android.com/develop/ui/compose/animation/customize" target="_blank" rel="noopener">Customize animations (specs)</a></li><li><a href="https://m3.material.io/styles/motion/overview" target="_blank" rel="noopener">Material motion</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-animations-beginners-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-animations-beginners-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/what-is-jetpack-compose/index.html"><small>Jetpack Compose</small>What Is Jetpack Compose and Why Should You Learn It?</a></li><li><a href="../../android/lazycolumn-vs-column/index.html"><small>Jetpack Compose</small>LazyColumn vs Column: When to Use Each</a></li><li><a href="../../android/compose-performance-optimization/index.html"><small>Jetpack Compose</small>Compose Performance Optimization</a></li><li><a href="../../android/material3-theming-dynamic-color/index.html"><small>Jetpack Compose</small>Material 3 Theming and Dynamic Colors</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/compose-animations-beginners/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/compose-animations-beginners/&amp;text=Jetpack Compose Animations for Beginners" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/compose-animations-beginners/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#choose">Which API should you use?</a></li><li><a href="#as-state">1. animate*AsState: animate a single value</a></li><li><a href="#visibility">2. AnimatedVisibility: enter and exit</a></li><li><a href="#content">3. AnimatedContent: swap content</a></li><li><a href="#size">4. animateContentSize: smooth expand and collapse</a></li><li><a href="#transition">5. updateTransition: coordinate several values</a></li><li><a href="#infinite">6. Infinite animations: use sparingly</a></li><li><a href="#specs">Animation specs in one minute</a></li><li><a href="#accessibility">Motion and accessibility</a></li><li><a href="#use-cases">Where animation helps users</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-animations-beginners-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-animations-beginners-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

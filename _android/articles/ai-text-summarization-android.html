@@ -1,0 +1,149 @@
+<!--meta
+{
+  "seo_title": "Add AI-Powered Text Summarization to an Android App",
+  "description": "Add text summarization to Android apps: on-device ML Kit Summarization, cloud Gemini for long documents, chunking with map-reduce, streaming summaries in Compose, caching and accuracy.",
+  "primary_keyword": "ai text summarization android",
+  "keywords": ["summarize text android kotlin", "ml kit summarization", "gemini summarize long document", "map reduce summarization", "streaming summary compose", "tl;dr feature android"],
+  "lede": "Long articles, chat threads and meeting notes are where users most want a quick summary. This guide shows how to add summarization to an Android app: on-device for short private text, cloud for long documents, chunking strategies, streaming UI and accuracy safeguards.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["gemini-nano-ml-kit-genai-android", "ai-document-summarizer-android", "gemini-api-android-kotlin", "ai-tokens-latency-cost-mobile"],
+  "refs": [
+    ["ML Kit GenAI Summarization", "https://developers.google.com/ml-kit/genai/summarization/android"],
+    ["Firebase AI Logic: generate text", "https://firebase.google.com/docs/ai-logic/generate-text?platform=android"],
+    ["Gemini models and context windows", "https://ai.google.dev/gemini-api/docs/models"],
+    ["Gemini API: long context", "https://ai.google.dev/gemini-api/docs/long-context"]
+  ]
+}
+-->
+<p class="ad-lead">A good summary saves time. A bad one misleads, which is worse than no summary. Summarization quality depends on three things: choosing the right model for the input length, structuring long inputs sensibly, and making it easy for users to check the source.</p>
+
+<h2 id="routing">Choose the engine by input size and sensitivity</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Input</th><th>Engine</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Short, private text (notes, chats) in a supported language</td><td>ML Kit Summarization (Gemini Nano)</td><td>On-device, free per request, offline</td></tr>
+    <tr><td>Long documents (reports, PDFs)</td><td>Cloud Gemini (long context)</td><td>Large context windows, better reasoning</td></tr>
+    <tr><td>Very long or many documents</td><td>Chunk + map-reduce, or a backend pipeline</td><td>Bounded cost and latency per call</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mr-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-mr-t fig-mr-d">
+    <title id="fig-mr-t">Map-reduce summarization of a long document</title>
+    <desc id="fig-mr-d">A long document is split into chunks at paragraph boundaries. Each chunk is summarized in parallel in the map step. The partial summaries are combined and summarized again in the reduce step to produce the final summary.</desc>
+    <defs><marker id="mrm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="80" width="120" height="60" rx="12"/><text class="d-t" x="70" y="106" text-anchor="middle">Document</text><text class="d-s" x="70" y="124" text-anchor="middle">40 pages</text></g>
+    <path class="d-flow" d="M130 110 L196 40 M130 110 H196 M130 110 L196 180" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="200" y="20" width="110" height="40" rx="8"/><text class="d-s" x="255" y="45" text-anchor="middle">chunk 1</text><rect class="d-box" x="200" y="90" width="110" height="40" rx="8"/><text class="d-s" x="255" y="115" text-anchor="middle">chunk 2</text><rect class="d-box" x="200" y="160" width="110" height="40" rx="8"/><text class="d-s" x="255" y="185" text-anchor="middle">chunk n</text></g>
+    <path class="d-flow" d="M310 40 H366 M310 110 H366 M310 180 H366" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="370" y="20" width="120" height="40" rx="8"/><text class="d-s" x="430" y="45" text-anchor="middle">summary 1</text><rect class="d-violet" x="370" y="90" width="120" height="40" rx="8"/><text class="d-s" x="430" y="115" text-anchor="middle">summary 2</text><rect class="d-violet" x="370" y="160" width="120" height="40" rx="8"/><text class="d-s" x="430" y="185" text-anchor="middle">summary n</text></g>
+    <path class="d-flow" d="M490 40 L556 104 M490 110 H556 M490 180 L556 116" marker-end="url(#mrm)"/>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="560" y="80" width="150" height="60" rx="12"/><text class="d-t" x="635" y="106" text-anchor="middle">Final summary</text><text class="d-s" x="635" y="124" text-anchor="middle">reduce step</text></g>
+  </svg>
+  <figcaption id="fig-mr-cap">Map-reduce keeps each request small. With long-context models you may not need it, but it's the fallback when inputs exceed limits or budgets.</figcaption>
+</figure>
+
+<h2 id="on-device">On-device summarization</h2>
+<p>For short text, the ML Kit Summarization API is the simplest option. See the full lifecycle (status check, download, streaming) in <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI</a>. Remember its documented constraints: input under roughly 4,000 tokens, a few supported languages, foreground-only use and supported devices.</p>
+
+<h2 id="cloud">Cloud summarization with a structured prompt</h2>
+<code-block lang="kotlin" file="CloudSummarizer.kt">
+class CloudSummarizer {
+    private val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = "gemini-3.8-flash",             // check current model names
+        generationConfig = generationConfig { temperature = 0.2f; maxOutputTokens = 600 },
+        systemInstruction = content {
+            text(
+                "Summarize the provided document faithfully. Use only information in the document. " +
+                "If something is unclear, say so. Output 3-5 bullet points, then one line 'Action items:' if any."
+            )
+        },
+    )
+
+    fun summarizeStream(document: String): Flow<String> =
+        model.generateContentStream("<document>\n$document\n</document>").mapNotNull { it.text }
+
+    suspend fun summarize(text: String): String = model.generateContent("<document>\n$text\n</document>").text.orEmpty()
+}
+</code-block>
+
+<h2 id="chunking">Chunking long text (map-reduce)</h2>
+<code-block lang="kotlin" file="MapReduceSummarizer.kt">
+class MapReduceSummarizer(private val summarizer: CloudSummarizer) {
+
+    /** Split at paragraph boundaries into chunks of at most [maxChars]. */
+    fun chunk(text: String, maxChars: Int = 12_000): List<String> {
+        val chunks = mutableListOf<String>()
+        val current = StringBuilder()
+        text.split("\n\n").forEach { paragraph ->
+            if (current.length + paragraph.length > maxChars && current.isNotEmpty()) {
+                chunks += current.toString(); current.clear()
+            }
+            current.append(paragraph).append("\n\n")
+        }
+        if (current.isNotBlank()) chunks += current.toString()
+        return chunks
+    }
+
+    suspend fun summarize(text: String): String = coroutineScope {
+        val parts = chunk(text)
+        if (parts.size == 1) return@coroutineScope summarizer.summarize(parts.single())
+        val partials = parts
+            .chunked(4)                                          // limit parallelism (rate limits)
+            .flatMap { batch -> batch.map { async { summarizer.summarize(it) } }.awaitAll() }
+        summarizer.summarize(partials.joinToString("\n\n"))      // reduce step
+    }
+}
+</code-block>
+<p>Character counts are only a rough proxy for tokens. If you need exact limits, use the SDK's token-counting API. Very large paragraphs may also need splitting.</p>
+
+<h2 id="ui">Streaming UI and trust</h2>
+<code-block lang="kotlin" file="SummaryPanel.kt">
+@Composable
+fun SummaryPanel(summary: String, isStreaming: Boolean, onViewSource: () -> Unit) {
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Text("AI summary", style = MaterialTheme.typography.titleSmall)
+            Text(summary, Modifier.padding(vertical = 8.dp))
+            if (isStreaming) LinearProgressIndicator(Modifier.fillMaxWidth())
+            Text("Summaries can miss or misstate details.", style = MaterialTheme.typography.labelSmall)
+            TextButton(onClick = onViewSource) { Text("Read the full text") }
+        }
+    }
+}
+</code-block>
+
+<h2 id="caching">Caching and cost</h2>
+<ul>
+  <li>Cache summaries keyed by a content hash plus prompt version, so the same document isn't summarized twice.</li>
+  <li>Summarize on demand (button), not automatically for every item.</li>
+  <li>Limit output length and choose a fast model tier for short inputs. See <a href="../ai-tokens-latency-cost-mobile/index.html">Tokens, Latency and Cost</a>.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Chat catch-up</h3><p>"Summarise the last 200 messages" on-device for privacy, where supported.</p></div>
+  <div class="card usecase"><h3>Long reports</h3><p>Cloud summarization with action items, streamed as it generates.</p></div>
+  <div class="card usecase"><h3>Reading list</h3><p>Cached TL;DRs for saved articles, generated when the user taps "Summarise".</p></div>
+</div>
+
+<h2 id="pitfalls">Accuracy pitfalls</h2>
+<ul>
+  <li>Summaries can omit critical caveats. Offer "read full text" and avoid summaries for legal or medical decisions.</li>
+  <li>Models may add plausible but absent facts. Instruct "use only the document", keep temperature low, and evaluate with real samples.</li>
+  <li>Map-reduce can lose cross-chunk context. Use overlap, or long-context models when possible.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I summarize PDFs?</summary><div><p>Extract text first (on-device PDF text extraction or a backend), or send the PDF to a multimodal cloud model that accepts documents. See <a href="../ai-document-summarizer-android/index.html">AI Document Summarizer</a>.</p></div></details>
+  <details><summary>How do I support Hindi and other languages?</summary><div><p>Check language support per engine. Cloud models generally support more languages than current on-device summarization.</p></div></details>
+  <details><summary>Should I store summaries?</summary><div><p>Caching improves cost and speed, but treat summaries as derived personal data, and delete them with the source.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Route summarization by <strong>length and sensitivity</strong>: on-device for short private text, cloud long-context models for big documents, and map-reduce when inputs exceed limits. Stream results, label them as AI-generated, link back to the source, and cache to control cost.</p>
+<p>Next step: summarize images instead of text with <a href="../ai-image-description-android/index.html">Image Understanding and Description</a>.</p>

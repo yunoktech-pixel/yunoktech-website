@@ -1,0 +1,101 @@
+<!--meta
+{
+  "seo_title": "Building and Launching an Android App as a Solo Developer",
+  "description": "A practical playbook for solo Android developers: choosing an idea, scoping an MVP, a lean tech stack, testing with real users, launching on Google Play, marketing basics and sustainable maintenance.",
+  "primary_keyword": "solo android developer launch app",
+  "keywords": ["indie android developer", "launch android app alone", "android mvp scope", "app marketing indie developer", "side project android app", "closed testing recruit testers"],
+  "lede": "Building an app alone means you're the product manager, designer, developer, QA, marketer and support team. It's very doable if you scope ruthlessly, choose boring technology, and plan for launch and maintenance from the start.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["publish-android-app-google-play", "android-store-listing-optimization", "android-monetization-ads-vs-iap", "maintaining-android-apps-lessons"],
+  "refs": [
+    ["Google Play Console", "https://play.google.com/console/about/"],
+    ["App testing requirements for new personal developer accounts", "https://support.google.com/googleplay/android-developer/answer/14151465"],
+    ["Core app quality guidelines", "https://developer.android.com/docs/quality-guidelines/core-app-quality"],
+    ["Android Developers: Get started", "https://developer.android.com/get-started/overview"]
+  ]
+}
+-->
+<p class="ad-lead">Most solo apps fail not because the code is bad, but because the scope is too big, nobody knows the app exists, or the developer burns out maintaining it. Here's a lean, realistic path from idea to a launched app you can keep improving.</p>
+
+<h2 id="phases">The solo launch path</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-solo-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-solo-t fig-solo-d">
+    <title id="fig-solo-t">Solo developer app launch phases</title>
+    <desc id="fig-solo-d">Validate the problem with real people; scope an MVP with one core job; build with a lean stack; test with real users in closed testing; launch with a clear listing and a small marketing push; then iterate based on data while keeping maintenance sustainable.</desc>
+    <defs><marker id="som" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H124 M224 70 H238 M338 70 H352 M452 70 H466 M566 70 H580" marker-end="url(#som)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="100" height="60" rx="10"/><text class="d-t" x="60" y="66" text-anchor="middle">Validate</text><text class="d-s" x="60" y="84" text-anchor="middle">problem</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="128" y="40" width="96" height="60" rx="10"/><text class="d-t" x="176" y="66" text-anchor="middle">Scope</text><text class="d-s" x="176" y="84" text-anchor="middle">one job</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="242" y="40" width="96" height="60" rx="10"/><text class="d-t" x="290" y="66" text-anchor="middle">Build</text><text class="d-s" x="290" y="84" text-anchor="middle">lean stack</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="356" y="40" width="96" height="60" rx="10"/><text class="d-t" x="404" y="66" text-anchor="middle">Test</text><text class="d-s" x="404" y="84" text-anchor="middle">real users</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="470" y="40" width="96" height="60" rx="10"/><text class="d-t" x="518" y="66" text-anchor="middle">Launch</text><text class="d-s" x="518" y="84" text-anchor="middle">+ tell people</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="10"/><text class="d-w" x="647" y="66" text-anchor="middle">Iterate</text><text class="d-w" x="647" y="84" text-anchor="middle">sustainably</text></g>
+  </svg>
+  <figcaption id="fig-solo-cap">Each phase should be small. The goal is a real app in users' hands, then learning.</figcaption>
+</figure>
+
+<h2 id="idea">1. Pick and validate an idea</h2>
+<ul>
+  <li>Solve a problem you or people you know actually have, and can describe in one sentence.</li>
+  <li>Check existing apps: read their low-rated reviews for unmet needs.</li>
+  <li>Talk to 5–10 potential users before writing code.</li>
+</ul>
+
+<h2 id="scope">2. Scope an MVP ruthlessly</h2>
+<div class="cards">
+  <div class="card pros"><h4>In the MVP</h4><ul><li>The one core job, done well</li><li>Offline-friendly basics</li><li>Crash reporting</li><li>Privacy policy and data safety</li></ul></div>
+  <div class="card cons"><h4>Not yet</h4><ul><li>Accounts and cloud sync (unless core)</li><li>Multiple themes, widgets, tablets</li><li>Complex monetisation</li><li>Every language</li></ul></div>
+</div>
+
+<h2 id="stack">3. A lean, boring stack</h2>
+<ul>
+  <li>Kotlin + Jetpack Compose + Material 3, single module, ViewModel + StateFlow.</li>
+  <li>Room/DataStore locally. Firebase if you need auth, sync or push without running servers.</li>
+  <li>CI on GitHub Actions for builds and tests. See <a href="../android-ci-cd-github-actions/index.html">CI/CD</a>.</li>
+  <li>AI coding assistants for boilerplate, with verification. See <a href="../verify-ai-generated-android-code/index.html">Verifying AI Code</a>.</li>
+</ul>
+
+<h2 id="testing">4. Test with real users</h2>
+<p>New personal developer accounts must run a closed test before production, with Google's minimum number of testers over a minimum period. Turn this requirement into an advantage: recruit genuine testers (friends, colleagues, online communities in your niche), give them a clear feedback form, and fix what they find.</p>
+
+<h2 id="launch">5. Launch and tell people</h2>
+<ol class="steps">
+  <li>Polish the store listing: benefit-first screenshots and a clear short description. See <a href="../android-store-listing-optimization/index.html">Listing Optimization</a>.</li>
+  <li>Create a simple landing page or blog post explaining the problem you solve. It helps search discovery.</li>
+  <li>Share where your users are: niche communities, social media, your network. Be helpful, not spammy.</li>
+  <li>Ask early happy users for reviews at the right moment. See <a href="../improve-android-app-ratings/index.html">Improving Ratings</a>.</li>
+</ol>
+
+<h2 id="iterate">6. Iterate and stay sustainable</h2>
+<ul>
+  <li>Watch crash-free rate, retention and reviews weekly. Fix the biggest problem first.</li>
+  <li>Batch work: one release every few weeks with a small changelog.</li>
+  <li>Budget time for annual Play requirements (target API updates, policy forms).</li>
+  <li>Automate what you can: CI, staged rollouts, dependency update PRs.</li>
+</ul>
+
+<h2 id="use-cases">Example timelines (part-time)</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Phase</th><th>Rough time</th></tr></thead>
+  <tbody>
+    <tr><td>Validation + scoping</td><td>1–2 weeks</td></tr>
+    <tr><td>MVP build</td><td>4–8 weeks</td></tr>
+    <tr><td>Closed testing + fixes</td><td>2–4 weeks</td></tr>
+    <tr><td>Launch + first iterations</td><td>Ongoing</td></tr>
+  </tbody>
+</table>
+<p class="ad-s" style="font-size:.85rem;color:var(--ad-muted);padding:8px 14px;margin:0">Illustrative only. Your pace depends on scope, experience and available hours.</p>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a solo app make money?</summary><div><p>Some do, many don't. Treat the first app as a learning and portfolio investment, and choose monetisation that fits usage. See <a href="../android-monetization-ads-vs-iap/index.html">Monetization</a>.</p></div></details>
+  <details><summary>Personal or organisation developer account?</summary><div><p>Personal is simplest for individuals. Organisation accounts need business verification but suit registered businesses.</p></div></details>
+  <details><summary>How do I avoid burnout?</summary><div><p>Small scope, a regular release rhythm, automated checks, and saying no to features that don't serve the core job.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Solo success comes from <strong>a validated problem, a ruthlessly small MVP, a boring stack, genuine testing, a clear launch, and sustainable iteration</strong>. Ship something small and real, then let users and data guide what's next.</p>
+<p>Next step: learn what changes after launch in <a href="../maintaining-android-apps-lessons/index.html">Lessons Learned from Maintaining Real Android Apps</a>.</p>

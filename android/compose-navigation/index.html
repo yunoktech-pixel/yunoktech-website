@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navigation in Jetpack Compose (Navigation 3 Guide) | Yunok Tech</title>
+  <meta name="description" content="Navigate between Compose screens with Jetpack Navigation 3: back stack as state, NavDisplay, NavKey routes, passing arguments, ViewModel scoping, deep links and Navigation 2 comparison.">
+  <meta name="keywords" content="jetpack compose navigation, navigation 3 compose, NavDisplay backStack, rememberNavBackStack, compose navigation arguments, type safe navigation compose, navigation compose vs navigation 3">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/compose-navigation/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/compose-navigation/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Navigation in Jetpack Compose (Navigation 3 Guide)">
+  <meta property="og:description" content="Navigate between Compose screens with Jetpack Navigation 3: back stack as state, NavDisplay, NavKey routes, passing arguments, ViewModel scoping, deep links and Navigation 2 comparison.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Navigation in Jetpack Compose (Navigation 3 Guide)">
+  <meta name="twitter:description" content="Navigate between Compose screens with Jetpack Navigation 3: back stack as state, NavDisplay, NavKey routes, passing arguments, ViewModel scoping, deep links and Navigation 2 comparison.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Navigation in Jetpack Compose", "description": "Navigate between Compose screens with Jetpack Navigation 3: back stack as state, NavDisplay, NavKey routes, passing arguments, ViewModel scoping, deep links and Navigation 2 comparison.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Jetpack Compose", "keywords": "navigation 3 compose, NavDisplay backStack, rememberNavBackStack, compose navigation arguments, type safe navigation compose, navigation compose vs navigation 3", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/compose-navigation/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Navigation in Jetpack Compose", "item": "https://yunoktech.com/android/compose-navigation/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Navigation in Jetpack Compose</h1>
+    <p class="ad-lede">Navigation 3 rethinks navigation for Compose: the back stack is just a list in Compose state that you own and modify. This guide shows how it works, how to pass arguments and scope ViewModels, and how it compares with the Navigation Compose (Navigation 2) API many apps still use.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#model">The Navigation 3 mental model</a></li><li><a href="#keys">Step 1: Define routes as keys</a></li><li><a href="#display">Step 2: Hold the back stack and render it</a></li><li><a href="#patterns">Common navigation patterns</a></li><li><a href="#nav2">Navigation Compose (Navigation 2) for existing apps</a></li><li><a href="#viewmodel-args">Passing arguments to ViewModels</a></li><li><a href="#use-cases">Real-world structures</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Navigation is where many Compose apps get messy: string routes with hand-parsed arguments, ViewModels that leak between screens, and back behaviour that surprises users. <strong>Jetpack Navigation 3</strong>, stable since late 2025, takes a simpler approach. Your back stack is plain Compose state, and screens are rendered from it.</p>
+
+<div class="note"><b>Which API should you use?</b>
+<p>For new Compose apps, Google now points to <strong>Navigation 3</strong>. Many existing apps use <strong>Navigation Compose</strong> (Navigation 2, with <code>NavHost</code> and <code>NavController</code>), which remains supported and gained type-safe routes. Both are covered below. Check the release notes for current API details, because Navigation 3 is still evolving.</p></div>
+
+<h2 id="model">The Navigation 3 mental model</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-nav-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-nav-t fig-nav-d">
+    <title id="fig-nav-t">Navigation 3: back stack as state rendered by NavDisplay</title>
+    <desc id="fig-nav-d">The back stack is a list of keys: Home, ProductList, Product with id 42. NavDisplay reads the list and shows the entry for the last key, using an entry provider that maps each key type to a composable. Adding a key navigates forward; removing the last key navigates back.</desc>
+    <defs><marker id="nv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-box" x="20" y="30" width="250" height="150" rx="14"/><text class="d-t" x="145" y="54" text-anchor="middle">backStack (state)</text>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="40" y="66" width="210" height="28" rx="6"/><text class="d-s" x="145" y="85" text-anchor="middle">Home</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="40" y="100" width="210" height="28" rx="6"/><text class="d-s" x="145" y="119" text-anchor="middle">ProductList</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="40" y="134" width="210" height="28" rx="6"/><text class="d-s" x="145" y="153" text-anchor="middle">Product(id = "42")  ← top</text></g>
+    <path class="d-flow" d="M270 105 H330" marker-end="url(#nv)"/>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="334" y="70" width="170" height="70" rx="12"/><text class="d-t" x="419" y="98" text-anchor="middle">NavDisplay</text><text class="d-s" x="419" y="118" text-anchor="middle">entryProvider maps keys</text></g>
+    <path class="d-flow" d="M504 105 H560" marker-end="url(#nv)"/>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="564" y="70" width="140" height="70" rx="12"/><text class="d-t" x="634" y="98" text-anchor="middle">ProductScreen</text><text class="d-s" x="634" y="118" text-anchor="middle">id = "42"</text></g>
+    <text class="d-s" x="145" y="196" text-anchor="middle">add() = navigate · removeLastOrNull() = back</text>
+  </svg>
+  <figcaption id="fig-nav-cap">No hidden controller state: what you see in the list is what's on screen.</figcaption>
+</figure>
+
+<h2 id="keys">Step 1: Define routes as keys</h2>
+<figure class="code"><figcaption><span class="file">Routes.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> androidx.navigation3.runtime.<span class="tk-t">NavKey</span>
+<span class="tk-k">import</span> kotlinx.serialization.<span class="tk-t">Serializable</span>
+
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Home</span> : <span class="tk-t">NavKey</span>
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">ProductList</span> : <span class="tk-t">NavKey</span>
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Product</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>) : <span class="tk-t">NavKey</span>      <span class="tk-c">// arguments are just properties</span>
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Cart</span> : <span class="tk-t">NavKey</span></code></pre></figure>
+<p>Keys are ordinary Kotlin types, so arguments are type-safe properties with no string parsing. Implementing <code>NavKey</code> and <code>@Serializable</code> lets Navigation 3 save the back stack across configuration changes and process death.</p>
+
+<h2 id="display">Step 2: Hold the back stack and render it</h2>
+<figure class="code"><figcaption><span class="file">AppNavigation.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">AppNavigation</span>() {
+    <span class="tk-k">val</span> backStack = rememberNavBackStack(<span class="tk-t">Home</span>)          <span class="tk-c">// saveable back stack</span>
+
+    <span class="tk-t">NavDisplay</span>(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),   <span class="tk-c">// per-entry rememberSaveable state</span>
+            rememberViewModelStoreNavEntryDecorator(),        <span class="tk-c">// per-entry ViewModels</span>
+        ),
+        entryProvider = entryProvider {
+            entry&lt;<span class="tk-t">Home</span>&gt; {
+                <span class="tk-t">HomeScreen</span>(onBrowse = { backStack.add(<span class="tk-t">ProductList</span>) })
+            }
+            entry&lt;<span class="tk-t">ProductList</span>&gt; {
+                <span class="tk-t">ProductListScreen</span>(onProductClick = { id -&gt; backStack.add(<span class="tk-t">Product</span>(id)) })
+            }
+            entry&lt;<span class="tk-t">Product</span>&gt; { key -&gt;
+                <span class="tk-t">ProductScreen</span>(
+                    viewModel = viewModel { <span class="tk-t">ProductViewModel</span>(productId = key.id) },
+                    onAddedToCart = { backStack.add(<span class="tk-t">Cart</span>) },
+                )
+            }
+            entry&lt;<span class="tk-t">Cart</span>&gt; {
+                <span class="tk-t">CartScreen</span>(onDone = { backStack.removeAll { it != <span class="tk-t">Home</span> } })   <span class="tk-c">// pop back to Home</span>
+            }
+        },
+    )
+}</code></pre></figure>
+<p>The ViewModel decorator scopes a ViewModel to its back stack entry, so it's cleared when that entry is popped. Decorator function names and artifacts (for example <code>lifecycle-viewmodel-navigation3</code>) are listed in the Navigation 3 docs, so check them against your version.</p>
+
+<h2 id="patterns">Common navigation patterns</h2>
+<figure class="code"><figcaption><span class="file">Back stack operations</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">backStack.add(<span class="tk-t">Product</span>(<span class="tk-s">"42"</span>))                          <span class="tk-c">// navigate forward</span>
+backStack.removeLastOrNull()                           <span class="tk-c">// back</span>
+backStack.removeAll { it <span class="tk-k">is</span> <span class="tk-t">Product</span> }                  <span class="tk-c">// pop all product screens</span>
+backStack.clear(); backStack.add(<span class="tk-t">Home</span>)                 <span class="tk-c">// reset (e.g. after logout)</span>
+
+<span class="tk-c">// Avoid duplicates when tapping the same tab twice</span>
+<span class="tk-k">fun</span> <span class="tk-t">NavBackStack</span>&lt;<span class="tk-t">NavKey</span>&gt;.navigateTopLevel(key: <span class="tk-t">NavKey</span>) {
+    <span class="tk-k">if</span> (lastOrNull() != key) { removeAll { it != <span class="tk-t">Home</span> }; <span class="tk-k">if</span> (key != <span class="tk-t">Home</span>) add(key) }
+}</code></pre></figure>
+<p>Because the back stack is a list you own, you can keep <strong>separate back stacks per bottom-navigation tab</strong>, or show two entries side by side on tablets using Navigation 3 scene strategies (for list-detail layouts).</p>
+
+<h2 id="nav2">Navigation Compose (Navigation 2) for existing apps</h2>
+<figure class="code"><figcaption><span class="file">Type-safe routes in Navigation Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span> <span class="tk-k">object</span> <span class="tk-t">HomeRoute</span>
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ProductRoute</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>)
+
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">AppNavHost</span>(navController: <span class="tk-t">NavHostController</span> = rememberNavController()) {
+    <span class="tk-t">NavHost</span>(navController, startDestination = <span class="tk-t">HomeRoute</span>) {
+        composable&lt;<span class="tk-t">HomeRoute</span>&gt; {
+            <span class="tk-t">HomeScreen</span>(onProductClick = { id -&gt; navController.navigate(<span class="tk-t">ProductRoute</span>(id)) })
+        }
+        composable&lt;<span class="tk-t">ProductRoute</span>&gt; { entry -&gt;
+            <span class="tk-k">val</span> route: <span class="tk-t">ProductRoute</span> = entry.toRoute()
+            <span class="tk-t">ProductScreen</span>(productId = route.id, onBack = navController::popBackStack)
+        }
+    }
+}</code></pre></figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Navigation 3</th><th>Navigation Compose (2.x)</th></tr></thead>
+  <tbody>
+    <tr><td>Back stack</td><td>Your own list in Compose state</td><td>Owned by NavController</td></tr>
+    <tr><td>Routes</td><td>Any key type (NavKey for saving)</td><td>Serializable route classes (type-safe since 2.8)</td></tr>
+    <tr><td>Adaptive layouts</td><td>Scenes can show multiple entries</td><td>One destination at a time</td></tr>
+    <tr><td>Maturity in your codebase</td><td>Newer</td><td>Widely deployed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="viewmodel-args">Passing arguments to ViewModels</h2>
+<p>Pass only <strong>IDs</strong> through navigation, never whole objects, and let the destination's ViewModel load the data from a repository. This keeps the saved back stack small, avoids stale copies, and survives process death correctly.</p>
+
+<h2 id="use-cases">Real-world structures</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Bottom-nav app</h3><p>One back stack per tab, preserved when switching tabs, with a top-level navigator that switches the active stack.</p></div>
+  <div class="card usecase"><h3>Auth flow</h3><p>Show login keys until authenticated, then clear and push Home, so Back doesn't return to login.</p></div>
+  <div class="card usecase"><h3>Deep link into a product</h3><p>Parse the URI into keys and build a synthetic back stack (Home, ProductList, Product) for natural Up and Back behaviour. See <a href="../deep-links-app-links-android/index.html">Deep Links and App Links</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Passing large objects as arguments instead of IDs.</li>
+  <li>Navigating from inside composable bodies (during composition) instead of from event callbacks.</li>
+  <li>Passing the back stack or NavController deep into components. Pass navigation lambdas instead.</li>
+  <li>Forgetting ViewModel scoping, so ViewModels outlive their screens.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I migrate from Navigation Compose to Navigation 3?</summary><div><p>For new apps, start with Navigation 3. For existing apps, migrate when you need its flexibility (custom back stacks, adaptive scenes) and follow Google's migration guide incrementally.</p></div></details>
+  <details><summary>How do I handle the system back gesture?</summary><div><p>NavDisplay calls your <code>onBack</code> lambda. In Navigation 2, NavHost handles it automatically. Predictive back animations are supported in recent versions.</p></div></details>
+  <details><summary>Can I still use Fragments?</summary><div><p>Yes, with the Fragment-based Navigation component, but new Compose apps rarely need Fragments.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Navigation 3 makes navigation <strong>just state</strong>: a list of type-safe keys you modify, rendered by <code>NavDisplay</code>, with decorators for saved state and ViewModels. Navigation Compose remains a solid choice for existing apps. In both, pass IDs, navigate from events, and keep navigation out of reusable components.</p>
+<p>Next step: render long lists efficiently with <a href="../lazycolumn-vs-column/index.html">LazyColumn vs Column</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/guide/navigation/navigation-3" target="_blank" rel="noopener">Navigation 3</a></li><li><a href="https://developer.android.com/blog/posts/jetpack-navigation-3-is-stable" target="_blank" rel="noopener">Jetpack Navigation 3 is stable (Android Developers Blog)</a></li><li><a href="https://developer.android.com/develop/ui/compose/navigation" target="_blank" rel="noopener">Navigation Compose (Navigation 2)</a></li><li><a href="https://developer.android.com/guide/navigation/design/type-safety" target="_blank" rel="noopener">Type safety in Navigation Compose</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-navigation-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-navigation-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-state-hoisting/index.html"><small>Jetpack Compose</small>State Hoisting Explained with Examples</a></li><li><a href="../../android/deep-links-app-links-android/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Deep Links, App Links, and Android App Actions</a></li><li><a href="../../android/compose-adaptive-ui-tablets-foldables/index.html"><small>Jetpack Compose</small>Adaptive UI for Tablets and Foldable Devices</a></li><li><a href="../../android/compose-state-management/index.html"><small>Jetpack Compose</small>State Management in Jetpack Compose</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/compose-navigation/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/compose-navigation/&amp;text=Navigation in Jetpack Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/compose-navigation/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#model">The Navigation 3 mental model</a></li><li><a href="#keys">Step 1: Define routes as keys</a></li><li><a href="#display">Step 2: Hold the back stack and render it</a></li><li><a href="#patterns">Common navigation patterns</a></li><li><a href="#nav2">Navigation Compose (Navigation 2) for existing apps</a></li><li><a href="#viewmodel-args">Passing arguments to ViewModels</a></li><li><a href="#use-cases">Real-world structures</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-navigation-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-navigation-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

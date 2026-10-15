@@ -1,0 +1,153 @@
+<!--meta
+{
+  "seo_title": "Composable Functions Explained (Jetpack Compose)",
+  "description": "How @Composable functions work: rules, parameters, modifiers, slots, previews, idempotence, recomposition, skipping and stability, with clean reusable Compose components.",
+  "primary_keyword": "composable functions",
+  "keywords": ["@composable annotation", "compose modifier parameter", "slot api compose", "compose preview", "compose recomposition skipping", "compose stability"],
+  "lede": "A composable function looks like an ordinary Kotlin function with an annotation, but it follows different rules: it can run many times, in any order, or be skipped entirely. Understanding those rules is the difference between Compose code that works and Compose code that works reliably.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["what-is-jetpack-compose", "compose-state-hoisting", "compose-state-management", "compose-performance-optimization"],
+  "refs": [
+    ["Thinking in Compose", "https://developer.android.com/develop/ui/compose/mental-model"],
+    ["Compose modifiers", "https://developer.android.com/develop/ui/compose/modifiers"],
+    ["API guidelines for Jetpack Compose", "https://android.googlesource.com/platform/frameworks/support/+/androidx-main/compose/docs/compose-api-guidelines.md"],
+    ["Preview your UI with composable previews", "https://developer.android.com/develop/ui/compose/tooling/previews"],
+    ["Stability in Compose", "https://developer.android.com/develop/ui/compose/performance/stability"]
+  ]
+}
+-->
+<p class="ad-lead">The <code>@Composable</code> annotation tells the Compose compiler plugin to transform your function so it can take part in composition: it can remember values, be re-run when state changes, and be skipped when nothing relevant changed. Writing good composables means respecting a few rules that ordinary functions don't have.</p>
+
+<h2 id="anatomy">Anatomy of a well-written composable</h2>
+<code-block lang="kotlin" file="PriceTag.kt">
+@Composable
+fun PriceTag(
+    pricePaise: Long,                       // 1. required data first
+    modifier: Modifier = Modifier,          // 2. first optional parameter: modifier
+    discounted: Boolean = false,            // 3. other optional parameters with defaults
+    onClick: (() -> Unit)? = null,          // 4. events as lambdas
+) {
+    val text = remember(pricePaise) { formatRupees(pricePaise) }   // cache derived values
+    Surface(
+        modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        color = if (discounted) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        Text(text, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), style = MaterialTheme.typography.labelLarge)
+    }
+}
+</code-block>
+<ul>
+  <li><strong>Named in PascalCase</strong> because it emits UI, like a noun: <code>PriceTag</code>, not <code>showPriceTag</code>.</li>
+  <li><strong>Returns <code>Unit</code></strong>. It emits UI rather than returning a View.</li>
+  <li><strong>Accepts a <code>modifier</code></strong> as the first optional parameter and applies it to the root element. This lets callers position and size it.</li>
+  <li><strong>Data in, events out</strong>: state comes in as parameters, and user actions go out as lambdas.</li>
+</ul>
+
+<h2 id="rules">The rules composables live by</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-r-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-r-t fig-r-d">
+    <title id="fig-r-t">Properties of composable functions</title>
+    <desc id="fig-r-d">Composable functions can execute frequently, can run in any order, can be skipped when inputs are unchanged, should be idempotent, and should be free of side effects in their body.</desc>
+    <rect class="d-blue" x="10" y="30" width="130" height="100" rx="12"/><text class="d-t" x="75" y="70" text-anchor="middle">Run often</text><text class="d-s" x="75" y="92" text-anchor="middle">every frame of</text><text class="d-s" x="75" y="108" text-anchor="middle">an animation</text>
+    <rect class="d-violet" x="152" y="30" width="130" height="100" rx="12"/><text class="d-t" x="217" y="70" text-anchor="middle">Any order</text><text class="d-s" x="217" y="92" text-anchor="middle">siblings aren't</text><text class="d-s" x="217" y="108" text-anchor="middle">sequential steps</text>
+    <rect class="d-green" x="294" y="30" width="130" height="100" rx="12"/><text class="d-t" x="359" y="70" text-anchor="middle">Skippable</text><text class="d-s" x="359" y="92" text-anchor="middle">unchanged inputs</text><text class="d-s" x="359" y="108" text-anchor="middle">→ not re-run</text>
+    <rect class="d-amber" x="436" y="30" width="130" height="100" rx="12"/><text class="d-t" x="501" y="70" text-anchor="middle">Idempotent</text><text class="d-s" x="501" y="92" text-anchor="middle">same input →</text><text class="d-s" x="501" y="108" text-anchor="middle">same UI</text>
+    <rect class="d-red" x="578" y="30" width="130" height="100" rx="12"/><text class="d-t" x="643" y="70" text-anchor="middle">No side effects</text><text class="d-s" x="643" y="92" text-anchor="middle">in the body; use</text><text class="d-s" x="643" y="108" text-anchor="middle">effect APIs</text>
+  </svg>
+  <figcaption id="fig-r-cap">Write composables as if they could be called at any time, any number of times, because they can.</figcaption>
+</figure>
+<code-block lang="kotlin" file="Side effect in the body: don't">
+@Composable
+fun ArticleScreen(id: String, viewModel: ArticleViewModel) {
+    // ❌ Runs on every recomposition: duplicate analytics events and requests
+    analytics.log("article_viewed", id)
+    viewModel.load(id)
+
+    // ✅ Runs when entering composition, and again only if id changes
+    LaunchedEffect(id) {
+        analytics.log("article_viewed", id)
+        viewModel.load(id)
+    }
+}
+</code-block>
+<p>More on effect APIs in <a href="../compose-side-effects/index.html">Side Effects in Compose</a>.</p>
+
+<h2 id="slots">Slot APIs: composables that accept composables</h2>
+<p>Instead of a long list of parameters for every variation, accept <code>@Composable</code> lambdas, called <strong>slots</strong>. Material's <code>Scaffold</code>, <code>TopAppBar</code> and <code>ListItem</code> work this way.</p>
+<code-block lang="kotlin" file="SectionCard.kt">
+@Composable
+fun SectionCard(
+    title: String,
+    modifier: Modifier = Modifier,
+    action: (@Composable () -> Unit)? = null,     // optional slot
+    content: @Composable ColumnScope.() -> Unit,  // trailing content slot with ColumnScope receiver
+) {
+    Card(modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                action?.invoke()
+            }
+            Spacer(Modifier.height(8.dp))
+            content()
+        }
+    }
+}
+
+// Usage
+SectionCard(title = "Recent orders", action = { TextButton(onClick = onSeeAll) { Text("See all") } }) {
+    orders.take(3).forEach { OrderRow(it) }
+}
+</code-block>
+
+<h2 id="modifiers">Modifiers: order matters</h2>
+<code-block lang="kotlin" file="Modifier order">
+Box(Modifier.padding(16.dp).background(Color.Yellow))   // padding outside: yellow area excludes padding
+Box(Modifier.background(Color.Yellow).padding(16.dp))   // background first: yellow includes padding
+Box(Modifier.clickable { }.padding(16.dp))              // whole padded area is clickable
+Box(Modifier.padding(16.dp).clickable { })              // only the inner area is clickable
+</code-block>
+<p>Each modifier wraps the next, so read the chain from outside to inside.</p>
+
+<h2 id="previews">Previews</h2>
+<code-block lang="kotlin" file="Multiple previews">
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "Large font", fontScale = 1.5f, showBackground = true)
+@Composable
+private fun PriceTagPreview() {
+    AppTheme { PriceTag(pricePaise = 129_900, discounted = true) }
+}
+</code-block>
+<p>Previews work best with stateless composables that take plain data, which is another reason to hoist state out of reusable components.</p>
+
+<h2 id="skipping">Skipping and stability, briefly</h2>
+<p>Compose can skip a composable during recomposition if all its parameters are <strong>stable</strong> and equal to last time. Primitives, Strings, lambdas (in most cases) and data classes with stable <code>val</code> properties are stable. Classes with <code>var</code>s, or interfaces such as <code>List</code> that could be mutable, may be treated as unstable, although the Compose compiler's strong skipping mode, enabled by default in recent versions, relaxes this considerably. Deep dive: <a href="../compose-performance-optimization/index.html">Compose Performance Optimization</a>.</p>
+
+<h2 id="use-cases">Designing a small component library</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design-system components</h3><p>Wrap Material components (<code>AppButton</code>, <code>AppTextField</code>) to enforce your brand's defaults, and expose a modifier and slots.</p></div>
+  <div class="card usecase"><h3>Screen vs component</h3><p>Screen-level composables connect to ViewModels. Components below them stay stateless and previewable.</p></div>
+  <div class="card usecase"><h3>Lists</h3><p>Row composables take an item and click lambdas, and they never fetch data themselves.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Not exposing a <code>modifier</code> parameter, or applying it to an inner element instead of the root.</li>
+  <li>Reading a ViewModel deep inside small components.</li>
+  <li>Expensive computations in the body without <code>remember</code>.</li>
+  <li>Mutating external variables from composable bodies.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a composable return a value?</summary><div><p>Composables that emit UI return <code>Unit</code>. Composables that compute values, such as <code>remember</code> or <code>stringResource</code>, return them and are named in camelCase.</p></div></details>
+  <details><summary>Can I call a composable from a normal function?</summary><div><p>No. Composables can only be called from other composables, because they need the composition context the compiler plugin adds.</p></div></details>
+  <details><summary>Why does my composable run twice?</summary><div><p>Recomposition can run it many times. That's normal. Make sure the body is cheap and free of side effects.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Composable functions are <strong>idempotent descriptions of UI</strong> that may run often, in any order, or be skipped. Design them with data in and events out, a <code>modifier</code> parameter, slots for flexibility, and no side effects in the body.</p>
+<p>Next step: learn where state should live in <a href="../compose-state-management/index.html">State Management in Jetpack Compose</a>.</p>

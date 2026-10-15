@@ -1,0 +1,126 @@
+<!--meta
+{
+  "seo_title": "Compose Multiplatform vs Kotlin Multiplatform Explained",
+  "description": "Kotlin Multiplatform vs Compose Multiplatform: what each shares, project structure, expect/actual, shared ViewModels and data, iOS interop, trade-offs, and when to choose shared logic only or shared UI too.",
+  "primary_keyword": "compose multiplatform vs kotlin multiplatform",
+  "keywords": ["kotlin multiplatform android ios", "kmp vs cmp", "compose multiplatform ios", "expect actual kotlin", "shared business logic kmp", "kmp vs flutter"],
+  "lede": "Kotlin Multiplatform (KMP) shares Kotlin code across platforms. Compose Multiplatform (CMP) builds on KMP to share UI too. They're not competitors; one sits on top of the other. Here's what each shares, how projects are structured, and how to decide how much to share.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["kotlin-multiplatform-vs-native-android", "kotlin-coroutines-flow-android", "android-architecture-at-scale", "android-engineering-tradeoffs"],
+  "refs": [
+    ["Kotlin Multiplatform overview", "https://kotlinlang.org/docs/multiplatform.html"],
+    ["Compose Multiplatform", "https://www.jetbrains.com/compose-multiplatform/"],
+    ["Expected and actual declarations", "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"],
+    ["Kotlin Multiplatform on Android Developers", "https://developer.android.com/kotlin/multiplatform"]
+  ]
+}
+-->
+<p class="ad-lead">Teams building for Android and iOS face a choice: write everything twice, share logic, or share logic <em>and</em> UI. Kotlin Multiplatform makes the second option practical. Compose Multiplatform extends it to the third, and you can mix both per screen.</p>
+
+<h2 id="layers">What each one shares</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-kmp-cap">
+  <svg viewBox="0 0 720 240" role="img" aria-labelledby="fig-kmp-t fig-kmp-d">
+    <title id="fig-kmp-t">Kotlin Multiplatform versus Compose Multiplatform sharing</title>
+    <desc id="fig-kmp-d">With Kotlin Multiplatform only, the data, domain and optionally ViewModel layers are shared, while Android uses Jetpack Compose and iOS uses SwiftUI for UI. With Compose Multiplatform, the UI layer is also shared, with platform-specific code where needed.</desc>
+    <g class="d-step" style="--i:0"><text class="d-t" x="180" y="22" text-anchor="middle">KMP: shared logic</text>
+    <rect class="d-blue" x="20" y="34" width="150" height="44" rx="10"/><text class="d-s" x="95" y="61" text-anchor="middle">Compose UI (Android)</text>
+    <rect class="d-amber" x="190" y="34" width="150" height="44" rx="10"/><text class="d-s" x="265" y="61" text-anchor="middle">SwiftUI (iOS)</text>
+    <rect class="d-green" x="20" y="90" width="320" height="44" rx="10"/><text class="d-t" x="180" y="117" text-anchor="middle">Shared ViewModels (optional)</text>
+    <rect class="d-green" x="20" y="146" width="320" height="44" rx="10"/><text class="d-t" x="180" y="173" text-anchor="middle">Shared domain + data</text></g>
+    <g class="d-step" style="--i:1"><text class="d-t" x="540" y="22" text-anchor="middle">CMP: shared logic + UI</text>
+    <rect class="d-violet" x="380" y="34" width="320" height="44" rx="10"/><text class="d-t" x="540" y="61" text-anchor="middle">Shared Compose UI</text>
+    <rect class="d-green" x="380" y="90" width="320" height="44" rx="10"/><text class="d-t" x="540" y="117" text-anchor="middle">Shared ViewModels</text>
+    <rect class="d-green" x="380" y="146" width="320" height="44" rx="10"/><text class="d-t" x="540" y="173" text-anchor="middle">Shared domain + data</text></g>
+    <text class="d-s" x="360" y="222" text-anchor="middle">Both: platform-specific code via expect/actual or interfaces</text>
+  </svg>
+  <figcaption id="fig-kmp-cap">CMP is KMP plus a shared UI layer. You can share UI for some screens and keep native UI for others.</figcaption>
+</figure>
+
+<h2 id="kmp">Kotlin Multiplatform (KMP)</h2>
+<p>KMP compiles shared Kotlin to JVM bytecode for Android and native binaries for iOS. Typically shared: networking (Ktor), persistence (Room KMP or SQLDelight), serialization, business rules, and often ViewModels. AndroidX libraries such as Lifecycle ViewModel, Room and DataStore offer multiplatform support. Check each library's current status before relying on it.</p>
+<p>Platform-specific APIs are accessed through <code>expect</code>/<code>actual</code> declarations or interfaces injected per platform:</p>
+<code-block lang="kotlin" file="commonMain / androidMain / iosMain">
+// commonMain
+expect fun platformName(): String
+
+// androidMain
+actual fun platformName(): String = "Android ${android.os.Build.VERSION.SDK_INT}"
+
+// iosMain
+actual fun platformName(): String =
+    platform.UIKit.UIDevice.currentDevice.systemName() + " " +
+    platform.UIKit.UIDevice.currentDevice.systemVersion
+</code-block>
+<p>Many teams prefer interfaces plus DI over <code>expect</code>/<code>actual</code> for larger platform services, because they're easier to fake in tests.</p>
+
+<h2 id="cmp">Compose Multiplatform (CMP)</h2>
+<p>CMP, by JetBrains, brings the Compose UI programming model to iOS, desktop and web (web is less mature). Compose Multiplatform for iOS has been stable since version 1.8.0 (2025). Shared composables live in <code>commonMain</code>:</p>
+<code-block lang="kotlin" file="commonMain/GreetingScreen.kt">
+@Composable
+fun GreetingScreen(viewModel: GreetingViewModel) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    MaterialTheme {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Text("Hello from ${state.platform}", style = MaterialTheme.typography.headlineSmall)
+            Button(onClick = viewModel::refresh) { Text("Refresh") }
+        }
+    }
+}
+</code-block>
+<p>On iOS, the shared UI is hosted in a <code>UIViewController</code> and can be embedded in SwiftUI, and SwiftUI or UIKit views can be embedded inside Compose when needed.</p>
+
+<h2 id="structure">Typical project structure</h2>
+<code-block lang="text" file="Project layout">
+composeApp/          (or shared/)
+  src/commonMain/    shared Kotlin (+ shared UI with CMP)
+  src/androidMain/   Android actuals, Android-only code
+  src/iosMain/       iOS actuals
+iosApp/              Xcode project hosting the shared framework
+</code-block>
+
+<h2 id="compare">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>KMP (logic only)</th><th>CMP (logic + UI)</th></tr></thead>
+  <tbody>
+    <tr><td>Code shared</td><td>Data, domain, often ViewModels</td><td>Plus UI</td></tr>
+    <tr><td>UI feel</td><td>Fully native on each platform</td><td>Same UI everywhere; adapt per platform where needed</td></tr>
+    <tr><td>iOS team involvement</td><td>Swift UI developers consume a Kotlin framework</td><td>Mostly Kotlin; iOS expertise still needed for integration</td></tr>
+    <tr><td>Adoption path</td><td>Incremental, module by module</td><td>Screen by screen, or new apps</td></tr>
+    <tr><td>Best when</td><td>Platform-native UX is a priority</td><td>Speed and consistency matter more than native look</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="tradeoffs">Trade-offs to weigh</h2>
+<div class="cards">
+  <div class="card pros"><h3>Benefits</h3><ul><li>One implementation of business logic and bugs fixed once</li><li>Kotlin skills reused across platforms</li><li>Incremental adoption: keep existing native apps</li></ul></div>
+  <div class="card cons"><h3>Costs</h3><ul><li>iOS build tooling and debugging take learning</li><li>Library availability for multiplatform varies</li><li>Platform-specific UX conventions need care with shared UI</li></ul></div>
+</div>
+
+<h2 id="decide">How to decide</h2>
+<ol class="steps">
+  <li><strong>Existing native apps?</strong> Start with KMP for one shared module (for example networking or a domain module).</li>
+  <li><strong>New app, small team?</strong> CMP can cover both platforms quickly. Prototype your hardest screen on iOS first.</li>
+  <li><strong>Heavy platform integration</strong> (camera pipelines, widgets, Watch, CarPlay)? Keep those parts native.</li>
+  <li><strong>Evaluate libraries</strong> you depend on for multiplatform support before committing.</li>
+</ol>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>iOS build slow:</strong> native compilation is slower than JVM. Build only the needed targets during development.</li>
+  <li><strong>Coroutines and Flow from Swift:</strong> consider community tools that generate Swift-friendly async wrappers, or expose callback-based APIs at the boundary.</li>
+  <li><strong>Missing API in commonMain:</strong> define an interface and implement it per platform.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is KMP the same as Flutter or React Native?</summary><div><p>No. KMP shares logic while allowing native UI, and compiles to native code without a separate runtime bridge. CMP is closer to Flutter in sharing UI, but keeps Kotlin and Android's Compose model.</p></div></details>
+  <details><summary>Does Google support KMP?</summary><div><p>Google's Android documentation covers KMP and several AndroidX libraries publish multiplatform artifacts. JetBrains leads KMP and CMP.</p></div></details>
+  <details><summary>Can I share ViewModels?</summary><div><p>Yes. The AndroidX Lifecycle ViewModel has multiplatform support, and community libraries exist too.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Kotlin Multiplatform</strong> shares logic while keeping native UI; <strong>Compose Multiplatform</strong> shares UI as well. Start small with a shared module, prototype your hardest screens, and keep deeply platform-specific features native.</p>
+<p>Next step: run reliable background tasks with <a href="../workmanager-background-work/index.html">WorkManager and Background Work</a>.</p>

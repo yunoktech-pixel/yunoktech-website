@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Collections and Functional Programming Guide | Yunok Tech</title>
+  <meta name="description" content="Master Kotlin collections for Android: map, filter, groupBy, associate, fold, partition, sorting, sequences, immutability and performance, with practical UI-state examples.">
+  <meta name="keywords" content="kotlin collections, kotlin map filter, kotlin groupby associateby, kotlin sequences vs lists, kotlin fold reduce, functional programming kotlin android, immutable list kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-collections-functional/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-collections-functional/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Collections and Functional Programming Guide">
+  <meta property="og:description" content="Master Kotlin collections for Android: map, filter, groupBy, associate, fold, partition, sorting, sequences, immutability and performance, with practical UI-state examples.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Collections and Functional Programming Guide">
+  <meta name="twitter:description" content="Master Kotlin collections for Android: map, filter, groupBy, associate, fold, partition, sorting, sequences, immutability and performance, with practical UI-state examples.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Collections and Functional Programming", "description": "Master Kotlin collections for Android: map, filter, groupBy, associate, fold, partition, sorting, sequences, immutability and performance, with practical UI-state examples.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Kotlin Programming", "keywords": "kotlin map filter, kotlin groupby associateby, kotlin sequences vs lists, kotlin fold reduce, functional programming kotlin android, immutable list kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-collections-functional/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Collections and Functional Programming", "item": "https://yunoktech.com/android/kotlin-collections-functional/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Collections and Functional Programming</h1>
+    <p class="ad-lede">Most Android screens are lists transformed into other lists: API results into UI models, items grouped by date, totals summed, duplicates removed. Kotlin's collection API turns these transformations into short, readable pipelines, if you know the right operators.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#read-only">Read-only vs mutable collections</a></li><li><a href="#pipeline">A real pipeline: API data to UI sections</a></li><li><a href="#operators">The operators you&#x27;ll use most</a></li><li><a href="#fold">fold and reduce</a></li><li><a href="#lookups">Efficient lookups: avoid O(n²)</a></li><li><a href="#sequences">Sequences: lazy evaluation</a></li><li><a href="#android-tips">Android-specific tips</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">An imperative loop that filters, sorts, groups and maps a list can easily take 25 lines and three mutable variables. The same logic as a Kotlin collection pipeline is often five lines, with no mutation and clear intent. This guide covers the operators you'll use constantly in Android code, and when to reach for sequences or immutable collections.</p>
+
+<h2 id="read-only">Read-only vs mutable collections</h2>
+<figure class="code"><figcaption><span class="file">Read-only by default</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> tags: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; = listOf(<span class="tk-s">"kotlin"</span>, <span class="tk-s">"compose"</span>)         <span class="tk-c">// read-only interface</span>
+<span class="tk-k">val</span> cart: <span class="tk-t">MutableList</span>&lt;<span class="tk-t">String</span>&gt; = mutableListOf(<span class="tk-s">"p1"</span>)           <span class="tk-c">// mutable</span>
+<span class="tk-k">val</span> updated = tags + <span class="tk-s">"flow"</span>                                   <span class="tk-c">// creates a NEW list</span></code></pre></figure>
+<p><code>List</code> is a <em>read-only view</em>, not a deep guarantee of immutability. The underlying object might be mutable elsewhere. For UI state, create new lists rather than mutating, and consider <code>kotlinx.collections.immutable</code> (<code>persistentListOf</code>, <code>ImmutableList</code>) when you want truly immutable types that Compose treats as stable.</p>
+
+<h2 id="pipeline">A real pipeline: API data to UI sections</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-p-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-p-t fig-p-d">
+    <title id="fig-p-t">Collection pipeline from transactions to grouped UI sections</title>
+    <desc id="fig-p-d">A list of transactions passes through filter to remove failed ones, sortedByDescending by time, groupBy date, and map to UI section models.</desc>
+    <defs><marker id="cp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 70 H146 M266 70 H292 M432 70 H458 M568 70 H594" marker-end="url(#cp)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="110" height="60" rx="12"/><text class="d-t" x="65" y="66" text-anchor="middle">List&lt;Txn&gt;</text><text class="d-s" x="65" y="84" text-anchor="middle">from API/Room</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="150" y="40" width="116" height="60" rx="12"/><text class="d-t" x="208" y="66" text-anchor="middle">filter</text><text class="d-s" x="208" y="84" text-anchor="middle">drop failed</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="296" y="40" width="136" height="60" rx="12"/><text class="d-t" x="364" y="66" text-anchor="middle">sortedByDesc</text><text class="d-s" x="364" y="84" text-anchor="middle">newest first</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-box" x="462" y="40" width="106" height="60" rx="12"/><text class="d-t" x="515" y="66" text-anchor="middle">groupBy</text><text class="d-s" x="515" y="84" text-anchor="middle">by date</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="598" y="40" width="112" height="60" rx="12"/><text class="d-t" x="654" y="66" text-anchor="middle">map</text><text class="d-s" x="654" y="84" text-anchor="middle">→ sections</text></g>
+  </svg>
+  <figcaption id="fig-p-cap">Each operator does one job and returns a new collection. Read the pipeline top to bottom like a sentence.</figcaption>
+</figure>
+<figure class="code"><figcaption><span class="file">TransactionsMapper.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Txn</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> amountPaise: <span class="tk-t">Long</span>, <span class="tk-k">val</span> status: <span class="tk-t">String</span>, <span class="tk-k">val</span> at: <span class="tk-t">LocalDateTime</span>)
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">TxnSection</span>(<span class="tk-k">val</span> date: <span class="tk-t">LocalDate</span>, <span class="tk-k">val</span> totalPaise: <span class="tk-t">Long</span>, <span class="tk-k">val</span> items: <span class="tk-t">List</span>&lt;<span class="tk-t">Txn</span>&gt;)
+
+<span class="tk-k">fun</span> toSections(txns: <span class="tk-t">List</span>&lt;<span class="tk-t">Txn</span>&gt;): <span class="tk-t">List</span>&lt;<span class="tk-t">TxnSection</span>&gt; =
+    txns
+        .filter { it.status != <span class="tk-s">"FAILED"</span> }
+        .sortedByDescending { it.at }
+        .groupBy { it.at.toLocalDate() }          <span class="tk-c">// Map&lt;LocalDate, List&lt;Txn&gt;&gt;, insertion-ordered</span>
+        .map { (date, items) -&gt; <span class="tk-t">TxnSection</span>(date, items.sumOf { it.amountPaise }, items) }</code></pre></figure>
+<figure class="code"><figcaption><span class="file">Rendering the sections in Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">LazyColumn</span> {
+    sections.forEach { section -&gt;
+        stickyHeader(key = section.date) { <span class="tk-t">DateHeader</span>(section.date, section.totalPaise) }
+        items(section.items, key = { it.id }) { txn -&gt; <span class="tk-t">TxnRow</span>(txn) }
+    }
+}</code></pre></figure>
+
+<h2 id="operators">The operators you'll use most</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Goal</th><th>Operator</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Transform each item</td><td><code>map</code>, <code>mapNotNull</code></td><td><code>dtos.mapNotNull { it.toDomainOrNull() }</code></td></tr>
+    <tr><td>Keep matching items</td><td><code>filter</code>, <code>filterIsInstance</code></td><td><code>items.filterIsInstance&lt;Video&gt;()</code></td></tr>
+    <tr><td>Find one</td><td><code>firstOrNull</code>, <code>find</code></td><td><code>users.firstOrNull { it.id == id }</code></td></tr>
+    <tr><td>Check</td><td><code>any</code>, <code>all</code>, <code>none</code></td><td><code>cart.any { it.qty == 0 }</code></td></tr>
+    <tr><td>Aggregate</td><td><code>sumOf</code>, <code>count</code>, <code>maxByOrNull</code>, <code>fold</code></td><td><code>cart.sumOf { it.qty * it.price }</code></td></tr>
+    <tr><td>Index by key</td><td><code>associateBy</code>, <code>associate</code></td><td><code>products.associateBy { it.id }</code></td></tr>
+    <tr><td>Group</td><td><code>groupBy</code>, <code>partition</code></td><td><code>val (done, todo) = tasks.partition { it.done }</code></td></tr>
+    <tr><td>Deduplicate</td><td><code>distinct</code>, <code>distinctBy</code></td><td><code>messages.distinctBy { it.id }</code></td></tr>
+    <tr><td>Sort</td><td><code>sortedBy</code>, <code>sortedWith(compareBy…)</code></td><td><code>sortedWith(compareBy({ it.priority }, { it.title }))</code></td></tr>
+    <tr><td>Split into pages</td><td><code>chunked</code>, <code>windowed</code></td><td><code>ids.chunked(50)</code> for batched API calls</td></tr>
+    <tr><td>Combine two lists</td><td><code>zip</code></td><td><code>labels.zip(values)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="fold">fold and reduce</h2>
+<figure class="code"><figcaption><span class="file">fold builds a result from a starting value</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Stats</span>(<span class="tk-k">val</span> count: <span class="tk-t">Int</span> = <span class="tk-n">0</span>, <span class="tk-k">val</span> totalPaise: <span class="tk-t">Long</span> = <span class="tk-n">0</span>, <span class="tk-k">val</span> refunds: <span class="tk-t">Int</span> = <span class="tk-n">0</span>)
+
+<span class="tk-k">val</span> stats = txns.fold(<span class="tk-t">Stats</span>()) { acc, t -&gt;
+    acc.copy(
+        count = acc.count + <span class="tk-n">1</span>,
+        totalPaise = acc.totalPaise + t.amountPaise,
+        refunds = acc.refunds + <span class="tk-k">if</span> (t.status == <span class="tk-s">"REFUNDED"</span>) <span class="tk-n">1</span> <span class="tk-k">else</span> <span class="tk-n">0</span>,
+    )
+}</code></pre></figure>
+<p>Prefer specific operators (<code>sumOf</code>, <code>count</code>) when they fit. Use <code>fold</code> when you compute several values in one pass.</p>
+
+<h2 id="lookups">Efficient lookups: avoid O(n²)</h2>
+<figure class="code"><figcaption><span class="file">Joining two lists</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// ❌ For each order, scan all products: slow for large lists</span>
+<span class="tk-k">val</span> rows = orders.map { o -&gt; o to products.first { it.id == o.productId } }
+
+<span class="tk-c">// ✅ Build a map once, then O(1) lookups</span>
+<span class="tk-k">val</span> productsById = products.associateBy { it.id }
+<span class="tk-k">val</span> rows2 = orders.mapNotNull { o -&gt; productsById[o.productId]?.let { p -&gt; o to p } }</code></pre></figure>
+
+<h2 id="sequences">Sequences: lazy evaluation</h2>
+<p>List operations are <em>eager</em>: each step creates a full intermediate list. <code>asSequence()</code> makes them <em>lazy</em>, processing one element at a time through the whole chain, and stopping early when possible.</p>
+<figure class="code"><figcaption><span class="file">When sequences help</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> firstTenMatches = hugeList.asSequence()
+    .filter { it.matches(query) }
+    .map { it.toUi() }
+    .take(<span class="tk-n">10</span>)              <span class="tk-c">// stops as soon as 10 are found</span>
+    .toList()</code></pre></figure>
+<p>Use sequences for large collections with several steps, or when you short-circuit with <code>take</code> or <code>first</code>. For small lists (typical UI lists of tens or hundreds of items), plain lists are usually just as fast and simpler.</p>
+
+<h2 id="android-tips">Android-specific tips</h2>
+<ul>
+  <li><strong>Transform data outside composables</strong>, in the ViewModel or with <code>remember(key)</code>, so pipelines don't rerun on every recomposition.</li>
+  <li><strong>Move heavy processing off the main thread</strong> (<code>withContext(Dispatchers.Default)</code>) for thousands of items.</li>
+  <li><strong>Prefer SQL for filtering and aggregating large datasets</strong> in Room, rather than loading everything into memory and filtering in Kotlin.</li>
+</ul>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>first { }</code> when nothing may match, which throws <code>NoSuchElementException</code>. Use <code>firstOrNull</code>.</li>
+  <li>Mutating a list while iterating over it.</li>
+  <li>Chaining <code>filter</code> then <code>count</code> when <code>count { }</code> does it in one pass.</li>
+  <li>Exposing <code>MutableList</code> in UI state.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are functional operators slower than for loops?</summary><div><p>Collection operators are inline functions, so lambdas don't allocate objects. Each step does create a new list, which rarely matters at UI-list sizes. Measure before optimising, and use sequences or a single loop for hot paths.</p></div></details>
+  <details><summary>What's the difference between map and forEach?</summary><div><p><code>map</code> returns a new transformed collection. <code>forEach</code> returns nothing and is for side effects.</p></div></details>
+  <details><summary>Does groupBy preserve order?</summary><div><p>Yes. It returns a <code>LinkedHashMap</code> in which keys appear in first-encounter order, which is why sorting before grouping works.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Kotlin's collection API lets you express data transformations as <strong>small, readable, mutation-free pipelines</strong>. Learn the dozen core operators, build maps for lookups, use sequences for large or short-circuiting chains, and keep heavy transformations out of composables.</p>
+<p>Next step: write your own reusable operators with <a href="../kotlin-extension-higher-order-functions/index.html">Extension and Higher-Order Functions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/collections-overview.html" target="_blank" rel="noopener">Collections overview</a></li><li><a href="https://kotlinlang.org/docs/collection-transformations.html" target="_blank" rel="noopener">Collection transformations</a></li><li><a href="https://kotlinlang.org/docs/collection-grouping.html" target="_blank" rel="noopener">Grouping</a></li><li><a href="https://kotlinlang.org/docs/sequences.html" target="_blank" rel="noopener">Sequences</a></li><li><a href="https://github.com/Kotlin/kotlinx.collections.immutable" target="_blank" rel="noopener">kotlinx.collections.immutable</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-collections-functional-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-collections-functional-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-basics-android/index.html"><small>Kotlin Programming</small>Kotlin Basics Every Android Developer Should Know</a></li><li><a href="../../android/kotlin-extension-higher-order-functions/index.html"><small>Kotlin Programming</small>Extension Functions and Higher-Order Functions</a></li><li><a href="../../android/kotlin-data-sealed-enum-classes/index.html"><small>Kotlin Programming</small>Data Classes, Sealed Classes, and Enum Classes</a></li><li><a href="../../android/compose-performance-optimization/index.html"><small>Jetpack Compose</small>Compose Performance Optimization</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-collections-functional/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-collections-functional/&amp;text=Kotlin Collections and Functional Programming" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-collections-functional/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#read-only">Read-only vs mutable collections</a></li><li><a href="#pipeline">A real pipeline: API data to UI sections</a></li><li><a href="#operators">The operators you&#x27;ll use most</a></li><li><a href="#fold">fold and reduce</a></li><li><a href="#lookups">Efficient lookups: avoid O(n²)</a></li><li><a href="#sequences">Sequences: lazy evaluation</a></li><li><a href="#android-tips">Android-specific tips</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-collections-functional-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-collections-functional-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

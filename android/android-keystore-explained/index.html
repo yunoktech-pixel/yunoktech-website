@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Keystore Explained (with Kotlin Examples) | Yunok Tech</title>
+  <meta name="description" content="How the Android Keystore protects cryptographic keys: hardware-backed keys, StrongBox, generating AES and EC keys, encrypting data, user-authentication-bound keys, key attestation and pitfalls.">
+  <meta name="keywords" content="android keystore, android keystore kotlin, hardware backed keystore, strongbox android, aes gcm keystore, key attestation android, setUserAuthenticationRequired">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-keystore-explained/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-keystore-explained/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android Keystore Explained (with Kotlin Examples)">
+  <meta property="og:description" content="How the Android Keystore protects cryptographic keys: hardware-backed keys, StrongBox, generating AES and EC keys, encrypting data, user-authentication-bound keys, key attestation and pitfalls.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Android Keystore Explained (with Kotlin Examples)">
+  <meta name="twitter:description" content="How the Android Keystore protects cryptographic keys: hardware-backed keys, StrongBox, generating AES and EC keys, encrypting data, user-authentication-bound keys, key attestation and pitfalls.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android Keystore Explained", "description": "How the Android Keystore protects cryptographic keys: hardware-backed keys, StrongBox, generating AES and EC keys, encrypting data, user-authentication-bound keys, key attestation and pitfalls.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Security and Privacy", "keywords": "android keystore kotlin, hardware backed keystore, strongbox android, aes gcm keystore, key attestation android, setUserAuthenticationRequired", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-keystore-explained/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android Keystore Explained", "item": "https://yunoktech.com/android/android-keystore-explained/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Android Keystore Explained</h1>
+    <p class="ad-lede">The Android Keystore lets apps use cryptographic keys without ever exposing the key material, not even to the app itself. Keys can live in secure hardware, be bound to biometric authentication, and be attested by the device. Here's how it works and how to use it correctly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#how">How the Keystore works</a></li><li><a href="#aes">Generate an AES key and encrypt data</a></li><li><a href="#auth-bound">Keys that require user authentication</a></li><li><a href="#strongbox">StrongBox and attestation</a></li><li><a href="#pitfalls">Pitfalls</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Encryption is only as strong as the protection of its key. Store an AES key in a file next to the encrypted data, and anyone who copies both has everything. The Android Keystore solves key storage: your app gets a handle to perform operations, while the key itself stays in a protected environment.</p>
+
+<h2 id="how">How the Keystore works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ks-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-ks-t fig-ks-d">
+    <title id="fig-ks-t">Android Keystore architecture</title>
+    <desc id="fig-ks-d">The app calls Keystore APIs with a key alias and data. The Keystore system service forwards operations to secure hardware, a Trusted Execution Environment or a StrongBox secure element, where keys are generated and stored. Plaintext data goes in and ciphertext comes out; the key material never leaves the secure hardware.</desc>
+    <defs><marker id="ksm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="80" width="160" height="70" rx="12"/><text class="d-t" x="100" y="110" text-anchor="middle">Your app</text><text class="d-s" x="100" y="130" text-anchor="middle">alias "notes_key"</text></g>
+    <path class="d-flow" d="M180 100 H246" marker-end="url(#ksm)"/><text class="d-s" x="213" y="92" text-anchor="middle">plaintext</text>
+    <path class="d-flow" d="M250 130 H184" marker-end="url(#ksm)"/><text class="d-s" x="217" y="148" text-anchor="middle">ciphertext</text>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="250" y="80" width="180" height="70" rx="12"/><text class="d-t" x="340" y="110" text-anchor="middle">Keystore service</text><text class="d-s" x="340" y="130" text-anchor="middle">access control</text></g>
+    <path class="d-flow" d="M430 115 H486" marker-end="url(#ksm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-dark" x="490" y="40" width="210" height="150" rx="14"/><text class="d-w" x="595" y="70" text-anchor="middle">Secure hardware</text><text class="d-w" x="595" y="96" text-anchor="middle">TEE or StrongBox</text><text class="d-w" x="595" y="126" text-anchor="middle">🔑 key material</text><text class="d-w" x="595" y="150" text-anchor="middle">never leaves</text></g>
+  </svg>
+  <figcaption id="fig-ks-cap">The app never sees the key bytes, so a stolen data file is useless without the device's secure hardware.</figcaption>
+</figure>
+<ul>
+  <li><strong>Non-exportable keys:</strong> key material can't be extracted from the Keystore.</li>
+  <li><strong>Hardware-backed</strong> on most modern devices, via a Trusted Execution Environment (TEE). Some devices also have <strong>StrongBox</strong>, a dedicated secure element.</li>
+  <li><strong>Key restrictions:</strong> algorithms, purposes, block modes, validity, and user-authentication requirements are enforced by the Keystore.</li>
+</ul>
+
+<h2 id="aes">Generate an AES key and encrypt data</h2>
+<figure class="code"><figcaption><span class="file">KeystoreCrypto.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">object</span> <span class="tk-t">KeystoreCrypto</span> {
+    <span class="tk-k">private</span> <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">KEYSTORE</span> = <span class="tk-s">"AndroidKeyStore"</span>
+    <span class="tk-k">private</span> <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">ALIAS</span> = <span class="tk-s">"notes_key"</span>
+    <span class="tk-k">private</span> <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">TRANSFORMATION</span> = <span class="tk-s">"AES/GCM/NoPadding"</span>
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> getOrCreateKey(): <span class="tk-t">SecretKey</span> {
+        <span class="tk-k">val</span> ks = <span class="tk-t">KeyStore</span>.getInstance(<span class="tk-t">KEYSTORE</span>).apply { load(<span class="tk-k">null</span>) }
+        (ks.getEntry(<span class="tk-t">ALIAS</span>, <span class="tk-k">null</span>) <span class="tk-k">as</span>? <span class="tk-t">KeyStore</span>.<span class="tk-t">SecretKeyEntry</span>)?.let { <span class="tk-k">return</span> it.secretKey }
+
+        <span class="tk-k">val</span> spec = <span class="tk-t">KeyGenParameterSpec</span>.<span class="tk-t">Builder</span>(<span class="tk-t">ALIAS</span>, <span class="tk-t">KeyProperties</span>.<span class="tk-t">PURPOSE_ENCRYPT</span> or <span class="tk-t">KeyProperties</span>.<span class="tk-t">PURPOSE_DECRYPT</span>)
+            .setBlockModes(<span class="tk-t">KeyProperties</span>.<span class="tk-t">BLOCK_MODE_GCM</span>)
+            .setEncryptionPaddings(<span class="tk-t">KeyProperties</span>.<span class="tk-t">ENCRYPTION_PADDING_NONE</span>)
+            .setKeySize(<span class="tk-n">256</span>)
+            .build()
+        <span class="tk-k">return</span> <span class="tk-t">KeyGenerator</span>.getInstance(<span class="tk-t">KeyProperties</span>.<span class="tk-t">KEY_ALGORITHM_AES</span>, <span class="tk-t">KEYSTORE</span>)
+            .apply { <span class="tk-k">init</span>(spec) }
+            .generateKey()
+    }
+
+    <span class="tk-c">/** Returns IV + ciphertext. A fresh random IV is generated for every encryption. */</span>
+    <span class="tk-k">fun</span> encrypt(plain: <span class="tk-t">ByteArray</span>): <span class="tk-t">ByteArray</span> {
+        <span class="tk-k">val</span> cipher = <span class="tk-t">Cipher</span>.getInstance(<span class="tk-t">TRANSFORMATION</span>).apply { <span class="tk-k">init</span>(<span class="tk-t">Cipher</span>.<span class="tk-t">ENCRYPT_MODE</span>, getOrCreateKey()) }
+        <span class="tk-k">return</span> cipher.iv + cipher.doFinal(plain)          <span class="tk-c">// GCM IV is 12 bytes</span>
+    }
+
+    <span class="tk-k">fun</span> decrypt(<span class="tk-k">data</span>: <span class="tk-t">ByteArray</span>): <span class="tk-t">ByteArray</span> {
+        <span class="tk-k">val</span> iv = <span class="tk-k">data</span>.copyOfRange(<span class="tk-n">0</span>, <span class="tk-n">12</span>)
+        <span class="tk-k">val</span> cipher = <span class="tk-t">Cipher</span>.getInstance(<span class="tk-t">TRANSFORMATION</span>).apply {
+            <span class="tk-k">init</span>(<span class="tk-t">Cipher</span>.<span class="tk-t">DECRYPT_MODE</span>, getOrCreateKey(), <span class="tk-t">GCMParameterSpec</span>(<span class="tk-n">128</span>, iv))
+        }
+        <span class="tk-k">return</span> cipher.doFinal(<span class="tk-k">data</span>, <span class="tk-n">12</span>, <span class="tk-k">data</span>.size - <span class="tk-n">12</span>)
+    }
+}</code></pre></figure>
+<p>AES-GCM provides confidentiality <em>and</em> integrity: tampered ciphertext fails to decrypt. Never reuse an IV with the same key. Let the cipher generate it, as above. For most apps, a higher-level library such as Tink, with a Keystore-wrapped master key, is easier to use correctly. See <a href="../encrypted-data-storage-android/index.html">Encrypted Data Storage</a>.</p>
+
+<h2 id="auth-bound">Keys that require user authentication</h2>
+<figure class="code"><figcaption><span class="file">Biometric-bound key</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> spec = <span class="tk-t">KeyGenParameterSpec</span>.<span class="tk-t">Builder</span>(<span class="tk-s">"payment_auth_key"</span>, <span class="tk-t">KeyProperties</span>.<span class="tk-t">PURPOSE_SIGN</span>)
+    .setAlgorithmParameterSpec(<span class="tk-t">ECGenParameterSpec</span>(<span class="tk-s">"secp256r1"</span>))
+    .setDigests(<span class="tk-t">KeyProperties</span>.<span class="tk-t">DIGEST_SHA256</span>)
+    .setUserAuthenticationRequired(<span class="tk-k">true</span>)
+    .setUserAuthenticationParameters(<span class="tk-n">0</span>, <span class="tk-t">KeyProperties</span>.<span class="tk-t">AUTH_BIOMETRIC_STRONG</span>)   <span class="tk-c">// auth for every use</span>
+    .setInvalidatedByBiometricEnrollment(<span class="tk-k">true</span>)                                <span class="tk-c">// new fingerprint → key invalid</span>
+    .build()</code></pre></figure>
+<p>Using this key requires a successful <code>BiometricPrompt</code> with a <code>CryptoObject</code>. That's much stronger than "biometric check passed, so continue". See <a href="../biometric-authentication-android/index.html">Biometric Authentication</a>.</p>
+
+<h2 id="strongbox">StrongBox and attestation</h2>
+<ul>
+  <li><code>setIsStrongBoxBacked(true)</code> requests a StrongBox key on supported devices. Handle <code>StrongBoxUnavailableException</code> and fall back to a TEE key.</li>
+  <li><strong>Key attestation</strong> lets your server verify, via a certificate chain, that a key was generated in secure hardware on a genuine device. It's useful for high-assurance scenarios, and verification belongs on the server.</li>
+</ul>
+
+<h2 id="pitfalls">Pitfalls</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Pitfall</th><th>Consequence</th><th>Guard</th></tr></thead>
+  <tbody>
+    <tr><td>Keys can be invalidated (lock screen removed, biometric changes)</td><td><code>KeyPermanentlyInvalidatedException</code></td><td>Catch, delete the key, re-create it, and re-authenticate or re-fetch data</td></tr>
+    <tr><td>Keys aren't backed up</td><td>Restored encrypted data can't be decrypted</td><td>Exclude encrypted data from backup, or treat it as re-fetchable</td></tr>
+    <tr><td>Uninstall deletes keys</td><td>Data unrecoverable</td><td>Design encrypted local data as a cache, or sync to the server</td></tr>
+    <tr><td>Rolling your own crypto modes</td><td>Weak security</td><td>Use AES-GCM via the Keystore or Tink; never ECB</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Encrypting tokens and local secrets</h3><p>A master key in the Keystore wraps the data encryption keys.</p></div>
+  <div class="card usecase"><h3>Biometric-confirmed transactions</h3><p>An auth-bound signing key signs a server challenge, and the server verifies it with the public key.</p></div>
+  <div class="card usecase"><h3>Device binding</h3><p>An attested key pair proves requests come from the enrolled device.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I store a password or token directly in the Keystore?</summary><div><p>The Keystore stores keys, not arbitrary values. Encrypt the token with a Keystore key and store the ciphertext.</p></div></details>
+  <details><summary>Is the Keystore safe on rooted devices?</summary><div><p>Hardware-backed keys resist extraction even on rooted devices, but an attacker with root can still use the key through your app while it runs. Combine with server-side checks.</p></div></details>
+  <details><summary>Does every device have StrongBox?</summary><div><p>No. It's optional hardware. Always handle its absence.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>The Android Keystore keeps <strong>key material out of your app's reach</strong>, often in secure hardware, with enforced restrictions and optional <strong>biometric binding</strong> and <strong>attestation</strong>. Use it (directly or via Tink) for every key that protects sensitive data, and handle invalidation gracefully.</p>
+<p>Next step: decide what never belongs in the app at all with <a href="../secure-api-keys-android/index.html">Secure API Keys and Secrets</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/privacy-and-security/keystore" target="_blank" rel="noopener">Android Keystore system</a></li><li><a href="https://source.android.com/docs/security/features/keystore" target="_blank" rel="noopener">Hardware-backed Keystore</a></li><li><a href="https://developer.android.com/privacy-and-security/security-key-attestation" target="_blank" rel="noopener">Key attestation</a></li><li><a href="https://developer.android.com/privacy-and-security/cryptography" target="_blank" rel="noopener">Cryptography on Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-keystore-explained-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-keystore-explained-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/encrypted-data-storage-android/index.html"><small>Android Security and Privacy</small>Encrypted Data Storage in Android</a></li><li><a href="../../android/secure-token-storage-android/index.html"><small>APIs, Databases, and Backend Integration</small>Secure Token Storage and API Authentication</a></li><li><a href="../../android/biometric-authentication-android/index.html"><small>Android Security and Privacy</small>Biometric Authentication with Android</a></li><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-keystore-explained/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-keystore-explained/&amp;text=Android Keystore Explained" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-keystore-explained/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#how">How the Keystore works</a></li><li><a href="#aes">Generate an AES key and encrypt data</a></li><li><a href="#auth-bound">Keys that require user authentication</a></li><li><a href="#strongbox">StrongBox and attestation</a></li><li><a href="#pitfalls">Pitfalls</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-keystore-explained-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-keystore-explained-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

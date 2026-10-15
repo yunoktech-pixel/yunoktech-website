@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biometric Authentication on Android with Kotlin | Yunok Tech</title>
+  <meta name="description" content="Implement biometric authentication on Android with BiometricPrompt: checking availability, authenticator classes, crypto-bound authentication with Keystore, device credential fallback and UX.">
+  <meta name="keywords" content="biometric authentication android, biometricprompt kotlin, fingerprint authentication android, biometric_strong vs weak, cryptoobject biometric, device credential fallback, app lock biometric">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/biometric-authentication-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/biometric-authentication-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Biometric Authentication on Android with Kotlin">
+  <meta property="og:description" content="Implement biometric authentication on Android with BiometricPrompt: checking availability, authenticator classes, crypto-bound authentication with Keystore, device credential fallback and UX.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Biometric Authentication on Android with Kotlin">
+  <meta name="twitter:description" content="Implement biometric authentication on Android with BiometricPrompt: checking availability, authenticator classes, crypto-bound authentication with Keystore, device credential fallback and UX.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Biometric Authentication with Android", "description": "Implement biometric authentication on Android with BiometricPrompt: checking availability, authenticator classes, crypto-bound authentication with Keystore, device credential fallback and UX.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Security and Privacy", "keywords": "biometricprompt kotlin, fingerprint authentication android, biometric_strong vs weak, cryptoobject biometric, device credential fallback, app lock biometric", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/biometric-authentication-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Biometric Authentication with Android", "item": "https://yunoktech.com/android/biometric-authentication-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Biometric Authentication with Android</h1>
+    <p class="ad-lede">Fingerprint and face unlock make sensitive actions both safer and faster. But a biometric prompt that just returns 'success' is weaker than most developers assume. This guide shows how to use BiometricPrompt correctly, including Keystore-bound authentication for real security.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#levels">Two levels of biometric security</a></li><li><a href="#setup">Setup and availability</a></li><li><a href="#crypto">Crypto-bound authentication (recommended)</a></li><li><a href="#server">Server-verified biometric confirmation</a></li><li><a href="#ux">UX guidelines</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Biometrics on Android don't send fingerprints or face data to your app. The system verifies the user and tells your app the result. How you use that result determines security: as a UI gate, or as the key that unlocks cryptographic operations.</p>
+
+<h2 id="levels">Two levels of biometric security</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bio-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-bio-t fig-bio-d">
+    <title id="fig-bio-t">Biometric gate versus crypto-bound authentication</title>
+    <desc id="fig-bio-d">Level one: BiometricPrompt returns success and the app shows the content; on a compromised device this boolean can be bypassed. Level two: BiometricPrompt authorises a CryptoObject wrapping a Keystore key that requires user authentication; only after successful authentication can the key decrypt data or sign a server challenge, so bypassing the UI does not unlock the key.</desc>
+    <defs><marker id="bim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">Level 1: UI gate</text>
+    <rect class="d-amber" x="20" y="34" width="170" height="50" rx="10"/><text class="d-s" x="105" y="64" text-anchor="middle">BiometricPrompt</text>
+    <path class="d-flow" d="M190 59 H246" marker-end="url(#bim)"/><text class="d-s" x="218" y="52" text-anchor="middle">success</text>
+    <rect class="d-box" x="250" y="34" width="170" height="50" rx="10"/><text class="d-s" x="335" y="64" text-anchor="middle">show content</text>
+    <text class="d-s" x="560" y="64" text-anchor="middle">bypassable on compromised devices</text>
+    <text class="d-t" x="20" y="122">Level 2: crypto-bound</text>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="134" width="170" height="56" rx="10"/><text class="d-s" x="105" y="158" text-anchor="middle">BiometricPrompt</text><text class="d-s" x="105" y="174" text-anchor="middle">+ CryptoObject</text></g>
+    <path class="d-flow" d="M190 162 H246" marker-end="url(#bim)"/><text class="d-s" x="218" y="154" text-anchor="middle">unlocks</text>
+    <g class="d-step" style="--i:1"><rect class="d-dark" x="250" y="134" width="170" height="56" rx="10"/><text class="d-w" x="335" y="158" text-anchor="middle">Keystore key</text><text class="d-w" x="335" y="174" text-anchor="middle">auth required</text></g>
+    <path class="d-flow" d="M420 162 H476" marker-end="url(#bim)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="480" y="134" width="220" height="56" rx="10"/><text class="d-s" x="590" y="158" text-anchor="middle">decrypt token /</text><text class="d-s" x="590" y="174" text-anchor="middle">sign server challenge</text></g>
+  </svg>
+  <figcaption id="fig-bio-cap">For anything valuable, bind authentication to a cryptographic operation that the server or the data itself depends on.</figcaption>
+</figure>
+
+<h2 id="setup">Setup and availability</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies { implementation(<span class="tk-s">"androidx.biometric:biometric:&lt;version&gt;"</span>) }</code></pre></figure>
+<figure class="code"><figcaption><span class="file">Check what&#x27;s available</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> canUseStrongBiometrics(context: <span class="tk-t">Context</span>): <span class="tk-t">Boolean</span> =
+    <span class="tk-t">BiometricManager</span>.from(context)
+        .canAuthenticate(<span class="tk-t">BiometricManager</span>.<span class="tk-t">Authenticators</span>.<span class="tk-t">BIOMETRIC_STRONG</span>) == <span class="tk-t">BiometricManager</span>.<span class="tk-t">BIOMETRIC_SUCCESS</span>
+<span class="tk-c">// Other results: BIOMETRIC_ERROR_NONE_ENROLLED (offer enrollment), NO_HARDWARE, HW_UNAVAILABLE…</span></code></pre></figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Authenticator</th><th>Meaning</th><th>Use with crypto?</th></tr></thead>
+  <tbody>
+    <tr><td><code>BIOMETRIC_STRONG</code></td><td>Class 3 biometrics (meet strong security requirements)</td><td>Yes</td></tr>
+    <tr><td><code>BIOMETRIC_WEAK</code></td><td>Class 2, including some face unlock implementations</td><td>No</td></tr>
+    <tr><td><code>DEVICE_CREDENTIAL</code></td><td>PIN, pattern, password</td><td>Yes, on newer Android versions</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="crypto">Crypto-bound authentication (recommended)</h2>
+<figure class="code"><figcaption><span class="file">BiometricVault.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">BiometricVault</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> activity: <span class="tk-t">FragmentActivity</span>) {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> alias = <span class="tk-s">"vault_key"</span>
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> key(): <span class="tk-t">SecretKey</span> {
+        <span class="tk-k">val</span> ks = <span class="tk-t">KeyStore</span>.getInstance(<span class="tk-s">"AndroidKeyStore"</span>).apply { load(<span class="tk-k">null</span>) }
+        (ks.getKey(alias, <span class="tk-k">null</span>) <span class="tk-k">as</span>? <span class="tk-t">SecretKey</span>)?.let { <span class="tk-k">return</span> it }
+        <span class="tk-k">val</span> spec = <span class="tk-t">KeyGenParameterSpec</span>.<span class="tk-t">Builder</span>(alias, <span class="tk-t">KeyProperties</span>.<span class="tk-t">PURPOSE_ENCRYPT</span> or <span class="tk-t">KeyProperties</span>.<span class="tk-t">PURPOSE_DECRYPT</span>)
+            .setBlockModes(<span class="tk-t">KeyProperties</span>.<span class="tk-t">BLOCK_MODE_GCM</span>)
+            .setEncryptionPaddings(<span class="tk-t">KeyProperties</span>.<span class="tk-t">ENCRYPTION_PADDING_NONE</span>)
+            .setUserAuthenticationRequired(<span class="tk-k">true</span>)
+            .setUserAuthenticationParameters(<span class="tk-n">0</span>, <span class="tk-t">KeyProperties</span>.<span class="tk-t">AUTH_BIOMETRIC_STRONG</span>)   <span class="tk-c">// every use</span>
+            .setInvalidatedByBiometricEnrollment(<span class="tk-k">true</span>)
+            .build()
+        <span class="tk-k">return</span> <span class="tk-t">KeyGenerator</span>.getInstance(<span class="tk-t">KeyProperties</span>.<span class="tk-t">KEY_ALGORITHM_AES</span>, <span class="tk-s">"AndroidKeyStore"</span>).apply { <span class="tk-k">init</span>(spec) }.generateKey()
+    }
+
+    <span class="tk-c">/** Decrypts [data] (IV + ciphertext) only after a successful strong biometric. */</span>
+    <span class="tk-k">fun</span> decrypt(<span class="tk-k">data</span>: <span class="tk-t">ByteArray</span>, onResult: (<span class="tk-t">ByteArray</span>?) -&gt; <span class="tk-t">Unit</span>) {
+        <span class="tk-k">val</span> cipher = <span class="tk-t">Cipher</span>.getInstance(<span class="tk-s">"AES/GCM/NoPadding"</span>).apply {
+            <span class="tk-k">init</span>(<span class="tk-t">Cipher</span>.<span class="tk-t">DECRYPT_MODE</span>, key(), <span class="tk-t">GCMParameterSpec</span>(<span class="tk-n">128</span>, <span class="tk-k">data</span>.copyOfRange(<span class="tk-n">0</span>, <span class="tk-n">12</span>)))
+        }
+        <span class="tk-k">val</span> prompt = <span class="tk-t">BiometricPrompt</span>(activity, <span class="tk-t">ContextCompat</span>.getMainExecutor(activity),
+            <span class="tk-k">object</span> : <span class="tk-t">BiometricPrompt</span>.<span class="tk-t">AuthenticationCallback</span>() {
+                <span class="tk-k">override</span> <span class="tk-k">fun</span> onAuthenticationSucceeded(result: <span class="tk-t">BiometricPrompt</span>.<span class="tk-t">AuthenticationResult</span>) {
+                    <span class="tk-k">val</span> unlocked = result.cryptoObject?.cipher ?: <span class="tk-k">return</span> onResult(<span class="tk-k">null</span>)
+                    onResult(unlocked.doFinal(<span class="tk-k">data</span>, <span class="tk-n">12</span>, <span class="tk-k">data</span>.size - <span class="tk-n">12</span>))
+                }
+                <span class="tk-k">override</span> <span class="tk-k">fun</span> onAuthenticationError(code: <span class="tk-t">Int</span>, msg: <span class="tk-t">CharSequence</span>) = onResult(<span class="tk-k">null</span>)
+            })
+        prompt.authenticate(
+            <span class="tk-t">BiometricPrompt</span>.<span class="tk-t">PromptInfo</span>.<span class="tk-t">Builder</span>()
+                .setTitle(<span class="tk-s">"Unlock your vault"</span>)
+                .setSubtitle(<span class="tk-s">"Confirm it's you"</span>)
+                .setNegativeButtonText(<span class="tk-s">"Cancel"</span>)
+                .setAllowedAuthenticators(<span class="tk-t">BiometricManager</span>.<span class="tk-t">Authenticators</span>.<span class="tk-t">BIOMETRIC_STRONG</span>)
+                .build(),
+            <span class="tk-t">BiometricPrompt</span>.<span class="tk-t">CryptoObject</span>(cipher),
+        )
+    }
+}</code></pre></figure>
+<p>Encrypting works the same way: initialise the cipher in <code>ENCRYPT_MODE</code> and store <code>cipher.iv + ciphertext</code>. Handle <code>KeyPermanentlyInvalidatedException</code> when <code>init</code> runs: delete the key and ask the user to sign in again.</p>
+
+<h2 id="server">Server-verified biometric confirmation</h2>
+<p>For high-value actions such as payment confirmation, generate an auth-bound <strong>signing</strong> key pair, register the public key with your server, then sign a server-issued challenge after BiometricPrompt. The server verifies the signature, which proves both the device and the user's presence.</p>
+
+<h2 id="ux">UX guidelines</h2>
+<ul>
+  <li>Offer biometrics as an opt-in convenience after a normal sign-in, and explain what it protects.</li>
+  <li>Provide a fallback (device credential or password) for users without biometrics, or when it fails.</li>
+  <li>Don't prompt repeatedly. Use reasonable session timeouts for app-lock scenarios.</li>
+  <li>Never claim biometric data is stored by your app. It isn't, and saying so confuses users.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>App lock</h3><p>Crypto-bound unlock of locally encrypted data when opening a notes or finance app.</p></div>
+  <div class="card usecase"><h3>Confirm a transfer</h3><p>Biometric-signed challenge verified by the server.</p></div>
+  <div class="card usecase"><h3>Quick sign-in</h3><p>Decrypt a stored refresh token after biometric authentication. See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can my app access fingerprint images?</summary><div><p>No. Biometric data stays within secure hardware and the system. Apps receive only an authentication result.</p></div></details>
+  <details><summary>Does face unlock count as strong?</summary><div><p>It depends on the device implementation's class. Query <code>BIOMETRIC_STRONG</code> to know whether a strong method is available.</p></div></details>
+  <details><summary>Should biometrics replace passwords?</summary><div><p>Use biometrics to unlock locally stored credentials or confirm actions. Account recovery still needs another factor.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <code>BiometricPrompt</code> with <strong>BIOMETRIC_STRONG</strong> and a <strong>Keystore-bound CryptoObject</strong>, so authentication actually unlocks data or signs server challenges. Provide fallbacks, handle key invalidation, and keep biometrics as a convenient layer on top of solid account security.</p>
+<p>Next step: protect user data in AI features with <a href="../protect-user-data-ai-android-apps/index.html">Protecting User Data in AI-Powered Android Apps</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/identity/sign-in/biometric-auth" target="_blank" rel="noopener">Show a biometric authentication dialog</a></li><li><a href="https://developer.android.com/jetpack/androidx/releases/biometric" target="_blank" rel="noopener">androidx.biometric</a></li><li><a href="https://developer.android.com/privacy-and-security/keystore#UserAuthentication" target="_blank" rel="noopener">Android Keystore: user authentication</a></li><li><a href="https://source.android.com/docs/security/features/biometric/measure" target="_blank" rel="noopener">Measuring biometric unlock security</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dbiometric-authentication-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dbiometric-authentication-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-keystore-explained/index.html"><small>Android Security and Privacy</small>Android Keystore Explained</a></li><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li><li><a href="../../android/secure-token-storage-android/index.html"><small>APIs, Databases, and Backend Integration</small>Secure Token Storage and API Authentication</a></li><li><a href="../../android/firebase-authentication-android/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Authentication in Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/biometric-authentication-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/biometric-authentication-android/&amp;text=Biometric Authentication with Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/biometric-authentication-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#levels">Two levels of biometric security</a></li><li><a href="#setup">Setup and availability</a></li><li><a href="#crypto">Crypto-bound authentication (recommended)</a></li><li><a href="#server">Server-verified biometric confirmation</a></li><li><a href="#ux">UX guidelines</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dbiometric-authentication-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dbiometric-authentication-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

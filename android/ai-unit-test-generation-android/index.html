@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Assisted Unit Test Generation for Android | Yunok Tech</title>
+  <meta name="description" content="Use AI to generate Android unit tests that actually catch bugs: edge-case-first prompting, fakes over mocks, coroutine test setup, mutation-style checks and reviewing AI-written tests.">
+  <meta name="keywords" content="ai unit test generation android, generate unit tests with ai, ai junit kotlin, gemini generate unit tests, test quality ai, viewmodel tests ai, mutation testing android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-unit-test-generation-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-unit-test-generation-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="AI-Assisted Unit Test Generation for Android">
+  <meta property="og:description" content="Use AI to generate Android unit tests that actually catch bugs: edge-case-first prompting, fakes over mocks, coroutine test setup, mutation-style checks and reviewing AI-written tests.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="AI Tools for Android Developers">
+  <meta name="twitter:title" content="AI-Assisted Unit Test Generation for Android">
+  <meta name="twitter:description" content="Use AI to generate Android unit tests that actually catch bugs: edge-case-first prompting, fakes over mocks, coroutine test setup, mutation-style checks and reviewing AI-written tests.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AI-Assisted Unit Test Generation for Android", "description": "Use AI to generate Android unit tests that actually catch bugs: edge-case-first prompting, fakes over mocks, coroutine test setup, mutation-style checks and reviewing AI-written tests.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "AI Tools for Android Developers", "keywords": "generate unit tests with ai, ai junit kotlin, gemini generate unit tests, test quality ai, viewmodel tests ai, mutation testing android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-unit-test-generation-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "AI-Assisted Unit Test Generation for Android", "item": "https://yunoktech.com/android/ai-unit-test-generation-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-tools">AI Tools for Android Developers</a></nav>
+    <span class="ad-chip">🛠️ AI Tools for Android Developers</span>
+    <h1 id="article-title">AI-Assisted Unit Test Generation for Android</h1>
+    <p class="ad-lede">AI can write dozens of unit tests in seconds, and many of them will test nothing useful. The trick is to make AI think about behaviour and edge cases first, use your test conventions, and review tests as critically as production code.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#workflow">Edge cases first, then tests</a></li><li><a href="#prompts">Prompts that produce useful tests</a></li><li><a href="#example">Example result, reviewed</a></li><li><a href="#weak">Recognising weak AI tests</a></li><li><a href="#mutation">Check that tests can fail</a></li><li><a href="#use-cases">Where AI test generation pays off</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">An AI-generated test that calls a function and asserts the result is "not null" adds coverage and no safety. Good tests encode <em>behaviour</em>: given this situation, the app must do that. AI can help enumerate situations, and you decide which behaviours matter.</p>
+
+<h2 id="workflow">Edge cases first, then tests</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tg-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-tg-t fig-tg-d">
+    <title id="fig-tg-t">Workflow for AI-assisted test generation</title>
+    <desc id="fig-tg-d">Ask AI to list behaviours and edge cases, curate the list yourself, generate tests using project conventions and fakes, run them and deliberately break the code to see tests fail, then keep only meaningful tests.</desc>
+    <defs><marker id="tgm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M420 70 H440 M570 70 H590" marker-end="url(#tgm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">List cases</text><text class="d-s" x="70" y="84" text-anchor="middle">AI brainstorm</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">Curate</text><text class="d-s" x="212" y="84" text-anchor="middle">you decide</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="294" y="40" width="126" height="60" rx="12"/><text class="d-t" x="357" y="66" text-anchor="middle">Generate</text><text class="d-s" x="357" y="84" text-anchor="middle">your conventions</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="444" y="40" width="126" height="60" rx="12"/><text class="d-t" x="507" y="66" text-anchor="middle">Break code</text><text class="d-s" x="507" y="84" text-anchor="middle">tests must fail</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="594" y="40" width="116" height="60" rx="12"/><text class="d-t" x="652" y="66" text-anchor="middle">Keep good</text><text class="d-s" x="652" y="84" text-anchor="middle">delete weak</text></g>
+  </svg>
+  <figcaption id="fig-tg-cap">A test that still passes when you break the code is not protecting anything.</figcaption>
+</figure>
+
+<h2 id="prompts">Prompts that produce useful tests</h2>
+<figure class="code"><figcaption><span class="file">Step 1: behaviours and edge cases</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Here is CheckoutViewModel and its UiState. List the behaviours and edge cases worth testing:
+user actions, success/failure paths, boundary values, concurrency (double taps), and
+state after errors. Don't write code yet. Group them by priority.</code></pre></figure>
+<figure class="code"><figcaption><span class="file">Step 2: tests with conventions</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Write JUnit4 tests for cases 1, 2, 4 and 7 only.
+Conventions: MainDispatcherRule from com.example.testing, runTest, FakeCartRepository
+and FakePaymentRepository (no mocking libraries), backtick test names describing behaviour,
+one behaviour per test, assert on uiState values only.</code></pre></figure>
+
+<h2 id="example">Example result, reviewed</h2>
+<figure class="code"><figcaption><span class="file">CheckoutViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">CheckoutViewModelTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> mainRule = <span class="tk-t">MainDispatcherRule</span>()
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `double tap on pay submits only one payment`() = runTest {
+        <span class="tk-k">val</span> payments = <span class="tk-t">FakePaymentRepository</span>(delayMs = <span class="tk-n">1_000</span>)
+        <span class="tk-k">val</span> vm = <span class="tk-t">CheckoutViewModel</span>(<span class="tk-t">FakeCartRepository</span>(total = <span class="tk-n">49_900</span>), payments)
+
+        vm.onPayClick(); vm.onPayClick()
+        advanceUntilIdle()
+
+        assertEquals(<span class="tk-n">1</span>, payments.submittedCount)                      <span class="tk-c">// guards against duplicate charges</span>
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `payment failure keeps cart and shows retryable error`() = runTest {
+        <span class="tk-k">val</span> vm = <span class="tk-t">CheckoutViewModel</span>(<span class="tk-t">FakeCartRepository</span>(total = <span class="tk-n">49_900</span>), <span class="tk-t">FakePaymentRepository</span>(fail = <span class="tk-k">true</span>))
+
+        vm.onPayClick(); advanceUntilIdle()
+
+        <span class="tk-k">val</span> state = vm.uiState.<span class="tk-k">value</span>
+        assertEquals(<span class="tk-n">49_900</span>, state.totalPaise)
+        assertTrue(state.error?.canRetry == <span class="tk-k">true</span>)
+        assertFalse(state.isProcessing)
+    }
+}</code></pre></figure>
+<p>These are worth keeping: each protects a real business rule, and each fails if the behaviour regresses.</p>
+
+<h2 id="weak">Recognising weak AI tests</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Smell</th><th>Example</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Asserts nothing meaningful</td><td><code>assertNotNull(vm.uiState.value)</code></td><td>Assert specific state values</td></tr>
+    <tr><td>Mirrors the implementation</td><td>Recomputes the expected total with the same formula</td><td>Use known, hand-calculated values</td></tr>
+    <tr><td>Over-mocking</td><td>Verifies every repository call</td><td>Use fakes; assert outcomes</td></tr>
+    <tr><td>Flaky timing</td><td><code>Thread.sleep</code>, real dispatchers</td><td>Test dispatchers, virtual time</td></tr>
+    <tr><td>Tests framework behaviour</td><td>Asserting Room or Retrofit internals in unit tests</td><td>Test your logic; integration tests elsewhere</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mutation">Check that tests can fail</h2>
+<p>Manually introduce a bug (flip a condition, remove a guard) and run the tests. At least one should fail. Mutation-testing tools automate this idea on the JVM, but even a few manual mutations reveal hollow tests quickly.</p>
+
+<h2 id="use-cases">Where AI test generation pays off</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Legacy code with no tests</h3><p>AI drafts characterization tests capturing current behaviour before a refactor. See <a href="../refactor-legacy-android-apps/index.html">Refactoring Legacy Apps</a>.</p></div>
+  <div class="card usecase"><h3>Mappers and validators</h3><p>Table-driven tests of many input variations, with hand-checked expected values.</p></div>
+  <div class="card usecase"><h3>Edge-case discovery</h3><p>The brainstorm step often surfaces cases the team missed, such as double taps, empty states and time zones.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should coverage targets drive AI test generation?</summary><div><p>No. Coverage encourages hollow tests. Target behaviours and risks, and use coverage only to find untested risky code.</p></div></details>
+  <details><summary>Can AI generate UI tests?</summary><div><p>It can draft Compose UI tests and screenshot previews, but they need the same review: realistic states, stable selectors and meaningful assertions.</p></div></details>
+  <details><summary>What about Android Studio's test generation?</summary><div><p>Gemini in Android Studio can generate unit tests for a class. Treat the output as a draft, and apply the review steps above.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use AI to <strong>enumerate edge cases and draft tests in your conventions</strong>, then curate them, <strong>prove they fail when code breaks</strong>, and delete hollow ones. Good AI-assisted tests protect behaviours, not coverage numbers.</p>
+<p>Next step: use AI on failures in <a href="../debug-android-errors-with-ai/index.html">Debugging Android Errors with AI</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/gemini/overview" target="_blank" rel="noopener">Gemini in Android Studio: generate unit tests</a></li><li><a href="https://developer.android.com/training/testing/fundamentals" target="_blank" rel="noopener">Fundamentals of testing</a></li><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing coroutines</a></li><li><a href="https://pitest.org/" target="_blank" rel="noopener">PIT mutation testing</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-unit-test-generation-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-unit-test-generation-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>AI coding tools multiply what you already know. The stronger your Kotlin, Compose and architecture foundation, the better you can judge, fix and ship what these tools suggest.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li><li><a href="../../android/gemini-in-android-studio/index.html"><small>AI Tools for Android Developers</small>How to Use Gemini in Android Studio</a></li><li><a href="../../android/verify-ai-generated-android-code/index.html"><small>AI Tools for Android Developers</small>How to Verify AI-Generated Android Code Before Shipping</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-unit-test-generation-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-unit-test-generation-android/&amp;text=AI-Assisted Unit Test Generation for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-unit-test-generation-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#workflow">Edge cases first, then tests</a></li><li><a href="#prompts">Prompts that produce useful tests</a></li><li><a href="#example">Example result, reviewed</a></li><li><a href="#weak">Recognising weak AI tests</a></li><li><a href="#mutation">Check that tests can fail</a></li><li><a href="#use-cases">Where AI test generation pays off</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-unit-test-generation-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-unit-test-generation-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

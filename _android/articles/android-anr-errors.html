@@ -1,0 +1,130 @@
+<!--meta
+{
+  "seo_title": "ANR Errors in Android Explained and How to Fix Them",
+  "description": "What causes Application Not Responding (ANR) errors in Android, ANR types and timeouts, reading ANR traces in Play Console, StrictMode, common culprits and proven fixes.",
+  "primary_keyword": "android anr",
+  "keywords": ["application not responding android", "fix anr android", "anr trace play console", "main thread blocked android", "broadcast receiver anr", "strictmode android"],
+  "lede": "An ANR, 'Application Not Responding', is Android telling users your app froze. ANR rate is a core Google Play vital, so frequent ANRs can hurt your app's visibility. This guide explains what triggers ANRs, how to diagnose them from traces, and how to fix the usual culprits.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["how-android-app-works-internally", "android-app-performance-optimization", "debugging-crashes-logcat", "kotlin-coroutines-flow-android"],
+  "refs": [
+    ["ANRs (Android vitals)", "https://developer.android.com/topic/performance/vitals/anr"],
+    ["Diagnose and fix ANRs", "https://developer.android.com/topic/performance/anrs/diagnose-and-fix-anrs"],
+    ["StrictMode", "https://developer.android.com/reference/android/os/StrictMode"],
+    ["Android vitals overview", "https://developer.android.com/topic/performance/vitals"]
+  ]
+}
+-->
+<p class="ad-lead">An ANR happens when your app's <strong>main thread</strong> can't respond in time: to an input event, a broadcast, or a service start. The user sees a dialog offering to close the app. Unlike crashes, ANRs often hide in rare conditions: slow storage, lock contention, or a slow network call made synchronously.</p>
+
+<h2 id="types">ANR types and timeouts</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Type</th><th>Triggered when</th><th>Typical timeout</th></tr></thead>
+  <tbody>
+    <tr><td>Input dispatch</td><td>The app doesn't respond to an input event (tap, key)</td><td>About 5 seconds</td></tr>
+    <tr><td>Broadcast receiver</td><td><code>onReceive</code> doesn't finish in time</td><td>Around 10 s (foreground) to 60 s (background)</td></tr>
+    <tr><td>Service</td><td>Service lifecycle methods take too long</td><td>Seconds, depending on foreground or background</td></tr>
+    <tr><td>Foreground service start</td><td><code>startForeground()</code> not called soon enough after starting</td><td>A few seconds</td></tr>
+    <tr><td>Content provider / job</td><td>Provider or job callbacks block too long</td><td>Varies</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Exact values vary by Android version. The principle is constant: <strong>never block the main thread</strong>.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-anr-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-anr-t fig-anr-d">
+    <title id="fig-anr-t">Main thread blocked leading to an ANR</title>
+    <desc id="fig-anr-d">The main thread's message queue holds a tap event. A long blocking task such as a database query or network call is running on the main thread, so the tap waits in the queue. After about five seconds without handling the input, the system shows the Application Not Responding dialog.</desc>
+    <text class="d-t" x="20" y="24">Main thread timeline</text>
+    <rect class="d-box" x="20" y="36" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="24" y="40" width="470" height="36" rx="6"/><text class="d-t" x="259" y="63" text-anchor="middle">blocking: db.query() / network / lock wait</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="80" y="104" width="160" height="34" rx="8"/><text class="d-s" x="160" y="126" text-anchor="middle">tap event waiting…</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-dark" x="500" y="100" width="200" height="42" rx="8"/><text class="d-w" x="600" y="126" text-anchor="middle">~5 s → ANR dialog</text></g>
+  </svg>
+  <figcaption id="fig-anr-cap">The tap itself is cheap. It's stuck behind work that should never have been on the main thread.</figcaption>
+</figure>
+
+<h2 id="culprits">Common culprits</h2>
+<ul>
+  <li><strong>Disk I/O on main:</strong> synchronous SharedPreferences <code>commit()</code>, large file reads, database queries.</li>
+  <li><strong>Network on main</strong>, often hidden inside a "quick" SDK call.</li>
+  <li><strong>Lock contention:</strong> the main thread waits for a lock held by a busy background thread.</li>
+  <li><strong><code>runBlocking</code> on the main thread</strong> to call suspend code.</li>
+  <li><strong>Heavy work in <code>onReceive</code></strong> or in Application/Activity creation.</li>
+  <li><strong>Binder calls</strong> to slow system services or other apps' content providers on main.</li>
+</ul>
+
+<h2 id="diagnose">Diagnosing from ANR traces</h2>
+<ol class="steps">
+  <li>Open <strong>Android vitals → ANRs</strong> in the Play Console, or Crashlytics if you use it, to see clusters by stack trace.</li>
+  <li>Look at the <strong>main thread stack</strong> ("main" thread) in the trace. Its top frames show what it was doing or waiting on.</li>
+  <li>If main is <code>WAITING</code> or <code>BLOCKED</code> on a lock, find the thread that <em>holds</em> the lock in the same trace.</li>
+  <li>Reproduce locally with a slow device or emulator, network throttling, and StrictMode enabled.</li>
+</ol>
+<code-block lang="text" file="Excerpt of an ANR main-thread trace (illustrative)">
+"main" prio=5 tid=1 Native
+  at android.database.sqlite.SQLiteConnection.nativeExecuteForCursorWindow(Native Method)
+  at android.database.sqlite.SQLiteQuery.fillWindow(SQLiteQuery.java)
+  ...
+  at com.example.orders.OrdersRepository.getAllBlocking(OrdersRepository.kt:42)
+  at com.example.orders.OrdersActivity.onCreate(OrdersActivity.kt:31)
+</code-block>
+<p>Here the fix is obvious: <code>getAllBlocking</code> runs a database query from <code>onCreate</code> on the main thread.</p>
+
+<h2 id="fixes">Fixes</h2>
+<code-block lang="kotlin" file="Move work off the main thread">
+// ❌ Blocking in onCreate
+val orders = repository.getAllBlocking()
+
+// ✅ Suspend + lifecycle-aware collection; Room handles threading
+lifecycleScope.launch {
+    repeatOnLifecycle(Lifecycle.State.STARTED) {
+        repository.observeOrders().collect(adapter::submitList)
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="BroadcastReceiver: hand off long work">
+class SyncTriggerReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        // Don't sync here; schedule it.
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "sync", ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<SyncWorker>().build(),
+        )
+    }
+}
+</code-block>
+<ul>
+  <li>Use <code>apply()</code> rather than <code>commit()</code> for SharedPreferences, or better, migrate to DataStore.</li>
+  <li>Replace <code>runBlocking</code> with coroutines launched in a proper scope.</li>
+  <li>Avoid holding locks during I/O. Prefer coroutine <code>Mutex</code> on background dispatchers.</li>
+  <li>Initialise SDKs lazily and off the main thread where supported.</li>
+</ul>
+
+<h2 id="strictmode">Prevent with StrictMode</h2>
+<code-block lang="kotlin" file="Debug-only StrictMode">
+if (BuildConfig.DEBUG) {
+    StrictMode.setThreadPolicy(
+        StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().penaltyFlashScreen().build()
+    )
+}
+</code-block>
+
+<h2 id="use-cases">Real cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Startup ANR on old devices</h3><p>Cause: a large JSON config parsed in <code>Application.onCreate</code>. Fix: parse lazily on a background dispatcher, with defaults until it's ready.</p></div>
+  <div class="card usecase"><h3>ANR on tapping "Save"</h3><p>Cause: a synchronous file write and image compression in the click handler. Fix: a ViewModel coroutine with <code>Dispatchers.IO</code> and progress UI.</p></div>
+  <div class="card usecase"><h3>Receiver ANRs</h3><p>Cause: a network call in <code>onReceive</code>. Fix: enqueue WorkManager.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's a "good" ANR rate?</summary><div><p>As low as possible. Google Play defines bad-behaviour thresholds for user-perceived ANR rate as a core vital. Check current thresholds in Android vitals documentation.</p></div></details>
+  <details><summary>Do ANRs show up as crashes?</summary><div><p>They're reported separately in Android vitals and many crash tools. Monitor both.</p></div></details>
+  <details><summary>Can coroutines still cause ANRs?</summary><div><p>Yes, if you run blocking code on <code>Dispatchers.Main</code> or use <code>runBlocking</code>. Suspension prevents ANRs only when the work actually leaves the main thread.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>ANRs come from a <strong>blocked main thread</strong>. Find the cause in the main thread's stack in ANR traces, move I/O and heavy work to background dispatchers or WorkManager, avoid <code>runBlocking</code> and lock contention, and catch regressions early with StrictMode.</p>
+<p>Next step: make the first impression fast with <a href="../reduce-android-app-startup-time/index.html">Reducing Android App Startup Time</a>.</p>

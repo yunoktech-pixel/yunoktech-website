@@ -1,0 +1,117 @@
+<!--meta
+{
+  "seo_title": "Modularization Strategies for Large Android Apps",
+  "description": "Compare Android modularization strategies: by layer, by feature, hybrid, api/impl split and dynamic features, with dependency rules, migration steps and how to measure success.",
+  "primary_keyword": "android modularization strategies",
+  "keywords": ["modularize android app", "feature vs layer modules", "api impl module split", "dynamic feature modules", "android module dependency rules", "migrate monolith android"],
+  "lede": "Once you've decided to modularize, the harder question is how to slice the app. By layer, by feature, or a hybrid? With api/impl splits? This guide compares the strategies used in large Android codebases and shows how to migrate a monolith without stopping feature work.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["multi-module-architecture-android", "gradle-multi-module-build-optimization", "scaling-android-codebase-teams", "android-architecture-at-scale"],
+  "refs": [
+    ["Guide to Android app modularization", "https://developer.android.com/topic/modularization"],
+    ["Common modularization patterns", "https://developer.android.com/topic/modularization/patterns"],
+    ["Play Feature Delivery", "https://developer.android.com/guide/playcore/feature-delivery"],
+    ["Gradle build cache", "https://docs.gradle.org/current/userguide/build_cache.html"]
+  ]
+}
+-->
+<p class="ad-lead">Two teams modularize the same 200-screen app. One splits by layer and ends up with a <code>:data</code> module that every change touches. The other splits by feature and gets independent teams and fast builds. The strategy you choose shapes your build times and your team's daily experience for years.</p>
+
+<h2 id="strategies">The main strategies</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ms-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ms-t fig-ms-d">
+    <title id="fig-ms-t">Layer-based versus feature-based versus hybrid modularization</title>
+    <desc id="fig-ms-d">Layer-based: three horizontal modules, ui, domain and data, each containing all features. Feature-based: vertical modules per feature, each containing its own layers. Hybrid: vertical feature modules on top of shared horizontal core modules.</desc>
+    <text class="d-t" x="110" y="20" text-anchor="middle">By layer</text>
+    <rect class="d-blue" x="20" y="34" width="180" height="40" rx="8"/><text class="d-s" x="110" y="58" text-anchor="middle">:ui (all features)</text>
+    <rect class="d-violet" x="20" y="84" width="180" height="40" rx="8"/><text class="d-s" x="110" y="108" text-anchor="middle">:domain (all features)</text>
+    <rect class="d-amber" x="20" y="134" width="180" height="40" rx="8"/><text class="d-s" x="110" y="158" text-anchor="middle">:data (all features)</text>
+    <text class="d-t" x="360" y="20" text-anchor="middle">By feature</text>
+    <rect class="d-green" x="260" y="34" width="60" height="140" rx="8"/><text class="d-s" x="290" y="108" text-anchor="middle">home</text>
+    <rect class="d-green" x="330" y="34" width="60" height="140" rx="8"/><text class="d-s" x="360" y="108" text-anchor="middle">search</text>
+    <rect class="d-green" x="400" y="34" width="60" height="140" rx="8"/><text class="d-s" x="430" y="108" text-anchor="middle">cart</text>
+    <text class="d-t" x="610" y="20" text-anchor="middle">Hybrid (common)</text>
+    <rect class="d-green" x="520" y="34" width="54" height="84" rx="8"/><text class="d-s" x="547" y="80" text-anchor="middle">home</text>
+    <rect class="d-green" x="583" y="34" width="54" height="84" rx="8"/><text class="d-s" x="610" y="80" text-anchor="middle">search</text>
+    <rect class="d-green" x="646" y="34" width="54" height="84" rx="8"/><text class="d-s" x="673" y="80" text-anchor="middle">cart</text>
+    <rect class="d-amber" x="520" y="128" width="180" height="46" rx="8"/><text class="d-s" x="610" y="156" text-anchor="middle">:core:* (data, ui, model)</text>
+  </svg>
+  <figcaption id="fig-ms-cap">Most large Android apps converge on the hybrid: vertical features over horizontal core modules.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Strategy</th><th>Pros</th><th>Cons</th><th>Fits</th></tr></thead>
+  <tbody>
+    <tr><td>By layer</td><td>Simple; enforces layering</td><td>Every feature change touches every layer module; poor build parallelism; no team ownership</td><td>Small apps wanting layer enforcement</td></tr>
+    <tr><td>By feature</td><td>Independent features; ownership; good caching</td><td>Shared code needs a home; risk of duplication</td><td>Apps with clear product areas</td></tr>
+    <tr><td>Hybrid</td><td>Feature independence plus shared core</td><td>Requires discipline about what goes in core</td><td>Most medium and large apps</td></tr>
+    <tr><td>api/impl split</td><td>Consumers depend on a small API module; impl changes don't recompile consumers</td><td>Doubles module count for split features</td><td>Very large apps, cross-feature contracts</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="api-impl">The api/impl split</h2>
+<code-block lang="text" file="Module layout">
+:feature:payments:api     ← interfaces + models other features may use (tiny, stable)
+:feature:payments:impl    ← UI, ViewModels, repositories (changes often)
+
+:feature:checkout  → depends on :feature:payments:api only
+:app               → depends on :feature:payments:impl (to bind implementations via DI)
+</code-block>
+<code-block lang="kotlin" file="feature/payments/api/PaymentLauncher.kt">
+interface PaymentLauncher {
+    fun paymentRoute(orderId: String): NavKey      // checkout navigates without knowing the impl
+}
+</code-block>
+<p>Because <code>checkout</code> sees only the small API module, editing payment screens doesn't recompile checkout. That pays off in large codebases.</p>
+
+<h2 id="rules">Dependency rules worth enforcing</h2>
+<ul>
+  <li>Feature modules don't depend on other feature modules, only on their <code>:api</code> modules.</li>
+  <li>Core modules never depend on feature modules.</li>
+  <li><code>:core:model</code> and <code>:core:domain</code> are pure Kotlin (no Android dependencies).</li>
+  <li>Only <code>:app</code> knows about every implementation.</li>
+</ul>
+<p>Enforce these in CI with a dependency-analysis plugin or a custom Gradle check, not by convention alone.</p>
+
+<h2 id="migration">Migrating a monolith step by step</h2>
+<ol class="steps">
+  <li><strong>Measure:</strong> record clean and incremental build times and the main pain points.</li>
+  <li><strong>Set up build logic:</strong> a version catalog and convention plugins.</li>
+  <li><strong>Extract leaf core modules:</strong> model, design system, network and database. These have few dependencies on the rest.</li>
+  <li><strong>Extract one well-bounded feature</strong>, such as settings, to prove the pattern, including navigation and DI.</li>
+  <li><strong>Continue feature by feature</strong>, prioritising frequently changed or team-owned areas.</li>
+  <li><strong>Re-measure</strong> and adjust granularity.</li>
+</ol>
+<div class="tip"><b>Keep shipping</b><p>Move code in small, behaviour-preserving PRs. Avoid long-lived modularization branches, which conflict with ongoing feature work.</p></div>
+
+<h2 id="dynamic">Dynamic feature modules</h2>
+<p>Play Feature Delivery can deliver modules on demand or conditionally, which reduces initial download size for large, rarely used features (an AR viewer, an advanced editor). They add complexity: different navigation, testing and dependency direction. Reserve them for genuinely large, optional features.</p>
+
+<h2 id="measure">Measuring success</h2>
+<ul>
+  <li>Incremental build time for typical changes.</li>
+  <li>CI time and build-cache hit rate.</li>
+  <li>Number of modules touched per PR (it should drop).</li>
+  <li>Developer feedback on sync time and navigation.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>E-commerce app</h3><p>Hybrid: catalogue, product, cart, checkout and account features over core data, design system and analytics, with an api/impl split for payments.</p></div>
+  <div class="card usecase"><h3>Banking app</h3><p>Strict feature isolation, security-sensitive core modules owned by a platform team, and dependency rules in CI.</p></div>
+  <div class="card usecase"><h3>Media app</h3><p>Player as a core module, with a dynamic feature for offline downloads in markets where it's used.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How big should a feature module be?</summary><div><p>Roughly one product area owned by one team: a few screens with their ViewModels and data. Split further only for build or ownership reasons.</p></div></details>
+  <details><summary>Where does shared UI go?</summary><div><p>Generic components go in <code>:core:designsystem</code>. Feature-specific but shared UI may need a small shared module, but avoid a dumping-ground "common" module.</p></div></details>
+  <details><summary>Does modularization help app size?</summary><div><p>Not by itself. R8 already removes unused code. Dynamic features can reduce initial download size.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>For most large Android apps, the winning strategy is <strong>hybrid</strong>: vertical feature modules over a disciplined set of core modules, with api/impl splits where cross-feature contracts are hot. Migrate incrementally, enforce dependency rules automatically, and measure the outcome.</p>
+<p>Next step: apply design principles inside those modules with <a href="../solid-principles-android/index.html">SOLID Principles in Android Development</a>.</p>

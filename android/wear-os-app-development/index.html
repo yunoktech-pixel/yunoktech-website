@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wear OS App Development with Compose for Wear OS | Yunok Tech</title>
+  <meta name="description" content="Build Wear OS apps: Compose for Wear OS, round screens, ScalingLazyColumn and TransformingLazyColumn, tiles and complications, data sync with phone, health data, battery and testing.">
+  <meta name="keywords" content="wear os app development, compose for wear os, wear os tiles, wear os complications, wearable data layer api, standalone wear os app, wear os health services">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/wear-os-app-development/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/wear-os-app-development/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Wear OS App Development with Compose for Wear OS">
+  <meta property="og:description" content="Build Wear OS apps: Compose for Wear OS, round screens, ScalingLazyColumn and TransformingLazyColumn, tiles and complications, data sync with phone, health data, battery and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Advanced Android Engineering and Emerging Technology">
+  <meta name="twitter:title" content="Wear OS App Development with Compose for Wear OS">
+  <meta name="twitter:description" content="Build Wear OS apps: Compose for Wear OS, round screens, ScalingLazyColumn and TransformingLazyColumn, tiles and complications, data sync with phone, health data, battery and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Wear OS App Development", "description": "Build Wear OS apps: Compose for Wear OS, round screens, ScalingLazyColumn and TransformingLazyColumn, tiles and complications, data sync with phone, health data, battery and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Advanced Android Engineering and Emerging Technology", "keywords": "compose for wear os, wear os tiles, wear os complications, wearable data layer api, standalone wear os app, wear os health services", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/wear-os-app-development/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Wear OS App Development", "item": "https://yunoktech.com/android/wear-os-app-development/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#advanced">Advanced Android Engineering and Emerging Technology</a></nav>
+    <span class="ad-chip">⚙️ Advanced Android Engineering and Emerging Technology</span>
+    <h1 id="article-title">Wear OS App Development</h1>
+    <p class="ad-lede">A watch app isn't a shrunk phone app. Sessions last seconds, screens are round and tiny, and battery is precious. Wear OS development with Compose for Wear OS makes building for the wrist familiar, as long as you design for glances.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#surfaces">Wear OS surfaces</a></li><li><a href="#setup">Project setup</a></li><li><a href="#compose">Compose for Wear OS</a></li><li><a href="#tiles">Tiles and complications</a></li><li><a href="#data">Syncing with the phone</a></li><li><a href="#health">Health and fitness</a></li><li><a href="#battery">Battery and performance</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Users interact with a watch for a few seconds at a time. The best Wear OS experiences surface information through <strong>tiles</strong> and <strong>complications</strong>, and use the full app only for short, focused tasks.</p>
+
+<h2 id="surfaces">Wear OS surfaces</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-wear-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-wear-t fig-wear-d">
+    <title id="fig-wear-t">Wear OS surfaces by interaction time</title>
+    <desc id="fig-wear-d">Complications on the watch face show tiny data at a glance in about a second. Tiles show a swipeable card of key information and actions in a few seconds. The app handles focused tasks lasting longer. Notifications bridge from the phone or watch.</desc>
+    <g class="d-step" style="--i:0"><circle class="d-green" cx="110" cy="100" r="70"/><text class="d-t" x="110" y="96" text-anchor="middle">Complication</text><text class="d-s" x="110" y="116" text-anchor="middle">~1 second</text></g>
+    <g class="d-step" style="--i:1"><circle class="d-blue" cx="290" cy="100" r="70"/><text class="d-t" x="290" y="96" text-anchor="middle">Tile</text><text class="d-s" x="290" y="116" text-anchor="middle">a few seconds</text></g>
+    <g class="d-step" style="--i:2"><circle class="d-violet" cx="470" cy="100" r="70"/><text class="d-t" x="470" y="96" text-anchor="middle">App</text><text class="d-s" x="470" y="116" text-anchor="middle">focused task</text></g>
+    <g class="d-step" style="--i:3"><circle class="d-amber" cx="630" cy="100" r="60"/><text class="d-t" x="630" y="96" text-anchor="middle">Notification</text><text class="d-s" x="630" y="116" text-anchor="middle">timely info</text></g>
+  </svg>
+  <figcaption id="fig-wear-cap">Design from the fastest surface outward.</figcaption>
+</figure>
+
+<h2 id="setup">Project setup</h2>
+<p>Create a Wear OS module in Android Studio (New Module → Wear OS). Use the Wear Compose libraries (Material 3 for Wear OS is recommended for new apps) and declare the watch feature:</p>
+<figure class="code"><figcaption><span class="file">wear/AndroidManifest.xml</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;uses-feature</span> <span class="tk-at">android:name</span>=<span class="tk-s">"android.hardware.type.watch"</span> <span class="tk-tag">/&gt;</span>
+<span class="tk-tag">&lt;application</span><span class="tk-tag">&gt;</span>
+    <span class="tk-c">&lt;!-- true = works without a phone app installed --&gt;</span>
+    <span class="tk-tag">&lt;meta-data</span> <span class="tk-at">android:name</span>=<span class="tk-s">"com.google.android.wearable.standalone"</span> <span class="tk-at">android:value</span>=<span class="tk-s">"true"</span> <span class="tk-tag">/&gt;</span>
+<span class="tk-tag">&lt;/application</span><span class="tk-tag">&gt;</span></code></pre></figure>
+
+<h2 id="compose">Compose for Wear OS</h2>
+<p>Wear Compose provides watch-specific components: scrolling lists that scale items near the edges, time text, round-friendly buttons and rotary input support.</p>
+<figure class="code"><figcaption><span class="file">Wear Compose screen</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">WorkoutList</span>(workouts: <span class="tk-t">List</span>&lt;<span class="tk-t">Workout</span>&gt;, onSelect: (<span class="tk-t">Workout</span>) -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-k">val</span> listState = rememberTransformingLazyColumnState()
+    <span class="tk-t">AppScaffold</span> {
+        <span class="tk-t">ScreenScaffold</span>(scrollState = listState) { contentPadding -&gt;
+            <span class="tk-t">TransformingLazyColumn</span>(state = listState, contentPadding = contentPadding) {
+                item { <span class="tk-t">ListHeader</span> { <span class="tk-t">Text</span>(<span class="tk-s">"Workouts"</span>) } }
+                items(workouts) { workout -&gt;
+                    <span class="tk-t">Button</span>(
+                        onClick = { onSelect(workout) },
+                        label = { <span class="tk-t">Text</span>(workout.name) },
+                        modifier = <span class="tk-t">Modifier</span>.fillMaxWidth(),
+                    )
+                }
+            }
+        }
+    }
+}</code></pre></figure>
+<p>Component names differ between Wear Compose Material and Material 3 versions (for example <code>ScalingLazyColumn</code> vs <code>TransformingLazyColumn</code>). Follow the docs for the version you use.</p>
+
+<h2 id="tiles">Tiles and complications</h2>
+<ul>
+  <li><strong>Tiles:</strong> implemented with a <code>TileService</code> and the ProtoLayout library. Show key data and one or two actions. Keep updates efficient.</li>
+  <li><strong>Complications:</strong> provide data to watch faces through a <code>ComplicationDataSourceService</code> (short text, ranged value, icon and so on).</li>
+</ul>
+
+<h2 id="data">Syncing with the phone</h2>
+<p>Use the Wearable <strong>Data Layer API</strong>: <code>DataClient</code> for synced state, <code>MessageClient</code> for one-off messages, and <code>ChannelClient</code> for large transfers. Standalone apps can also use the network directly (Wi-Fi/LTE, or proxied through the phone).</p>
+<figure class="code"><figcaption><span class="file">Send a message to the phone</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> sendToPhone(context: <span class="tk-t">Context</span>, path: <span class="tk-t">String</span>, payload: <span class="tk-t">ByteArray</span>) {
+    <span class="tk-k">val</span> nodes = <span class="tk-t">Wearable</span>.getNodeClient(context).connectedNodes.await()
+    nodes.forEach { node -&gt;
+        <span class="tk-t">Wearable</span>.getMessageClient(context).sendMessage(node.id, path, payload).await()
+    }
+}</code></pre></figure>
+
+<h2 id="health">Health and fitness</h2>
+<p>Use <strong>Health Services</strong> on Wear OS for heart rate, exercise tracking and passive data. It manages sensors efficiently. Request the relevant permissions, and run exercises with the exercise client so tracking survives the app going to the background.</p>
+
+<h2 id="battery">Battery and performance</h2>
+<ul>
+  <li>Avoid keeping the screen on. Support ambient mode for ongoing activities.</li>
+  <li>Batch network calls, and prefer syncing via the phone.</li>
+  <li>Use ongoing activities for workouts, so users can return quickly.</li>
+</ul>
+
+<h2 id="testing">Testing</h2>
+<p>Use round and square Wear OS emulators, test rotary input, and test on a real watch for performance and sensor behaviour. Compose previews support Wear device configurations.</p>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Fitness tracking</h3><p>Health Services + ongoing activity + tile showing today's progress.</p></div>
+  <div class="card usecase"><h3>Quick actions</h3><p>Smart home toggles or timers from a tile.</p></div>
+  <div class="card usecase"><h3>Companion data</h3><p>Next calendar event or delivery status as a complication.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I reuse my phone app's Compose UI?</summary><div><p>You can share ViewModels and data layers, but UI should be designed for the watch using Wear Compose components.</p></div></details>
+  <details><summary>Does a Wear OS app need a phone app?</summary><div><p>No. Standalone apps are supported and recommended where possible.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Build for <strong>glances</strong>: complications and tiles first, then a focused app with <strong>Compose for Wear OS</strong>, the <strong>Data Layer</strong> for phone sync, <strong>Health Services</strong> for fitness, and careful battery use.</p>
+<p>Next step: build for the car with <a href="../android-automotive-development/index.html">Android Auto and Android Automotive OS</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/wearables" target="_blank" rel="noopener">Wear OS developer docs</a></li><li><a href="https://developer.android.com/training/wearables/compose" target="_blank" rel="noopener">Compose for Wear OS</a></li><li><a href="https://developer.android.com/training/wearables/tiles" target="_blank" rel="noopener">Tiles</a></li><li><a href="https://developer.android.com/training/wearables/complications" target="_blank" rel="noopener">Complications</a></li><li><a href="https://developer.android.com/training/wearables/data/overview" target="_blank" rel="noopener">Data Layer API</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwear-os-app-development-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwear-os-app-development-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/what-is-jetpack-compose/index.html"><small>Jetpack Compose</small>What Is Jetpack Compose and Why Should You Learn It?</a></li><li><a href="../../android/android-battery-optimization/index.html"><small>Testing, Debugging, and Performance</small>Battery Optimization for Android Apps</a></li><li><a href="../../android/android-app-widgets-shortcuts/index.html"><small>Advanced Android Engineering and Emerging Technology</small>App Widgets and Shortcuts</a></li><li><a href="../../android/android-automotive-development/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Android Automotive Development</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/wear-os-app-development/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/wear-os-app-development/&amp;text=Wear OS App Development" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/wear-os-app-development/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#surfaces">Wear OS surfaces</a></li><li><a href="#setup">Project setup</a></li><li><a href="#compose">Compose for Wear OS</a></li><li><a href="#tiles">Tiles and complications</a></li><li><a href="#data">Syncing with the phone</a></li><li><a href="#health">Health and fitness</a></li><li><a href="#battery">Battery and performance</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwear-os-app-development-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwear-os-app-development-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

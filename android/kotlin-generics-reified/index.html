@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Generics and Reified Types Explained | Yunok Tech</title>
+  <meta name="description" content="Kotlin generics for Android developers: type parameters, constraints, variance (in/out), star projection, type erasure and reified type parameters with practical examples.">
+  <meta name="keywords" content="kotlin generics reified, kotlin generics variance, kotlin in out keywords, reified type parameter, type erasure kotlin, kotlin star projection, generic repository android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-generics-reified/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-generics-reified/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Generics and Reified Types Explained">
+  <meta property="og:description" content="Kotlin generics for Android developers: type parameters, constraints, variance (in/out), star projection, type erasure and reified type parameters with practical examples.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Generics and Reified Types Explained">
+  <meta name="twitter:description" content="Kotlin generics for Android developers: type parameters, constraints, variance (in/out), star projection, type erasure and reified type parameters with practical examples.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Generics and Reified Types", "description": "Kotlin generics for Android developers: type parameters, constraints, variance (in/out), star projection, type erasure and reified type parameters with practical examples.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Kotlin Programming", "keywords": "kotlin generics variance, kotlin in out keywords, reified type parameter, type erasure kotlin, kotlin star projection, generic repository android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-generics-reified/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Generics and Reified Types", "item": "https://yunoktech.com/android/kotlin-generics-reified/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Generics and Reified Types</h1>
+    <p class="ad-lede">Generics let you write one piece of code that works safely with many types: a Result wrapper, a cache, a paging helper. Variance and type erasure confuse many developers. This guide explains them with Android examples, and shows how reified types solve erasure for inline functions.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#basics">Type parameters and constraints</a></li><li><a href="#variance">Variance: in and out</a></li><li><a href="#star">Star projection</a></li><li><a href="#erasure">Type erasure</a></li><li><a href="#reified">Reified type parameters</a></li><li><a href="#generic-repo">A practical generic: an in-memory cache</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">You've used generics since your first <code>List&lt;String&gt;</code>. Writing your own is a different matter: why can't you pass a <code>List&lt;Dog&gt;</code> where a <code>MutableList&lt;Animal&gt;</code> is expected? Why does <code>T::class</code> fail inside a function? This guide answers those questions with code you'd actually write in an Android app.</p>
+
+<h2 id="basics">Type parameters and constraints</h2>
+<figure class="code"><figcaption><span class="file">A typed result wrapper</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">Outcome</span>&lt;<span class="tk-k">out</span> <span class="tk-t">T</span>&gt; {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Success</span>&lt;<span class="tk-t">T</span>&gt;(<span class="tk-k">val</span> <span class="tk-k">value</span>: <span class="tk-t">T</span>) : <span class="tk-t">Outcome</span>&lt;<span class="tk-t">T</span>&gt;
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Failure</span>(<span class="tk-k">val</span> error: <span class="tk-t">Throwable</span>) : <span class="tk-t">Outcome</span>&lt;<span class="tk-t">Nothing</span>&gt;
+}
+
+<span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>, <span class="tk-t">R</span>&gt; <span class="tk-t">Outcome</span>&lt;<span class="tk-t">T</span>&gt;.map(transform: (<span class="tk-t">T</span>) -&gt; <span class="tk-t">R</span>): <span class="tk-t">Outcome</span>&lt;<span class="tk-t">R</span>&gt; = <span class="tk-k">when</span> (<span class="tk-k">this</span>) {
+    <span class="tk-k">is</span> <span class="tk-t">Outcome</span>.<span class="tk-t">Success</span> -&gt; <span class="tk-t">Outcome</span>.<span class="tk-t">Success</span>(transform(<span class="tk-k">value</span>))
+    <span class="tk-k">is</span> <span class="tk-t">Outcome</span>.<span class="tk-t">Failure</span> -&gt; <span class="tk-k">this</span>
+}
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; runCatchingIo(block: <span class="tk-k">suspend</span> () -&gt; <span class="tk-t">T</span>): <span class="tk-t">Outcome</span>&lt;<span class="tk-t">T</span>&gt; =
+    <span class="tk-k">try</span> { <span class="tk-t">Outcome</span>.<span class="tk-t">Success</span>(block()) } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) { <span class="tk-t">Outcome</span>.<span class="tk-t">Failure</span>(e) }</code></pre></figure>
+<p><code>Failure</code> uses <code>Nothing</code>, the type with no values and a subtype of everything. Thanks to <code>out T</code> (covariance, explained next), an <code>Outcome&lt;Nothing&gt;</code> is usable as an <code>Outcome&lt;User&gt;</code>.</p>
+<figure class="code"><figcaption><span class="file">Upper-bound constraints</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> &lt;<span class="tk-t">T</span> : <span class="tk-t">Comparable</span>&lt;<span class="tk-t">T</span>&gt;&gt; <span class="tk-t">List</span>&lt;<span class="tk-t">T</span>&gt;.secondLargest(): <span class="tk-t">T</span>? = sortedDescending().getOrNull(<span class="tk-n">1</span>)
+
+<span class="tk-c">// Multiple bounds with where</span>
+<span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; persist(item: <span class="tk-t">T</span>) <span class="tk-k">where</span> <span class="tk-t">T</span> : <span class="tk-t">Parcelable</span>, <span class="tk-t">T</span> : <span class="tk-t">Identifiable</span> { <span class="tk-c">/* ... */</span> }</code></pre></figure>
+
+<h2 id="variance">Variance: in and out</h2>
+<p>Variance answers a question: if <code>Dog</code> is a subtype of <code>Animal</code>, is <code>Box&lt;Dog&gt;</code> a subtype of <code>Box&lt;Animal&gt;</code>? It depends on whether the box <em>produces</em> or <em>consumes</em> values.</p>
+<figure class="diagram" role="group" aria-labelledby="fig-v-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-v-t fig-v-d">
+    <title id="fig-v-t">Covariance with out and contravariance with in</title>
+    <desc id="fig-v-d">With out T, a producer of Dog can be used as a producer of Animal, because reading a Dog as an Animal is safe. With in T, a consumer of Animal can be used as a consumer of Dog, because anything that accepts any Animal accepts a Dog.</desc>
+    <rect class="d-green" x="20" y="20" width="320" height="140" rx="14"/><text class="d-t" x="180" y="48" text-anchor="middle">out T: producer (covariant)</text>
+    <text class="d-s" x="180" y="78" text-anchor="middle">List&lt;Dog&gt; → usable as List&lt;Animal&gt;</text>
+    <text class="d-s" x="180" y="100" text-anchor="middle">T only returned, never accepted</text>
+    <text class="d-s" x="180" y="122" text-anchor="middle">e.g. List&lt;out E&gt;, Flow&lt;out T&gt;</text>
+    <rect class="d-violet" x="380" y="20" width="320" height="140" rx="14"/><text class="d-t" x="540" y="48" text-anchor="middle">in T: consumer (contravariant)</text>
+    <text class="d-s" x="540" y="78" text-anchor="middle">Comparator&lt;Animal&gt; → usable as Comparator&lt;Dog&gt;</text>
+    <text class="d-s" x="540" y="100" text-anchor="middle">T only accepted, never returned</text>
+    <text class="d-s" x="540" y="122" text-anchor="middle">e.g. Comparable&lt;in T&gt;, (T) -&gt; Unit</text>
+  </svg>
+  <figcaption id="fig-v-cap">"Producer out, consumer in." A <code>MutableList</code> does both, so it is invariant: <code>MutableList&lt;Dog&gt;</code> is <em>not</em> a <code>MutableList&lt;Animal&gt;</code>.</figcaption>
+</figure>
+<figure class="code"><figcaption><span class="file">Why MutableList is invariant</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> dogs: <span class="tk-t">MutableList</span>&lt;<span class="tk-t">Dog</span>&gt; = mutableListOf(<span class="tk-t">Dog</span>())
+<span class="tk-c">// val animals: MutableList&lt;Animal&gt; = dogs     // ❌ compile error, and here's why:</span>
+<span class="tk-c">// animals.add(Cat())                          // would put a Cat into a list of Dogs!</span>
+
+<span class="tk-k">val</span> readOnly: <span class="tk-t">List</span>&lt;<span class="tk-t">Animal</span>&gt; = dogs              <span class="tk-c">// ✅ List&lt;out E&gt; only produces: safe</span></code></pre></figure>
+<p>Kotlin uses <strong>declaration-site variance</strong> (<code>interface Source&lt;out T&gt;</code>). You can also use <strong>use-site variance</strong> (<code>fun copy(from: Array&lt;out Any&gt;, to: Array&lt;Any&gt;)</code>) for classes you don't control.</p>
+
+<h2 id="star">Star projection</h2>
+<p><code>List&lt;*&gt;</code> means "a list of some specific but unknown type". You can read elements as <code>Any?</code> but can't add anything. It's useful when you only need type-independent operations, such as <code>size</code>.</p>
+
+<h2 id="erasure">Type erasure</h2>
+<p>On the JVM and Android, generic type arguments are <strong>erased at runtime</strong>: a <code>List&lt;String&gt;</code> and a <code>List&lt;Int&gt;</code> are both just <code>List</code>. So this doesn't compile:</p>
+<figure class="code"><figcaption><span class="file">Erasure</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; isOfType(<span class="tk-k">value</span>: <span class="tk-t">Any</span>): <span class="tk-t">Boolean</span> = <span class="tk-k">value</span> <span class="tk-k">is</span> <span class="tk-t">T</span>     <span class="tk-c">// ❌ Cannot check for instance of erased type: T</span></code></pre></figure>
+
+<h2 id="reified">Reified type parameters</h2>
+<p>In an <code>inline</code> function, the compiler copies the body to each call site, where the concrete type is known. Mark the parameter <code>reified</code> and you can use <code>T</code> at runtime:</p>
+<figure class="code"><figcaption><span class="file">Reified helpers in Android</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-k">reified</span> <span class="tk-t">T</span>&gt; <span class="tk-t">Any</span>.isOfType(): <span class="tk-t">Boolean</span> = <span class="tk-k">this</span> <span class="tk-k">is</span> <span class="tk-t">T</span>
+
+<span class="tk-c">// Start an Activity without passing ::class.java</span>
+<span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-k">reified</span> <span class="tk-t">A</span> : <span class="tk-t">Activity</span>&gt; <span class="tk-t">Context</span>.startActivity(configure: <span class="tk-t">Intent</span>.() -&gt; <span class="tk-t">Unit</span> = {}) {
+    startActivity(<span class="tk-t">Intent</span>(<span class="tk-k">this</span>, <span class="tk-t">A</span>::<span class="tk-k">class</span>.java).apply(configure))
+}
+<span class="tk-c">// context.startActivity&lt;SettingsActivity&gt; { putExtra("tab", "privacy") }</span>
+
+<span class="tk-c">// Filter a mixed feed by type</span>
+<span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-k">reified</span> <span class="tk-t">T</span>&gt; <span class="tk-t">List</span>&lt;<span class="tk-t">FeedItem</span>&gt;.only(): <span class="tk-t">List</span>&lt;<span class="tk-t">T</span>&gt; = filterIsInstance&lt;<span class="tk-t">T</span>&gt;()
+
+<span class="tk-c">// Decode JSON without passing a serializer explicitly (kotlinx.serialization)</span>
+<span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-k">reified</span> <span class="tk-t">T</span>&gt; <span class="tk-t">String</span>.decode(json: <span class="tk-t">Json</span> = <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }): <span class="tk-t">T</span> =
+    json.decodeFromString&lt;<span class="tk-t">T</span>&gt;(<span class="tk-k">this</span>)</code></pre></figure>
+<p>Libraries use this widely: Hilt's <code>hiltViewModel&lt;T&gt;()</code>, Koin's <code>get&lt;T&gt;()</code> and kotlinx.serialization's <code>decodeFromString&lt;T&gt;()</code> all rely on reified generics.</p>
+
+<h2 id="generic-repo">A practical generic: an in-memory cache</h2>
+<figure class="code"><figcaption><span class="file">TimedCache.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">TimedCache</span>&lt;<span class="tk-t">K</span> : <span class="tk-t">Any</span>, <span class="tk-t">V</span> : <span class="tk-t">Any</span>&gt;(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> ttlMillis: <span class="tk-t">Long</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> now: () -&gt; <span class="tk-t">Long</span> = { <span class="tk-t">System</span>.currentTimeMillis() },
+) {
+    <span class="tk-k">private</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Entry</span>&lt;<span class="tk-t">V</span>&gt;(<span class="tk-k">val</span> <span class="tk-k">value</span>: <span class="tk-t">V</span>, <span class="tk-k">val</span> storedAt: <span class="tk-t">Long</span>)
+    <span class="tk-k">private</span> <span class="tk-k">val</span> map = mutableMapOf&lt;<span class="tk-t">K</span>, <span class="tk-t">Entry</span>&lt;<span class="tk-t">V</span>&gt;&gt;()
+    <span class="tk-k">private</span> <span class="tk-k">val</span> mutex = <span class="tk-t">Mutex</span>()
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> getOrLoad(key: <span class="tk-t">K</span>, load: <span class="tk-k">suspend</span> (<span class="tk-t">K</span>) -&gt; <span class="tk-t">V</span>): <span class="tk-t">V</span> = mutex.withLock {
+        map[key]?.takeIf { now() - it.storedAt &lt; ttlMillis }?.<span class="tk-k">value</span>
+            ?: load(key).also { map[key] = <span class="tk-t">Entry</span>(it, now()) }
+    }
+}
+
+<span class="tk-c">// val profiles = TimedCache&lt;String, Profile&gt;(ttlMillis = 60_000)</span>
+<span class="tk-c">// profiles.getOrLoad(userId) { api.getProfile(it) }</span></code></pre></figure>
+<p>Holding the mutex during <code>load</code> keeps it simple but serialises loads. For high concurrency you'd lock per key.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Over-generalising: a <code>BaseRepository&lt;T, ID, DTO, ENTITY&gt;</code> that every feature fights against. Generic code should remove duplication, not create puzzles.</li>
+  <li>Using <code>Any</code> and casts instead of type parameters.</li>
+  <li>Forgetting that <code>reified</code> requires <code>inline</code>, and that inline functions can't be called from Java with the reified behaviour.</li>
+  <li>Unchecked casts (<code>as List&lt;User&gt;</code>) that hide erasure problems until runtime.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's the difference between T, T? and T : Any?</summary><div><p>A type parameter <code>T</code> may itself be nullable unless bounded by <code>T : Any</code>. <code>T?</code> explicitly allows null. Use <code>T : Any</code> when you need non-null values.</p></div></details>
+  <details><summary>Is Kotlin's <code>out</code> the same as Java's <code>? extends</code>?</summary><div><p>Yes in meaning. <code>out T</code> corresponds to <code>? extends T</code>, and <code>in T</code> to <code>? super T</code>. Kotlin adds declaration-site variance so you rarely need wildcards.</p></div></details>
+  <details><summary>Do reified functions increase app size?</summary><div><p>Inline functions duplicate their body at each call site, so keep them small. R8 also optimises in release builds.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Generics give you reusable, type-safe code. <strong>Variance</strong> (<code>out</code> for producers, <code>in</code> for consumers) explains which substitutions are safe. <strong>Erasure</strong> removes type arguments at runtime, and <strong>reified</strong> parameters in inline functions bring them back where you need them.</p>
+<p>Next step: reuse behaviour without inheritance using <a href="../kotlin-delegation/index.html">Kotlin Delegation and Property Delegates</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/generics.html" target="_blank" rel="noopener">Generics: in, out, where</a></li><li><a href="https://kotlinlang.org/docs/inline-functions.html#reified-type-parameters" target="_blank" rel="noopener">Inline functions: reified type parameters</a></li><li><a href="https://kotlinlang.org/docs/serialization.html" target="_blank" rel="noopener">kotlinx.serialization</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-generics-reified-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-generics-reified-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-extension-higher-order-functions/index.html"><small>Kotlin Programming</small>Extension Functions and Higher-Order Functions</a></li><li><a href="../../android/kotlin-delegation/index.html"><small>Kotlin Programming</small>Kotlin Delegation and Property Delegates</a></li><li><a href="../../android/kotlin-interview-questions-experienced/index.html"><small>Android Interview Preparation and Career</small>Kotlin Interview Questions for Experienced Developers</a></li><li><a href="../../android/android-design-patterns/index.html"><small>Android Architecture and Clean Code</small>Design Patterns Every Android Developer Should Know</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-generics-reified/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-generics-reified/&amp;text=Kotlin Generics and Reified Types" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-generics-reified/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#basics">Type parameters and constraints</a></li><li><a href="#variance">Variance: in and out</a></li><li><a href="#star">Star projection</a></li><li><a href="#erasure">Type erasure</a></li><li><a href="#reified">Reified type parameters</a></li><li><a href="#generic-repo">A practical generic: an in-memory cache</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-generics-reified-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-generics-reified-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

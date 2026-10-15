@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android System Design Interview Questions and Approach | Yunok Tech</title>
+  <meta name="description" content="How to answer Android (mobile) system design interviews: a step-by-step framework, client architecture, offline sync, pagination, real-time, images, push, security, and worked example designs.">
+  <meta name="keywords" content="android system design interview, mobile system design interview, design a chat app android, design news feed mobile, offline sync system design, android client architecture interview, senior android system design">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-system-design-interview/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-system-design-interview/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android System Design Interview Questions and Approach">
+  <meta property="og:description" content="How to answer Android (mobile) system design interviews: a step-by-step framework, client architecture, offline sync, pagination, real-time, images, push, security, and worked example designs.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Interview Preparation and Career">
+  <meta name="twitter:title" content="Android System Design Interview Questions and Approach">
+  <meta name="twitter:description" content="How to answer Android (mobile) system design interviews: a step-by-step framework, client architecture, offline sync, pagination, real-time, images, push, security, and worked example designs.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android System Design Interview Questions", "description": "How to answer Android (mobile) system design interviews: a step-by-step framework, client architecture, offline sync, pagination, real-time, images, push, security, and worked example designs.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android Interview Preparation and Career", "keywords": "mobile system design interview, design a chat app android, design news feed mobile, offline sync system design, android client architecture interview, senior android system design", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-system-design-interview/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android System Design Interview Questions", "item": "https://yunoktech.com/android/android-system-design-interview/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#career">Android Interview Preparation and Career</a></nav>
+    <span class="ad-chip">🎯 Android Interview Preparation and Career</span>
+    <h1 id="article-title">Android System Design Interview Questions</h1>
+    <p class="ad-lede">Mobile system design interviews ask you to design an app, such as a chat app, a news feed or a photo gallery, end to end from the client's perspective. The skill being tested is structured thinking about constraints, data flow and trade-offs, not drawing boxes quickly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#framework">A framework for the interview</a></li><li><a href="#clarify">Step 1: Clarify</a></li><li><a href="#api">Step 2: API and data models</a></li><li><a href="#architecture">Step 3: Client architecture</a></li><li><a href="#deep-dives">Step 4: Common deep dives</a></li><li><a href="#examples">Worked example prompts</a></li><li><a href="#tradeoffs">Step 5: Trade-offs to volunteer</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"Design Instagram's feed" isn't a request to rebuild Instagram in 45 minutes. It's an invitation to show how you clarify requirements, choose a client architecture, handle network and storage constraints, and reason about trade-offs, while communicating clearly.</p>
+
+<h2 id="framework">A framework for the interview</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sd-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sd-t fig-sd-d">
+    <title id="fig-sd-t">Mobile system design interview framework</title>
+    <desc id="fig-sd-d">Five steps with approximate time: clarify requirements and constraints, define API and data models, design client architecture and data flow, deep-dive into critical parts such as offline, pagination or real-time, then discuss trade-offs, scaling and quality concerns.</desc>
+    <defs><marker id="sdm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#sdm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Clarify</text><text class="d-s" x="70" y="84" text-anchor="middle">~5 min</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">API + models</text><text class="d-s" x="212" y="84" text-anchor="middle">~5 min</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Architecture</text><text class="d-s" x="352" y="84" text-anchor="middle">~10 min</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Deep dives</text><text class="d-s" x="497" y="84" text-anchor="middle">~15 min</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="12"/><text class="d-w" x="647" y="66" text-anchor="middle">Trade-offs</text><text class="d-w" x="647" y="84" text-anchor="middle">~5–10 min</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Talk through decisions out loud. The interviewer grades reasoning, not completeness.</text>
+  </svg>
+  <figcaption id="fig-sd-cap">Spend most time on deep dives the interviewer cares about. Ask which parts they'd like to explore.</figcaption>
+</figure>
+
+<h2 id="clarify">Step 1: Clarify</h2>
+<ul>
+  <li><strong>Functional:</strong> core features for this interview (for example: view feed, like, comment, post photo).</li>
+  <li><strong>Non-functional:</strong> offline support? Real-time? Scale (users, items per screen)? Low-end devices? Battery and data constraints?</li>
+  <li><strong>Out of scope:</strong> confirm what you'll skip (for example the ranking algorithm and server internals).</li>
+</ul>
+
+<h2 id="api">Step 2: API and data models</h2>
+<figure class="code"><figcaption><span class="file">Example: feed API sketch</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">GET  /feed?cursor={cursor}&amp;limit=20      → { items: [Post], nextCursor }
+POST /posts/{id}/like                    → { liked: true, likeCount }   (idempotent)
+POST /posts  (multipart: image + caption) → Post
+Post { id, author{id,name,avatarUrl}, imageUrl, caption, likeCount, likedByMe, createdAt }</code></pre></figure>
+<p>Mention cursor-based pagination (stable under inserts), idempotency for actions, and image URLs with size variants.</p>
+
+<h2 id="architecture">Step 3: Client architecture</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sd2-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-sd2-t fig-sd2-d">
+    <title id="fig-sd2-t">Client architecture for a feed app</title>
+    <desc id="fig-sd2-d">Compose UI observes a ViewModel with paged UI state. The repository uses a Paging RemoteMediator to load pages from the API into Room, the source of truth. Likes are written locally first and synced by WorkManager. An image loader with memory and disk cache fetches thumbnails. Push notifications trigger refreshes.</desc>
+    <rect class="d-blue" x="20" y="20" width="160" height="56" rx="10"/><text class="d-t" x="100" y="44" text-anchor="middle">Compose UI</text><text class="d-s" x="100" y="62" text-anchor="middle">LazyColumn + images</text>
+    <rect class="d-violet" x="220" y="20" width="160" height="56" rx="10"/><text class="d-t" x="300" y="44" text-anchor="middle">ViewModel</text><text class="d-s" x="300" y="62" text-anchor="middle">PagingData + actions</text>
+    <rect class="d-box" x="420" y="20" width="160" height="56" rx="10"/><text class="d-t" x="500" y="44" text-anchor="middle">FeedRepository</text><text class="d-s" x="500" y="62" text-anchor="middle">RemoteMediator</text>
+    <rect class="d-green" x="420" y="110" width="160" height="50" rx="10"/><text class="d-t" x="500" y="140" text-anchor="middle">Room (truth)</text>
+    <rect class="d-amber" x="600" y="20" width="110" height="56" rx="10"/><text class="d-t" x="655" y="52" text-anchor="middle">API</text>
+    <rect class="d-amber" x="220" y="110" width="160" height="50" rx="10"/><text class="d-s" x="300" y="140" text-anchor="middle">WorkManager sync</text>
+    <rect class="d-amber" x="20" y="110" width="160" height="50" rx="10"/><text class="d-s" x="100" y="140" text-anchor="middle">Image loader cache</text>
+    <rect class="d-box" x="600" y="110" width="110" height="50" rx="10"/><text class="d-s" x="655" y="140" text-anchor="middle">FCM push</text>
+    <path class="d-line" d="M180 48 H220 M380 48 H420 M580 48 H600 M500 76 V110 M380 135 H420 M100 76 V110 M655 110 V76"/>
+  </svg>
+  <figcaption id="fig-sd2-cap">A defensible baseline: offline-capable, paged, with optimistic actions and background sync.</figcaption>
+</figure>
+
+<h2 id="deep-dives">Step 4: Common deep dives</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Topic</th><th>Key points to discuss</th></tr></thead>
+  <tbody>
+    <tr><td>Pagination</td><td>Cursor vs offset, Paging 3 + RemoteMediator, prefetch distance, invalidation on refresh</td></tr>
+    <tr><td>Offline and sync</td><td>Local source of truth, pending-change outbox, WorkManager constraints, conflict policy</td></tr>
+    <tr><td>Optimistic updates</td><td>Write locally, show immediately, roll back on failure, idempotent APIs</td></tr>
+    <tr><td>Real-time</td><td>WebSocket while visible, FCM when backgrounded, catch-up via REST after reconnect</td></tr>
+    <tr><td>Images</td><td>Size variants, memory and disk cache, downsampling, placeholders, prefetching visible items</td></tr>
+    <tr><td>Uploads</td><td>Compress, resumable or chunked, WorkManager with progress notification, retries</td></tr>
+    <tr><td>Security</td><td>Token storage, TLS, server-side authorisation, Play Integrity for abuse-prone actions</td></tr>
+    <tr><td>Performance</td><td>Startup, list jank, memory on low-end devices, Baseline Profiles</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="examples">Worked example prompts</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design a chat app</h3><p>Local message store, send queue with states (sending, sent, failed), WebSocket while open, FCM otherwise, ordering with server IDs, attachments uploaded in the background.</p></div>
+  <div class="card usecase"><h3>Design an offline notes app with sync</h3><p>Room, client UUIDs, change log, periodic and on-change sync, last-write-wins or field merge, end-to-end encryption options.</p></div>
+  <div class="card usecase"><h3>Design an image gallery</h3><p>MediaStore or Photo Picker, paging thumbnails, memory budgets, decoding off the main thread, and large-screen layouts.</p></div>
+</div>
+
+<h2 id="tradeoffs">Step 5: Trade-offs to volunteer</h2>
+<ul>
+  <li>Consistency vs responsiveness (optimistic UI).</li>
+  <li>Real-time freshness vs battery and data.</li>
+  <li>Offline capability vs complexity and storage.</li>
+  <li>Modularization vs speed for a small team.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How much backend detail is expected?</summary><div><p>Mostly API contracts and client implications. Mention server concerns briefly (rate limits, idempotency), and stay focused on the client.</p></div></details>
+  <details><summary>Should I write code?</summary><div><p>Usually only small snippets or interfaces. Diagrams and clear explanations matter more.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Ace mobile system design by <strong>clarifying constraints</strong>, defining <strong>APIs and models</strong>, presenting a <strong>clear client architecture</strong>, going deep on <strong>offline, pagination, real-time and media</strong>, and volunteering <strong>trade-offs</strong>, all while thinking out loud.</p>
+<p>Next step: prepare the whole senior loop with <a href="../senior-android-developer-interview/index.html">How to Prepare for a Senior Android Developer Interview</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li><li><a href="https://developer.android.com/topic/architecture/data-layer/offline-first" target="_blank" rel="noopener">Offline-first data layer</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/paging/v3-overview" target="_blank" rel="noopener">Paging library</a></li><li><a href="https://developer.android.com/develop/background-work/background-tasks/persistent" target="_blank" rel="noopener">WorkManager</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-system-design-interview-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-system-design-interview-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Interviews reward developers who can explain why, not just how. Build the Kotlin, Compose and architecture depth that lets you discuss real trade-offs with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-architecture-interview-questions/index.html"><small>Android Interview Preparation and Career</small>Android Architecture Interview Questions</a></li><li><a href="../../android/offline-first-android-architecture/index.html"><small>APIs, Databases, and Backend Integration</small>Offline-First Android App Architecture</a></li><li><a href="../../android/websockets-vs-rest-android/index.html"><small>APIs, Databases, and Backend Integration</small>WebSockets vs REST APIs in Android</a></li><li><a href="../../android/senior-android-developer-interview/index.html"><small>Android Interview Preparation and Career</small>How to Prepare for a Senior Android Developer Interview</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-system-design-interview/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-system-design-interview/&amp;text=Android System Design Interview Questions" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-system-design-interview/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#framework">A framework for the interview</a></li><li><a href="#clarify">Step 1: Clarify</a></li><li><a href="#api">Step 2: API and data models</a></li><li><a href="#architecture">Step 3: Client architecture</a></li><li><a href="#deep-dives">Step 4: Common deep dives</a></li><li><a href="#examples">Worked example prompts</a></li><li><a href="#tradeoffs">Step 5: Trade-offs to volunteer</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-system-design-interview-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-system-design-interview-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

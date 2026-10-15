@@ -1,0 +1,144 @@
+<!--meta
+{
+  "seo_title": "Speech-to-Text and AI Voice Features on Android",
+  "description": "Add speech-to-text and voice features to Android apps: SpeechRecognizer and on-device recognition, ML Kit GenAI speech, cloud transcription, voice commands with AI, TTS and permissions.",
+  "primary_keyword": "speech to text android",
+  "keywords": ["android speechrecognizer kotlin", "on-device speech recognition android", "voice notes transcription", "text to speech android", "voice commands ai android", "record_audio permission"],
+  "lede": "Voice input is faster than typing for many users and essential for accessibility. Android offers platform speech recognition, on-device options, and cloud models that transcribe and understand. Here's how to add speech-to-text, AI-powered voice actions and text-to-speech responsibly.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-voice-notes-app-android", "ml-kit-genai-apis", "function-calling-ai-android", "android-permissions-privacy"],
+  "refs": [
+    ["SpeechRecognizer", "https://developer.android.com/reference/android/speech/SpeechRecognizer"],
+    ["ML Kit GenAI APIs (Speech Recognition)", "https://developers.google.com/ml-kit/genai"],
+    ["TextToSpeech", "https://developer.android.com/reference/android/speech/tts/TextToSpeech"],
+    ["Request runtime permissions", "https://developer.android.com/training/permissions/requesting"],
+    ["Firebase AI Logic: analyze audio", "https://firebase.google.com/docs/ai-logic/analyze-audio?platform=android"]
+  ]
+}
+-->
+<p class="ad-lead">Users dictate messages while walking, search hands-free in the kitchen, and record voice notes in meetings. Good voice features are fast, accurate in the user's language and accent, respectful of privacy, and always have a typing fallback.</p>
+
+<h2 id="options">Your options</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Option</th><th>Strengths</th><th>Limits</th></tr></thead>
+  <tbody>
+    <tr><td>Platform <code>SpeechRecognizer</code></td><td>Built in, streaming partial results, many languages; on-device recognition on newer Android versions</td><td>Short utterances; behaviour depends on the device's recognition service</td></tr>
+    <tr><td>ML Kit GenAI Speech Recognition</td><td>On-device transcription (alpha at the time of writing)</td><td>Device and mode support varies; alpha API</td></tr>
+    <tr><td>Cloud multimodal model (e.g. Gemini with audio input)</td><td>Transcribe <em>and</em> summarise, translate or extract in one step</td><td>Network, cost, privacy considerations</td></tr>
+    <tr><td>Dedicated cloud speech APIs</td><td>Long-form, diarization, specialised models</td><td>Backend integration and cost</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-vo-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-vo-t fig-vo-d">
+    <title id="fig-vo-t">Voice feature pipeline</title>
+    <desc id="fig-vo-d">The microphone captures audio after RECORD_AUDIO permission. Speech-to-text produces a transcript, shown live to the user. Optionally an AI model interprets the transcript into an intent or summary. The app confirms and performs the action, and text-to-speech can speak a response.</desc>
+    <defs><marker id="vom" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 70 H140 M270 70 H290 M430 70 H450 M580 70 H600" marker-end="url(#vom)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="110" height="60" rx="12"/><text class="d-t" x="65" y="66" text-anchor="middle">🎙 Mic</text><text class="d-s" x="65" y="84" text-anchor="middle">permission</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="144" y="40" width="126" height="60" rx="12"/><text class="d-t" x="207" y="66" text-anchor="middle">Speech-to-text</text><text class="d-s" x="207" y="84" text-anchor="middle">partial results</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="294" y="40" width="136" height="60" rx="12"/><text class="d-t" x="362" y="66" text-anchor="middle">AI (optional)</text><text class="d-s" x="362" y="84" text-anchor="middle">intent / summary</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="454" y="40" width="126" height="60" rx="12"/><text class="d-t" x="517" y="66" text-anchor="middle">Confirm + act</text><text class="d-s" x="517" y="84" text-anchor="middle">user in control</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="604" y="40" width="106" height="60" rx="12"/><text class="d-t" x="657" y="66" text-anchor="middle">🔊 TTS</text><text class="d-s" x="657" y="84" text-anchor="middle">optional</text></g>
+  </svg>
+  <figcaption id="fig-vo-cap">Show the transcript as it forms and confirm before acting. Speech recognition makes mistakes.</figcaption>
+</figure>
+
+<h2 id="platform">Platform SpeechRecognizer as a Flow</h2>
+<code-block lang="kotlin" file="SpeechInput.kt">
+sealed interface SpeechEvent {
+    data class Partial(val text: String) : SpeechEvent
+    data class Final(val text: String) : SpeechEvent
+    data class Error(val code: Int) : SpeechEvent
+}
+
+@RequiresPermission(Manifest.permission.RECORD_AUDIO)
+fun Context.listen(languageTag: String = Locale.getDefault().toLanguageTag()): Flow<SpeechEvent> = callbackFlow {
+    val recognizer =
+        if (Build.VERSION.SDK_INT >= 31 && SpeechRecognizer.isOnDeviceRecognitionAvailable(this@listen))
+            SpeechRecognizer.createOnDeviceSpeechRecognizer(this@listen)   // audio stays on device
+        else SpeechRecognizer.createSpeechRecognizer(this@listen)
+
+    recognizer.setRecognitionListener(object : RecognitionListener {
+        override fun onPartialResults(b: Bundle) {
+            b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let { trySend(SpeechEvent.Partial(it)) }
+        }
+        override fun onResults(b: Bundle) {
+            trySend(SpeechEvent.Final(b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty()))
+            close()
+        }
+        override fun onError(error: Int) { trySend(SpeechEvent.Error(error)); close() }
+        override fun onReadyForSpeech(p: Bundle?) {}
+        override fun onBeginningOfSpeech() {}
+        override fun onRmsChanged(rms: Float) {}
+        override fun onBufferReceived(b: ByteArray?) {}
+        override fun onEndOfSpeech() {}
+        override fun onEvent(t: Int, b: Bundle?) {}
+    })
+    recognizer.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageTag)            // e.g. "hi-IN", "en-IN"
+        putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+    })
+    awaitClose { recognizer.destroy() }
+}.flowOn(Dispatchers.Main)   // SpeechRecognizer must be used from the main thread
+</code-block>
+
+<h2 id="ai-actions">From transcript to action with AI</h2>
+<p>A transcript like "remind me to call the plumber tomorrow at 10" can be turned into a structured intent by a model, using structured output or function calling. See <a href="../function-calling-ai-android/index.html">Function Calling</a>.</p>
+<code-block lang="kotlin" file="Parse a voice command into a structured reminder">
+@Serializable data class ReminderIntent(val title: String, val dateTimeIso: String?)
+
+suspend fun parseReminder(model: GenerativeModel, transcript: String, nowIso: String): ReminderIntent? {
+    val response = model.generateContent(
+        "Current time: $nowIso. Extract a reminder from the user's words as JSON with fields " +
+        "title and dateTimeIso (ISO-8601, null if no time). User said: <said>$transcript</said>"
+    )
+    return runCatching { Json { ignoreUnknownKeys = true }.decodeFromString<ReminderIntent>(response.text.orEmpty()) }.getOrNull()
+}
+// Always show: "Create reminder 'Call the plumber' for tomorrow 10:00?" → user confirms.
+</code-block>
+
+<h2 id="tts">Speaking responses: TextToSpeech</h2>
+<code-block lang="kotlin" file="Speaker.kt">
+class Speaker(context: Context) : TextToSpeech.OnInitListener {
+    private val tts = TextToSpeech(context, this)
+    private var ready = false
+    override fun onInit(status: Int) { ready = status == TextToSpeech.SUCCESS }
+    fun say(text: String, locale: Locale = Locale.getDefault()) {
+        if (!ready) return
+        tts.language = locale
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "utt-${text.hashCode()}")
+    }
+    fun shutdown() = tts.shutdown()
+}
+</code-block>
+
+<h2 id="privacy">Permissions and privacy</h2>
+<ul>
+  <li>Request <code>RECORD_AUDIO</code> in context, when the user taps the mic, and explain why.</li>
+  <li>Show a clear recording indicator, and stop listening when the user leaves the screen.</li>
+  <li>Prefer on-device recognition for sensitive content. Disclose any cloud processing and retention.</li>
+  <li>Never record in the background without explicit, ongoing user awareness.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Dictation in forms</h3><p>Mic button on text fields, with partial results shown live and editable.</p></div>
+  <div class="card usecase"><h3>Voice notes</h3><p>Record, transcribe and summarise. See <a href="../ai-voice-notes-app-android/index.html">AI Voice-Notes App</a>.</p></div>
+  <div class="card usecase"><h3>Hands-free commands</h3><p>Transcribe, parse the intent, confirm, act, speak the result.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does SpeechRecognizer support Indian languages?</summary><div><p>Support depends on the recognition service and language packs on the device. Many devices support Hindi and other Indian languages. Test on target devices, and fall back to typing.</p></div></details>
+  <details><summary>Can I transcribe long recordings?</summary><div><p>SpeechRecognizer is designed for short utterances. For long recordings, record audio to a file and transcribe it with an on-device model or a cloud service.</p></div></details>
+  <details><summary>Is audio sent to Google?</summary><div><p>With on-device recognizers, audio is processed locally. Other recognition services or cloud APIs may send audio to servers, so check the service and disclose it to users.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Voice features combine <strong>speech-to-text</strong> (platform, on-device or cloud), optional <strong>AI interpretation</strong> into structured intents, <strong>confirmation</strong> before actions, and optional <strong>text-to-speech</strong>. Request the microphone in context, prefer on-device for privacy, and always keep a typing path.</p>
+<p>Next step: generate useful content with AI in <a href="../ai-generated-app-content-android/index.html">Using AI to Generate App Content Dynamically</a>.</p>

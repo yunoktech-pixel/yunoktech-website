@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Using AI to Generate App Content Dynamically | Yunok Tech</title>
+  <meta name="description" content="Generate Android app content with AI safely: structured JSON output, schema validation, server-side generation and caching, moderation, personalization limits, labelling and fallbacks.">
+  <meta name="keywords" content="ai generated content android app, dynamic content generation ai, structured output gemini kotlin, ai personalization mobile app, content moderation ai, server side ai generation, json schema llm android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-generated-app-content-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-generated-app-content-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Using AI to Generate App Content Dynamically">
+  <meta property="og:description" content="Generate Android app content with AI safely: structured JSON output, schema validation, server-side generation and caching, moderation, personalization limits, labelling and fallbacks.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Using AI to Generate App Content Dynamically">
+  <meta name="twitter:description" content="Generate Android app content with AI safely: structured JSON output, schema validation, server-side generation and caching, moderation, personalization limits, labelling and fallbacks.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Using AI to Generate App Content Dynamically", "description": "Generate Android app content with AI safely: structured JSON output, schema validation, server-side generation and caching, moderation, personalization limits, labelling and fallbacks.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "dynamic content generation ai, structured output gemini kotlin, ai personalization mobile app, content moderation ai, server side ai generation, json schema llm android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-generated-app-content-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Using AI to Generate App Content Dynamically", "item": "https://yunoktech.com/android/ai-generated-app-content-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Using AI to Generate App Content Dynamically</h1>
+    <p class="ad-lede">AI can generate quiz questions, product descriptions, workout plans, onboarding tips or personalised summaries inside your app. Doing it well means treating model output as untrusted data: structured, validated, moderated, cached and clearly labelled.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#pipeline">A safe generation pipeline</a></li><li><a href="#structured">Structured output instead of free text</a></li><li><a href="#where">Generate on the client or the server?</a></li><li><a href="#moderation">Moderation and policy</a></li><li><a href="#ux">Presenting generated content</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Static content doesn't adapt: the same tips for every user, the same practice questions every day. Generated content can adapt to a learner's level, a user's goals or a product's attributes. It can also be wrong, inappropriate, or inconsistent with your app's design, unless you engineer guardrails.</p>
+
+<h2 id="pipeline">A safe generation pipeline</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gc-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-gc-t fig-gc-d">
+    <title id="fig-gc-t">Pipeline for AI-generated app content</title>
+    <desc id="fig-gc-d">A request with context goes to a model with a JSON schema. The output is parsed and validated against business rules, then passed through moderation. Valid content is cached and rendered with an AI label; invalid output triggers a retry or a static fallback.</desc>
+    <defs><marker id="gcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 70 H140 M260 70 H280 M400 70 H420 M540 70 H560" marker-end="url(#gcm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="110" height="60" rx="12"/><text class="d-t" x="65" y="66" text-anchor="middle">Request</text><text class="d-s" x="65" y="84" text-anchor="middle">context</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="144" y="40" width="116" height="60" rx="12"/><text class="d-t" x="202" y="66" text-anchor="middle">Model</text><text class="d-s" x="202" y="84" text-anchor="middle">JSON schema</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="284" y="40" width="116" height="60" rx="12"/><text class="d-t" x="342" y="66" text-anchor="middle">Validate</text><text class="d-s" x="342" y="84" text-anchor="middle">rules</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="424" y="40" width="116" height="60" rx="12"/><text class="d-t" x="482" y="66" text-anchor="middle">Moderate</text><text class="d-s" x="482" y="84" text-anchor="middle">safety</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="564" y="40" width="146" height="60" rx="12"/><text class="d-t" x="637" y="66" text-anchor="middle">Cache + render</text><text class="d-s" x="637" y="84" text-anchor="middle">labelled</text></g>
+    <path class="d-dash" d="M342 100 V150 H202 V104" marker-end="url(#gcm)"/><text class="d-s" x="272" y="168" text-anchor="middle">invalid → retry once</text>
+    <path class="d-dash" d="M482 100 V150 H620"/><text class="d-s" x="560" y="168" text-anchor="middle">rejected → static fallback</text>
+  </svg>
+  <figcaption id="fig-gc-cap">Model output never goes straight to the screen. It passes validation and moderation first.</figcaption>
+</figure>
+
+<h2 id="structured">Structured output instead of free text</h2>
+<figure class="code"><figcaption><span class="file">QuizGenerator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">QuizQuestion</span>(<span class="tk-k">val</span> question: <span class="tk-t">String</span>, <span class="tk-k">val</span> options: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;, <span class="tk-k">val</span> correctIndex: <span class="tk-t">Int</span>, <span class="tk-k">val</span> explanation: <span class="tk-t">String</span>)
+
+<span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Quiz</span>(<span class="tk-k">val</span> topic: <span class="tk-t">String</span>, <span class="tk-k">val</span> questions: <span class="tk-t">List</span>&lt;<span class="tk-t">QuizQuestion</span>&gt;)
+
+<span class="tk-k">class</span> <span class="tk-t">QuizGenerator</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> model: <span class="tk-t">GenerativeModel</span>) {
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> generate(topic: <span class="tk-t">String</span>, level: <span class="tk-t">String</span>): <span class="tk-t">Quiz</span>? {
+        <span class="tk-k">val</span> prompt = <span class="tk-s">"""
+            Create 5 multiple-choice questions about "$topic" for a $level Android learner.
+            Each question: 4 options, exactly one correct (correctIndex 0-3), a one-sentence explanation.
+            Use only well-established facts; avoid version-specific numbers.
+        """</span>.trimIndent()
+        repeat(<span class="tk-n">2</span>) {                                         <span class="tk-c">// one retry on invalid output</span>
+            <span class="tk-k">val</span> raw = model.generateContent(prompt).text ?: <span class="tk-k">return</span><span class="tk-a">@repeat</span>
+            <span class="tk-k">val</span> quiz = runCatching { <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }.decodeFromString&lt;<span class="tk-t">Quiz</span>&gt;(raw) }.getOrNull()
+            <span class="tk-k">if</span> (quiz != <span class="tk-k">null</span> &amp;&amp; quiz.isValid()) <span class="tk-k">return</span> quiz
+        }
+        <span class="tk-k">return</span> <span class="tk-k">null</span>                                         <span class="tk-c">// caller shows curated fallback quiz</span>
+    }
+}
+
+<span class="tk-c">/** Business-rule validation the schema can't express. */</span>
+<span class="tk-k">fun</span> <span class="tk-t">Quiz</span>.isValid(): <span class="tk-t">Boolean</span> = questions.size == <span class="tk-n">5</span> &amp;&amp; questions.all { q -&gt;
+    q.options.size == <span class="tk-n">4</span> &amp;&amp; q.correctIndex <span class="tk-k">in</span> <span class="tk-n">0</span>..<span class="tk-n">3</span> &amp;&amp;
+    q.options.distinct().size == <span class="tk-n">4</span> &amp;&amp; q.question.length <span class="tk-k">in</span> <span class="tk-n">10</span>..<span class="tk-n">300</span>
+}</code></pre></figure>
+<p>Configure the model with <code>responseMimeType = "application/json"</code> and a <code>responseSchema</code> (see <a href="../ai-image-description-android/index.html">structured output example</a>) so it's constrained to your shape, then still validate rules such as distinct options.</p>
+
+<h2 id="where">Generate on the client or the server?</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Content</th><th>Where</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Shared by many users (product descriptions, daily tips)</td><td>Server, generated once, reviewed, cached</td><td>Cost, consistency, human review possible</td></tr>
+    <tr><td>Personalised, low-risk (practice questions for a user)</td><td>Client via Firebase AI Logic, or backend</td><td>Personalisation; validate and cache per user</td></tr>
+    <tr><td>Sensitive domains (health, finance)</td><td>Server with strict review, or don't generate</td><td>Accuracy and liability</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="moderation">Moderation and policy</h2>
+<ul>
+  <li>Use model safety settings and an additional moderation step for user-visible content.</li>
+  <li>Google Play's policies require apps with AI-generated content to prevent prohibited content and to provide ways for users to report offensive content. Review the current policy.</li>
+  <li>Avoid generating content about real people, or anything that could be mistaken for authoritative advice.</li>
+</ul>
+
+<h2 id="ux">Presenting generated content</h2>
+<ul>
+  <li>Label it ("Generated by AI"), and let users regenerate, report or hide it.</li>
+  <li>Keep a curated static fallback so the feature never shows an empty state.</li>
+  <li>Cache results so the same content doesn't change unexpectedly between visits.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Learning apps</h3><p>Practice questions adapted to level, validated and with explanations. See <a href="../ai-study-assistant-android/index.html">AI Study Assistant</a>.</p></div>
+  <div class="card usecase"><h3>E-commerce</h3><p>Server-generated product description drafts that merchants edit and approve.</p></div>
+  <div class="card usecase"><h3>Fitness</h3><p>Workout variations from a fixed, validated exercise catalogue, with the model choosing and ordering rather than inventing exercises.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Rendering raw model text with HTML or Markdown that can break the layout or inject links.</li>
+  <li>Trusting numbers, prices or facts generated by the model.</li>
+  <li>Generating per screen view instead of caching, which drives cost and inconsistency.</li>
+  <li>No reporting path for bad content.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I let the model invent quiz answers?</summary><div><p>Risky. Prefer grounding generation in your own verified content (RAG), and validate. See <a href="../rag-android-apps/index.html">RAG for Android Apps</a>.</p></div></details>
+  <details><summary>How do I keep a consistent style?</summary><div><p>Use a system instruction with style rules and examples, a low temperature, and a fixed schema, and evaluate samples regularly.</p></div></details>
+  <details><summary>Do I need to disclose AI-generated content?</summary><div><p>Labelling builds trust and may be required by platform policy or law in some contexts. Check current Play policy and local regulations.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Generated content is valuable when it's <strong>structured, validated, moderated, cached and labelled</strong>, with a static fallback. Generate shared content on the server, personalise carefully on the client, and never let raw model output reach users unchecked.</p>
+<p>Next step: make your app's content findable with <a href="../ai-powered-search-android/index.html">Build an AI-Powered Search Feature</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/generate-structured-output?platform=android" target="_blank" rel="noopener">Firebase AI Logic: structured output</a></li><li><a href="https://ai.google.dev/gemini-api/docs/structured-output" target="_blank" rel="noopener">Gemini API: structured output</a></li><li><a href="https://support.google.com/googleplay/android-developer/answer/13985936" target="_blank" rel="noopener">Google Play: AI-generated content policy</a></li><li><a href="https://pair.withgoogle.com/guidebook/" target="_blank" rel="noopener">People + AI Guidebook</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-generated-app-content-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-generated-app-content-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-study-assistant-android/index.html"><small>Android AI Projects and Production</small>Build an AI Study Assistant for Android</a></li><li><a href="../../android/secure-cloud-ai-api-android/index.html"><small>Android AI and Generative AI</small>Integrating Cloud AI APIs Securely in Android</a></li><li><a href="../../android/evaluate-ai-responses-hallucinations/index.html"><small>Android AI and Generative AI</small>Evaluating AI Responses and Reducing Hallucinations</a></li><li><a href="../../android/responsible-ai-ux-android/index.html"><small>Android AI Projects and Production</small>Responsible AI User Experience on Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-generated-app-content-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-generated-app-content-android/&amp;text=Using AI to Generate App Content Dynamically" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-generated-app-content-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#pipeline">A safe generation pipeline</a></li><li><a href="#structured">Structured output instead of free text</a></li><li><a href="#where">Generate on the client or the server?</a></li><li><a href="#moderation">Moderation and policy</a></li><li><a href="#ux">Presenting generated content</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-generated-app-content-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-generated-app-content-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

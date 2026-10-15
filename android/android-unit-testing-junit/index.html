@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit Testing in Android with JUnit (Kotlin Guide) | Yunok Tech</title>
+  <meta name="description" content="Start unit testing Android apps with JUnit and Kotlin: what to test, local vs instrumented tests, test structure, fakes vs mocks, assertions, parameterized tests and running in CI.">
+  <meta name="keywords" content="android unit testing junit, junit kotlin android, local unit tests android, android testing pyramid, fakes vs mocks, given when then test, gradle test android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-unit-testing-junit/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-unit-testing-junit/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Unit Testing in Android with JUnit (Kotlin Guide)">
+  <meta property="og:description" content="Start unit testing Android apps with JUnit and Kotlin: what to test, local vs instrumented tests, test structure, fakes vs mocks, assertions, parameterized tests and running in CI.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Unit Testing in Android with JUnit (Kotlin Guide)">
+  <meta name="twitter:description" content="Start unit testing Android apps with JUnit and Kotlin: what to test, local vs instrumented tests, test structure, fakes vs mocks, assertions, parameterized tests and running in CI.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Unit Testing in Android with JUnit", "description": "Start unit testing Android apps with JUnit and Kotlin: what to test, local vs instrumented tests, test structure, fakes vs mocks, assertions, parameterized tests and running in CI.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Testing, Debugging, and Performance", "keywords": "junit kotlin android, local unit tests android, android testing pyramid, fakes vs mocks, given when then test, gradle test android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-unit-testing-junit/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Unit Testing in Android with JUnit", "item": "https://yunoktech.com/android/android-unit-testing-junit/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Unit Testing in Android with JUnit</h1>
+    <p class="ad-lede">Unit tests are the cheapest, fastest safety net an Android app can have. They run on your computer in seconds and catch regressions before users do. This guide covers what to unit test, how to structure tests, and the habits that keep them valuable.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#pyramid">Where unit tests fit</a></li><li><a href="#what">What to unit test</a></li><li><a href="#setup">Setup</a></li><li><a href="#first">A well-structured test</a></li><li><a href="#doubles">Fakes, stubs and mocks</a></li><li><a href="#parameterized">Testing many cases</a></li><li><a href="#android-deps">When code touches Android classes</a></li><li><a href="#run">Running tests</a></li><li><a href="#use-cases">High-value tests</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Many Android developers skip tests because UI tests felt slow and flaky. Unit tests are different: they test plain Kotlin logic (ViewModels, mappers, validators, reducers) on the JVM, with no device needed. A few hundred of them run in seconds.</p>
+
+<h2 id="pyramid">Where unit tests fit</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-up-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-up-t fig-up-d">
+    <title id="fig-up-t">Android test types by speed and scope</title>
+    <desc id="fig-up-d">Local unit tests in src/test run on the JVM in milliseconds and are the majority. Instrumented tests in src/androidTest run on a device or emulator and cover integration and UI. End-to-end tests are fewest and slowest.</desc>
+    <polygon points="360,10 690,190 30,190" class="d-box"/>
+    <rect class="d-red" x="300" y="34" width="120" height="30" rx="6"/><text class="d-s" x="360" y="54" text-anchor="middle">E2E (few)</text>
+    <rect class="d-amber" x="215" y="80" width="290" height="36" rx="6"/><text class="d-s" x="360" y="103" text-anchor="middle">Instrumented: src/androidTest (device)</text>
+    <rect class="d-green" x="110" y="134" width="500" height="44" rx="6"/><text class="d-t" x="360" y="161" text-anchor="middle">Local unit tests: src/test (JVM, ms each)</text>
+  </svg>
+  <figcaption id="fig-up-cap">Most of your tests should be fast local unit tests. Keep device tests for what truly needs Android.</figcaption>
+</figure>
+
+<h2 id="what">What to unit test</h2>
+<ul>
+  <li><strong>ViewModels:</strong> state changes in response to events and data.</li>
+  <li><strong>Business logic:</strong> validators, calculators, use cases, reducers.</li>
+  <li><strong>Mappers:</strong> DTO to domain to UI conversions, especially edge cases.</li>
+  <li><strong>Repositories:</strong> caching and merging logic, with fake data sources.</li>
+</ul>
+<p>Don't unit test framework code (Room's SQL is better tested with an in-memory DB in instrumented tests) or trivial getters.</p>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    testImplementation(<span class="tk-s">"junit:junit:4.13.2"</span>)
+    testImplementation(<span class="tk-s">"org.jetbrains.kotlinx:kotlinx-coroutines-test:&lt;version&gt;"</span>)
+    testImplementation(<span class="tk-s">"com.google.truth:truth:&lt;version&gt;"</span>)       <span class="tk-c">// optional: readable assertions</span>
+}</code></pre></figure>
+
+<h2 id="first">A well-structured test</h2>
+<figure class="code"><figcaption><span class="file">src/main/.../PasswordValidator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">object</span> <span class="tk-t">PasswordValidator</span> {
+    <span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">Result</span> {
+        <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Valid</span> : <span class="tk-t">Result</span>
+        <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Invalid</span>(<span class="tk-k">val</span> reasons: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;) : <span class="tk-t">Result</span>
+    }
+
+    <span class="tk-k">fun</span> validate(password: <span class="tk-t">String</span>): <span class="tk-t">Result</span> {
+        <span class="tk-k">val</span> reasons = buildList {
+            <span class="tk-k">if</span> (password.length &lt; <span class="tk-n">8</span>) add(<span class="tk-s">"At least 8 characters"</span>)
+            <span class="tk-k">if</span> (password.none(<span class="tk-t">Char</span>::isDigit)) add(<span class="tk-s">"At least one number"</span>)
+            <span class="tk-k">if</span> (password.none(<span class="tk-t">Char</span>::isUpperCase)) add(<span class="tk-s">"At least one uppercase letter"</span>)
+        }
+        <span class="tk-k">return</span> <span class="tk-k">if</span> (reasons.isEmpty()) <span class="tk-t">Result</span>.<span class="tk-t">Valid</span> <span class="tk-k">else</span> <span class="tk-t">Result</span>.<span class="tk-t">Invalid</span>(reasons)
+    }
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">src/test/.../PasswordValidatorTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">PasswordValidatorTest</span> {
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `valid password passes`() {
+        assertEquals(<span class="tk-t">PasswordValidator</span>.<span class="tk-t">Result</span>.<span class="tk-t">Valid</span>, <span class="tk-t">PasswordValidator</span>.validate(<span class="tk-s">"Secure123"</span>))
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `short password without digits lists both reasons`() {
+        <span class="tk-c">// Given a short, letters-only password</span>
+        <span class="tk-k">val</span> password = <span class="tk-s">"Abc"</span>
+        <span class="tk-c">// When validated</span>
+        <span class="tk-k">val</span> result = <span class="tk-t">PasswordValidator</span>.validate(password)
+        <span class="tk-c">// Then both problems are reported</span>
+        assertEquals(
+            <span class="tk-t">PasswordValidator</span>.<span class="tk-t">Result</span>.<span class="tk-t">Invalid</span>(listOf(<span class="tk-s">"At least 8 characters"</span>, <span class="tk-s">"At least one number"</span>)),
+            result,
+        )
+    }
+}</code></pre></figure>
+<p>Backtick names describe behaviour in plain language, and the given/when/then structure keeps tests readable.</p>
+
+<h2 id="doubles">Fakes, stubs and mocks</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Double</th><th>What it is</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>Fake</td><td>A working lightweight implementation (in-memory repository)</td><td>Default choice for repositories and data sources</td></tr>
+    <tr><td>Stub</td><td>Returns canned values</td><td>Simple dependencies</td></tr>
+    <tr><td>Mock</td><td>Records and verifies calls (MockK, Mockito)</td><td>Verifying interactions such as "analytics logged once"</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Google's testing guidance favours fakes where practical. They make tests describe behaviour rather than implementation details. See <a href="../mockk-vs-mockito/index.html">MockK vs Mockito</a>.</p>
+
+<h2 id="parameterized">Testing many cases</h2>
+<figure class="code"><figcaption><span class="file">Table-driven test</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `formats durations`() {
+    <span class="tk-k">val</span> cases = mapOf(<span class="tk-n">0L</span> to <span class="tk-s">"0:00"</span>, <span class="tk-n">59L</span> to <span class="tk-s">"0:59"</span>, <span class="tk-n">61L</span> to <span class="tk-s">"1:01"</span>, <span class="tk-n">3_600L</span> to <span class="tk-s">"60:00"</span>)
+    cases.forEach { (seconds, expected) -&gt;
+        assertEquals(<span class="tk-s">"for $seconds s"</span>, expected, formatDuration(seconds))
+    }
+}</code></pre></figure>
+
+<h2 id="android-deps">When code touches Android classes</h2>
+<p>Local tests run on the JVM with a stub <code>android.jar</code>, so Android framework calls throw by default. Options:</p>
+<ul>
+  <li><strong>Design it away:</strong> keep logic in classes without Android dependencies (best).</li>
+  <li><strong>Inject abstractions:</strong> for example a <code>StringProvider</code> or <code>Clock</code> instead of <code>Context</code> or <code>System.currentTimeMillis()</code>.</li>
+  <li><strong>Robolectric:</strong> runs Android framework code on the JVM when you really need it.</li>
+</ul>
+
+<h2 id="run">Running tests</h2>
+<figure class="code"><figcaption><span class="file">Terminal</span><span class="lang">Shell</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-bash">./gradlew testDebugUnitTest                 <span class="tk-c"># all local unit tests for the debug variant</span>
+./gradlew :feature:cart:testDebugUnitTest   <span class="tk-c"># one module</span>
+<span class="tk-c"># HTML report: &lt;module&gt;/build/reports/tests/testDebugUnitTest/index.html</span></code></pre></figure>
+
+<h2 id="use-cases">High-value tests</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Money and dates</h3><p>Rounding, currency formatting, time zones. Bugs here are costly and easy to test.</p></div>
+  <div class="card usecase"><h3>State transitions</h3><p>Reducers and ViewModels: loading to success, error to retry.</p></div>
+  <div class="card usecase"><h3>Bug regressions</h3><p>Every fixed bug gets a test that would have caught it.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Testing implementation details (private methods, call order) so every refactor breaks tests.</li>
+  <li>Using real time, randomness or the network in unit tests.</li>
+  <li>Huge setup shared by unrelated tests. Prefer small builders and fakes.</li>
+  <li>No assertions, or assertions that can't fail.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>JUnit 4 or JUnit 5?</summary><div><p>Android's tooling and many AndroidX test libraries are built around JUnit 4, which is the simplest default. JUnit 5 can be used for local tests with additional setup.</p></div></details>
+  <details><summary>How much coverage should I aim for?</summary><div><p>Coverage is a weak target. Aim to cover business logic and state transitions thoroughly, and use coverage reports to find untested risky code.</p></div></details>
+  <details><summary>Can AI write my tests?</summary><div><p>AI tools can draft tests, but you must check that they assert meaningful behaviour. See <a href="../ai-unit-test-generation-android/index.html">AI-Assisted Unit Test Generation</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Unit tests are <strong>fast, cheap and high-value</strong> when they target logic: ViewModels, validators, mappers and use cases. Keep logic free of Android classes, prefer fakes, name tests by behaviour, and run them on every commit.</p>
+<p>Next step: test asynchronous code properly in <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels with Coroutines and Flow</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/testing/fundamentals" target="_blank" rel="noopener">Fundamentals of testing Android apps</a></li><li><a href="https://developer.android.com/training/testing/local-tests" target="_blank" rel="noopener">Build local unit tests</a></li><li><a href="https://developer.android.com/training/testing/fundamentals/test-doubles" target="_blank" rel="noopener">Use test doubles</a></li><li><a href="https://junit.org/junit4/" target="_blank" rel="noopener">JUnit 4</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-unit-testing-junit-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-unit-testing-junit-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li><li><a href="../../android/mockk-vs-mockito/index.html"><small>Testing, Debugging, and Performance</small>MockK vs Mockito for Kotlin Testing</a></li><li><a href="../../android/compose-ui-testing/index.html"><small>Testing, Debugging, and Performance</small>UI Testing in Jetpack Compose</a></li><li><a href="../../android/android-ci-cd-github-actions/index.html"><small>Testing, Debugging, and Performance</small>CI/CD for Android with GitHub Actions</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-unit-testing-junit/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-unit-testing-junit/&amp;text=Unit Testing in Android with JUnit" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-unit-testing-junit/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#pyramid">Where unit tests fit</a></li><li><a href="#what">What to unit test</a></li><li><a href="#setup">Setup</a></li><li><a href="#first">A well-structured test</a></li><li><a href="#doubles">Fakes, stubs and mocks</a></li><li><a href="#parameterized">Testing many cases</a></li><li><a href="#android-deps">When code touches Android classes</a></li><li><a href="#run">Running tests</a></li><li><a href="#use-cases">High-value tests</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-unit-testing-junit-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-unit-testing-junit-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

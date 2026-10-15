@@ -1,0 +1,145 @@
+<!--meta
+{
+  "seo_title": "Reducing Android App Startup Time (Practical Guide)",
+  "description": "Speed up Android app startup: cold, warm and hot starts, measuring TTID and TTFD, trimming Application.onCreate, App Startup library, lazy DI, Baseline Profiles and splash screens.",
+  "primary_keyword": "reduce android app startup time",
+  "keywords": ["android cold start optimization", "time to initial display", "reportFullyDrawn", "app startup library", "android splash screen api", "baseline profile startup"],
+  "lede": "Startup is your app's first impression, repeated every time a user opens it. Slow cold starts frustrate users and show up in Android vitals. This guide shows how to measure startup precisely and the changes that usually make the biggest difference.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["baseline-profiles-android", "android-app-performance-optimization", "how-android-app-works-internally", "android-studio-profiler-guide"],
+  "refs": [
+    ["App startup time", "https://developer.android.com/topic/performance/vitals/launch-time"],
+    ["App Startup library", "https://developer.android.com/topic/libraries/app-startup"],
+    ["Splash screens", "https://developer.android.com/develop/ui/views/launch/splash-screen"],
+    ["Inspect app performance with Macrobenchmark", "https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview"]
+  ]
+}
+-->
+<p class="ad-lead">Every SDK added "just one line" to <code>Application.onCreate()</code>. Two years later, cold start takes three seconds on mid-range phones. Startup regressions creep in silently, so you need measurement, a budget, and a few structural fixes.</p>
+
+<h2 id="types">Cold, warm and hot starts</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Type</th><th>What happens</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>Cold</td><td>Process created, Application and Activity created, first frame drawn</td><td>Highest: optimise this</td></tr>
+    <tr><td>Warm</td><td>Process exists, but the Activity is recreated</td><td>Medium</td></tr>
+    <tr><td>Hot</td><td>Activity brought to the foreground</td><td>Lowest</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="metrics">Metrics: TTID and TTFD</h2>
+<ul>
+  <li><strong>Time to Initial Display (TTID):</strong> until the first frame is drawn. Logcat prints it as "Displayed …".</li>
+  <li><strong>Time to Full Display (TTFD):</strong> until the content the user cares about is shown. Report it by calling <code>reportFullyDrawn()</code>, or with Compose's <code>ReportDrawnWhen</code>.</li>
+</ul>
+<code-block lang="kotlin" file="Report full display in Compose">
+@Composable
+fun HomeScreen(state: HomeUiState) {
+    ReportDrawnWhen { state is HomeUiState.Content }    // tells the system when real content is visible
+    // ...
+}
+</code-block>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-st2-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-st2-t fig-st2-d">
+    <title id="fig-st2-t">Cold start timeline with common delays</title>
+    <desc id="fig-st2-d">Cold start timeline: process start, Application onCreate where SDK initialisation often adds hundreds of milliseconds, Activity onCreate and the first composition, first frame marking time to initial display, then loading content marking time to full display.</desc>
+    <rect class="d-box" x="20" y="60" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="24" y="64" width="90" height="36" rx="6"/><text class="d-s" x="69" y="86" text-anchor="middle">process</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-red" x="118" y="64" width="220" height="36" rx="6"/><text class="d-s" x="228" y="86" text-anchor="middle">Application.onCreate (SDKs!)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="342" y="64" width="150" height="36" rx="6"/><text class="d-s" x="417" y="86" text-anchor="middle">Activity + compose</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="496" y="64" width="80" height="36" rx="6"/><text class="d-s" x="536" y="86" text-anchor="middle">1st frame</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="580" y="64" width="116" height="36" rx="6"/><text class="d-s" x="638" y="86" text-anchor="middle">content</text></g>
+    <path class="d-dash" d="M576 50 V114"/><text class="d-s" x="576" y="40" text-anchor="middle">TTID</text>
+    <path class="d-dash" d="M696 50 V114"/><text class="d-s" x="690" y="40" text-anchor="middle">TTFD</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">The red segment is usually the cheapest to shrink.</text>
+  </svg>
+  <figcaption id="fig-st2-cap">Profile a cold start once with a system trace and you'll usually find the biggest item immediately.</figcaption>
+</figure>
+
+<h2 id="measure">Measuring reliably</h2>
+<ul>
+  <li><strong>Macrobenchmark</strong> with <code>StartupTimingMetric</code> on a release-like build. See <a href="../android-app-performance-optimization/index.html">the performance guide</a> for code.</li>
+  <li><strong>System traces</strong> (Perfetto or the Android Studio Profiler) to see what runs during startup.</li>
+  <li><strong>Android vitals</strong> for real-user startup data.</li>
+</ul>
+
+<h2 id="fixes">The highest-impact fixes</h2>
+<h3 id="application">1. Slim down Application.onCreate()</h3>
+<code-block lang="kotlin" file="Defer non-critical initialisation">
+@HiltAndroidApp
+class App : Application() {
+    @Inject lateinit var crashReporting: CrashReporting          // keep: needed early
+    @Inject lateinit var analytics: dagger.Lazy<Analytics>        // defer: created on first use
+    @Inject lateinit var appScope: CoroutineScope                  // injected application scope
+
+    override fun onCreate() {
+        super.onCreate()
+        crashReporting.init()
+        appScope.launch(Dispatchers.Default) {
+            delay(1_000)                                          // after the first screen settles
+            analytics.get().init()
+            RemoteConfigWarmup.fetch()
+        }
+    }
+}
+</code-block>
+<p>Ask of every initialiser: <em>does the first screen need it?</em> If not, defer it, make it lazy, or initialise it on first use.</p>
+
+<h3 id="content-providers">2. Watch hidden initialisers</h3>
+<p>Some libraries initialise themselves through ContentProviders that run before <code>Application.onCreate()</code>. The <strong>App Startup</strong> library lets you consolidate initialisers into one provider, control dependencies between them, and disable automatic initialisation for libraries you want to start lazily.</p>
+
+<h3 id="baseline">3. Ship a Baseline Profile</h3>
+<p>Baseline Profiles pre-compile the code on your startup path. They're often one of the biggest single wins, especially for Compose apps. See <a href="../baseline-profiles-android/index.html">Baseline Profiles</a>.</p>
+
+<h3 id="first-screen">4. Make the first screen cheap</h3>
+<ul>
+  <li>Render cached data or a lightweight skeleton immediately. Load the rest asynchronously.</li>
+  <li>Avoid synchronous disk reads, such as large SharedPreferences, before the first frame.</li>
+  <li>Keep the first composition small. Defer heavy, below-the-fold UI.</li>
+</ul>
+
+<h3 id="splash">5. Use the SplashScreen API correctly</h3>
+<code-block lang="kotlin" file="Keep splash only while truly necessary">
+class MainActivity : ComponentActivity() {
+    private val viewModel: StartupViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        val splash = installSplashScreen()
+        super.onCreate(savedInstanceState)
+        // Keep the splash only until the minimum state (e.g. auth check from local storage) is ready
+        splash.setKeepOnScreenCondition { !viewModel.isReady.value }
+        setContent { AppRoot() }
+    }
+}
+</code-block>
+<p>Don't keep the splash visible for network calls or artificial delays. That only hides a slow start.</p>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>SDK diet</h3><p>Deferring analytics, ads and remote config initialisation often removes a large share of <code>Application.onCreate</code> time.</p></div>
+  <div class="card usecase"><h3>Baseline Profile</h3><p>A measurable startup improvement with little code change. Verify it with Macrobenchmark.</p></div>
+  <div class="card usecase"><h3>Lazy DI graph</h3><p><code>Lazy&lt;T&gt;</code> and providers stop the whole object graph being created at launch.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Measuring debug builds, or only on flagship phones.</li>
+  <li>Moving work to a background thread that the first screen then waits for anyway.</li>
+  <li>Blocking on network or remote config before showing anything.</li>
+  <li>No regression guard. Add a startup benchmark to CI.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What's a good cold start time?</summary><div><p>Faster is better, and Android vitals flags excessive startup times. Set a budget for your app on a mid-range device and track it over releases.</p></div></details>
+  <details><summary>Does Hilt slow startup?</summary><div><p>Hilt itself is fast (code generated at compile time), but eagerly creating many singletons can. Use lazy injection for non-critical dependencies.</p></div></details>
+  <details><summary>Should I use multidex or other old tricks?</summary><div><p>Modern minSdk levels support multidex natively. Focus on initialisation work and Baseline Profiles.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Faster startup comes from <strong>measuring cold starts on release builds</strong>, <strong>deferring everything the first screen doesn't need</strong>, <strong>controlling library initialisers</strong>, <strong>shipping a Baseline Profile</strong>, and keeping the first screen light, then guarding it with a benchmark.</p>
+<p>Next step: go deeper on the biggest single lever in <a href="../baseline-profiles-android/index.html">Baseline Profiles and App Performance</a>.</p>

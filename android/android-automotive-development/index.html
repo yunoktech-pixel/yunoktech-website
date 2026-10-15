@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Auto and Android Automotive OS Development | Yunok Tech</title>
+  <meta name="description" content="Build car apps for Android Auto and Android Automotive OS: supported app categories, Media3 media apps, messaging, the Car App Library templates for navigation, POI and more, driver distraction rules, and testing.">
+  <meta name="keywords" content="android automotive development, android auto app development, car app library templates, android automotive os apps, media app android auto, desktop head unit, driver distraction guidelines">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-automotive-development/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-automotive-development/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android Auto and Android Automotive OS Development">
+  <meta property="og:description" content="Build car apps for Android Auto and Android Automotive OS: supported app categories, Media3 media apps, messaging, the Car App Library templates for navigation, POI and more, driver distraction rules, and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Advanced Android Engineering and Emerging Technology">
+  <meta name="twitter:title" content="Android Auto and Android Automotive OS Development">
+  <meta name="twitter:description" content="Build car apps for Android Auto and Android Automotive OS: supported app categories, Media3 media apps, messaging, the Car App Library templates for navigation, POI and more, driver distraction rules, and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android Automotive Development", "description": "Build car apps for Android Auto and Android Automotive OS: supported app categories, Media3 media apps, messaging, the Car App Library templates for navigation, POI and more, driver distraction rules, and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Advanced Android Engineering and Emerging Technology", "keywords": "android auto app development, car app library templates, android automotive os apps, media app android auto, desktop head unit, driver distraction guidelines", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-automotive-development/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android Automotive Development", "item": "https://yunoktech.com/android/android-automotive-development/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#advanced">Advanced Android Engineering and Emerging Technology</a></nav>
+    <span class="ad-chip">⚙️ Advanced Android Engineering and Emerging Technology</span>
+    <h1 id="article-title">Android Automotive Development</h1>
+    <p class="ad-lede">In the car, safety comes first. You don't design free-form UI; you supply data and actions to templates the system renders safely. Here's how Android Auto and Android Automotive OS differ, which app categories are supported, and how to build for them.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#platforms">Two platforms, shared app models</a></li><li><a href="#categories">Supported app categories</a></li><li><a href="#media">Media apps with Media3</a></li><li><a href="#templates">Car App Library templates</a></li><li><a href="#safety">Driver distraction and quality</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">There are two car platforms. <strong>Android Auto</strong> projects your phone app onto the car's display. <strong>Android Automotive OS</strong> is Android running on the car itself, with apps installed directly. The same app architecture can target both.</p>
+
+<h2 id="platforms">Two platforms, shared app models</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-car-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-car-t fig-car-d">
+    <title id="fig-car-t">Android Auto versus Android Automotive OS</title>
+    <desc id="fig-car-d">With Android Auto, the app runs on the phone and the car display shows it. With Android Automotive OS, the app runs on the car's built-in Android system. Both use the same media and Car App Library models, and the system renders templates.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="20" width="320" height="120" rx="14"/><text class="d-t" x="180" y="50" text-anchor="middle">Android Auto</text><text class="d-s" x="180" y="78" text-anchor="middle">app runs on the phone</text><text class="d-s" x="180" y="100" text-anchor="middle">projected to car display</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="380" y="20" width="320" height="120" rx="14"/><text class="d-t" x="540" y="50" text-anchor="middle">Android Automotive OS</text><text class="d-s" x="540" y="78" text-anchor="middle">app runs on the car</text><text class="d-s" x="540" y="100" text-anchor="middle">installed from Play in the car</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="20" y="158" width="680" height="46" rx="12"/><text class="d-t" x="360" y="186" text-anchor="middle">Shared: Media (MediaSession) · messaging · Car App Library templates</text></g>
+  </svg>
+  <figcaption id="fig-car-cap">You supply content; the platform renders driver-safe UI.</figcaption>
+</figure>
+
+<h2 id="categories">Supported app categories</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>How you build it</th></tr></thead>
+  <tbody>
+    <tr><td>Media (music, podcasts, audiobooks)</td><td>A <code>MediaLibraryService</code> with Media3; the system builds the UI</td></tr>
+    <tr><td>Messaging</td><td>Notifications with MessagingStyle and reply/mark-read actions</td></tr>
+    <tr><td>Navigation, POI (parking, charging), IoT, weather and more</td><td>Car App Library templates</td></tr>
+    <tr><td>Video, games, browsers</td><td>Only in specific contexts on Automotive OS (for example while parked). Check the current docs.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Supported categories expand over time, so check the official overview before planning.</p>
+
+<h2 id="media">Media apps with Media3</h2>
+<figure class="code"><figcaption><span class="file">PlaybackService.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">PlaybackService</span> : <span class="tk-t">MediaLibraryService</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">var</span> session: <span class="tk-t">MediaLibrarySession</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreate() {
+        <span class="tk-k">super</span>.onCreate()
+        <span class="tk-k">val</span> player = <span class="tk-t">ExoPlayer</span>.<span class="tk-t">Builder</span>(<span class="tk-k">this</span>).build()
+        session = <span class="tk-t">MediaLibrarySession</span>.<span class="tk-t">Builder</span>(<span class="tk-k">this</span>, player, <span class="tk-t">LibraryCallback</span>()).build()
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onGetSession(controllerInfo: <span class="tk-t">MediaSession</span>.<span class="tk-t">ControllerInfo</span>) = session
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onDestroy() {
+        session?.run { player.release(); release() }
+        session = <span class="tk-k">null</span>
+        <span class="tk-k">super</span>.onDestroy()
+    }
+}
+<span class="tk-c">// LibraryCallback returns the browsable tree: root → categories → playable items.</span></code></pre></figure>
+<p>The same service powers your phone notification, Wear OS, Android Auto and Automotive OS media UIs.</p>
+
+<h2 id="templates">Car App Library templates</h2>
+<figure class="code"><figcaption><span class="file">Car App Library screen</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ChargersScreen</span>(carContext: <span class="tk-t">CarContext</span>) : <span class="tk-t">Screen</span>(carContext) {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onGetTemplate(): <span class="tk-t">Template</span> {
+        <span class="tk-k">val</span> list = <span class="tk-t">ItemList</span>.<span class="tk-t">Builder</span>()
+            .addItem(<span class="tk-t">Row</span>.<span class="tk-t">Builder</span>().setTitle(<span class="tk-s">"Station A"</span>).addText(<span class="tk-s">"2 km · 4 free"</span>).build())
+            .addItem(<span class="tk-t">Row</span>.<span class="tk-t">Builder</span>().setTitle(<span class="tk-s">"Station B"</span>).addText(<span class="tk-s">"5 km · 1 free"</span>).build())
+            .build()
+        <span class="tk-k">return</span> <span class="tk-t">ListTemplate</span>.<span class="tk-t">Builder</span>()
+            .setTitle(<span class="tk-s">"Nearby chargers"</span>)
+            .setSingleList(list)
+            .build()
+    }
+}
+<span class="tk-c">// Declared via a CarAppService with a category in the manifest.</span></code></pre></figure>
+<p>Templates enforce limits on list length, text and steps while driving. These limits are part of driver distraction safeguards.</p>
+
+<h2 id="safety">Driver distraction and quality</h2>
+<ul>
+  <li>Follow the car app quality guidelines. Apps are reviewed against them.</li>
+  <li>Keep tasks short, minimise text, and support voice where possible.</li>
+  <li>Don't show video or complex UI while driving.</li>
+</ul>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li><strong>Android Auto:</strong> the Desktop Head Unit (DHU) simulates the car screen on your computer.</li>
+  <li><strong>Android Automotive OS:</strong> Automotive emulator system images in Android Studio.</li>
+  <li>Test day and night modes, different screen sizes, and touch vs rotary input.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Podcast app</h3><p>One Media3 service, available on phone, car and watch.</p></div>
+  <div class="card usecase"><h3>EV charging</h3><p>POI templates listing nearby chargers with navigation hand-off.</p></div>
+  <div class="card usecase"><h3>Messaging</h3><p>Notifications read aloud with voice reply.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I build a custom UI for the car?</summary><div><p>For most categories, no. You use templates or system media UI. Some Automotive OS app types allow more, mainly while parked.</p></div></details>
+  <details><summary>Is one APK enough for phone and Auto?</summary><div><p>For Android Auto, yes: car support lives in your phone app. Automotive OS needs a build targeting the automotive form factor, often a separate module.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Car apps supply <strong>content and actions</strong>: media through <strong>Media3</strong>, messaging through notifications, and other categories through <strong>Car App Library templates</strong>, with driver safety guidelines and DHU and emulator testing.</p>
+<p>Next step: adapt to big screens with <a href="../large-screen-foldable-android/index.html">Large Screens and Foldables</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/cars" target="_blank" rel="noopener">Android for Cars overview</a></li><li><a href="https://developer.android.com/training/cars/apps" target="_blank" rel="noopener">Car App Library</a></li><li><a href="https://developer.android.com/training/cars/media" target="_blank" rel="noopener">Build media apps for cars</a></li><li><a href="https://developer.android.com/training/cars/testing" target="_blank" rel="noopener">Test Android apps for cars</a></li><li><a href="https://developer.android.com/docs/quality-guidelines/car-app-quality" target="_blank" rel="noopener">Car app quality guidelines</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-automotive-development-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-automotive-development-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/wear-os-app-development/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Wear OS App Development</a></li><li><a href="../../android/large-screen-foldable-android/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Large-Screen and Foldable Android Experiences</a></li><li><a href="../../android/android-app-components/index.html"><small>Android Development for Beginners</small>Android App Components: Activities, Services, and Receivers</a></li><li><a href="../../android/publish-android-app-google-play/index.html"><small>App Publishing, Monetization, and Product Development</small>How to Publish an Android App on Google Play</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-automotive-development/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-automotive-development/&amp;text=Android Automotive Development" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-automotive-development/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#platforms">Two platforms, shared app models</a></li><li><a href="#categories">Supported app categories</a></li><li><a href="#media">Media apps with Media3</a></li><li><a href="#templates">Car App Library templates</a></li><li><a href="#safety">Driver distraction and quality</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-automotive-development-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-automotive-development-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

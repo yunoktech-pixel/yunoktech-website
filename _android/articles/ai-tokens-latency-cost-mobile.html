@@ -1,0 +1,131 @@
+<!--meta
+{
+  "seo_title": "AI Tokens, Latency and Cost Optimization for Mobile",
+  "description": "Optimise AI features in mobile apps: how tokens drive cost, measuring time to first token, streaming, model tiering, prompt and history trimming, caching, rate limits, retries and budgets.",
+  "primary_keyword": "ai cost optimization mobile app",
+  "keywords": ["llm token cost", "reduce ai latency android", "time to first token", "context caching llm", "rate limits retries ai api", "model tiering llm"],
+  "lede": "AI features have a running cost per request and a latency users feel on every tap. Both are driven mostly by tokens: how many you send, how many you generate, and which model processes them. Here's how to measure and reduce them without hurting quality.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["choose-ai-model-android-app", "monitor-ai-latency-errors-costs", "streaming-ai-responses-compose", "ai-chatbot-jetpack-compose"],
+  "refs": [
+    ["Gemini API pricing", "https://ai.google.dev/gemini-api/docs/pricing"],
+    ["Gemini API: tokens", "https://ai.google.dev/gemini-api/docs/tokens"],
+    ["Gemini API: context caching", "https://ai.google.dev/gemini-api/docs/caching"],
+    ["Gemini API rate limits", "https://ai.google.dev/gemini-api/docs/rate-limits"],
+    ["Firebase AI Logic: count tokens", "https://firebase.google.com/docs/ai-logic/count-tokens?platform=android"]
+  ]
+}
+-->
+<p class="ad-lead">A chat feature costs almost nothing in testing with five users. At 50,000 daily users, each sending ten messages with growing conversation history, the bill becomes a product decision. Meanwhile, users judge the feature by how quickly the first words appear. Tokens connect both problems.</p>
+
+<h2 id="tokens">Tokens 101</h2>
+<ul>
+  <li>Models process text as <strong>tokens</strong>: chunks of characters. In English, a token averages a few characters. Other scripts, such as Hindi, may use more tokens per word.</li>
+  <li>You pay for <strong>input tokens</strong> (system instruction + context + history + user message) and <strong>output tokens</strong>, often at different rates.</li>
+  <li>Images, audio and documents also consume tokens.</li>
+  <li>Latency grows with input size (processing) and output length (generation).</li>
+</ul>
+<code-block lang="kotlin" file="Measure before optimising">
+val tokens = model.countTokens(prompt)              // Firebase AI Logic: count tokens for a request
+Log.d("AI", "input tokens=${tokens.totalTokens}")
+// Response usage metadata reports prompt/candidate token counts when available:
+// response.usageMetadata?.promptTokenCount, response.usageMetadata?.candidatesTokenCount
+</code-block>
+
+<h2 id="anatomy">Where the tokens go in a chat</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tk-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-tk-t fig-tk-d">
+    <title id="fig-tk-t">Token growth in multi-turn chat</title>
+    <desc id="fig-tk-d">Each turn resends the system instruction and the entire history. Bars for turns one to five grow longer as history accumulates, so input tokens per request grow over the conversation. Trimming or summarizing history caps the growth.</desc>
+    <text class="d-s" x="20" y="30">turn 1</text><g class="d-step" style="--i:0"><rect class="d-violet" x="80" y="18" width="60" height="18" rx="3"/><rect class="d-blue" x="140" y="18" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="60">turn 2</text><g class="d-step" style="--i:1"><rect class="d-violet" x="80" y="48" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="48" width="90" height="18" rx="3"/><rect class="d-blue" x="230" y="48" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="90">turn 3</text><g class="d-step" style="--i:2"><rect class="d-violet" x="80" y="78" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="78" width="180" height="18" rx="3"/><rect class="d-blue" x="320" y="78" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="120">turn 5</text><g class="d-step" style="--i:3"><rect class="d-violet" x="80" y="108" width="60" height="18" rx="3"/><rect class="d-amber" x="140" y="108" width="360" height="18" rx="3"/><rect class="d-blue" x="500" y="108" width="40" height="18" rx="3"/></g>
+    <text class="d-s" x="20" y="150">trimmed</text><g class="d-step" style="--i:4"><rect class="d-violet" x="80" y="138" width="60" height="18" rx="3"/><rect class="d-green" x="140" y="138" width="120" height="18" rx="3"/><rect class="d-blue" x="260" y="138" width="40" height="18" rx="3"/></g>
+    <rect class="d-violet" x="80" y="176" width="14" height="12"/><text class="d-s" x="100" y="186">system</text>
+    <rect class="d-amber" x="160" y="176" width="14" height="12"/><text class="d-s" x="180" y="186">history</text>
+    <rect class="d-blue" x="240" y="176" width="14" height="12"/><text class="d-s" x="260" y="186">new message</text>
+    <rect class="d-green" x="360" y="176" width="14" height="12"/><text class="d-s" x="380" y="186">summary + recent turns</text>
+  </svg>
+  <figcaption id="fig-tk-cap">In chat, history dominates input cost. Capping it is usually the single biggest saving.</figcaption>
+</figure>
+
+<h2 id="cost-levers">Cost levers, in order of impact</h2>
+<ol class="steps">
+  <li><strong>Model tiering:</strong> use the smallest model that passes your evaluation, such as a Flash-Lite-class model for classification, short rewrites and extraction, and reserve larger models for hard reasoning.</li>
+  <li><strong>Trim context:</strong> keep the last N turns, and summarise older ones into a short memory. Send only relevant retrieved passages, not whole documents.</li>
+  <li><strong>Cap output:</strong> set <code>maxOutputTokens</code>, and ask for concise formats ("3 bullets").</li>
+  <li><strong>Cache:</strong> deduplicate identical requests (hash of prompt version + input). Use provider-side context caching for large repeated prefixes where supported.</li>
+  <li><strong>Move work on-device:</strong> Gemini Nano for supported tasks and devices costs nothing per request.</li>
+  <li><strong>Avoid accidental calls:</strong> no AI on every keystroke, scroll or screen open without user intent.</li>
+</ol>
+
+<h2 id="latency">Latency: what users feel</h2>
+<ul>
+  <li><strong>Time to first token (TTFT)</strong> matters most for perceived speed. <strong>Stream</strong> responses so text appears immediately. See <a href="../streaming-ai-responses-compose/index.html">Streaming AI Responses in Compose</a>.</li>
+  <li>Smaller prompts and smaller models reduce TTFT.</li>
+  <li>Show progress states ("Thinking…") and allow cancelling.</li>
+  <li>Prefetch or precompute where the action is predictable, for example summaries of items the user is likely to open, but only within budget.</li>
+</ul>
+
+<h2 id="history">Trimming chat history</h2>
+<code-block lang="kotlin" file="HistoryTrimmer.kt">
+data class Turn(val role: String, val text: String)
+
+class HistoryTrimmer(private val maxTurns: Int = 10, private val maxChars: Int = 8_000) {
+    fun trim(history: List<Turn>, memorySummary: String?): List<Turn> {
+        val recent = history.takeLast(maxTurns).toMutableList()
+        // Drop oldest until under the character budget (rough token proxy)
+        while (recent.sumOf { it.text.length } > maxChars && recent.size > 2) recent.removeAt(0)
+        return buildList {
+            memorySummary?.let { add(Turn("user", "Summary of earlier conversation: $it")) }
+            addAll(recent)
+        }
+    }
+}
+</code-block>
+
+<h2 id="rate-limits">Rate limits and retries</h2>
+<code-block lang="kotlin" file="Retry only what's retryable">
+suspend fun <T> withAiRetry(maxAttempts: Int = 3, block: suspend () -> T): T {
+    var delayMs = 500L
+    repeat(maxAttempts - 1) {
+        try { return block() }
+        catch (e: Exception) {
+            if (e is CancellationException) throw e
+            val retryable = e is IOException || e is QuotaExceededException || e is ServerException
+            if (!retryable) throw e
+            delay(delayMs + Random.nextLong(0, 250))        // backoff + jitter
+            delayMs *= 2
+        }
+    }
+    return block()
+}
+</code-block>
+<p><code>QuotaExceededException</code> and <code>ServerException</code> are Firebase AI Logic types. Adapt the check to your SDK or backend errors. Don't retry invalid requests or safety blocks.</p>
+
+<h2 id="budget">Budgets and limits</h2>
+<ul>
+  <li>Per-user daily request or token caps (server-side, or at least client-side for Firebase setups).</li>
+  <li>Budget alerts in your cloud billing.</li>
+  <li>Track cost per feature and per active user. See <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI</a>.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Support chat</h3><p>A small model for intent classification, a larger model only for complex answers, history summarisation and cached FAQ answers.</p></div>
+  <div class="card usecase"><h3>Summaries</h3><p>A cache keyed by content hash and on-demand generation: the same article is never summarised twice.</p></div>
+  <div class="card usecase"><h3>Smart replies</h3><p>On-device where possible, with zero per-request cost and instant responses.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does a lower temperature reduce cost?</summary><div><p>No. Temperature affects randomness, not token count. Output length limits and concise instructions reduce cost.</p></div></details>
+  <details><summary>Are images expensive?</summary><div><p>They consume tokens depending on resolution and provider rules. Downscale images to what the task needs.</p></div></details>
+  <details><summary>How do I estimate monthly cost?</summary><div><p>Multiply requests per user × users × (input tokens × input price + output tokens × output price), using current provider pricing. See <a href="../choose-ai-model-android-app/index.html">Choosing an AI Model</a> for a Kotlin helper.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Tokens drive both <strong>cost and latency</strong>. Measure them, pick the <strong>smallest adequate model</strong>, <strong>trim history and context</strong>, <strong>cap outputs</strong>, <strong>cache</strong>, move suitable tasks <strong>on-device</strong>, <strong>stream</strong> for perceived speed, and enforce <strong>budgets and retries</strong> deliberately.</p>
+<p>Next step: get better results from fewer tokens with <a href="../prompt-engineering-android-developers/index.html">Prompt Engineering for Android Developers</a>.</p>

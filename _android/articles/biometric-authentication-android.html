@@ -1,0 +1,135 @@
+<!--meta
+{
+  "seo_title": "Biometric Authentication on Android with Kotlin",
+  "description": "Implement biometric authentication on Android with BiometricPrompt: checking availability, authenticator classes, crypto-bound authentication with Keystore, device credential fallback and UX.",
+  "primary_keyword": "biometric authentication android",
+  "keywords": ["biometricprompt kotlin", "fingerprint authentication android", "biometric_strong vs weak", "cryptoobject biometric", "device credential fallback", "app lock biometric"],
+  "lede": "Fingerprint and face unlock make sensitive actions both safer and faster. But a biometric prompt that just returns 'success' is weaker than most developers assume. This guide shows how to use BiometricPrompt correctly, including Keystore-bound authentication for real security.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["android-keystore-explained", "android-app-security-best-practices", "secure-token-storage-android", "firebase-authentication-android"],
+  "refs": [
+    ["Show a biometric authentication dialog", "https://developer.android.com/identity/sign-in/biometric-auth"],
+    ["androidx.biometric", "https://developer.android.com/jetpack/androidx/releases/biometric"],
+    ["Android Keystore: user authentication", "https://developer.android.com/privacy-and-security/keystore#UserAuthentication"],
+    ["Measuring biometric unlock security", "https://source.android.com/docs/security/features/biometric/measure"]
+  ]
+}
+-->
+<p class="ad-lead">Biometrics on Android don't send fingerprints or face data to your app. The system verifies the user and tells your app the result. How you use that result determines security: as a UI gate, or as the key that unlocks cryptographic operations.</p>
+
+<h2 id="levels">Two levels of biometric security</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bio-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-bio-t fig-bio-d">
+    <title id="fig-bio-t">Biometric gate versus crypto-bound authentication</title>
+    <desc id="fig-bio-d">Level one: BiometricPrompt returns success and the app shows the content; on a compromised device this boolean can be bypassed. Level two: BiometricPrompt authorises a CryptoObject wrapping a Keystore key that requires user authentication; only after successful authentication can the key decrypt data or sign a server challenge, so bypassing the UI does not unlock the key.</desc>
+    <defs><marker id="bim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">Level 1: UI gate</text>
+    <rect class="d-amber" x="20" y="34" width="170" height="50" rx="10"/><text class="d-s" x="105" y="64" text-anchor="middle">BiometricPrompt</text>
+    <path class="d-flow" d="M190 59 H246" marker-end="url(#bim)"/><text class="d-s" x="218" y="52" text-anchor="middle">success</text>
+    <rect class="d-box" x="250" y="34" width="170" height="50" rx="10"/><text class="d-s" x="335" y="64" text-anchor="middle">show content</text>
+    <text class="d-s" x="560" y="64" text-anchor="middle">bypassable on compromised devices</text>
+    <text class="d-t" x="20" y="122">Level 2: crypto-bound</text>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="134" width="170" height="56" rx="10"/><text class="d-s" x="105" y="158" text-anchor="middle">BiometricPrompt</text><text class="d-s" x="105" y="174" text-anchor="middle">+ CryptoObject</text></g>
+    <path class="d-flow" d="M190 162 H246" marker-end="url(#bim)"/><text class="d-s" x="218" y="154" text-anchor="middle">unlocks</text>
+    <g class="d-step" style="--i:1"><rect class="d-dark" x="250" y="134" width="170" height="56" rx="10"/><text class="d-w" x="335" y="158" text-anchor="middle">Keystore key</text><text class="d-w" x="335" y="174" text-anchor="middle">auth required</text></g>
+    <path class="d-flow" d="M420 162 H476" marker-end="url(#bim)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="480" y="134" width="220" height="56" rx="10"/><text class="d-s" x="590" y="158" text-anchor="middle">decrypt token /</text><text class="d-s" x="590" y="174" text-anchor="middle">sign server challenge</text></g>
+  </svg>
+  <figcaption id="fig-bio-cap">For anything valuable, bind authentication to a cryptographic operation that the server or the data itself depends on.</figcaption>
+</figure>
+
+<h2 id="setup">Setup and availability</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies { implementation("androidx.biometric:biometric:<version>") }
+</code-block>
+<code-block lang="kotlin" file="Check what's available">
+fun canUseStrongBiometrics(context: Context): Boolean =
+    BiometricManager.from(context)
+        .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+// Other results: BIOMETRIC_ERROR_NONE_ENROLLED (offer enrollment), NO_HARDWARE, HW_UNAVAILABLE…
+</code-block>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Authenticator</th><th>Meaning</th><th>Use with crypto?</th></tr></thead>
+  <tbody>
+    <tr><td><code>BIOMETRIC_STRONG</code></td><td>Class 3 biometrics (meet strong security requirements)</td><td>Yes</td></tr>
+    <tr><td><code>BIOMETRIC_WEAK</code></td><td>Class 2, including some face unlock implementations</td><td>No</td></tr>
+    <tr><td><code>DEVICE_CREDENTIAL</code></td><td>PIN, pattern, password</td><td>Yes, on newer Android versions</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="crypto">Crypto-bound authentication (recommended)</h2>
+<code-block lang="kotlin" file="BiometricVault.kt">
+class BiometricVault(private val activity: FragmentActivity) {
+    private val alias = "vault_key"
+
+    private fun key(): SecretKey {
+        val ks = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+        (ks.getKey(alias, null) as? SecretKey)?.let { return it }
+        val spec = KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setUserAuthenticationRequired(true)
+            .setUserAuthenticationParameters(0, KeyProperties.AUTH_BIOMETRIC_STRONG)   // every use
+            .setInvalidatedByBiometricEnrollment(true)
+            .build()
+        return KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore").apply { init(spec) }.generateKey()
+    }
+
+    /** Decrypts [data] (IV + ciphertext) only after a successful strong biometric. */
+    fun decrypt(data: ByteArray, onResult: (ByteArray?) -> Unit) {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding").apply {
+            init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, data.copyOfRange(0, 12)))
+        }
+        val prompt = BiometricPrompt(activity, ContextCompat.getMainExecutor(activity),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    val unlocked = result.cryptoObject?.cipher ?: return onResult(null)
+                    onResult(unlocked.doFinal(data, 12, data.size - 12))
+                }
+                override fun onAuthenticationError(code: Int, msg: CharSequence) = onResult(null)
+            })
+        prompt.authenticate(
+            BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Unlock your vault")
+                .setSubtitle("Confirm it's you")
+                .setNegativeButtonText("Cancel")
+                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                .build(),
+            BiometricPrompt.CryptoObject(cipher),
+        )
+    }
+}
+</code-block>
+<p>Encrypting works the same way: initialise the cipher in <code>ENCRYPT_MODE</code> and store <code>cipher.iv + ciphertext</code>. Handle <code>KeyPermanentlyInvalidatedException</code> when <code>init</code> runs: delete the key and ask the user to sign in again.</p>
+
+<h2 id="server">Server-verified biometric confirmation</h2>
+<p>For high-value actions such as payment confirmation, generate an auth-bound <strong>signing</strong> key pair, register the public key with your server, then sign a server-issued challenge after BiometricPrompt. The server verifies the signature, which proves both the device and the user's presence.</p>
+
+<h2 id="ux">UX guidelines</h2>
+<ul>
+  <li>Offer biometrics as an opt-in convenience after a normal sign-in, and explain what it protects.</li>
+  <li>Provide a fallback (device credential or password) for users without biometrics, or when it fails.</li>
+  <li>Don't prompt repeatedly. Use reasonable session timeouts for app-lock scenarios.</li>
+  <li>Never claim biometric data is stored by your app. It isn't, and saying so confuses users.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>App lock</h3><p>Crypto-bound unlock of locally encrypted data when opening a notes or finance app.</p></div>
+  <div class="card usecase"><h3>Confirm a transfer</h3><p>Biometric-signed challenge verified by the server.</p></div>
+  <div class="card usecase"><h3>Quick sign-in</h3><p>Decrypt a stored refresh token after biometric authentication. See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can my app access fingerprint images?</summary><div><p>No. Biometric data stays within secure hardware and the system. Apps receive only an authentication result.</p></div></details>
+  <details><summary>Does face unlock count as strong?</summary><div><p>It depends on the device implementation's class. Query <code>BIOMETRIC_STRONG</code> to know whether a strong method is available.</p></div></details>
+  <details><summary>Should biometrics replace passwords?</summary><div><p>Use biometrics to unlock locally stored credentials or confirm actions. Account recovery still needs another factor.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <code>BiometricPrompt</code> with <strong>BIOMETRIC_STRONG</strong> and a <strong>Keystore-bound CryptoObject</strong>, so authentication actually unlocks data or signs server challenges. Provide fallbacks, handle key invalidation, and keep biometrics as a convenient layer on top of solid account security.</p>
+<p>Next step: protect user data in AI features with <a href="../protect-user-data-ai-android-apps/index.html">Protecting User Data in AI-Powered Android Apps</a>.</p>

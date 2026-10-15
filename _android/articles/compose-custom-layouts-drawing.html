@@ -1,0 +1,154 @@
+<!--meta
+{
+  "seo_title": "Custom Layouts and Drawing in Jetpack Compose",
+  "description": "Build custom Compose layouts with Layout and the layout modifier, and draw with Canvas, drawBehind and drawWithCache: measurement constraints, a flow layout, a ring chart and accessibility.",
+  "primary_keyword": "compose custom layout",
+  "keywords": ["compose Layout composable", "compose canvas drawing", "drawWithCache", "compose measure constraints", "custom chart compose", "compose semantics custom component"],
+  "lede": "Row, Column and Box cover most screens, but sooner or later you need a chart, a tag cloud or a timeline that no built-in component draws. Compose makes custom layout and drawing far simpler than custom Views. Here's how measurement works, plus two complete examples.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-performance-optimization", "composable-functions-explained", "compose-animations-beginners", "android-privacy-accessibility-reliability"],
+  "refs": [
+    ["Custom layouts", "https://developer.android.com/develop/ui/compose/layouts/custom"],
+    ["Graphics in Compose", "https://developer.android.com/develop/ui/compose/graphics/draw/overview"],
+    ["Graphics modifiers", "https://developer.android.com/develop/ui/compose/graphics/draw/modifiers"],
+    ["Semantics in Compose", "https://developer.android.com/develop/ui/compose/accessibility/semantics"]
+  ]
+}
+-->
+<p class="ad-lead">With Views, a custom component meant subclassing View, overriding <code>onMeasure</code>, <code>onLayout</code> and <code>onDraw</code>, and declaring XML attributes. In Compose, layout is one function that measures children and places them, and drawing is a lambda with a canvas.</p>
+
+<h2 id="model">How Compose layout works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ly-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-ly-t fig-ly-d">
+    <title id="fig-ly-t">Compose single-pass layout: constraints down, sizes up, then placement</title>
+    <desc id="fig-ly-d">A parent passes constraints, minimum and maximum width and height, down to each child. Each child measures itself and returns a size. The parent decides its own size and places each child at a position.</desc>
+    <defs><marker id="lym" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="270" y="10" width="180" height="44" rx="10"/><text class="d-t" x="360" y="37" text-anchor="middle">Parent layout</text></g>
+    <path class="d-flow" d="M320 54 L170 112" marker-end="url(#lym)"/><text class="d-s" x="200" y="78">1. constraints ↓</text>
+    <path class="d-dash" d="M190 116 L340 58" marker-end="url(#lym)"/><text class="d-s" x="300" y="104">2. size ↑</text>
+    <path class="d-flow" d="M400 54 L550 112" marker-end="url(#lym)"/><text class="d-s" x="490" y="78">3. place(x, y)</text>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="90" y="116" width="160" height="50" rx="10"/><text class="d-t" x="170" y="146" text-anchor="middle">Child A</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="470" y="116" width="160" height="50" rx="10"/><text class="d-t" x="550" y="146" text-anchor="middle">Child B</text></g>
+  </svg>
+  <figcaption id="fig-ly-cap">Each child is measured once per layout pass, which is why Compose avoids the exponential cost of nested View measurement.</figcaption>
+</figure>
+
+<h2 id="flow-layout">Example 1: A simple wrapping tag layout</h2>
+<p>Compose already provides <code>FlowRow</code> for this. Building a simplified version yourself is the best way to learn the <code>Layout</code> API:</p>
+<code-block lang="kotlin" file="TagWrapLayout.kt">
+@Composable
+fun TagWrapLayout(
+    modifier: Modifier = Modifier,
+    horizontalGap: Dp = 8.dp,
+    verticalGap: Dp = 8.dp,
+    content: @Composable () -> Unit,
+) {
+    Layout(content = content, modifier = modifier) { measurables, constraints ->
+        val hGap = horizontalGap.roundToPx()
+        val vGap = verticalGap.roundToPx()
+        // Children may be any width up to ours; never force a minimum on them.
+        val childConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val placeables = measurables.map { it.measure(childConstraints) }
+
+        // Compute positions row by row.
+        val positions = ArrayList<IntOffset>(placeables.size)
+        var x = 0; var y = 0; var rowHeight = 0
+        placeables.forEach { p ->
+            if (x > 0 && x + p.width > constraints.maxWidth) {   // wrap to next row
+                x = 0; y += rowHeight + vGap; rowHeight = 0
+            }
+            positions += IntOffset(x, y)
+            x += p.width + hGap
+            rowHeight = maxOf(rowHeight, p.height)
+        }
+        val height = (y + rowHeight).coerceIn(constraints.minHeight, constraints.maxHeight)
+
+        layout(width = constraints.maxWidth, height = height) {
+            placeables.forEachIndexed { i, p -> p.place(positions[i]) }
+        }
+    }
+}
+</code-block>
+<p>This assumes a bounded maximum width, which is the normal case inside a screen. Inside a horizontally scrolling parent, <code>maxWidth</code> would be infinite, and you'd need to handle that.</p>
+
+<h2 id="layout-modifier">The layout modifier for a single element</h2>
+<code-block lang="kotlin" file="Baseline-to-top padding">
+fun Modifier.firstBaselineToTop(distance: Dp) = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val baseline = placeable[FirstBaseline]
+    check(baseline != AlignmentLine.Unspecified)
+    val y = distance.roundToPx() - baseline
+    layout(placeable.width, placeable.height + y) { placeable.placeRelative(0, y) }
+}
+</code-block>
+
+<h2 id="drawing">Drawing: Canvas, drawBehind and drawWithCache</h2>
+<ul>
+  <li><strong><code>Canvas(modifier) { … }</code></strong>: a composable that is purely a drawing surface.</li>
+  <li><strong><code>Modifier.drawBehind</code></strong>: draw behind a composable's content, for example custom backgrounds.</li>
+  <li><strong><code>Modifier.drawWithCache</code></strong>: create objects (paths, brushes) once and reuse them until the size or state changes.</li>
+</ul>
+
+<h2 id="ring-chart">Example 2: An accessible progress ring chart</h2>
+<code-block lang="kotlin" file="ProgressRing.kt">
+@Composable
+fun ProgressRing(
+    progress: Float,                  // 0f..1f
+    label: String,
+    modifier: Modifier = Modifier,
+    strokeWidth: Dp = 12.dp,
+    trackColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    progressColor: Color = MaterialTheme.colorScheme.primary,
+) {
+    val animated by animateFloatAsState(progress.coerceIn(0f, 1f), label = "ring")
+    Box(
+        modifier = modifier
+            .size(120.dp)
+            .semantics(mergeDescendants = true) {
+                contentDescription = "$label: ${(progress * 100).roundToInt()} percent"
+                progressBarRangeInfo = ProgressBarRangeInfo(progress, 0f..1f)
+            }
+            .drawWithCache {
+                val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
+                val inset = stroke.width / 2
+                val arcSize = Size(size.width - stroke.width, size.height - stroke.width)
+                onDrawBehind {
+                    drawArc(trackColor, 0f, 360f, false, Offset(inset, inset), arcSize, style = stroke)
+                    drawArc(progressColor, -90f, 360f * animated, false, Offset(inset, inset), arcSize, style = stroke)
+                }
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Text("${(animated * 100).roundToInt()}%", style = MaterialTheme.typography.titleLarge)
+    }
+}
+</code-block>
+<p>Because <code>animated</code> is read inside the draw lambda, each animation frame only redraws, with no recomposition of the ring. The <code>semantics</code> block makes the chart understandable to TalkBack users, which custom drawing would otherwise lose.</p>
+
+<h2 id="use-cases">When to go custom</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Charts and gauges</h3><p>Lightweight bar, line or ring charts drawn with Canvas, avoiding a heavy charting library for simple needs.</p></div>
+  <div class="card usecase"><h3>Special arrangements</h3><p>Timelines, staggered badges and overlapping avatars that Row and Column can't express cleanly.</p></div>
+  <div class="card usecase"><h3>Decorations</h3><p>Dashed borders, gradient strokes and ticket notches with <code>drawBehind</code> or custom <code>Shape</code>s.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Measuring a child twice in one layout pass, which isn't allowed. Use intrinsic measurements or <code>SubcomposeLayout</code> if you truly need it.</li>
+  <li>Allocating Paths and Brushes in <code>drawBehind</code> every frame. Use <code>drawWithCache</code>.</li>
+  <li>Ignoring constraints, for example returning a size larger than <code>maxWidth</code>.</li>
+  <li>Forgetting semantics, which makes custom components invisible to screen readers.</li>
+  <li>Ignoring right-to-left layouts. Use <code>placeRelative</code> for direction-aware placement.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>When should I use SubcomposeLayout?</summary><div><p>When a child's content depends on another child's measured size, as in <code>BoxWithConstraints</code> or some table layouts. It's more expensive, so prefer <code>Layout</code> when possible.</p></div></details>
+  <details><summary>Can I use Android's Canvas APIs?</summary><div><p>Yes, via <code>drawIntoCanvas { it.nativeCanvas }</code> for things like advanced text drawing, though Compose's DrawScope covers most needs.</p></div></details>
+  <details><summary>How do I handle touches on a custom drawing?</summary><div><p>Use <code>Modifier.pointerInput</code> with gesture detectors such as <code>detectTapGestures</code>, and map touch positions to your drawn shapes.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Custom Compose components come down to two tools: <strong><code>Layout</code></strong> (constraints down, sizes up, then place) and <strong>drawing modifiers</strong> (<code>Canvas</code>, <code>drawBehind</code>, <code>drawWithCache</code>). Read animated state in the draw phase, cache drawing objects, and always add semantics.</p>
+<p>Next step: lock in your UI's correctness with <a href="../compose-ui-screenshot-testing/index.html">Compose UI Testing and Screenshot Testing</a>.</p>

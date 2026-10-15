@@ -1,0 +1,96 @@
+<!--meta
+{
+  "seo_title": "AI Coding Assistants for Android: A Practical Comparison",
+  "description": "Compare AI coding assistants for Android development: IDE-integrated assistants, agentic coding tools and chat models, by Android awareness, context, privacy, workflow fit and verification needs.",
+  "primary_keyword": "ai coding assistants android",
+  "keywords": ["best ai coding assistant android studio", "gemini android studio vs copilot", "agentic coding tools", "ai pair programming kotlin", "ai code assistant privacy", "android studio ai plugins"],
+  "lede": "There are now many AI coding tools that work with Android projects: assistants built into Android Studio, general IDE plugins, terminal-based coding agents and chat apps. Rather than ranking products that change monthly, this guide compares the categories and the criteria that matter for Android work.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["gemini-in-android-studio", "verify-ai-generated-android-code", "ai-agents-android-development", "better-prompts-ai-coding-tools"],
+  "refs": [
+    ["Gemini in Android Studio", "https://developer.android.com/studio/gemini/overview"],
+    ["Android Studio plugins", "https://developer.android.com/studio/intro/studio-config#plugins"],
+    ["Configure AI context sharing (.aiexclude)", "https://developer.android.com/studio/gemini/aiexclude"],
+    ["Model Context Protocol", "https://modelcontextprotocol.io/"]
+  ]
+}
+-->
+<p class="ad-lead">Choosing an AI coding assistant by marketing claims is a mistake. Choose by fit: does it understand Android projects, can it see the right context, does it respect your company's data rules, and does it make verifying its output easy? The landscape changes quickly, but these criteria don't.</p>
+
+<h2 id="categories">Categories of AI coding tools</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ct-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ct-t fig-ct-d">
+    <title id="fig-ct-t">Categories of AI coding tools</title>
+    <desc id="fig-ct-d">Four categories: Android-native IDE assistants such as Gemini in Android Studio; general IDE plugins and completion tools; agentic coding tools that plan and edit across files and run commands; and general chat assistants used outside the IDE. Moving from left to right, autonomy and scope increase, and so does the need for careful review.</desc>
+    <rect class="d-green" x="20" y="30" width="160" height="120" rx="12"/><text class="d-t" x="100" y="60" text-anchor="middle">Android-native</text><text class="d-s" x="100" y="84" text-anchor="middle">Gemini in</text><text class="d-s" x="100" y="100" text-anchor="middle">Android Studio</text>
+    <rect class="d-blue" x="196" y="30" width="160" height="120" rx="12"/><text class="d-t" x="276" y="60" text-anchor="middle">IDE plugins</text><text class="d-s" x="276" y="84" text-anchor="middle">completion, chat</text><text class="d-s" x="276" y="100" text-anchor="middle">in the editor</text>
+    <rect class="d-violet" x="372" y="30" width="160" height="120" rx="12"/><text class="d-t" x="452" y="60" text-anchor="middle">Coding agents</text><text class="d-s" x="452" y="84" text-anchor="middle">multi-file edits,</text><text class="d-s" x="452" y="100" text-anchor="middle">run builds/tests</text>
+    <rect class="d-amber" x="548" y="30" width="152" height="120" rx="12"/><text class="d-t" x="624" y="60" text-anchor="middle">Chat assistants</text><text class="d-s" x="624" y="84" text-anchor="middle">explain, design,</text><text class="d-s" x="624" y="100" text-anchor="middle">outside the IDE</text>
+    <path class="d-flow" d="M40 175 H690"/><text class="d-s" x="360" y="194" text-anchor="middle">more autonomy and scope → more review needed</text>
+  </svg>
+  <figcaption id="fig-ct-cap">Most developers combine categories: completion while typing, chat for explanations, agents for well-scoped multi-step tasks.</figcaption>
+</figure>
+
+<h2 id="criteria">Evaluation criteria for Android work</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Criterion</th><th>Why it matters on Android</th><th>How to test</th></tr></thead>
+  <tbody>
+    <tr><td>Android awareness</td><td>Gradle, AGP versions, manifest, lifecycle and Compose specifics trip up generic tools</td><td>Ask it to fix a real Gradle sync error and add a Compose screen in your style</td></tr>
+    <tr><td>Project context</td><td>Good suggestions need your modules, conventions and dependencies</td><td>Check whether it reads multiple files, rules files (e.g. AGENTS.md) and version catalogs</td></tr>
+    <tr><td>Tool integration</td><td>Builds, tests, Logcat, crash data</td><td>Can it run Gradle tasks, read build output, or access App Quality Insights?</td></tr>
+    <tr><td>Privacy and policy</td><td>Company code and customer data</td><td>Context exclusion (.aiexclude), data retention, enterprise terms</td></tr>
+    <tr><td>Reviewability</td><td>You must verify every change</td><td>Does it show diffs, explain reasoning, and keep changes small?</td></tr>
+    <tr><td>Cost and limits</td><td>Daily usage on large projects</td><td>Free tier limits, per-seat or per-token costs</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="trial">Run a fair trial in your codebase</h2>
+<ol class="steps">
+  <li><strong>Pick five representative tasks</strong>: fix a build error, add a Compose screen, write ViewModel tests, refactor a Java class to Kotlin, explain a crash.</li>
+  <li><strong>Give each tool the same prompts and context</strong> (rules file, relevant files).</li>
+  <li><strong>Score</strong> correctness (builds and tests pass), idiomatic code, adherence to conventions, review time, and how many corrections you needed.</li>
+  <li><strong>Check data handling</strong> with your security or legal team before rolling out.</li>
+</ol>
+
+<h2 id="setup">Getting the most from any assistant</h2>
+<code-block lang="text" file="AGENTS.md / rules file excerpt that improves Android output">
+- Kotlin + Jetpack Compose + Material 3; no new XML layouts.
+- Dependencies only via gradle/libs.versions.toml; never hard-code versions in build files.
+- ViewModels expose StateFlow<UiState>; use viewModelScope; inject dispatchers.
+- Tests: JUnit4 + kotlinx-coroutines-test + fakes in src/test.
+- Never add API keys or secrets to source; never disable TLS or R8.
+</code-block>
+<ul>
+  <li>Keep tasks small, and ask for a plan before code for anything non-trivial.</li>
+  <li>Attach the exact error output and relevant files.</li>
+  <li>Exclude secrets and sensitive directories from AI context.</li>
+</ul>
+
+<h2 id="use-cases">Which category for which job</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Daily coding</h3><p>Inline completion and chat in the IDE, ideally with Android-specific awareness.</p></div>
+  <div class="card usecase"><h3>Repetitive multi-file changes</h3><p>Agentic tools: dependency upgrades, mechanical migrations, test scaffolding, with diff review.</p></div>
+  <div class="card usecase"><h3>Learning and design</h3><p>Chat assistants for explanations, trade-off discussions and architecture sketches.</p></div>
+</div>
+
+<h2 id="risks">Risks to manage</h2>
+<ul>
+  <li>Outdated or invented APIs and dependency versions. Verify against official docs.</li>
+  <li>Subtle lifecycle, threading and security bugs. See <a href="../verify-ai-generated-android-code/index.html">How to Verify AI-Generated Code</a>.</li>
+  <li>Licence and provenance concerns for large generated snippets. Follow your organisation's policy.</li>
+  <li>Skill atrophy for juniors. Use AI to explain, not just to produce.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Which assistant is best for Android?</summary><div><p>It depends on your stack, policies and workflow, and the products change quickly. Gemini in Android Studio has the deepest Android integration. Run the five-task trial above with your shortlist.</p></div></details>
+  <details><summary>Can I use several tools at once?</summary><div><p>Yes, many developers do, but share the same rules file across them, and avoid conflicting suggestions in the same session.</p></div></details>
+  <details><summary>Do AI tools make code review unnecessary?</summary><div><p>No. They increase the volume of code, which makes careful review more important. See <a href="../ai-code-review-android/index.html">AI Code Review</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Evaluate AI coding assistants by <strong>Android awareness, project context, tool integration, privacy and reviewability</strong>, with a fair trial on your own tasks. Combine categories deliberately, configure project rules, and keep verification non-negotiable.</p>
+<p>Next step: try a high-leverage workflow in <a href="../generate-compose-ui-with-ai/index.html">How to Generate Jetpack Compose UI with AI</a>.</p>

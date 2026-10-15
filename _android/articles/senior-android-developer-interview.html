@@ -1,0 +1,91 @@
+<!--meta
+{
+  "seo_title": "How to Prepare for a Senior Android Developer Interview",
+  "description": "Prepare for senior Android interviews: what seniority means, the typical loop (coding, system design, architecture, behavioural), a study plan, story preparation and signals interviewers look for.",
+  "primary_keyword": "senior android developer interview",
+  "keywords": ["senior android interview preparation", "android tech lead interview", "behavioral interview android", "star method engineering", "senior android skills", "android interview study plan"],
+  "lede": "Senior Android interviews test more than technical depth. They assess judgement, ownership, influence and the ability to make teams and codebases better. Here's what to expect in the loop, and a structured plan to prepare for each part.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["android-system-design-interview", "android-architecture-interview-questions", "android-developer-junior-to-senior", "kotlin-interview-questions-experienced"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["App performance guide", "https://developer.android.com/topic/performance/overview"],
+    ["Google engineering practices", "https://google.github.io/eng-practices/"]
+  ]
+}
+-->
+<p class="ad-lead">A mid-level developer delivers features well. A senior developer also decides <em>how</em> features should be built, foresees problems, raises the quality of others' work, and handles ambiguity. Interviews are designed to find evidence of those behaviours.</p>
+
+<h2 id="signals">What interviewers look for</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sr-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sr-t fig-sr-d">
+    <title id="fig-sr-t">Senior Android interview signals</title>
+    <desc id="fig-sr-d">Five signal areas: technical depth in Android and Kotlin, system and architecture design, quality and performance ownership, influence such as mentoring and code review, and handling ambiguity and trade-offs with product partners.</desc>
+    <rect class="d-violet" x="10" y="30" width="132" height="130" rx="12"/><text class="d-t" x="76" y="62" text-anchor="middle">Depth</text><text class="d-s" x="76" y="88" text-anchor="middle">Android, Kotlin,</text><text class="d-s" x="76" y="104" text-anchor="middle">internals</text>
+    <rect class="d-blue" x="152" y="30" width="132" height="130" rx="12"/><text class="d-t" x="218" y="62" text-anchor="middle">Design</text><text class="d-s" x="218" y="88" text-anchor="middle">architecture,</text><text class="d-s" x="218" y="104" text-anchor="middle">system design</text>
+    <rect class="d-green" x="294" y="30" width="132" height="130" rx="12"/><text class="d-t" x="360" y="62" text-anchor="middle">Ownership</text><text class="d-s" x="360" y="88" text-anchor="middle">quality, perf,</text><text class="d-s" x="360" y="104" text-anchor="middle">incidents</text>
+    <rect class="d-amber" x="436" y="30" width="132" height="130" rx="12"/><text class="d-t" x="502" y="62" text-anchor="middle">Influence</text><text class="d-s" x="502" y="88" text-anchor="middle">mentoring,</text><text class="d-s" x="502" y="104" text-anchor="middle">reviews, docs</text>
+    <rect class="d-red" x="578" y="30" width="132" height="130" rx="12"/><text class="d-t" x="644" y="62" text-anchor="middle">Judgement</text><text class="d-s" x="644" y="88" text-anchor="middle">ambiguity,</text><text class="d-s" x="644" y="104" text-anchor="middle">trade-offs</text>
+  </svg>
+  <figcaption id="fig-sr-cap">Technical depth gets you in. Ownership, influence and judgement distinguish senior candidates.</figcaption>
+</figure>
+
+<h2 id="loop">The typical interview loop</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Round</th><th>What it tests</th><th>How to prepare</th></tr></thead>
+  <tbody>
+    <tr><td>Coding (DS&amp;A or practical Android)</td><td>Problem solving, clean Kotlin</td><td>Practise medium problems in Kotlin and small Android features. See <a href="../android-coding-interview-problems/index.html">Coding Problems</a></td></tr>
+    <tr><td>Android deep dive</td><td>Lifecycle, coroutines, Compose, performance, memory</td><td><a href="../android-interview-questions/index.html">Top 50 questions</a>, <a href="../coroutines-flow-interview-questions/index.html">Coroutines questions</a></td></tr>
+    <tr><td>Mobile system design</td><td>Structured design, trade-offs</td><td><a href="../android-system-design-interview/index.html">System design guide</a>; practise 4–5 prompts aloud</td></tr>
+    <tr><td>Architecture / code review</td><td>Spotting issues, proposing improvements</td><td>Review real PRs critically; know common anti-patterns</td></tr>
+    <tr><td>Behavioural</td><td>Ownership, collaboration, conflict, impact</td><td>Prepare 8–10 stories with outcomes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stories">Preparing behavioural stories</h2>
+<p>Use a simple structure (situation, task, action, result) and focus on <em>your</em> decisions and measurable outcomes. Prepare stories for:</p>
+<ul>
+  <li>A technical decision you drove, and its trade-offs.</li>
+  <li>A production incident you handled, and what changed afterwards.</li>
+  <li>Improving performance or stability (with numbers if you have them).</li>
+  <li>Mentoring someone, or raising code-review standards.</li>
+  <li>Disagreeing with a product or engineering decision.</li>
+  <li>A failure, and what you learned from it.</li>
+</ul>
+<div class="tip"><b>Use real outcomes</b><p>"Reduced cold start from X to Y on mid-range devices by deferring SDK initialisation and adding a Baseline Profile" is far stronger than "improved performance". Use honest numbers you can explain.</p></div>
+
+<h2 id="plan">A 4-week preparation plan</h2>
+<ol class="steps">
+  <li><strong>Week 1:</strong> fundamentals refresh: lifecycle, process death, coroutines, Flow, Compose state and effects.</li>
+  <li><strong>Week 2:</strong> architecture and system design: practise three designs aloud (feed, chat, offline notes).</li>
+  <li><strong>Week 3:</strong> performance, testing and security deep dives; coding practice in Kotlin.</li>
+  <li><strong>Week 4:</strong> behavioural stories, mock interviews, review weak areas.</li>
+</ol>
+
+<h2 id="questions">Questions to ask them</h2>
+<ul>
+  <li>How are architecture decisions made and documented?</li>
+  <li>What's the state of testing, CI and release process?</li>
+  <li>How do Android engineers collaborate with product, design and backend?</li>
+  <li>What does success look like for this role in six months?</li>
+</ul>
+
+<h2 id="use-cases">Common pitfalls</h2>
+<div class="cards">
+  <div class="card cons"><h4>Only "we"</h4><p>Describe your specific contributions, not just the team's.</p></div>
+  <div class="card cons"><h4>Dogmatic answers</h4><p>"Always Clean Architecture" signals inexperience. Talk about context.</p></div>
+  <div class="card cons"><h4>No trade-offs</h4><p>Every senior decision has costs. Name them.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How many years make someone "senior"?</summary><div><p>Titles vary by company. Interviews look for behaviours (ownership, judgement, influence) more than years.</p></div></details>
+  <details><summary>Will AI tools come up?</summary><div><p>Increasingly: how you use AI coding tools responsibly, and how you'd add AI features safely. See <a href="../ai-changing-android-developer-work/index.html">AI and Android Work</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Prepare for senior Android interviews across <strong>depth, design, ownership, influence and judgement</strong>: refresh fundamentals, practise system design aloud, sharpen coding, and prepare honest stories with real outcomes.</p>
+<p>Next step: map your growth with <a href="../android-developer-junior-to-senior/index.html">Android Developer Roadmap: Junior to Senior</a>.</p>

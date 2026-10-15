@@ -1,0 +1,102 @@
+<!--meta
+{
+  "seo_title": "Android App Monetization: Ads vs In-App Purchases",
+  "description": "Choose how to monetize an Android app: ads, in-app purchases, subscriptions or hybrid. Compare revenue drivers, user experience, policy requirements, implementation effort and India-specific considerations.",
+  "primary_keyword": "android app monetization ads vs in app purchases",
+  "keywords": ["admob vs in app purchase", "android subscription model", "freemium android app", "google play billing policy", "rewarded ads android", "app monetization india"],
+  "lede": "Ads monetise attention, and purchases monetise value. The right model depends on how often people use your app, what they'd pay for, and the experience you want to protect. Here's a practical comparison, including policy rules that limit your options.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["android-subscription-billing", "solo-android-developer-launch", "android-analytics-crash-reporting", "improve-android-app-ratings"],
+  "refs": [
+    ["Google Play Billing overview", "https://developer.android.com/google/play/billing"],
+    ["Play Payments policy", "https://support.google.com/googleplay/android-developer/answer/9858738"],
+    ["Google AdMob for Android", "https://developers.google.com/admob/android/quick-start"],
+    ["Play Families policy (ads to children)", "https://support.google.com/googleplay/android-developer/answer/9893335"]
+  ]
+}
+-->
+<p class="ad-lead">Many first-time app makers add banner ads by default and earn very little while damaging the experience. Others put everything behind a paywall and get few installs. Monetisation works when the model matches how users get value from the app.</p>
+
+<h2 id="models">The main models</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Model</th><th>Earns from</th><th>Fits</th><th>Watch out for</th></tr></thead>
+  <tbody>
+    <tr><td>Ads (banner, interstitial, rewarded, native)</td><td>Impressions and clicks; revenue per user is usually small</td><td>High-frequency, broad-audience apps (utilities, casual games, content)</td><td>UX damage, ad policy violations, privacy disclosures</td></tr>
+    <tr><td>One-time purchases</td><td>Unlocks (pro version, packs)</td><td>Tools with clear premium features</td><td>One-off revenue; needs ongoing new users</td></tr>
+    <tr><td>Subscriptions</td><td>Recurring access</td><td>Ongoing value: content, cloud sync, services</td><td>Must deliver continuous value; churn</td></tr>
+    <tr><td>Hybrid</td><td>Ads for free users, plus a purchase to remove ads or unlock features</td><td>Many consumer apps</td><td>Balance so the free tier stays usable</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-mon-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-mon-t fig-mon-d">
+    <title id="fig-mon-t">Choosing a monetization model by usage and value</title>
+    <desc id="fig-mon-d">A two by two grid. High usage frequency and low willingness to pay: ads, especially rewarded or native. High usage and high willingness to pay: subscription or hybrid. Low usage and high willingness to pay: one-time purchase. Low usage and low willingness to pay: reconsider the model or keep it free as a funnel for another product.</desc>
+    <line class="d-line" x1="360" y1="20" x2="360" y2="200"/><line class="d-line" x1="40" y1="110" x2="700" y2="110"/>
+    <text class="d-s" x="200" y="14" text-anchor="middle">low willingness to pay</text><text class="d-s" x="530" y="14" text-anchor="middle">high willingness to pay</text>
+    <text class="d-s" x="22" y="70" text-anchor="middle" transform="rotate(-90 22 70)">frequent use</text>
+    <text class="d-s" x="22" y="160" text-anchor="middle" transform="rotate(-90 22 160)">occasional use</text>
+    <rect class="d-amber" x="60" y="30" width="280" height="70" rx="10"/><text class="d-t" x="200" y="62" text-anchor="middle">Ads</text><text class="d-s" x="200" y="82" text-anchor="middle">rewarded / native, light</text>
+    <rect class="d-green" x="380" y="30" width="300" height="70" rx="10"/><text class="d-t" x="530" y="62" text-anchor="middle">Subscription / hybrid</text><text class="d-s" x="530" y="82" text-anchor="middle">ongoing value</text>
+    <rect class="d-box" x="60" y="120" width="280" height="70" rx="10"/><text class="d-t" x="200" y="152" text-anchor="middle">Rethink</text><text class="d-s" x="200" y="172" text-anchor="middle">free funnel / services</text>
+    <rect class="d-blue" x="380" y="120" width="300" height="70" rx="10"/><text class="d-t" x="530" y="152" text-anchor="middle">One-time purchase</text><text class="d-s" x="530" y="172" text-anchor="middle">pro unlock / packs</text>
+  </svg>
+  <figcaption id="fig-mon-cap">Usage frequency drives ad potential. Perceived ongoing value drives subscription potential.</figcaption>
+</figure>
+
+<h2 id="ads">Ads done right</h2>
+<ul>
+  <li><strong>Rewarded ads</strong> (the user chooses to watch for a benefit) are less intrusive and often perform well.</li>
+  <li><strong>Native ads</strong> blend with content when clearly labelled.</li>
+  <li><strong>Interstitials</strong> only at natural breaks, never on launch, during input or repeatedly.</li>
+  <li>Follow ad network and Play policies: no accidental-click layouts, correct handling of child-directed audiences, and consent where required.</li>
+  <li>Account for ad SDKs in your Data safety form and privacy policy, and measure their startup and size cost.</li>
+</ul>
+
+<h2 id="iap">In-app purchases</h2>
+<p>For digital goods and features consumed in the app, Google Play's Payments policy generally requires <strong>Google Play Billing</strong> (with specific exceptions and regional programmes such as user choice billing in some countries). Physical goods and real-world services, such as food delivery or rides, use other payment methods. Check the current policy for your category and region.</p>
+<code-block lang="kotlin" file="Entitlement check (conceptual)">
+// Keep entitlement logic server-verified for anything valuable.
+data class Entitlements(val adsRemoved: Boolean, val proFeatures: Boolean)
+
+@Composable
+fun AdSlot(entitlements: Entitlements) {
+    if (!entitlements.adsRemoved) NativeAdCard()      // free tier
+}
+</code-block>
+<p>Implementation details are covered in <a href="../android-subscription-billing/index.html">Subscription Billing in Android Apps</a>.</p>
+
+<h2 id="india">Considerations for Indian audiences</h2>
+<ul>
+  <li>Price sensitivity is high, so regional pricing and smaller price points (weekly plans, low-cost unlocks) can matter.</li>
+  <li>Many users are on entry-level devices, so heavy ad SDKs hurt performance more.</li>
+  <li>UPI and local payment methods are available through Google Play Billing in supported cases. Check current Play payment options.</li>
+</ul>
+
+<h2 id="metrics">Metrics to track</h2>
+<ul>
+  <li>Revenue per daily active user, conversion to paid, churn, and refund rate.</li>
+  <li>Retention before and after adding ads. Ads that reduce retention may cost more than they earn.</li>
+  <li>Ratings and reviews mentioning ads or pricing.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Wallpaper app</h3><p>Frequent, light use: native and rewarded ads, plus a one-time "remove ads" purchase.</p></div>
+  <div class="card usecase"><h3>Notes app with sync</h3><p>Free local notes, with a subscription for cloud sync and AI features (ongoing server costs).</p></div>
+  <div class="card usecase"><h3>Exam prep app</h3><p>A free sample of tests, with subscriptions for full access during the exam season.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How much can I earn from ads?</summary><div><p>It varies enormously by country, category, format and engagement. Estimate from your own test data rather than generic averages.</p></div></details>
+  <details><summary>Can I accept payments via my own gateway?</summary><div><p>For digital goods inside the app, Play's Payments policy generally requires Play Billing, with defined exceptions and regional programmes. Physical goods and services can use other payment methods.</p></div></details>
+  <details><summary>Should a new app monetise from day one?</summary><div><p>Often it's better to validate retention first, while designing the monetisation model early so you don't surprise users later.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Match monetisation to <strong>usage frequency and perceived value</strong>: light ads for frequent, low-value use, <strong>one-time purchases</strong> for clear upgrades, <strong>subscriptions</strong> for ongoing value, or a hybrid. Respect policies and UX, and measure the effect on retention.</p>
+<p>Next step: implement recurring revenue with <a href="../android-subscription-billing/index.html">Subscription Billing in Android Apps</a>.</p>

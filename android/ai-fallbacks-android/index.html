@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fallbacks When AI Is Unavailable in Android Apps | Yunok Tech</title>
+  <meta name="description" content="Design graceful fallbacks for AI features in Android apps: failure types, timeouts, retries with backoff, model and provider fallback chains, cached results, non-AI alternatives, kill switches and UX for failures.">
+  <meta name="keywords" content="ai fallback android, llm fallback strategy, ai error handling android, gemini rate limit 429 android, remote config kill switch ai, graceful degradation mobile, ai timeout retry kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-fallbacks-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-fallbacks-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Fallbacks When AI Is Unavailable in Android Apps">
+  <meta property="og:description" content="Design graceful fallbacks for AI features in Android apps: failure types, timeouts, retries with backoff, model and provider fallback chains, cached results, non-AI alternatives, kill switches and UX for failures.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Fallbacks When AI Is Unavailable in Android Apps">
+  <meta name="twitter:description" content="Design graceful fallbacks for AI features in Android apps: failure types, timeouts, retries with backoff, model and provider fallback chains, cached results, non-AI alternatives, kill switches and UX for failures.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Fallbacks When AI Is Unavailable", "description": "Design graceful fallbacks for AI features in Android apps: failure types, timeouts, retries with backoff, model and provider fallback chains, cached results, non-AI alternatives, kill switches and UX for failures.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "llm fallback strategy, ai error handling android, gemini rate limit 429 android, remote config kill switch ai, graceful degradation mobile, ai timeout retry kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-fallbacks-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Fallbacks When AI Is Unavailable", "item": "https://yunoktech.com/android/ai-fallbacks-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Fallbacks When AI Is Unavailable</h1>
+    <p class="ad-lede">AI services fail in more ways than typical APIs: rate limits, quota exhaustion, safety blocks, slow responses, unsupported devices, model deprecations. An AI feature without fallbacks becomes a broken feature on a bad day. Here's how to degrade gracefully.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#failures">Failure types</a></li><li><a href="#chain">A fallback chain</a></li><li><a href="#code">Implementing it</a></li><li><a href="#killswitch">Kill switches and remote config</a></li><li><a href="#ux">Failure UX</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">The core of your app should never depend on an AI call succeeding. Design every AI feature with a plan for when the model is slow, refuses, errors or isn't available, and make that plan visible to users in a helpful way.</p>
+
+<h2 id="failures">Failure types</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Failure</th><th>Typical signal</th><th>Good response</th></tr></thead>
+  <tbody>
+    <tr><td>Offline / network error</td><td>IOException</td><td>On-device tier, queue, or offline message</td></tr>
+    <tr><td>Rate limited</td><td>429</td><td>Backoff and retry once; then explain</td></tr>
+    <tr><td>Quota exhausted</td><td>Quota error / your backend's code</td><td>Explain limit; offer non-AI path</td></tr>
+    <tr><td>Slow response</td><td>Timeout</td><td>Cancel, offer retry or smaller model</td></tr>
+    <tr><td>Safety block / refusal</td><td>Blocked finish reason</td><td>Neutral message; let user rephrase</td></tr>
+    <tr><td>Invalid output</td><td>JSON parse / validation fails</td><td>Retry once; then fallback</td></tr>
+    <tr><td>Unsupported device</td><td>Feature status UNAVAILABLE</td><td>Cloud tier or hide feature</td></tr>
+    <tr><td>Model deprecated</td><td>404 / model not found</td><td>Remote-config model name; alerting</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="chain">A fallback chain</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fb-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-fb-t fig-fb-d">
+    <title id="fig-fb-t">AI fallback chain</title>
+    <desc id="fig-fb-d">Try the primary model with a timeout. On a retryable failure, retry once with backoff. If that fails, try a cheaper or on-device model. If that fails, return a cached result if one exists. Otherwise show the non-AI experience with a clear message.</desc>
+    <defs><marker id="fbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 80 H158 M280 80 H298 M420 80 H438 M560 80 H578" marker-end="url(#fbm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="50" width="130" height="60" rx="12"/><text class="d-t" x="75" y="76" text-anchor="middle">Primary</text><text class="d-s" x="75" y="94" text-anchor="middle">+ timeout</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="160" y="50" width="120" height="60" rx="12"/><text class="d-t" x="220" y="76" text-anchor="middle">Retry</text><text class="d-s" x="220" y="94" text-anchor="middle">once, backoff</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="300" y="50" width="120" height="60" rx="12"/><text class="d-t" x="360" y="76" text-anchor="middle">Secondary</text><text class="d-s" x="360" y="94" text-anchor="middle">model/tier</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="440" y="50" width="120" height="60" rx="12"/><text class="d-t" x="500" y="76" text-anchor="middle">Cache</text><text class="d-s" x="500" y="94" text-anchor="middle">if available</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="580" y="50" width="130" height="60" rx="12"/><text class="d-w" x="645" y="76" text-anchor="middle">Non-AI</text><text class="d-w" x="645" y="94" text-anchor="middle">experience</text></g>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Not every failure should walk the whole chain: safety blocks shouldn't be retried elsewhere.</text>
+  </svg>
+  <figcaption id="fig-fb-cap">Decide per failure type which steps make sense.</figcaption>
+</figure>
+
+<h2 id="code">Implementing it</h2>
+<figure class="code"><figcaption><span class="file">ResilientSummarizer.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">AiOutcome</span>&lt;<span class="tk-k">out</span> <span class="tk-t">T</span>&gt; {
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Ok</span>&lt;<span class="tk-t">T</span>&gt;(<span class="tk-k">val</span> <span class="tk-k">value</span>: <span class="tk-t">T</span>, <span class="tk-k">val</span> source: <span class="tk-t">String</span>) : <span class="tk-t">AiOutcome</span>&lt;<span class="tk-t">T</span>&gt;
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Unavailable</span>(<span class="tk-k">val</span> reason: <span class="tk-t">Reason</span>) : <span class="tk-t">AiOutcome</span>&lt;<span class="tk-t">Nothing</span>&gt;
+    <span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">Reason</span> { <span class="tk-t">OFFLINE</span>, <span class="tk-t">LIMITED</span>, <span class="tk-t">BLOCKED</span>, <span class="tk-t">FAILED</span> }
+}
+
+<span class="tk-k">class</span> <span class="tk-t">ResilientSummarizer</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> primary: <span class="tk-t">Summarizer</span>,      <span class="tk-c">// e.g. cloud Flash</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> secondary: <span class="tk-t">Summarizer</span>?,   <span class="tk-c">// e.g. on-device, or a lighter model</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cache: <span class="tk-t">SummaryCache</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> flags: <span class="tk-t">AiFlags</span>,           <span class="tk-c">// remote config kill switch, model names</span>
+) {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(key: <span class="tk-t">String</span>, text: <span class="tk-t">String</span>): <span class="tk-t">AiOutcome</span>&lt;<span class="tk-t">String</span>&gt; {
+        <span class="tk-k">if</span> (!flags.summariesEnabled) <span class="tk-k">return</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Unavailable</span>(<span class="tk-t">AiOutcome</span>.<span class="tk-t">Reason</span>.<span class="tk-t">FAILED</span>)
+        cache.<span class="tk-k">get</span>(key)?.let { <span class="tk-k">return</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Ok</span>(it, <span class="tk-s">"cache"</span>) }
+
+        <span class="tk-k">val</span> first = attempt(primary, text, retries = <span class="tk-n">1</span>)
+        <span class="tk-k">if</span> (first <span class="tk-k">is</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Success</span>) <span class="tk-k">return</span> first.save(key, <span class="tk-s">"primary"</span>)
+        <span class="tk-k">if</span> (first <span class="tk-k">is</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Blocked</span>) <span class="tk-k">return</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Unavailable</span>(<span class="tk-t">AiOutcome</span>.<span class="tk-t">Reason</span>.<span class="tk-t">BLOCKED</span>)
+
+        secondary?.let { s -&gt;
+            <span class="tk-k">val</span> second = attempt(s, text, retries = <span class="tk-n">0</span>)
+            <span class="tk-k">if</span> (second <span class="tk-k">is</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Success</span>) <span class="tk-k">return</span> second.save(key, <span class="tk-s">"secondary"</span>)
+        }
+        <span class="tk-k">return</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Unavailable</span>(<span class="tk-k">if</span> (first <span class="tk-k">is</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Offline</span>) <span class="tk-t">AiOutcome</span>.<span class="tk-t">Reason</span>.<span class="tk-t">OFFLINE</span> <span class="tk-k">else</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Reason</span>.<span class="tk-t">LIMITED</span>)
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> attempt(s: <span class="tk-t">Summarizer</span>, text: <span class="tk-t">String</span>, retries: <span class="tk-t">Int</span>): <span class="tk-t">AttemptResult</span> {
+        repeat(retries + <span class="tk-n">1</span>) { i -&gt;
+            <span class="tk-k">val</span> r = <span class="tk-k">try</span> {
+                withTimeout(<span class="tk-n">15_000</span>) { <span class="tk-t">AttemptResult</span>.<span class="tk-t">Success</span>(s.summarize(text)) }
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">TimeoutCancellationException</span>) { <span class="tk-t">AttemptResult</span>.<span class="tk-t">Failed</span>
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) { <span class="tk-t">AttemptResult</span>.<span class="tk-t">Offline</span>
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">BlockedException</span>) { <span class="tk-k">return</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Blocked</span>
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">RateLimitedException</span>) { <span class="tk-t">AttemptResult</span>.<span class="tk-t">Failed</span> }
+            <span class="tk-k">if</span> (r <span class="tk-k">is</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Success</span>) <span class="tk-k">return</span> r
+            <span class="tk-k">if</span> (i &lt; retries) delay(<span class="tk-n">1_000L</span> * (i + <span class="tk-n">1</span>) + <span class="tk-t">Random</span>.nextLong(<span class="tk-n">250</span>))     <span class="tk-c">// backoff with jitter</span>
+        }
+        <span class="tk-k">return</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Failed</span>
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> <span class="tk-t">AttemptResult</span>.<span class="tk-t">Success</span>.save(key: <span class="tk-t">String</span>, source: <span class="tk-t">String</span>): <span class="tk-t">AiOutcome</span>&lt;<span class="tk-t">String</span>&gt; {
+        cache.put(key, <span class="tk-k">value</span>); <span class="tk-k">return</span> <span class="tk-t">AiOutcome</span>.<span class="tk-t">Ok</span>(<span class="tk-k">value</span>, source)
+    }
+}
+<span class="tk-c">// AttemptResult (Success/Failed/Offline/Blocked) and the exceptions map from your SDK's errors.</span></code></pre></figure>
+
+<h2 id="killswitch">Kill switches and remote config</h2>
+<ul>
+  <li>Put feature enablement and model names in Remote Config, so you can disable a feature or switch models without an app release.</li>
+  <li>Use per-feature flags, so one broken feature doesn't take down others.</li>
+  <li>Set backend-side circuit breakers to stop calling a failing provider for a while.</li>
+</ul>
+
+<h2 id="ux">Failure UX</h2>
+<ul>
+  <li>Keep the non-AI path first-class: manual editing, regular search, templates.</li>
+  <li>Be specific: "You're offline. Summaries need internet on this device." is better than "Something went wrong".</li>
+  <li>Preserve user input on failure, and keep partial streamed results.</li>
+  <li>Don't blame the user for safety blocks. Suggest rephrasing neutrally.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I fall back from one provider to another?</summary><div><p>It can improve availability, but it adds complexity, different outputs and privacy implications (another provider's terms). Do it on the backend, if at all, and disclose it.</p></div></details>
+  <details><summary>How many retries?</summary><div><p>Usually one, with backoff, for transient errors. More retries add latency and cost, and can worsen rate limiting.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Treat AI as an <strong>optional enhancement with a plan B</strong>: classify failures, use <strong>timeouts and limited retries</strong>, a <strong>fallback chain</strong> (secondary tier, cache, non-AI), <strong>kill switches</strong> via remote config, and clear, input-preserving failure UX.</p>
+<p>Next step: design trustworthy AI interfaces in <a href="../responsible-ai-ux-android/index.html">Responsible AI User Experience</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/quotas" target="_blank" rel="noopener">Firebase AI Logic: quotas and limits</a></li><li><a href="https://ai.google.dev/gemini-api/docs/rate-limits" target="_blank" rel="noopener">Gemini API rate limits</a></li><li><a href="https://firebase.google.com/docs/remote-config" target="_blank" rel="noopener">Firebase Remote Config</a></li><li><a href="https://kotlinlang.org/docs/cancellation-and-timeouts.html" target="_blank" rel="noopener">Kotlin coroutines: timeouts</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-fallbacks-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-fallbacks-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/offline-ai-device-compatibility/index.html"><small>Android AI Projects and Production</small>Offline AI Features and Device Compatibility</a></li><li><a href="../../android/android-api-error-handling/index.html"><small>APIs, Databases, and Backend Integration</small>Handling API Errors and Network Failures</a></li><li><a href="../../android/monitor-ai-latency-errors-costs/index.html"><small>Android AI Projects and Production</small>Monitoring AI Latency, Errors, and Inference Costs</a></li><li><a href="../../android/responsible-ai-ux-android/index.html"><small>Android AI Projects and Production</small>Responsible AI User Experience on Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-fallbacks-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-fallbacks-android/&amp;text=Fallbacks When AI Is Unavailable" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-fallbacks-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#failures">Failure types</a></li><li><a href="#chain">A fallback chain</a></li><li><a href="#code">Implementing it</a></li><li><a href="#killswitch">Kill switches and remote config</a></li><li><a href="#ux">Failure UX</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-fallbacks-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-fallbacks-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

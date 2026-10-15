@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an AI Voice-Notes App for Android (Kotlin) | Yunok Tech</title>
+  <meta name="description" content="Project guide: record voice notes, transcribe them on device or in the cloud, summarise and extract action items with Gemini, store in Room, search, and handle permissions, background work and privacy.">
+  <meta name="keywords" content="ai voice notes app android, voice notes transcription android, speech to text kotlin app, mediarecorder kotlin, gemini audio transcription, action items extraction ai, android ai project">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-voice-notes-app-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-voice-notes-app-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Build an AI Voice-Notes App for Android (Kotlin)">
+  <meta property="og:description" content="Project guide: record voice notes, transcribe them on device or in the cloud, summarise and extract action items with Gemini, store in Room, search, and handle permissions, background work and privacy.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Build an AI Voice-Notes App for Android (Kotlin)">
+  <meta name="twitter:description" content="Project guide: record voice notes, transcribe them on device or in the cloud, summarise and extract action items with Gemini, store in Room, search, and handle permissions, background work and privacy.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Build an AI Voice-Notes App for Android", "description": "Project guide: record voice notes, transcribe them on device or in the cloud, summarise and extract action items with Gemini, store in Room, search, and handle permissions, background work and privacy.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "voice notes transcription android, speech to text kotlin app, mediarecorder kotlin, gemini audio transcription, action items extraction ai, android ai project", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-voice-notes-app-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Build an AI Voice-Notes App for Android", "item": "https://yunoktech.com/android/ai-voice-notes-app-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Build an AI Voice-Notes App for Android</h1>
+    <p class="ad-lede">Speak for a minute, get a clean transcript, a summary and a list of action items. A voice-notes app combines audio recording, speech-to-text, LLM post-processing and search. Here's the architecture and key code.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architecture">Architecture</a></li><li><a href="#record">1. Record audio</a></li><li><a href="#transcribe">2. Transcribe</a></li><li><a href="#enrich">3. Summarise and extract action items</a></li><li><a href="#worker">4. Process in the background</a></li><li><a href="#search">5. Store and search</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead"><a href="../speech-to-text-ai-voice-android/index.html">Speech to Text</a> covers dictation APIs. This project records audio files and processes them afterwards, which lets you transcribe longer notes, re-process later, and run AI over the result.</p>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-vn-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-vn-t fig-vn-d">
+    <title id="fig-vn-t">Voice notes processing pipeline</title>
+    <desc id="fig-vn-d">Record audio to an app-private file. A WorkManager job transcribes it, either on device or by sending audio to a multimodal cloud model. Then an LLM produces a title, summary and action items as JSON. Results are saved in Room with full-text search, and the UI shows status per note.</desc>
+    <defs><marker id="vnm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 80 H160 M300 80 H320 M460 80 H480 M590 80 H610" marker-end="url(#vnm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="10" y="50" width="130" height="60" rx="12"/><text class="d-t" x="75" y="76" text-anchor="middle">Record</text><text class="d-s" x="75" y="94" text-anchor="middle">.m4a, private</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="162" y="50" width="138" height="60" rx="12"/><text class="d-t" x="231" y="76" text-anchor="middle">Transcribe</text><text class="d-s" x="231" y="94" text-anchor="middle">worker</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="322" y="50" width="138" height="60" rx="12"/><text class="d-t" x="391" y="76" text-anchor="middle">Enrich</text><text class="d-s" x="391" y="94" text-anchor="middle">summary, todos</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="482" y="50" width="108" height="60" rx="12"/><text class="d-t" x="536" y="76" text-anchor="middle">Room</text><text class="d-s" x="536" y="94" text-anchor="middle">+ FTS</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="612" y="50" width="98" height="60" rx="12"/><text class="d-w" x="661" y="84" text-anchor="middle">UI</text></g>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Processing is resumable: each note has a status (recorded → transcribed → enriched).</text>
+  </svg>
+  <figcaption id="fig-vn-cap">Background processing means users can record and move on.</figcaption>
+</figure>
+
+<h2 id="record">1. Record audio</h2>
+<figure class="code"><figcaption><span class="file">VoiceRecorder.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">VoiceRecorder</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> context: <span class="tk-t">Context</span>) {
+    <span class="tk-k">private</span> <span class="tk-k">var</span> recorder: <span class="tk-t">MediaRecorder</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-c">/** Requires RECORD_AUDIO permission granted. */</span>
+    <span class="tk-k">fun</span> start(output: <span class="tk-t">File</span>) {
+        recorder = <span class="tk-t">MediaRecorder</span>(context).apply {
+            setAudioSource(<span class="tk-t">MediaRecorder</span>.<span class="tk-t">AudioSource</span>.<span class="tk-t">MIC</span>)
+            setOutputFormat(<span class="tk-t">MediaRecorder</span>.<span class="tk-t">OutputFormat</span>.<span class="tk-t">MPEG_4</span>)
+            setAudioEncoder(<span class="tk-t">MediaRecorder</span>.<span class="tk-t">AudioEncoder</span>.<span class="tk-t">AAC</span>)
+            setAudioSamplingRate(<span class="tk-n">16_000</span>)
+            setAudioEncodingBitRate(<span class="tk-n">64_000</span>)
+            setOutputFile(output)
+            prepare()
+            start()
+        }
+    }
+
+    <span class="tk-k">fun</span> stop() {
+        recorder?.runCatching { stop() }       <span class="tk-c">// stop() throws if nothing was recorded</span>
+        recorder?.release()
+        recorder = <span class="tk-k">null</span>
+    }
+}
+<span class="tk-c">// MediaRecorder(Context) requires API 31+; use the deprecated no-arg constructor on older versions.</span></code></pre></figure>
+<p>Store files in <code>filesDir</code> (app-private). Request <code>RECORD_AUDIO</code> in context. For long recordings in the background, you'd need a foreground service with the microphone type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</p>
+
+<h2 id="transcribe">2. Transcribe</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Option</th><th>Pros</th><th>Cons</th></tr></thead>
+  <tbody>
+    <tr><td>Cloud multimodal (Gemini audio input)</td><td>Works on all devices, handles long audio, can transcribe + summarise together</td><td>Audio leaves the device; cost</td></tr>
+    <tr><td>ML Kit GenAI Speech Recognition (alpha)</td><td>On-device, private</td><td>Alpha; device and language support limited</td></tr>
+    <tr><td>Platform <code>SpeechRecognizer</code></td><td>Built in</td><td>Designed for live mic input, not files</td></tr>
+  </tbody>
+</table>
+</div>
+<figure class="code"><figcaption><span class="file">Cloud transcription with Gemini (audio as inline data)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> transcribe(model: <span class="tk-t">GenerativeModel</span>, audio: <span class="tk-t">File</span>): <span class="tk-t">String</span> {
+    <span class="tk-k">val</span> response = model.generateContent(content {
+        inlineData(audio.readBytes(), <span class="tk-s">"audio/mp4"</span>)
+        text(<span class="tk-s">"Transcribe this voice note verbatim. Mark unclear words as [inaudible]."</span>)
+    })
+    <span class="tk-k">return</span> response.text.orEmpty()
+}
+<span class="tk-c">// Inline data has size limits; for long recordings, split audio or use file upload options per the docs.</span></code></pre></figure>
+
+<h2 id="enrich">3. Summarise and extract action items</h2>
+<figure class="code"><figcaption><span class="file">NoteEnricher.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Enrichment</span>(<span class="tk-k">val</span> title: <span class="tk-t">String</span>, <span class="tk-k">val</span> summary: <span class="tk-t">String</span>, <span class="tk-k">val</span> actionItems: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;)
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> enrich(model: <span class="tk-t">GenerativeModel</span>, transcript: <span class="tk-t">String</span>): <span class="tk-t">Enrichment</span> {
+    <span class="tk-k">val</span> response = model.generateContent(
+        <span class="tk-s">"From this voice note transcript, return JSON with: title (max 6 words), "</span> +
+        <span class="tk-s">"summary (max 2 sentences), actionItems (list, only explicit tasks; empty if none). "</span> +
+        <span class="tk-s">"Use only information in the transcript.\n\nTranscript:\n$transcript"</span>
+    )
+    <span class="tk-k">return</span> <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }.decodeFromString(response.text.orEmpty())
+}
+<span class="tk-c">// Configure the model with responseMimeType = "application/json" and a schema for reliability.</span></code></pre></figure>
+
+<h2 id="worker">4. Process in the background</h2>
+<figure class="code"><figcaption><span class="file">ProcessNoteWorker.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltWorker</span>
+<span class="tk-k">class</span> <span class="tk-t">ProcessNoteWorker</span> <span class="tk-a">@AssistedInject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-a">@Assisted</span> ctx: <span class="tk-t">Context</span>, <span class="tk-a">@Assisted</span> params: <span class="tk-t">WorkerParameters</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> notes: <span class="tk-t">NoteRepository</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> ai: <span class="tk-t">VoiceAi</span>,
+) : <span class="tk-t">CoroutineWorker</span>(ctx, params) {
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> doWork(): <span class="tk-t">Result</span> {
+        <span class="tk-k">val</span> id = inputData.getLong(<span class="tk-s">"noteId"</span>, -<span class="tk-n">1</span>)
+        <span class="tk-k">val</span> note = notes.<span class="tk-k">get</span>(id) ?: <span class="tk-k">return</span> <span class="tk-t">Result</span>.failure()
+        <span class="tk-k">return</span> <span class="tk-k">try</span> {
+            <span class="tk-k">val</span> transcript = note.transcript ?: ai.transcribe(<span class="tk-t">File</span>(note.audioPath)).also { notes.saveTranscript(id, it) }
+            <span class="tk-k">if</span> (note.summary == <span class="tk-k">null</span>) notes.saveEnrichment(id, ai.enrich(transcript))
+            <span class="tk-t">Result</span>.success()
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-t">Result</span>.retry()
+        }
+    }
+}
+<span class="tk-c">// Enqueue with a CONNECTED network constraint as unique work per note.</span></code></pre></figure>
+
+<h2 id="search">5. Store and search</h2>
+<p>Use Room with an FTS table over title, transcript and summary for instant search. See <a href="../room-database-kotlin/index.html">Room Database</a>. Show per-note status: "Transcribing…", "Ready", "Failed – retry".</p>
+
+<h2 id="privacy">Privacy</h2>
+<ul>
+  <li>Voice notes can be very personal: explain where audio is processed, and offer on-device mode where supported.</li>
+  <li>Let users delete audio after transcription, and delete everything with one action.</li>
+  <li>Exclude audio from cloud backups if sensitive.</li>
+  <li>See <a href="../ai-privacy-data-retention/index.html">AI Privacy and Data Retention</a>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Which languages are supported?</summary><div><p>Cloud multimodal models support many languages. On-device options are more limited, so check the docs and test with real speakers.</p></div></details>
+  <details><summary>How accurate are transcripts?</summary><div><p>Usually good for clear speech, worse with noise, accents and jargon. Let users edit transcripts.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A voice-notes app <strong>records to private files</strong>, <strong>transcribes</strong> on device or in the cloud, <strong>enriches</strong> with summaries and action items as JSON, processes in <strong>WorkManager</strong>, and stores searchable notes, with privacy controls front and centre.</p>
+<p>Next project: <a href="../ai-study-assistant-android/index.html">an AI Study Assistant</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/media/platform/mediarecorder" target="_blank" rel="noopener">MediaRecorder</a></li><li><a href="https://developer.android.com/reference/android/speech/SpeechRecognizer" target="_blank" rel="noopener">SpeechRecognizer</a></li><li><a href="https://firebase.google.com/docs/ai-logic/analyze-audio" target="_blank" rel="noopener">Firebase AI Logic: analyze audio</a></li><li><a href="https://developers.google.com/ml-kit/genai/speech-recognition/android" target="_blank" rel="noopener">ML Kit GenAI Speech Recognition (alpha)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-voice-notes-app-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-voice-notes-app-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/speech-to-text-ai-voice-android/index.html"><small>Android AI and Generative AI</small>Speech-to-Text and AI Voice Features on Android</a></li><li><a href="../../android/ai-document-summarizer-android/index.html"><small>Android AI Projects and Production</small>Build an AI Document Summarizer for Android</a></li><li><a href="../../android/room-database-kotlin/index.html"><small>APIs, Databases, and Backend Integration</small>Room Database Tutorial with Kotlin</a></li><li><a href="../../android/workmanager-background-work/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Background Work with WorkManager</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-voice-notes-app-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-voice-notes-app-android/&amp;text=Build an AI Voice-Notes App for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-voice-notes-app-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architecture">Architecture</a></li><li><a href="#record">1. Record audio</a></li><li><a href="#transcribe">2. Transcribe</a></li><li><a href="#enrich">3. Summarise and extract action items</a></li><li><a href="#worker">4. Process in the background</a></li><li><a href="#search">5. Store and search</a></li><li><a href="#privacy">Privacy</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-voice-notes-app-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-voice-notes-app-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

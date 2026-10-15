@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Patterns Every Android Developer Should Know | Yunok Tech</title>
+  <meta name="description" content="Practical design patterns in Android with Kotlin: Repository, Observer, Factory, Builder, Adapter, Decorator, Strategy, Singleton, Facade and State, with where Android uses them.">
+  <meta name="keywords" content="android design patterns, design patterns kotlin, observer pattern android flow, builder pattern kotlin, strategy pattern android, adapter pattern android, decorator pattern kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-design-patterns/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-design-patterns/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Design Patterns Every Android Developer Should Know">
+  <meta property="og:description" content="Practical design patterns in Android with Kotlin: Repository, Observer, Factory, Builder, Adapter, Decorator, Strategy, Singleton, Facade and State, with where Android uses them.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="Design Patterns Every Android Developer Should Know">
+  <meta name="twitter:description" content="Practical design patterns in Android with Kotlin: Repository, Observer, Factory, Builder, Adapter, Decorator, Strategy, Singleton, Facade and State, with where Android uses them.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Design Patterns Every Android Developer Should Know", "description": "Practical design patterns in Android with Kotlin: Repository, Observer, Factory, Builder, Adapter, Decorator, Strategy, Singleton, Facade and State, with where Android uses them.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Architecture and Clean Code", "keywords": "design patterns kotlin, observer pattern android flow, builder pattern kotlin, strategy pattern android, adapter pattern android, decorator pattern kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-design-patterns/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Design Patterns Every Android Developer Should Know", "item": "https://yunoktech.com/android/android-design-patterns/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">Design Patterns Every Android Developer Should Know</h1>
+    <p class="ad-lede">You already use design patterns every day in Android, often without naming them: Flow is Observer, Retrofit.Builder is Builder, Hilt modules are Factories. Recognising patterns helps you read libraries faster, communicate designs, and choose solutions deliberately.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#map">Patterns at a glance</a></li><li><a href="#observer">Observer</a></li><li><a href="#builder">Builder, and when Kotlin replaces it</a></li><li><a href="#factory">Factory</a></li><li><a href="#adapter">Adapter</a></li><li><a href="#decorator">Decorator</a></li><li><a href="#strategy">Strategy</a></li><li><a href="#facade">Facade</a></li><li><a href="#singleton">Singleton: use with care</a></li><li><a href="#use-cases">Choosing patterns</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Design patterns are named, reusable solutions to recurring design problems. Kotlin removes the boilerplate many of them needed in Java, but the ideas remain essential, especially for reading codebases and discussing designs in reviews and interviews.</p>
+
+<h2 id="map">Patterns at a glance</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Pattern</th><th>Problem it solves</th><th>Where Android uses it</th></tr></thead>
+  <tbody>
+    <tr><td>Observer</td><td>Notify many listeners of changes</td><td>Flow, StateFlow, LiveData, Compose state</td></tr>
+    <tr><td>Repository</td><td>Hide data sources behind one API</td><td>Data layer</td></tr>
+    <tr><td>Builder</td><td>Construct complex objects step by step</td><td>Retrofit.Builder, NotificationCompat.Builder, Room.databaseBuilder</td></tr>
+    <tr><td>Factory</td><td>Centralise creation logic</td><td>ViewModelProvider.Factory, Hilt @Provides</td></tr>
+    <tr><td>Singleton</td><td>One shared instance</td><td>Kotlin <code>object</code>, Hilt @Singleton</td></tr>
+    <tr><td>Adapter</td><td>Make incompatible interfaces work together</td><td>RecyclerView.Adapter, Retrofit CallAdapter, callback → suspend wrappers</td></tr>
+    <tr><td>Decorator</td><td>Add behaviour by wrapping</td><td>OkHttp interceptors, Compose Modifiers, <code>by</code> delegation</td></tr>
+    <tr><td>Strategy</td><td>Swap algorithms at runtime</td><td>Sorting comparators, payment handlers, retry policies</td></tr>
+    <tr><td>Facade</td><td>Simple interface over a complex subsystem</td><td>Media3 player, your own SDK wrappers</td></tr>
+    <tr><td>State</td><td>Behaviour depends on state</td><td>Sealed UiState with <code>when</code>, MVI reducers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="observer">Observer</h2>
+<figure class="code"><figcaption><span class="file">Flow is Observer with structured lifecycles</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">CartStore</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _items = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">CartItem</span>&gt;&gt;(emptyList())
+    <span class="tk-k">val</span> items: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">CartItem</span>&gt;&gt; = _items.asStateFlow()     <span class="tk-c">// observers subscribe here</span>
+    <span class="tk-k">fun</span> add(item: <span class="tk-t">CartItem</span>) = _items.update { it + item }          <span class="tk-c">// all observers notified</span>
+}</code></pre></figure>
+<p>Unlike classic listener lists, Flow ties subscriptions to coroutine scopes, so forgetting to unregister is much harder.</p>
+
+<h2 id="builder">Builder, and when Kotlin replaces it</h2>
+<figure class="code"><figcaption><span class="file">Named arguments often replace builders</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Java-style builder</span>
+<span class="tk-k">val</span> request = <span class="tk-t">Request</span>.<span class="tk-t">Builder</span>().url(url).header(<span class="tk-s">"Accept"</span>, <span class="tk-s">"application/json"</span>).build()
+
+<span class="tk-c">// Kotlin: named + default arguments do the same for your own classes</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">UploadRequest</span>(<span class="tk-k">val</span> uri: <span class="tk-t">Uri</span>, <span class="tk-k">val</span> compress: <span class="tk-t">Boolean</span> = <span class="tk-k">true</span>, <span class="tk-k">val</span> maxSizeMb: <span class="tk-t">Int</span> = <span class="tk-n">10</span>)
+<span class="tk-k">val</span> upload = <span class="tk-t">UploadRequest</span>(uri = photo, maxSizeMb = <span class="tk-n">5</span>)</code></pre></figure>
+
+<h2 id="factory">Factory</h2>
+<figure class="code"><figcaption><span class="file">Creating the right parser</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">FeedParser</span> { <span class="tk-k">fun</span> parse(raw: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">FeedItem</span>&gt; }
+
+<span class="tk-k">object</span> <span class="tk-t">FeedParserFactory</span> {
+    <span class="tk-k">fun</span> create(contentType: <span class="tk-t">String</span>): <span class="tk-t">FeedParser</span> = <span class="tk-k">when</span> {
+        contentType.contains(<span class="tk-s">"json"</span>) -&gt; <span class="tk-t">JsonFeedParser</span>()
+        contentType.contains(<span class="tk-s">"xml"</span>) -&gt; <span class="tk-t">RssFeedParser</span>()
+        <span class="tk-k">else</span> -&gt; error(<span class="tk-s">"Unsupported content type: $contentType"</span>)
+    }
+}</code></pre></figure>
+
+<h2 id="adapter">Adapter</h2>
+<figure class="code"><figcaption><span class="file">Adapting a callback SDK to coroutines</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> <span class="tk-t">LegacyAuthClient</span>.signInSuspending(email: <span class="tk-t">String</span>, password: <span class="tk-t">String</span>): <span class="tk-t">Session</span> =
+    suspendCancellableCoroutine { cont -&gt;
+        signIn(email, password, <span class="tk-k">object</span> : <span class="tk-t">AuthCallback</span> {
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onSuccess(session: <span class="tk-t">Session</span>) = cont.resume(session)
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onError(error: <span class="tk-t">Exception</span>) = cont.resumeWithException(error)
+        })
+    }</code></pre></figure>
+
+<h2 id="decorator">Decorator</h2>
+<figure class="code"><figcaption><span class="file">OkHttp interceptor decorates every request</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">AuthInterceptor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> tokens: <span class="tk-t">TokenProvider</span>) : <span class="tk-t">Interceptor</span> {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> intercept(chain: <span class="tk-t">Interceptor</span>.<span class="tk-t">Chain</span>): <span class="tk-t">Response</span> {
+        <span class="tk-k">val</span> request = chain.request().newBuilder()
+            .header(<span class="tk-s">"Authorization"</span>, <span class="tk-s">"Bearer ${tokens.current()}"</span>)
+            .build()
+        <span class="tk-k">return</span> chain.proceed(request)
+    }
+}</code></pre></figure>
+<p>Compose's <code>Modifier</code> chain is also a decorator chain: each modifier wraps the next. Kotlin class delegation (<code>by</code>) makes decorators of interfaces trivial. See <a href="../kotlin-delegation/index.html">Kotlin Delegation</a>.</p>
+
+<h2 id="strategy">Strategy</h2>
+<figure class="code"><figcaption><span class="file">Pluggable sorting</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">SortOption</span>(<span class="tk-k">val</span> comparator: <span class="tk-t">Comparator</span>&lt;<span class="tk-t">Product</span>&gt;) {
+    <span class="tk-t">PRICE_LOW</span>(compareBy { it.pricePaise }),
+    <span class="tk-t">PRICE_HIGH</span>(compareByDescending { it.pricePaise }),
+    <span class="tk-t">RATING</span>(compareByDescending&lt;<span class="tk-t">Product</span>&gt; { it.rating }.thenBy { it.name }),
+}
+<span class="tk-k">fun</span> <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt;.sorted(option: <span class="tk-t">SortOption</span>) = sortedWith(option.comparator)</code></pre></figure>
+
+<h2 id="facade">Facade</h2>
+<figure class="code"><figcaption><span class="file">Hide a complex SDK behind your own API</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">Analytics</span> {
+    <span class="tk-k">fun</span> screen(name: <span class="tk-t">String</span>)
+    <span class="tk-k">fun</span> event(name: <span class="tk-t">String</span>, params: <span class="tk-t">Map</span>&lt;<span class="tk-t">String</span>, <span class="tk-t">Any</span>&gt; = emptyMap())
+}
+<span class="tk-c">// One implementation talks to the analytics SDK(s); the app sees only these two methods.</span></code></pre></figure>
+
+<h2 id="singleton">Singleton: use with care</h2>
+<p>Kotlin's <code>object</code> makes singletons trivial, which makes them easy to overuse. Global singletons with state hurt testability. Prefer DI-scoped singletons (<code>@Singleton</code> in Hilt), which can be replaced in tests.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-dp-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-dp-t fig-dp-d">
+    <title id="fig-dp-t">Patterns across a typical Android request path</title>
+    <desc id="fig-dp-d">A ViewModel observes a StateFlow (Observer) from a Repository (Repository pattern), which uses Retrofit built with a Builder, with OkHttp interceptors as Decorators, and an analytics Facade.</desc>
+    <defs><marker id="dpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-blue" x="10" y="50" width="130" height="60" rx="10"/><text class="d-t" x="75" y="76" text-anchor="middle">ViewModel</text><text class="d-s" x="75" y="94" text-anchor="middle">Observer</text>
+    <rect class="d-violet" x="190" y="50" width="130" height="60" rx="10"/><text class="d-t" x="255" y="76" text-anchor="middle">Repository</text><text class="d-s" x="255" y="94" text-anchor="middle">Repository</text>
+    <rect class="d-amber" x="370" y="50" width="130" height="60" rx="10"/><text class="d-t" x="435" y="76" text-anchor="middle">Retrofit</text><text class="d-s" x="435" y="94" text-anchor="middle">Builder · Adapter</text>
+    <rect class="d-green" x="550" y="50" width="160" height="60" rx="10"/><text class="d-t" x="630" y="76" text-anchor="middle">OkHttp</text><text class="d-s" x="630" y="94" text-anchor="middle">Decorator chain</text>
+    <path class="d-flow" d="M140 80 H186 M320 80 H366 M500 80 H546" marker-end="url(#dpm)"/>
+  </svg>
+  <figcaption id="fig-dp-cap">A single network call passes through four or five patterns. Naming them makes the design easier to discuss.</figcaption>
+</figure>
+
+<h2 id="use-cases">Choosing patterns</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Many variants of behaviour</h3><p>Strategy (with DI multibinding if the variants are pluggable).</p></div>
+  <div class="card usecase"><h3>Ugly third-party API</h3><p>Facade or Adapter, so the rest of the app stays clean and the SDK is replaceable.</p></div>
+  <div class="card usecase"><h3>Cross-cutting behaviour</h3><p>Decorator: logging, caching and auth headers without touching core logic.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are design patterns outdated in Kotlin?</summary><div><p>Some implementations are simpler (builders, singletons, decorators), but the concepts remain useful vocabulary and design tools.</p></div></details>
+  <details><summary>Is MVVM a design pattern?</summary><div><p>It's an architectural pattern: a larger-scale structure built from smaller patterns such as Observer.</p></div></details>
+  <details><summary>Which patterns come up in Android interviews?</summary><div><p>Repository, Observer, Singleton (and its pitfalls), Factory, Builder, Adapter and Decorator, usually with an Android example.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android code is full of design patterns: <strong>Observer</strong> in Flow, <strong>Builder</strong> in SDK setup, <strong>Decorator</strong> in interceptors and modifiers, <strong>Adapter</strong> around callbacks, <strong>Strategy</strong> for interchangeable behaviour, and <strong>Facade</strong> over complex SDKs. Use Kotlin features to implement them lightly, and name them to communicate clearly.</p>
+<p>Next step: apply these tools to old code in <a href="../refactor-legacy-android-apps/index.html">How to Refactor Legacy Android Applications</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/idioms.html" target="_blank" rel="noopener">Kotlin idioms</a></li><li><a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">Guide to app architecture</a></li><li><a href="https://kotlinlang.org/docs/delegation.html" target="_blank" rel="noopener">Kotlin delegation</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-design-patterns-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-design-patterns-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/solid-principles-android/index.html"><small>Android Architecture and Clean Code</small>SOLID Principles in Android Development</a></li><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li><li><a href="../../android/kotlin-delegation/index.html"><small>Kotlin Programming</small>Kotlin Delegation and Property Delegates</a></li><li><a href="../../android/android-architecture-interview-questions/index.html"><small>Android Interview Preparation and Career</small>Android Architecture Interview Questions</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-design-patterns/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-design-patterns/&amp;text=Design Patterns Every Android Developer Should Know" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-design-patterns/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#map">Patterns at a glance</a></li><li><a href="#observer">Observer</a></li><li><a href="#builder">Builder, and when Kotlin replaces it</a></li><li><a href="#factory">Factory</a></li><li><a href="#adapter">Adapter</a></li><li><a href="#decorator">Decorator</a></li><li><a href="#strategy">Strategy</a></li><li><a href="#facade">Facade</a></li><li><a href="#singleton">Singleton: use with care</a></li><li><a href="#use-cases">Choosing patterns</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-design-patterns-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-design-patterns-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

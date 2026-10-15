@@ -23,6 +23,7 @@
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need to know programming before joining?", "acceptedAnswer": {"@type": "Answer", "text": "No. We start Kotlin from the basics. Knowing any language (C, Java, Python) makes it faster, but it is not required."}}, {"@type": "Question", "name": "What laptop do I need?", "acceptedAnswer": {"@type": "Answer", "text": "A Windows, Mac or Linux laptop with at least 8GB RAM (16GB recommended) to run Android Studio smoothly. An Android phone helps for testing."}}, {"@type": "Question", "name": "Is Jetpack Compose worth learning in 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Jetpack Compose is Google's recommended toolkit for building Android UI, and most new Android apps and job openings now use it."}}, {"@type": "Question", "name": "Can I attend a demo class first?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. WhatsApp or call +91 99882 00178 to book a free demo class, online or at our Kharar centre."}}, {"@type": "Question", "name": "Will I get job help?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You finish with a GitHub portfolio of real projects, and we help with resume review and mock interviews."}}]}</script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
   <link rel="stylesheet" href="css/yt.css">
+  <link rel="stylesheet" href="css/course-simple.css">
 </head>
 <body class="yt yt-course">
 <div class="yt-progress" aria-hidden="true"></div>
@@ -33,14 +34,14 @@
         <img src="assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
         <span class="nav-logo-text">Yunok<span>Tech</span></span>
       </a>
-      <ul class="nav-links" role="list"><li><a href="index.html">Home</a></li><li><a href="apps.html">Apps</a></li><li><a href="services.html">Services</a></li><li><a href="course.html" class="active">Course</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li></ul>
+      <ul class="nav-links" role="list"><li><a href="index.html">Home</a></li><li><a href="apps.html">Apps</a></li><li><a href="services.html">Services</a></li><li><a href="course.html" class="active">Course</a></li><li><a href="android/index.html">Android</a></li><li><a href="blog.html">Blog</a></li><li><a href="contact.html">Contact</a></li></ul>
       <div class="nav-cta"><a href="#enroll" class="btn btn-violet btn-sm">Enroll Now</a></div>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </nav>
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
-  <a href="index.html">🏠 Home</a><a href="apps.html">📱 Apps</a><a href="services.html">💼 App for Your Business</a><a href="course.html">🎓 Android Course</a><a href="blog.html">📝 Blog</a><a href="contact.html">✉️ Contact</a>
+  <a href="index.html">🏠 Home</a><a href="apps.html">📱 Apps</a><a href="services.html">💼 App for Your Business</a><a href="course.html">🎓 Android Course</a><a href="android/index.html">🤖 Android Dev Blog</a><a href="blog.html">📝 Blog</a><a href="contact.html">✉️ Contact</a>
   <div class="mobile-cta"><a href="https://wa.me/919988200178" target="_blank" rel="noopener" class="btn btn-whatsapp" style="width:100%;justify-content:center;margin-top:4px">WhatsApp +91 99882 00178</a></div>
 </nav>
 
@@ -62,9 +63,8 @@
         </div>
         <div class="yt-stats">
           <div class="yt-stat"><b>8–10 wks</b><span>Duration</span></div>
-          <div class="yt-stat"><b><span data-count="2">0</span> apps</b><span>Real projects</span></div>
+          <div class="yt-stat"><b>2 apps</b><span>Real projects</span></div>
           <div class="yt-stat"><b>Online + 📍</b><span>Live &amp; Kharar classroom</span></div>
-          <div class="yt-stat"><b>हि · EN · ਪੰ</b><span>Hindi / English / Punjabi</span></div>
         </div>
       </div>
       <div class="yt-ide" aria-label="Kotlin code and a live phone preview">
@@ -92,8 +92,6 @@
     }
 }
 <span class="c">// ▶ Run — your first app 🚀</span></template>
-
-<div class="yt-marquee" aria-hidden="true"><div class="yt-marquee-track"><span>Kotlin <em>✦</em> <span class="o">Jetpack Compose</span> <em>✦</em> Material 3 <em>✦</em> <span class="o">MVVM</span> <em>✦</em> Hilt <em>✦</em> <span class="o">Room</span> <em>✦</em> Retrofit <em>✦</em> <span class="o">Coroutines &amp; Flow</span> <em>✦</em> Firebase <em>✦</em> <span class="o">Play Store publishing</span> <em>✦</em> </span><span>Kotlin <em>✦</em> <span class="o">Jetpack Compose</span> <em>✦</em> Material 3 <em>✦</em> <span class="o">MVVM</span> <em>✦</em> Hilt <em>✦</em> <span class="o">Room</span> <em>✦</em> Retrofit <em>✦</em> <span class="o">Coroutines &amp; Flow</span> <em>✦</em> Firebase <em>✦</em> <span class="o">Play Store publishing</span> <em>✦</em> </span></div></div>
 
 <!-- WHO -->
 <section class="yt-sec yt-center" aria-labelledby="who-heading">
@@ -137,7 +135,7 @@
     <p class="yt-sub" data-anim="up" style="--d:.08s">Inspired by the apps we've shipped to thousands of users.</p>
     <div class="yt-apps" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));max-width:860px;margin-inline:auto">
       <div class="yt-app" data-anim="up" style="--ac:#c34cff;--bgm:#140c26">
-        <div class="yt-app-media"><video data-auto muted loop playsinline preload="none" poster="assets/walzi/reel-cars.jpg" aria-hidden="true"><source src="assets/walzi/reel-cars.mp4" type="video/mp4"></video></div>
+        <div class="yt-app-media"><img src="assets/walzi/reel-cars.jpg" alt="Wallpaper app screen" width="360" height="300" loading="lazy"></div>
         <div class="yt-app-body"><h3>🖼️ Wallpaper App</h3><div class="meta">Like Walzi</div><p>Retrofit, Paging, Coil, favourites and set-as-wallpaper — like Walzi.</p></div>
       </div>
       <div class="yt-app" data-anim="up" style="--d:.12s;--ac:#f97316;--bgm:linear-gradient(135deg,#7c2d12,#ef4444)">
@@ -204,9 +202,9 @@
         <h2 id="instructor-heading" class="yt-h2" data-anim="up" style="--d:.06s">Learn From Someone <span class="yt-grad">Who Ships</span></h2>
         <p class="yt-sub" data-anim="up" style="--d:.12s">Kamal has 10+ years of Android experience at <strong style="color:#fff">Nagarro</strong> and <strong style="color:#fff">KareXpert</strong>, building apps for the <strong style="color:#fff">healthcare</strong> and <strong style="color:#fff">banking</strong> domains. He has built and published 13 apps on Google Play, including Walzi, NotiVault and Hanuman Dham, and writes about Android on Medium. You'll learn the patterns used in real production apps — not just tutorials.</p>
         <div class="yt-nums" data-anim="up" style="--d:.18s">
-          <div><b><span data-count="10">0</span>+</b><span>Years Android</span></div>
-          <div><b><span data-count="13">0</span></b><span>Apps on Play Store</span></div>
-          <div><b><span data-count="2">0</span></b><span>Enterprise domains</span></div>
+          <div><b>10+</b><span>Years Android</span></div>
+          <div><b>13</b><span>Apps on Play Store</span></div>
+          <div><b>2</b><span>Enterprise domains</span></div>
         </div>
       </div>
     </div>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Suspend Functions Explained with Real Examples | Yunok Tech</title>
+  <meta name="description" content="How Kotlin suspend functions work on Android: suspension vs blocking, continuations, main-safety, withContext, converting callbacks with suspendCancellableCoroutine, and timeouts.">
+  <meta name="keywords" content="kotlin suspend function, suspend function explained, suspendCancellableCoroutine, withContext dispatchers io, main safe suspend function, convert callback to coroutine, withTimeout kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-suspend-functions/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-suspend-functions/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Suspend Functions Explained with Real Examples">
+  <meta property="og:description" content="How Kotlin suspend functions work on Android: suspension vs blocking, continuations, main-safety, withContext, converting callbacks with suspendCancellableCoroutine, and timeouts.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Suspend Functions Explained with Real Examples">
+  <meta name="twitter:description" content="How Kotlin suspend functions work on Android: suspension vs blocking, continuations, main-safety, withContext, converting callbacks with suspendCancellableCoroutine, and timeouts.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Suspend Functions Explained with Real Examples", "description": "How Kotlin suspend functions work on Android: suspension vs blocking, continuations, main-safety, withContext, converting callbacks with suspendCancellableCoroutine, and timeouts.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Kotlin Programming", "keywords": "suspend function explained, suspendCancellableCoroutine, withContext dispatchers io, main safe suspend function, convert callback to coroutine, withTimeout kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-suspend-functions/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Suspend Functions Explained with Real Examples", "item": "https://yunoktech.com/android/kotlin-suspend-functions/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Suspend Functions Explained with Real Examples</h1>
+    <p class="ad-lede">The suspend keyword is small, but it changes how you write every asynchronous operation on Android. Here's what suspension really means, how the compiler implements it, and how to write, wrap and call suspend functions correctly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#definition">What suspend actually means</a></li><li><a href="#how">How the compiler does it</a></li><li><a href="#writing">Writing main-safe suspend functions</a></li><li><a href="#sequential-parallel">Sequential by default, parallel when you ask</a></li><li><a href="#callbacks">Converting callback APIs to suspend functions</a></li><li><a href="#timeouts">Timeouts and cancellation</a></li><li><a href="#use-cases">Real-world examples</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Developers often describe a suspend function as "a function that runs in the background". That's wrong, and the misunderstanding causes real bugs. A suspend function can run on the main thread. What makes it special is that it can <em>pause</em> without blocking the thread.</p>
+
+<h2 id="definition">What suspend actually means</h2>
+<p>A <code>suspend</code> function can be paused at <strong>suspension points</strong> (calls to other suspend functions such as <code>delay</code>, a Retrofit call or <code>withContext</code>) and resumed later, possibly on a different thread. While it's paused, the thread it was using is free to do other work.</p>
+<p>Two rules follow:</p>
+<ul>
+  <li>Suspend functions can only be called from other suspend functions or from a coroutine (<code>launch</code>, <code>async</code>, <code>runTest</code>…).</li>
+  <li>Marking a function <code>suspend</code> does <strong>not</strong> move it off the main thread. If it does blocking work, it still blocks.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sus-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-sus-t fig-sus-d">
+    <title id="fig-sus-t">A suspend function pausing and resuming</title>
+    <desc id="fig-sus-d">On the main thread, loadProfile starts, reaches api.getUser and suspends. The main thread is free and draws frames. When the network result arrives, the coroutine resumes on main and updates the UI state.</desc>
+    <text class="d-t" x="20" y="24">Main thread timeline</text>
+    <rect class="d-box" x="20" y="36" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="24" y="40" width="130" height="36" rx="6"/><text class="d-s" x="89" y="62" text-anchor="middle">start loadProfile()</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="158" y="40" width="370" height="36" rx="6"/><text class="d-t" x="343" y="62" text-anchor="middle">suspended: thread free (frames, input)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="532" y="40" width="164" height="36" rx="6"/><text class="d-s" x="614" y="62" text-anchor="middle">resume → update state</text></g>
+    <text class="d-t" x="20" y="124">Network (OkHttp threads)</text>
+    <rect class="d-box" x="20" y="136" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="158" y="140" width="370" height="36" rx="6"/><text class="d-s" x="343" y="162" text-anchor="middle">HTTP request in progress</text></g>
+    <path class="d-dash" d="M158 80 V136 M528 136 V80"/>
+  </svg>
+  <figcaption id="fig-sus-cap">Suspension hands the thread back. Resumption picks up exactly where the function left off, with local variables intact.</figcaption>
+</figure>
+
+<h2 id="how">How the compiler does it</h2>
+<p>The Kotlin compiler transforms each suspend function into a state machine. It adds a hidden <code>Continuation</code> parameter, an object holding "where to resume and with which local variables". At each suspension point, the function saves its state into the continuation and returns a special marker. When the awaited result is ready, the continuation is resumed, jumping back into the state machine. You never write this code, but knowing it exists explains why suspension is cheap: no thread is parked, only a small object.</p>
+
+<h2 id="writing">Writing main-safe suspend functions</h2>
+<p>Convention on Android: <strong>suspend functions should be main-safe</strong>, meaning safe to call from the main thread. Callers shouldn't need to know which dispatcher to use.</p>
+<figure class="code"><figcaption><span class="file">ImageRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ImageRepository</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> context: <span class="tk-t">Context</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> io: <span class="tk-t">CoroutineDispatcher</span> = <span class="tk-t">Dispatchers</span>.<span class="tk-t">IO</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cpu: <span class="tk-t">CoroutineDispatcher</span> = <span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>,
+) {
+    <span class="tk-c">/** Main-safe: switches to IO for disk and Default for CPU work. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> saveThumbnail(source: <span class="tk-t">Uri</span>, name: <span class="tk-t">String</span>): <span class="tk-t">File</span> {
+        <span class="tk-k">val</span> bitmap = withContext(io) {
+            context.contentResolver.openInputStream(source).use { <span class="tk-t">BitmapFactory</span>.decodeStream(it) }
+        } ?: <span class="tk-k">throw</span> <span class="tk-t">IOException</span>(<span class="tk-s">"Could not decode image"</span>)
+
+        <span class="tk-k">val</span> thumb = withContext(cpu) { <span class="tk-t">Bitmap</span>.createScaledBitmap(bitmap, <span class="tk-n">256</span>, <span class="tk-n">256</span>, <span class="tk-k">true</span>) }
+
+        <span class="tk-k">return</span> withContext(io) {
+            <span class="tk-t">File</span>(context.filesDir, <span class="tk-s">"$name.webp"</span>).also { file -&gt;
+                file.outputStream().use { thumb.compress(<span class="tk-t">Bitmap</span>.<span class="tk-t">CompressFormat</span>.<span class="tk-t">WEBP_LOSSY</span>, <span class="tk-n">85</span>, it) }
+            }
+        }
+    }
+}</code></pre></figure>
+<p>Retrofit and Room suspend functions are already main-safe. Don't wrap them in <code>withContext(Dispatchers.IO)</code>, because it adds nothing.</p>
+
+<h2 id="sequential-parallel">Sequential by default, parallel when you ask</h2>
+<figure class="code"><figcaption><span class="file">Sequential vs concurrent</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Sequential: second call waits for the first (correct when B needs A's result)</span>
+<span class="tk-k">val</span> user = api.getUser(id)
+<span class="tk-k">val</span> orders = api.getOrders(user.accountId)
+
+<span class="tk-c">// Concurrent: independent calls in parallel</span>
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> loadDashboard(id: <span class="tk-t">String</span>): <span class="tk-t">Dashboard</span> = coroutineScope {
+    <span class="tk-k">val</span> profile = async { api.getProfile(id) }
+    <span class="tk-k">val</span> stats = async { api.getStats(id) }
+    <span class="tk-t">Dashboard</span>(profile.await(), stats.await())   <span class="tk-c">// if one fails, the other is cancelled</span>
+}</code></pre></figure>
+
+<h2 id="callbacks">Converting callback APIs to suspend functions</h2>
+<p>Many SDKs still use callbacks. Wrap them once with <code>suspendCancellableCoroutine</code>, and the rest of your code stays sequential:</p>
+<figure class="code"><figcaption><span class="file">LocationExtensions.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@SuppressLint</span>(<span class="tk-s">"MissingPermission"</span>)   <span class="tk-c">// caller must ensure location permission is granted</span>
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> <span class="tk-t">FusedLocationProviderClient</span>.currentLocationOrNull(): <span class="tk-t">Location</span>? =
+    suspendCancellableCoroutine { cont -&gt;
+        <span class="tk-k">val</span> cancellation = <span class="tk-t">CancellationTokenSource</span>()
+        getCurrentLocation(<span class="tk-t">Priority</span>.<span class="tk-t">PRIORITY_BALANCED_POWER_ACCURACY</span>, cancellation.token)
+            .addOnSuccessListener { location -&gt; cont.resume(location) }
+            .addOnFailureListener { error -&gt; cont.resumeWithException(error) }
+        <span class="tk-c">// If the coroutine is cancelled (user left the screen), cancel the underlying request too.</span>
+        cont.invokeOnCancellation { cancellation.cancel() }
+    }</code></pre></figure>
+<p>For Google Play services <code>Task</code> APIs specifically, <code>kotlinx-coroutines-play-services</code> already provides <code>Task.await()</code>.</p>
+
+<h2 id="timeouts">Timeouts and cancellation</h2>
+<figure class="code"><figcaption><span class="file">Timeouts</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> config = withTimeoutOrNull(<span class="tk-n">3_000</span>) { api.fetchRemoteConfig() }   <span class="tk-c">// null if it takes &gt; 3 s</span>
+    ?: <span class="tk-t">RemoteConfig</span>.<span class="tk-t">DEFAULT</span></code></pre></figure>
+<p>Cancellation is cooperative. Suspension points check for it automatically, but CPU-heavy loops should call <code>ensureActive()</code>. Never swallow <code>CancellationException</code> in a broad <code>catch</code>.</p>
+
+<h2 id="use-cases">Real-world examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Login flow</h3><p>Sequential suspend calls (authenticate, fetch profile, save token) read like a recipe, with one try/catch for failures.</p></div>
+  <div class="card usecase"><h3>Image picker</h3><p>Decode, resize and save with <code>withContext</code> switches inside one main-safe function, called from <code>viewModelScope</code>.</p></div>
+  <div class="card usecase"><h3>Legacy SDK</h3><p>Wrap the SDK's callbacks once with <code>suspendCancellableCoroutine</code>, so callers never see callbacks again.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Assuming <code>suspend</code> means "background thread".</li>
+  <li>Calling blocking APIs (<code>Thread.sleep</code>, <code>File.readText</code> on large files, blocking SDK calls) inside suspend functions without <code>withContext</code>.</li>
+  <li>Using <code>suspendCoroutine</code> instead of <code>suspendCancellableCoroutine</code>, which ignores cancellation and can leak work.</li>
+  <li>Resuming a continuation twice, which crashes with <code>IllegalStateException</code>. Guard callbacks that may fire more than once.</li>
+  <li>Using <code>runBlocking</code> to call suspend functions from app code.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a suspend function return a value?</summary><div><p>Yes. Suspend functions return values like any function. The caller simply suspends until the value is ready.</p></div></details>
+  <details><summary>Should every repository function be suspend?</summary><div><p>Functions that do I/O or long work should be suspend, or return Flow. Pure, fast computations don't need <code>suspend</code>.</p></div></details>
+  <details><summary>How do I call a suspend function from Java?</summary><div><p>Not directly in a convenient way. Expose a Java-friendly wrapper, for example one returning a <code>CompletableFuture</code> or using callbacks, from Kotlin.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A suspend function is a function that can <strong>pause without blocking</strong>, implemented by the compiler as a state machine with a continuation. Write them to be <strong>main-safe</strong> with <code>withContext</code>, run independent work in parallel with <code>async</code>, wrap callbacks with <code>suspendCancellableCoroutine</code>, and respect cancellation.</p>
+<p>Next step: make your APIs more expressive with <a href="../kotlin-extension-higher-order-functions/index.html">Extension and Higher-Order Functions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/composing-suspending-functions.html" target="_blank" rel="noopener">Composing suspending functions</a></li><li><a href="https://developer.android.com/kotlin/coroutines" target="_blank" rel="noopener">Coroutines on Android</a></li><li><a href="https://developer.android.com/kotlin/coroutines/coroutines-best-practices" target="_blank" rel="noopener">Coroutines best practices</a></li><li><a href="https://kotlinlang.org/docs/cancellation-and-timeouts.html" target="_blank" rel="noopener">Cancellation and timeouts</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-suspend-functions-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-suspend-functions-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li><li><a href="../../android/flow-vs-stateflow-vs-sharedflow/index.html"><small>Kotlin Programming</small>Flow vs StateFlow vs SharedFlow</a></li><li><a href="../../android/rest-api-kotlin-coroutines/index.html"><small>APIs, Databases, and Backend Integration</small>REST API Integration with Kotlin and Coroutines</a></li><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-suspend-functions/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-suspend-functions/&amp;text=Suspend Functions Explained with Real Examples" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-suspend-functions/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#definition">What suspend actually means</a></li><li><a href="#how">How the compiler does it</a></li><li><a href="#writing">Writing main-safe suspend functions</a></li><li><a href="#sequential-parallel">Sequential by default, parallel when you ask</a></li><li><a href="#callbacks">Converting callback APIs to suspend functions</a></li><li><a href="#timeouts">Timeouts and cancellation</a></li><li><a href="#use-cases">Real-world examples</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-suspend-functions-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-suspend-functions-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

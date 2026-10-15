@@ -1,0 +1,174 @@
+<!--meta
+{
+  "seo_title": "Top 50 Android Interview Questions and Answers (2026)",
+  "description": "50 Android interview questions with concise, accurate answers: fundamentals, lifecycle, Kotlin, coroutines, Compose, architecture, data, performance, security, testing and release.",
+  "primary_keyword": "android interview questions",
+  "keywords": ["android interview questions and answers", "android developer interview 2026", "kotlin android interview", "jetpack compose interview questions", "android lifecycle interview", "junior android interview"],
+  "lede": "These 50 questions cover what Android interviews actually test in 2026: fundamentals, Kotlin, coroutines, Compose, architecture, data, performance, security and release. Each answer is short enough to say aloud, with links to deeper guides.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["kotlin-interview-questions-experienced", "jetpack-compose-interview-questions", "android-architecture-interview-questions", "coroutines-flow-interview-questions"],
+  "refs": [
+    ["Android Developers documentation", "https://developer.android.com/"],
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Kotlin documentation", "https://kotlinlang.org/docs/home.html"],
+    ["Jetpack Compose", "https://developer.android.com/compose"]
+  ]
+}
+-->
+<p class="ad-lead">Interviewers rarely want memorised definitions. They want to know whether you understand <em>why</em> Android works the way it does, and whether you've built real things. Use these answers as a starting point, then add an example from your own projects to each.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-iq-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-iq-t fig-iq-d">
+    <title id="fig-iq-t">Topics covered in Android interviews</title>
+    <desc id="fig-iq-d">Ten topic areas: fundamentals and lifecycle, Kotlin, coroutines and Flow, Jetpack Compose, architecture, data and networking, performance, security, testing, and release and tooling.</desc>
+    <rect class="d-blue" x="10" y="20" width="132" height="50" rx="10"/><text class="d-s" x="76" y="50" text-anchor="middle">Fundamentals</text>
+    <rect class="d-violet" x="152" y="20" width="132" height="50" rx="10"/><text class="d-s" x="218" y="50" text-anchor="middle">Kotlin</text>
+    <rect class="d-violet" x="294" y="20" width="132" height="50" rx="10"/><text class="d-s" x="360" y="50" text-anchor="middle">Coroutines/Flow</text>
+    <rect class="d-green" x="436" y="20" width="132" height="50" rx="10"/><text class="d-s" x="502" y="50" text-anchor="middle">Compose</text>
+    <rect class="d-amber" x="578" y="20" width="132" height="50" rx="10"/><text class="d-s" x="644" y="50" text-anchor="middle">Architecture</text>
+    <rect class="d-amber" x="10" y="80" width="132" height="50" rx="10"/><text class="d-s" x="76" y="110" text-anchor="middle">Data</text>
+    <rect class="d-red" x="152" y="80" width="132" height="50" rx="10"/><text class="d-s" x="218" y="110" text-anchor="middle">Performance</text>
+    <rect class="d-red" x="294" y="80" width="132" height="50" rx="10"/><text class="d-s" x="360" y="110" text-anchor="middle">Security</text>
+    <rect class="d-green" x="436" y="80" width="132" height="50" rx="10"/><text class="d-s" x="502" y="110" text-anchor="middle">Testing</text>
+    <rect class="d-box" x="578" y="80" width="132" height="50" rx="10"/><text class="d-s" x="644" y="110" text-anchor="middle">Release/tools</text>
+  </svg>
+  <figcaption id="fig-iq-cap">Ten areas, five questions each.</figcaption>
+</figure>
+
+<h2 id="fundamentals">Fundamentals and lifecycle (1–5)</h2>
+<h3>1. What are the four Android app components?</h3>
+<p>Activities (UI entry points), Services (work without UI), Broadcast Receivers (respond to events) and Content Providers (share structured data). They're declared in the manifest and can be started by the system independently. See <a href="../android-app-components/index.html">App Components</a>.</p>
+<h3>2. Explain the Activity lifecycle.</h3>
+<p><code>onCreate → onStart → onResume</code> (visible, interactive), then <code>onPause → onStop</code> as it leaves the foreground, and <code>onDestroy</code> when finishing or being recreated. Do UI-visible work between start and stop, and release resources symmetrically.</p>
+<h3>3. What happens on a configuration change?</h3>
+<p>By default the Activity is destroyed and recreated (rotation, locale, dark mode). ViewModels survive. Small UI state can be saved with <code>rememberSaveable</code> or <code>onSaveInstanceState</code>.</p>
+<h3>4. What is process death, and how do you handle it?</h3>
+<p>The system can kill a backgrounded app's process to reclaim memory. When the user returns, the Activity is recreated in a new process, but ViewModels are gone. Use <code>SavedStateHandle</code> and <code>rememberSaveable</code> for critical UI state, and persistence for data. See <a href="../how-android-app-works-internally/index.html">How an App Works Internally</a>.</p>
+<h3>5. What causes an ANR?</h3>
+<p>Blocking the main thread too long (around 5 seconds for input), for example with disk or network I/O, lock contention, or slow <code>onReceive</code>. Fix it by moving work off the main thread. See <a href="../android-anr-errors/index.html">ANRs</a>.</p>
+
+<h2 id="kotlin">Kotlin (6–10)</h2>
+<h3>6. How does Kotlin null safety work?</h3>
+<p>Types are non-null by default, and <code>T?</code> allows null. The compiler forces handling via <code>?.</code>, <code>?:</code>, smart casts or <code>!!</code>. Platform types from Java can still cause NPEs.</p>
+<h3>7. data class vs regular class?</h3>
+<p>A data class generates <code>equals</code>/<code>hashCode</code>/<code>toString</code>/<code>copy</code>/<code>componentN</code> from primary-constructor properties. It's ideal for immutable models and UI state.</p>
+<h3>8. When do you use a sealed class or interface?</h3>
+<p>For a closed set of types, such as UI states or results, so <code>when</code> expressions are exhaustive and the compiler flags unhandled cases.</p>
+<h3>9. What are scope functions?</h3>
+<p><code>let</code>, <code>run</code>, <code>with</code>, <code>apply</code> and <code>also</code> differ in receiver (<code>this</code> or <code>it</code>) and return value (lambda result or the object). Use them for clarity, not nesting.</p>
+<h3>10. What does <code>inline</code> do, and what is <code>reified</code>?</h3>
+<p><code>inline</code> copies the function and its lambdas into the call site, avoiding allocations. <code>reified</code> type parameters (only in inline functions) keep the type available at runtime. See <a href="../kotlin-generics-reified/index.html">Generics and Reified</a>.</p>
+
+<h2 id="coroutines">Coroutines and Flow (11–15)</h2>
+<h3>11. What is a suspend function?</h3>
+<p>A function that can pause without blocking its thread and resume later. It doesn't automatically run in the background. Main-safety comes from <code>withContext</code> or main-safe libraries.</p>
+<h3>12. What is structured concurrency?</h3>
+<p>Coroutines run in scopes. Cancelling a scope cancels its children, and a child failure cancels the parent (unless supervised). This prevents leaks. Use <code>viewModelScope</code> and <code>lifecycleScope</code>.</p>
+<h3>13. Dispatchers.IO vs Default vs Main?</h3>
+<p>IO for blocking I/O, Default for CPU work, Main for UI updates.</p>
+<h3>14. Flow vs StateFlow vs SharedFlow?</h3>
+<p>Flow is cold and runs per collector. StateFlow is hot, always has a value, and suits UI state. SharedFlow is a hot, configurable broadcast. See <a href="../flow-vs-stateflow-vs-sharedflow/index.html">the comparison</a>.</p>
+<h3>15. How do you collect flows safely in the UI?</h3>
+<p><code>collectAsStateWithLifecycle()</code> in Compose, or <code>repeatOnLifecycle(STARTED)</code> in Views, so collection stops in the background.</p>
+
+<h2 id="compose">Jetpack Compose (16–20)</h2>
+<h3>16. What is recomposition?</h3>
+<p>Re-running composables whose read state changed. Compose skips composables whose inputs are unchanged and stable.</p>
+<h3>17. remember vs rememberSaveable?</h3>
+<p><code>remember</code> survives recomposition. <code>rememberSaveable</code> also survives configuration changes and process death via the saved-state Bundle.</p>
+<h3>18. What is state hoisting?</h3>
+<p>Moving state up to a caller and passing <code>value</code> plus <code>onValueChange</code> down, which makes components stateless, reusable and testable.</p>
+<h3>19. What are side-effect APIs?</h3>
+<p><code>LaunchedEffect</code> (coroutines tied to composition and keys), <code>DisposableEffect</code> (setup and cleanup), <code>SideEffect</code> (publish after recomposition), and <code>rememberCoroutineScope</code> (launching from callbacks).</p>
+<h3>20. How do you improve Compose performance?</h3>
+<p>Measure release builds, use stable keys in lazy lists, defer fast-changing state reads to layout or draw, use <code>derivedStateOf</code>, avoid heavy work in composition, and add Baseline Profiles.</p>
+
+<h2 id="architecture">Architecture (21–25)</h2>
+<h3>21. Explain MVVM on Android.</h3>
+<p>The View renders state and sends events, the ViewModel holds UI state and logic, and the Model (repositories) provides data. State flows down and events flow up.</p>
+<h3>22. MVVM vs MVI?</h3>
+<p>Both use unidirectional flow. MVI formalises user actions as intents and state changes in a pure reducer. See <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a>.</p>
+<h3>23. What is a repository?</h3>
+<p>An abstraction over data sources (network, database) that exposes data to the app and owns the source of truth and caching policy.</p>
+<h3>24. Are use cases necessary?</h3>
+<p>Only when there's real, reusable or cross-repository business logic. The domain layer is optional.</p>
+<h3>25. Why dependency injection, and why Hilt?</h3>
+<p>DI makes classes testable and configurable by passing dependencies in. Hilt provides compile-time-checked DI integrated with Android lifecycles.</p>
+
+<h2 id="data">Data and networking (26–30)</h2>
+<h3>26. How does Retrofit work with coroutines?</h3>
+<p>You declare suspend functions on an annotated interface. Retrofit generates the implementation, and OkHttp performs I/O off the main thread.</p>
+<h3>27. Room vs DataStore?</h3>
+<p>Room for structured, queryable collections. DataStore for small settings. See <a href="../room-vs-datastore/index.html">Room vs DataStore</a>.</p>
+<h3>28. What does offline-first mean?</h3>
+<p>The local database is the source of truth, writes go local first, and sync happens in the background with conflict handling.</p>
+<h3>29. How do you handle API errors?</h3>
+<p>Classify IO, HTTP and parsing errors into typed errors at the boundary, map them to user-facing states, and retry only transient failures.</p>
+<h3>30. How do you implement pagination?</h3>
+<p>Paging 3: <code>PagingSource</code>, <code>Pager</code>, <code>cachedIn(viewModelScope)</code>, and <code>LazyPagingItems</code>. Add <code>RemoteMediator</code> with Room for offline support.</p>
+
+<h2 id="performance">Performance (31–35)</h2>
+<h3>31. How do you reduce startup time?</h3>
+<p>Defer non-critical initialisation, keep <code>Application.onCreate</code> light, ship Baseline Profiles, and measure with Macrobenchmark.</p>
+<h3>32. What are Baseline Profiles?</h3>
+<p>Lists of critical classes and methods shipped with the app, so ART compiles them ahead of time, which improves startup and jank from the first run.</p>
+<h3>33. How do you find memory leaks?</h3>
+<p>LeakCanary in debug builds, and heap dumps in Android Studio. The usual causes are Context or View references in long-lived objects.</p>
+<h3>34. What does R8 do?</h3>
+<p>It shrinks, optimises and obfuscates code, and removes unused resources with resource shrinking. It needs keep rules for reflection.</p>
+<h3>35. How do you diagnose jank?</h3>
+<p>Use system traces or Macrobenchmark <code>FrameTimingMetric</code>, find long main-thread work during janky frames, and fix the cause.</p>
+
+<h2 id="security">Security (36–40)</h2>
+<h3>36. How do you store API keys securely?</h3>
+<p>You can't hide secrets in an APK. Keep secrets on a server, and restrict any client keys. See <a href="../secure-api-keys-android/index.html">Secure API Keys</a>.</p>
+<h3>37. What is the Android Keystore?</h3>
+<p>A system that stores cryptographic keys, often in secure hardware, and performs operations without exposing key material.</p>
+<h3>38. What's the risk of exported components?</h3>
+<p>Other apps can invoke them. Export only what's necessary, and validate all input.</p>
+<h3>39. What is Play Integrity?</h3>
+<p>An API that gives your server signed verdicts about app, device and account integrity for risk decisions.</p>
+<h3>40. How do runtime permissions work?</h3>
+<p>Dangerous permissions are requested at runtime. Check, explain in context, request, and handle denial, including "don't ask again".</p>
+
+<h2 id="testing">Testing (41–45)</h2>
+<h3>41. Unit vs instrumented tests?</h3>
+<p>Unit tests run on the JVM (fast, for logic). Instrumented tests run on a device or emulator (for Android integration and UI).</p>
+<h3>42. How do you test coroutines?</h3>
+<p><code>runTest</code>, test dispatchers (replace Main with a rule), and injected dispatchers. Virtual time skips delays.</p>
+<h3>43. Fakes vs mocks?</h3>
+<p>Fakes are lightweight working implementations and are often preferred for repositories. Mocks verify interactions.</p>
+<h3>44. How do you test Compose UI?</h3>
+<p><code>createComposeRule</code>, finders on the semantics tree, actions and assertions, with stateless screens fed with test state.</p>
+<h3>45. What is screenshot testing?</h3>
+<p>Rendering composables and comparing them against reference images to catch visual regressions.</p>
+
+<h2 id="release">Release and tooling (46–50)</h2>
+<h3>46. compileSdk vs targetSdk vs minSdk?</h3>
+<p>APIs available at compile time, the behaviour version you've tested against, and the oldest supported Android version.</p>
+<h3>47. What is Play App Signing?</h3>
+<p>Google holds the app signing key, and you sign uploads with an upload key that can be reset if lost.</p>
+<h3>48. What is an Android App Bundle?</h3>
+<p>The publishing format from which Play generates optimised APKs per device configuration.</p>
+<h3>49. What is WorkManager for?</h3>
+<p>Deferrable, guaranteed background work with constraints, which survives app restarts and reboots.</p>
+<h3>50. How has AI changed Android development?</h3>
+<p>AI assistants speed up boilerplate, tests and debugging, but developers must verify output. AI features in apps use on-device (Gemini Nano) or cloud models. See <a href="../ai-changing-android-developer-work/index.html">How AI Is Changing Android Work</a>.</p>
+
+<h2 id="tips">How to use these answers</h2>
+<ul>
+  <li>Add a <strong>real example</strong> from your projects to each answer.</li>
+  <li>Mention <strong>trade-offs</strong>: interviewers value judgement over definitions.</li>
+  <li>Practise saying answers aloud in 30–60 seconds.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are XML View questions still asked?</summary><div><p>Sometimes, especially for companies with legacy code: RecyclerView, Fragments, View lifecycle. Be ready to discuss both Views and Compose.</p></div></details>
+  <details><summary>Do interviews include coding tasks?</summary><div><p>Usually: a small feature, a take-home or live coding. See <a href="../android-coding-interview-problems/index.html">Coding Interview Problems</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Strong Android interview answers are <strong>short, accurate and grounded in experience</strong>, covering why things work and the trade-offs involved. Use these 50 as a map, go deeper in your weaker areas, and practise explaining your own projects.</p>
+<p>Next step: go deeper on language questions in <a href="../kotlin-interview-questions-experienced/index.html">Kotlin Interview Questions for Experienced Developers</a>.</p>

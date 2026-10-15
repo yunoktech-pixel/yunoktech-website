@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debugging Android Crashes with Logcat (Step by Step) | Yunok Tech</title>
+  <meta name="description" content="Debug Android crashes with Logcat: reading stack traces, filtering logs, common exceptions and fixes, breakpoints, crash reporting with Crashlytics, and logging best practices.">
+  <meta name="keywords" content="debug android crash logcat, logcat filter android studio, read stack trace android, android crash fatal exception, crashlytics android, android logging best practices, caused by exception android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/debugging-crashes-logcat/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/debugging-crashes-logcat/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Debugging Android Crashes with Logcat (Step by Step)">
+  <meta property="og:description" content="Debug Android crashes with Logcat: reading stack traces, filtering logs, common exceptions and fixes, breakpoints, crash reporting with Crashlytics, and logging best practices.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Debugging Android Crashes with Logcat (Step by Step)">
+  <meta name="twitter:description" content="Debug Android crashes with Logcat: reading stack traces, filtering logs, common exceptions and fixes, breakpoints, crash reporting with Crashlytics, and logging best practices.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Debugging Crashes with Logcat", "description": "Debug Android crashes with Logcat: reading stack traces, filtering logs, common exceptions and fixes, breakpoints, crash reporting with Crashlytics, and logging best practices.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Testing, Debugging, and Performance", "keywords": "logcat filter android studio, read stack trace android, android crash fatal exception, crashlytics android, android logging best practices, caused by exception android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/debugging-crashes-logcat/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Debugging Crashes with Logcat", "item": "https://yunoktech.com/android/debugging-crashes-logcat/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Debugging Crashes with Logcat</h1>
+    <p class="ad-lede">When an Android app crashes, Logcat holds the answer, usually in the first few lines of a stack trace. This guide teaches you to find the right lines quickly, interpret common exceptions, and turn a crash into a fix and a test.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#filter">Find the crash in Logcat</a></li><li><a href="#anatomy">Anatomy of a stack trace</a></li><li><a href="#common">Common exceptions and their usual fixes</a></li><li><a href="#debugger">From crash to fix: using the debugger</a></li><li><a href="#logging">Logging well</a></li><li><a href="#production">Crashes in production</a></li><li><a href="#use-cases">Debugging scenarios</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"The app stopped" tells the user nothing and you even less. Logcat, Android's system log, records exactly which exception was thrown, where, and why. Learning to read it is one of the highest-leverage debugging skills you can build.</p>
+
+<h2 id="filter">Find the crash in Logcat</h2>
+<p>Android Studio's Logcat supports query filters. Useful ones:</p>
+<figure class="code"><figcaption><span class="file">Logcat filter examples</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">package:mine level:error          # only your app, errors and above
+package:mine tag:OrderRepo        # one tag from your app
+FATAL EXCEPTION                   # search for crash headers
+is:crash                          # crashes only (newer Logcat versions)</code></pre></figure>
+
+<h2 id="anatomy">Anatomy of a stack trace</h2>
+<figure class="code"><figcaption><span class="file">A typical crash (illustrative)</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">FATAL EXCEPTION: main
+Process: com.example.shop, PID: 12345
+java.lang.IllegalStateException: Product price missing for id=42
+    at com.example.shop.cart.CartMapper.toUi(CartMapper.kt:18)
+    at com.example.shop.cart.CartViewModel$load$1.invokeSuspend(CartViewModel.kt:34)
+    at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(...)
+    at kotlinx.coroutines.DispatchedTask.run(...)
+    ...
+Caused by: kotlinx.serialization.MissingFieldException: Field 'price' is required ...
+    at com.example.shop.api.ProductDto$$serializer.deserialize(...)</code></pre></figure>
+<figure class="diagram" role="group" aria-labelledby="fig-st-cap3">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-st-t3 fig-st-d3">
+    <title id="fig-st-t3">How to read an Android stack trace</title>
+    <desc id="fig-st-d3">Step one: read the exception type and message. Step two: find the first line in your own package, which is where to start looking. Step three: read the Caused by section, which often contains the root cause. Framework and library frames below are usually context.</desc>
+    <rect class="d-red" x="20" y="20" width="210" height="140" rx="12"/><text class="d-t" x="125" y="48" text-anchor="middle">1. Exception + message</text><text class="d-s" x="125" y="78" text-anchor="middle">what went wrong</text><text class="d-s" x="125" y="98" text-anchor="middle">IllegalStateException:</text><text class="d-s" x="125" y="114" text-anchor="middle">"price missing"</text>
+    <rect class="d-amber" x="255" y="20" width="210" height="140" rx="12"/><text class="d-t" x="360" y="48" text-anchor="middle">2. First frame in YOUR code</text><text class="d-s" x="360" y="78" text-anchor="middle">where to look</text><text class="d-s" x="360" y="98" text-anchor="middle">CartMapper.kt:18</text>
+    <rect class="d-violet" x="490" y="20" width="210" height="140" rx="12"/><text class="d-t" x="595" y="48" text-anchor="middle">3. "Caused by"</text><text class="d-s" x="595" y="78" text-anchor="middle">the root cause</text><text class="d-s" x="595" y="98" text-anchor="middle">API omitted 'price'</text>
+  </svg>
+  <figcaption id="fig-st-cap3">Most crashes are solved by these three reads. Framework frames below your code are usually context, not cause.</figcaption>
+</figure>
+
+<h2 id="common">Common exceptions and their usual fixes</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Exception</th><th>Usual cause</th><th>Typical fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>NullPointerException</code></td><td><code>!!</code>, platform types from Java, uninitialised <code>lateinit</code></td><td>Model nullability; safe calls; initialise properly</td></tr>
+    <tr><td><code>IllegalStateException</code></td><td>Invalid state: fragment not attached, <code>checkNotNull</code> failed, ViewModel misuse</td><td>Fix lifecycle timing; validate inputs earlier</td></tr>
+    <tr><td><code>NetworkOnMainThreadException</code></td><td>Network call on the main thread</td><td>Coroutines + suspend APIs</td></tr>
+    <tr><td><code>IndexOutOfBoundsException</code></td><td>Stale index, list changed</td><td>Use stable keys/IDs; <code>getOrNull</code></td></tr>
+    <tr><td><code>ClassCastException</code></td><td>Wrong type assumption, often from Bundles or reflection</td><td>Type-safe navigation arguments; safe casts</td></tr>
+    <tr><td><code>Resources$NotFoundException</code></td><td>Passing an Int value where a resource ID is expected (<code>setText(42)</code>)</td><td>Convert to String; check resource qualifiers</td></tr>
+    <tr><td><code>SecurityException</code></td><td>Missing runtime permission</td><td>Request permission; check before use</td></tr>
+    <tr><td><code>TransactionTooLargeException</code></td><td>Large Bundle (saved state, intent extras)</td><td>Pass IDs; persist large data elsewhere</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="debugger">From crash to fix: using the debugger</h2>
+<ol class="steps">
+  <li>Click the file link in the stack trace (for example <code>CartMapper.kt:18</code>) to jump to the line.</li>
+  <li>Set a breakpoint there, or an <strong>exception breakpoint</strong> for that exception type (Run → View Breakpoints).</li>
+  <li>Run in debug and reproduce. Inspect variables and the call stack when it stops.</li>
+  <li>Write a unit test that reproduces the failing input, fix the code, and watch the test pass.</li>
+</ol>
+<figure class="code"><figcaption><span class="file">Regression test for the crash above</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `product without price <span class="tk-k">is</span> shown <span class="tk-k">as</span> unavailable instead of crashing`() {
+    <span class="tk-k">val</span> ui = <span class="tk-t">CartMapper</span>.toUi(<span class="tk-t">ProductDto</span>(id = <span class="tk-s">"42"</span>, name = <span class="tk-s">"Mug"</span>, price = <span class="tk-k">null</span>))
+    assertEquals(<span class="tk-s">"Unavailable"</span>, ui.priceText)
+}</code></pre></figure>
+
+<h2 id="logging">Logging well</h2>
+<figure class="code"><figcaption><span class="file">Structured, safe logging</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">private</span> <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">TAG</span> = <span class="tk-s">"OrderRepo"</span>
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> placeOrder(order: <span class="tk-t">Order</span>) {
+    <span class="tk-t">Log</span>.d(<span class="tk-t">TAG</span>, <span class="tk-s">"placeOrder items=${order.items.size} total=${order.totalPaise}"</span>)   <span class="tk-c">// no personal data</span>
+    <span class="tk-k">try</span> {
+        api.place(order.toDto())
+    } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+        <span class="tk-t">Log</span>.w(<span class="tk-t">TAG</span>, <span class="tk-s">"placeOrder failed: network"</span>, e)       <span class="tk-c">// include the throwable for its stack trace</span>
+        <span class="tk-k">throw</span> e
+    }
+}</code></pre></figure>
+<ul>
+  <li>Use levels meaningfully: <code>d</code> for debug detail, <code>i</code> for milestones, <code>w</code> for recoverable problems, <code>e</code> for failures.</li>
+  <li>Never log tokens, passwords or personal data.</li>
+  <li>Strip verbose logs from release builds (for example with a logging wrapper or Timber's debug tree).</li>
+</ul>
+
+<h2 id="production">Crashes in production</h2>
+<p>Logcat only shows <em>your</em> device. For users' crashes, use <strong>Android vitals</strong> in the Play Console and a crash reporter such as <strong>Firebase Crashlytics</strong>. Upload R8 mapping files so stack traces are readable (see <a href="../proguard-r8-explained/index.html">R8</a>), and add breadcrumbs and custom keys (screen name, feature flag) to reproduce context.</p>
+
+<h2 id="use-cases">Debugging scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Crash only in release</h3><p>Usually R8 or reflection. Reproduce with a minified build and add a targeted keep rule.</p></div>
+  <div class="card usecase"><h3>Crash after returning from background</h3><p>Usually process death and a missing <code>lateinit</code> or state. Test with "Don't keep activities".</p></div>
+  <div class="card usecase"><h3>Crash on one manufacturer</h3><p>Check Android version, permissions behaviour and WebView or OEM differences in vitals breakdowns.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Logcat is too noisy. What can I do?</summary><div><p>Filter by <code>package:mine</code> and level, create saved filters, and use consistent tags.</p></div></details>
+  <details><summary>Why don't I see my logs?</summary><div><p>Check the selected device and process, the filter, and that your logging isn't stripped in that build variant.</p></div></details>
+  <details><summary>Can AI help read stack traces?</summary><div><p>Yes. Tools like Gemini in Android Studio can explain traces and suggest causes, but verify suggestions against the code. See <a href="../debug-android-errors-with-ai/index.html">Debugging with AI</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>To debug a crash: <strong>filter Logcat</strong>, read the <strong>exception and message</strong>, jump to the <strong>first frame in your code</strong>, check <strong>"Caused by"</strong>, reproduce with breakpoints, and lock in the fix with a <strong>regression test</strong>. Use Android vitals and Crashlytics for production crashes.</p>
+<p>Next step: automate your quality checks with <a href="../android-ci-cd-github-actions/index.html">CI/CD for Android with GitHub Actions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/debug/logcat" target="_blank" rel="noopener">View logs with Logcat</a></li><li><a href="https://developer.android.com/studio/debug" target="_blank" rel="noopener">Debug your app</a></li><li><a href="https://developer.android.com/topic/performance/vitals/crash" target="_blank" rel="noopener">Crashes (Android vitals)</a></li><li><a href="https://firebase.google.com/docs/crashlytics" target="_blank" rel="noopener">Firebase Crashlytics</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddebugging-crashes-logcat-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddebugging-crashes-logcat-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-beginner-mistakes/index.html"><small>Android Development for Beginners</small>Common Mistakes Beginners Make in Android Development</a></li><li><a href="../../android/android-anr-errors/index.html"><small>Testing, Debugging, and Performance</small>ANR Errors Explained and How to Fix Them</a></li><li><a href="../../android/debug-android-errors-with-ai/index.html"><small>AI Tools for Android Developers</small>Debugging Android Errors with AI Coding Assistants</a></li><li><a href="../../android/android-analytics-crash-reporting/index.html"><small>App Publishing, Monetization, and Product Development</small>Analytics and Crash Reporting for Android Apps</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/debugging-crashes-logcat/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/debugging-crashes-logcat/&amp;text=Debugging Crashes with Logcat" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/debugging-crashes-logcat/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#filter">Find the crash in Logcat</a></li><li><a href="#anatomy">Anatomy of a stack trace</a></li><li><a href="#common">Common exceptions and their usual fixes</a></li><li><a href="#debugger">From crash to fix: using the debugger</a></li><li><a href="#logging">Logging well</a></li><li><a href="#production">Crashes in production</a></li><li><a href="#use-cases">Debugging scenarios</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddebugging-crashes-logcat-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Ddebugging-crashes-logcat-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

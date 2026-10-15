@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkManager in Android: Background Work Guide (Kotlin) | Yunok Tech</title>
+  <meta name="description" content="Schedule reliable background work with WorkManager: CoroutineWorker, constraints, one-time and periodic work, unique work, chaining, input/output data, retries, expedited work, Hilt and testing.">
+  <meta name="keywords" content="workmanager android, coroutineworker kotlin, periodic work request android, workmanager constraints, unique work workmanager, expedited work android, android background tasks">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/workmanager-background-work/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/workmanager-background-work/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="WorkManager in Android: Background Work Guide (Kotlin)">
+  <meta property="og:description" content="Schedule reliable background work with WorkManager: CoroutineWorker, constraints, one-time and periodic work, unique work, chaining, input/output data, retries, expedited work, Hilt and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Advanced Android Engineering and Emerging Technology">
+  <meta name="twitter:title" content="WorkManager in Android: Background Work Guide (Kotlin)">
+  <meta name="twitter:description" content="Schedule reliable background work with WorkManager: CoroutineWorker, constraints, one-time and periodic work, unique work, chaining, input/output data, retries, expedited work, Hilt and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Background Work with WorkManager", "description": "Schedule reliable background work with WorkManager: CoroutineWorker, constraints, one-time and periodic work, unique work, chaining, input/output data, retries, expedited work, Hilt and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Advanced Android Engineering and Emerging Technology", "keywords": "coroutineworker kotlin, periodic work request android, workmanager constraints, unique work workmanager, expedited work android, android background tasks", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/workmanager-background-work/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Background Work with WorkManager", "item": "https://yunoktech.com/android/workmanager-background-work/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#advanced">Advanced Android Engineering and Emerging Technology</a></nav>
+    <span class="ad-chip">⚙️ Advanced Android Engineering and Emerging Technology</span>
+    <h1 id="article-title">Background Work with WorkManager</h1>
+    <p class="ad-lede">Uploading a photo, syncing data overnight, cleaning old files: work that must finish even if the user leaves the app or the device restarts. WorkManager is the recommended API for this persistent background work. Here's how to use it properly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#when">When to use WorkManager</a></li><li><a href="#setup">Setup and a CoroutineWorker</a></li><li><a href="#enqueue">Enqueue with constraints</a></li><li><a href="#chain">Chaining and observing</a></li><li><a href="#expedited">Expedited and long-running work</a></li><li><a href="#hilt">Dependency injection with Hilt</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Android aggressively limits background execution to save battery. WorkManager works within those limits: it persists scheduled work in a database, respects constraints like network and charging, retries with backoff, and survives app restarts and reboots.</p>
+
+<h2 id="when">When to use WorkManager</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-wm-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-wm-t fig-wm-d">
+    <title id="fig-wm-t">Choosing a background work API</title>
+    <desc id="fig-wm-d">Work tied to a screen uses coroutines in viewModelScope. Persistent work that must complete, possibly deferred, uses WorkManager. User-visible ongoing work like media playback or navigation uses a foreground service. Exact-time user-facing events like alarms use AlarmManager.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="165" height="130" rx="12"/><text class="d-t" x="92" y="60" text-anchor="middle">Coroutines</text><text class="d-s" x="92" y="88" text-anchor="middle">while screen</text><text class="d-s" x="92" y="106" text-anchor="middle">is active</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="187" y="30" width="165" height="130" rx="12"/><text class="d-t" x="270" y="60" text-anchor="middle">WorkManager</text><text class="d-s" x="270" y="88" text-anchor="middle">must finish,</text><text class="d-s" x="270" y="106" text-anchor="middle">can be deferred</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="364" y="30" width="165" height="130" rx="12"/><text class="d-t" x="446" y="60" text-anchor="middle">Foreground service</text><text class="d-s" x="446" y="88" text-anchor="middle">user-visible,</text><text class="d-s" x="446" y="106" text-anchor="middle">ongoing now</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="541" y="30" width="169" height="130" rx="12"/><text class="d-t" x="625" y="60" text-anchor="middle">AlarmManager</text><text class="d-s" x="625" y="88" text-anchor="middle">exact time,</text><text class="d-s" x="625" y="106" text-anchor="middle">user-facing alarm</text></g>
+    <text class="d-s" x="360" y="188" text-anchor="middle">WorkManager is the default for persistent work.</text>
+  </svg>
+  <figcaption id="fig-wm-cap">Pick the API by whether work must persist, must run now, and whether the user sees it.</figcaption>
+</figure>
+
+<h2 id="setup">Setup and a CoroutineWorker</h2>
+<figure class="code"><figcaption><span class="file">build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    implementation(<span class="tk-s">"androidx.work:work-runtime-ktx:2.10.0"</span>) <span class="tk-c">// check for the latest stable version</span>
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">SyncWorker.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SyncWorker</span>(
+    appContext: <span class="tk-t">Context</span>,
+    params: <span class="tk-t">WorkerParameters</span>,
+) : <span class="tk-t">CoroutineWorker</span>(appContext, params) {
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> doWork(): <span class="tk-t">Result</span> {
+        <span class="tk-k">val</span> since = inputData.getLong(<span class="tk-t">KEY_SINCE</span>, <span class="tk-n">0L</span>)
+        <span class="tk-k">return</span> <span class="tk-k">try</span> {
+            <span class="tk-k">val</span> count = syncRepository().syncChangesSince(since)     <span class="tk-c">// suspend, main-safe</span>
+            <span class="tk-t">Result</span>.success(workDataOf(<span class="tk-t">KEY_COUNT</span> to count))
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-k">if</span> (runAttemptCount &lt; <span class="tk-n">5</span>) <span class="tk-t">Result</span>.retry() <span class="tk-k">else</span> <span class="tk-t">Result</span>.failure()
+        }
+    }
+
+    <span class="tk-k">companion</span> <span class="tk-k">object</span> {
+        <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">KEY_SINCE</span> = <span class="tk-s">"since"</span>
+        <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">KEY_COUNT</span> = <span class="tk-s">"count"</span>
+    }
+}</code></pre></figure>
+<p>Return <code>success</code>, <code>retry</code> (uses backoff) or <code>failure</code>. Treat work as idempotent: it may run more than once.</p>
+
+<h2 id="enqueue">Enqueue with constraints</h2>
+<figure class="code"><figcaption><span class="file">Scheduling work</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> constraints = <span class="tk-t">Constraints</span>.<span class="tk-t">Builder</span>()
+    .setRequiredNetworkType(<span class="tk-t">NetworkType</span>.<span class="tk-t">CONNECTED</span>)
+    .setRequiresBatteryNotLow(<span class="tk-k">true</span>)
+    .build()
+
+<span class="tk-c">// One-time, unique: avoid duplicate syncs if the user taps twice</span>
+<span class="tk-k">val</span> oneTime = <span class="tk-t">OneTimeWorkRequestBuilder</span>&lt;<span class="tk-t">SyncWorker</span>&gt;()
+    .setConstraints(constraints)
+    .setInputData(workDataOf(<span class="tk-t">SyncWorker</span>.<span class="tk-t">KEY_SINCE</span> to lastSync))
+    .setBackoffCriteria(<span class="tk-t">BackoffPolicy</span>.<span class="tk-t">EXPONENTIAL</span>, <span class="tk-n">30</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">SECONDS</span>)
+    .build()
+<span class="tk-t">WorkManager</span>.getInstance(context)
+    .enqueueUniqueWork(<span class="tk-s">"sync"</span>, <span class="tk-t">ExistingWorkPolicy</span>.<span class="tk-t">KEEP</span>, oneTime)
+
+<span class="tk-c">// Periodic: minimum interval is 15 minutes</span>
+<span class="tk-k">val</span> periodic = <span class="tk-t">PeriodicWorkRequestBuilder</span>&lt;<span class="tk-t">SyncWorker</span>&gt;(<span class="tk-n">12</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">HOURS</span>)
+    .setConstraints(constraints)
+    .build()
+<span class="tk-t">WorkManager</span>.getInstance(context)
+    .enqueueUniquePeriodicWork(<span class="tk-s">"periodic-sync"</span>, <span class="tk-t">ExistingPeriodicWorkPolicy</span>.<span class="tk-t">KEEP</span>, periodic)</code></pre></figure>
+<div class="callout note"><b>Timing isn't exact</b><p>WorkManager runs work when constraints are met and the system allows. Doze and App Standby buckets can delay it. Don't use it when work must happen at a precise time.</p></div>
+
+<h2 id="chain">Chaining and observing</h2>
+<figure class="code"><figcaption><span class="file">Chain and observe</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">WorkManager</span>.getInstance(context)
+    .beginUniqueWork(<span class="tk-s">"upload"</span>, <span class="tk-t">ExistingWorkPolicy</span>.<span class="tk-t">REPLACE</span>, compressRequest)
+    .then(uploadRequest)          <span class="tk-c">// receives compress output as input</span>
+    .then(cleanupRequest)
+    .enqueue()
+
+<span class="tk-c">// Observe progress/state as Flow (e.g. in a ViewModel)</span>
+<span class="tk-k">val</span> uploadState: <span class="tk-t">Flow</span>&lt;<span class="tk-t">WorkInfo</span>.<span class="tk-t">State</span>?&gt; =
+    <span class="tk-t">WorkManager</span>.getInstance(context)
+        .getWorkInfosForUniqueWorkFlow(<span class="tk-s">"upload"</span>)
+        .map { infos -&gt; infos.lastOrNull()?.state }</code></pre></figure>
+
+<h2 id="expedited">Expedited and long-running work</h2>
+<ul>
+  <li><strong>Expedited work</strong> (<code>setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)</code>): for short, important tasks the user started, like sending a message. Subject to quotas.</li>
+  <li><strong>Long-running work</strong>: call <code>setForeground(...)</code> from the worker to run as a foreground service with a notification, declaring the right foreground service type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</li>
+</ul>
+
+<h2 id="hilt">Dependency injection with Hilt</h2>
+<figure class="code"><figcaption><span class="file">HiltWorker</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@HiltWorker</span>
+<span class="tk-k">class</span> <span class="tk-t">SyncWorker</span> <span class="tk-a">@AssistedInject</span> <span class="tk-k">constructor</span>(
+    <span class="tk-a">@Assisted</span> appContext: <span class="tk-t">Context</span>,
+    <span class="tk-a">@Assisted</span> params: <span class="tk-t">WorkerParameters</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">SyncRepository</span>,
+) : <span class="tk-t">CoroutineWorker</span>(appContext, params) {
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> doWork(): <span class="tk-t">Result</span> = <span class="tk-c">/* ... */</span> <span class="tk-t">Result</span>.success()
+}
+<span class="tk-c">// Application implements Configuration.Provider with HiltWorkerFactory,</span>
+<span class="tk-c">// and the default WorkManager initializer is removed in the manifest.</span></code></pre></figure>
+
+<h2 id="testing">Testing</h2>
+<figure class="code"><figcaption><span class="file">SyncWorkerTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> syncWorker_succeeds() = runTest {
+    <span class="tk-k">val</span> worker = <span class="tk-t">TestListenableWorkerBuilder</span>&lt;<span class="tk-t">SyncWorker</span>&gt;(context)
+        .setInputData(workDataOf(<span class="tk-t">SyncWorker</span>.<span class="tk-t">KEY_SINCE</span> to <span class="tk-n">0L</span>))
+        .build()
+    <span class="tk-k">val</span> result = worker.doWork()
+    assertTrue(result <span class="tk-k">is</span> <span class="tk-t">ListenableWorker</span>.<span class="tk-t">Result</span>.<span class="tk-t">Success</span>)
+}</code></pre></figure>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Offline-first sync</h3><p>Push queued local changes when the network returns. See <a href="../offline-first-android-architecture/index.html">Offline-First Apps</a>.</p></div>
+  <div class="card usecase"><h3>Media upload</h3><p>Compress, upload and clean up as a chain, with progress shown in the UI.</p></div>
+  <div class="card usecase"><h3>Maintenance</h3><p>Periodic cache cleanup or database pruning while charging.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Work never runs:</strong> check constraints, inspect with Background Task Inspector in Android Studio, and check if the app is force-stopped (force-stop cancels scheduled work until the app is opened again).</li>
+  <li><strong>Duplicate work:</strong> use unique work with the right existing-work policy.</li>
+  <li><strong>Hilt worker crashes on creation:</strong> the custom WorkManager configuration or initializer removal is missing.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does WorkManager survive reboots?</summary><div><p>Yes. Work is persisted and rescheduled after reboot.</p></div></details>
+  <details><summary>Can periodic work run every minute?</summary><div><p>No. The minimum interval is 15 minutes. For real-time updates use push messages (FCM) or a foreground service when appropriate.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use WorkManager for <strong>persistent, deferrable work</strong>: write idempotent <strong>CoroutineWorkers</strong>, add <strong>constraints</strong>, use <strong>unique work</strong> to avoid duplicates, <strong>chain</strong> steps, observe state as Flow, and test with <code>TestListenableWorkerBuilder</code>.</p>
+<p>Next step: handle ongoing, user-visible tasks with <a href="../android-foreground-services/index.html">Foreground Services in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/background-work/background-tasks" target="_blank" rel="noopener">Background work overview</a></li><li><a href="https://developer.android.com/develop/background-work/background-tasks/persistent" target="_blank" rel="noopener">WorkManager guide</a></li><li><a href="https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work" target="_blank" rel="noopener">Define work requests</a></li><li><a href="https://developer.android.com/develop/background-work/background-tasks/testing/persistent/integration-testing" target="_blank" rel="noopener">Testing WorkManager</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dworkmanager-background-work-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dworkmanager-background-work-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-foreground-services/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Android Services and Foreground Services</a></li><li><a href="../../android/offline-first-android-architecture/index.html"><small>APIs, Databases, and Backend Integration</small>Offline-First Android App Architecture</a></li><li><a href="../../android/android-app-components/index.html"><small>Android Development for Beginners</small>Android App Components: Activities, Services, and Receivers</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/workmanager-background-work/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/workmanager-background-work/&amp;text=Background Work with WorkManager" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/workmanager-background-work/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#when">When to use WorkManager</a></li><li><a href="#setup">Setup and a CoroutineWorker</a></li><li><a href="#enqueue">Enqueue with constraints</a></li><li><a href="#chain">Chaining and observing</a></li><li><a href="#expedited">Expedited and long-running work</a></li><li><a href="#hilt">Dependency injection with Hilt</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dworkmanager-background-work-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dworkmanager-background-work-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

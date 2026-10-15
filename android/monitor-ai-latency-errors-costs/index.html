@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring AI Latency, Errors and Inference Costs | Yunok Tech</title>
+  <meta name="description" content="Monitor AI features in Android apps: key metrics (time to first token, total latency, error rates, token usage, cost per user), client and backend instrumentation, dashboards, alerts, budgets and quality signals.">
+  <meta name="keywords" content="monitor ai latency cost, llm observability mobile, time to first token metric, ai cost tracking per user, firebase performance custom trace, ai error rate monitoring, token usage metadata">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/monitor-ai-latency-errors-costs/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/monitor-ai-latency-errors-costs/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Monitoring AI Latency, Errors and Inference Costs">
+  <meta property="og:description" content="Monitor AI features in Android apps: key metrics (time to first token, total latency, error rates, token usage, cost per user), client and backend instrumentation, dashboards, alerts, budgets and quality signals.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Monitoring AI Latency, Errors and Inference Costs">
+  <meta name="twitter:description" content="Monitor AI features in Android apps: key metrics (time to first token, total latency, error rates, token usage, cost per user), client and backend instrumentation, dashboards, alerts, budgets and quality signals.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Monitoring AI Latency, Errors, and Inference Costs", "description": "Monitor AI features in Android apps: key metrics (time to first token, total latency, error rates, token usage, cost per user), client and backend instrumentation, dashboards, alerts, budgets and quality signals.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android AI Projects and Production", "keywords": "llm observability mobile, time to first token metric, ai cost tracking per user, firebase performance custom trace, ai error rate monitoring, token usage metadata", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/monitor-ai-latency-errors-costs/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Monitoring AI Latency, Errors, and Inference Costs", "item": "https://yunoktech.com/android/monitor-ai-latency-errors-costs/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Monitoring AI Latency, Errors, and Inference Costs</h1>
+    <p class="ad-lede">Once an AI feature ships, you need to know: is it fast, is it working, how much does it cost, and do users find it useful? AI adds new metrics, such as time to first token, tokens per request and cost per user, on top of normal app monitoring. Here's what to measure and how.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#metrics">What to measure</a></li><li><a href="#pipeline">Instrumentation overview</a></li><li><a href="#client">Client instrumentation</a></li><li><a href="#tokens">Token usage and cost</a></li><li><a href="#alerts">Dashboards, alerts and budgets</a></li><li><a href="#quality">Quality signals</a></li><li><a href="#optimise">Acting on the data</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead"><a href="../ai-tokens-latency-cost-mobile/index.html">Tokens, Latency and Cost</a> explains the concepts. This article is about operating AI in production: instrumenting calls, building dashboards, setting alerts and budgets, and connecting metrics to quality.</p>
+
+<h2 id="metrics">What to measure</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>Metric</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Latency</td><td>Time to first token (TTFT), total time, p50/p95</td><td>TTFT drives perceived speed</td></tr>
+    <tr><td>Reliability</td><td>Error rate by type (429, timeout, blocked, parse)</td><td>Detect outages and limits</td></tr>
+    <tr><td>Usage</td><td>Requests per feature/user, input/output tokens</td><td>Capacity planning</td></tr>
+    <tr><td>Cost</td><td>Cost per request, per active user, per feature</td><td>Unit economics</td></tr>
+    <tr><td>Tier</td><td>On-device vs cloud vs fallback share</td><td>Device availability reality</td></tr>
+    <tr><td>Quality</td><td>Thumbs up/down, edits, retries, stops</td><td>Usefulness signals</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="pipeline">Instrumentation overview</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-mon-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-mon-t fig-mon-d">
+    <title id="fig-mon-t">AI monitoring pipeline</title>
+    <desc id="fig-mon-d">The app measures time to first token, total latency, outcome and tier, and sends events without content. The backend or provider records token usage and cost. Both feed dashboards and alerts on latency, error rate and spend, and quality signals from user feedback.</desc>
+    <defs><marker id="monm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M220 60 H276 M220 140 H276 M460 100 H516" marker-end="url(#monm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="30" width="200" height="60" rx="12"/><text class="d-t" x="120" y="56" text-anchor="middle">App</text><text class="d-s" x="120" y="74" text-anchor="middle">TTFT · latency · outcome</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="20" y="110" width="200" height="60" rx="12"/><text class="d-t" x="120" y="136" text-anchor="middle">Backend / provider</text><text class="d-s" x="120" y="154" text-anchor="middle">tokens · cost</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="280" y="60" width="180" height="80" rx="12"/><text class="d-t" x="370" y="94" text-anchor="middle">Events store</text><text class="d-s" x="370" y="114" text-anchor="middle">no prompt content</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="60" width="180" height="80" rx="12"/><text class="d-t" x="610" y="94" text-anchor="middle">Dashboards</text><text class="d-s" x="610" y="114" text-anchor="middle">+ alerts, budgets</text></g>
+  </svg>
+  <figcaption id="fig-mon-cap">Client metrics show user experience; server metrics show cost and provider health.</figcaption>
+</figure>
+
+<h2 id="client">Client instrumentation</h2>
+<figure class="code"><figcaption><span class="file">Measuring a streamed call</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; <span class="tk-t">Flow</span>&lt;<span class="tk-t">T</span>&gt;.instrumented(feature: <span class="tk-t">String</span>, model: <span class="tk-t">String</span>, source: <span class="tk-t">String</span>, telemetry: <span class="tk-t">AiTelemetry</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">T</span>&gt; {
+    <span class="tk-k">var</span> start = <span class="tk-n">0L</span>
+    <span class="tk-k">var</span> firstTokenAt = <span class="tk-n">0L</span>
+    <span class="tk-k">return</span> <span class="tk-k">this</span>
+        .onStart { start = <span class="tk-t">SystemClock</span>.elapsedRealtime() }
+        .onEach { <span class="tk-k">if</span> (firstTokenAt == <span class="tk-n">0L</span>) firstTokenAt = <span class="tk-t">SystemClock</span>.elapsedRealtime() }
+        .onCompletion { cause -&gt;
+            <span class="tk-k">val</span> end = <span class="tk-t">SystemClock</span>.elapsedRealtime()
+            telemetry.record(
+                <span class="tk-t">AiCallEvent</span>(
+                    feature = feature, model = model, source = source,
+                    ttftMs = <span class="tk-k">if</span> (firstTokenAt &gt; <span class="tk-n">0</span>) firstTokenAt - start <span class="tk-k">else</span> <span class="tk-k">null</span>,
+                    totalMs = end - start,
+                    outcome = <span class="tk-k">when</span> (cause) {
+                        <span class="tk-k">null</span> -&gt; <span class="tk-s">"ok"</span>
+                        <span class="tk-k">is</span> <span class="tk-t">CancellationException</span> -&gt; <span class="tk-s">"stopped"</span>
+                        <span class="tk-k">else</span> -&gt; <span class="tk-s">"error:${cause::class.simpleName}"</span>
+                    },
+                )
+            )
+        }
+}
+<span class="tk-c">// Usage: model.generateContentStream(prompt).mapNotNull { it.text }.instrumented("summarize", "gemini-3.8-flash", "cloud", telemetry)</span></code></pre></figure>
+<p>Send these as analytics events or custom Performance Monitoring traces. Never include prompts or responses. See <a href="../ai-privacy-data-retention/index.html">AI Privacy</a>.</p>
+
+<h2 id="tokens">Token usage and cost</h2>
+<p>Responses usually include usage metadata (input and output token counts). Record it where you can trust it, ideally on your backend, and multiply by your model's current price:</p>
+<figure class="code"><figcaption><span class="file">Cost estimate (prices are inputs, not constants)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ModelPrice</span>(<span class="tk-k">val</span> inputPerMillion: <span class="tk-t">Double</span>, <span class="tk-k">val</span> outputPerMillion: <span class="tk-t">Double</span>)   <span class="tk-c">// from your config</span>
+
+<span class="tk-k">fun</span> estimateCost(inputTokens: <span class="tk-t">Int</span>, outputTokens: <span class="tk-t">Int</span>, price: <span class="tk-t">ModelPrice</span>): <span class="tk-t">Double</span> =
+    inputTokens / <span class="tk-n">1_000_000.0</span> * price.inputPerMillion +
+    outputTokens / <span class="tk-n">1_000_000.0</span> * price.outputPerMillion
+<span class="tk-c">// Load prices from remote config/backend; check the provider's pricing page for current rates.</span></code></pre></figure>
+<p>Firebase AI Logic also offers AI monitoring in the Firebase console, covering requests, latency, errors and tokens. Use it alongside your own feature-level metrics.</p>
+
+<h2 id="alerts">Dashboards, alerts and budgets</h2>
+<ul>
+  <li><strong>Dashboards:</strong> p95 TTFT and error rate per feature and model; daily cost per feature; tier share.</li>
+  <li><strong>Alerts:</strong> error-rate spikes (for example 429s), latency regressions after model changes, cost above a daily threshold.</li>
+  <li><strong>Budgets:</strong> cloud billing budget alerts, plus per-user quotas on your backend to prevent abuse.</li>
+</ul>
+
+<h2 id="quality">Quality signals</h2>
+<ul>
+  <li>Ratings, report rate, regenerate/retry rate, stop rate, and edit distance between suggestion and final text.</li>
+  <li>Compare quality metrics when switching models or prompts (A/B tests with flags).</li>
+  <li>Combine with offline evaluation sets. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI</a>.</li>
+</ul>
+
+<h2 id="optimise">Acting on the data</h2>
+<div class="cards">
+  <div class="card usecase"><h3>High TTFT</h3><p>Stream, shorten prompts, use a faster model, or move simple tasks on device.</p></div>
+  <div class="card usecase"><h3>High cost</h3><p>Cap output tokens, trim context, cache results, route simple requests to cheaper models.</p></div>
+  <div class="card usecase"><h3>High errors</h3><p>Check quotas, add backoff, and improve fallbacks. See <a href="../ai-fallbacks-android/index.html">Fallbacks</a>.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I trust client-reported token counts?</summary><div><p>For dashboards, yes. For billing users or enforcing quotas, record usage on your backend, where clients can't tamper with it.</p></div></details>
+  <details><summary>How do I monitor on-device AI?</summary><div><p>Track availability, latency, errors (including busy and quota errors) and tier share. There's no per-token cost, but there may be battery impact.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Operate AI like any production dependency, plus a few new metrics: <strong>TTFT and latency percentiles</strong>, <strong>error types</strong>, <strong>tokens and cost per feature and user</strong>, <strong>tier share</strong> and <strong>quality signals</strong>, with dashboards, alerts and budgets, and without logging user content.</p>
+<p>Explore more in the <a href="../index.html">Android Developer Blog hub</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/perf-mon/custom-code-traces?platform=android" target="_blank" rel="noopener">Firebase Performance Monitoring: custom traces</a></li><li><a href="https://firebase.google.com/docs/ai-logic/monitoring" target="_blank" rel="noopener">Firebase AI Logic: monitoring</a></li><li><a href="https://ai.google.dev/gemini-api/docs/tokens" target="_blank" rel="noopener">Gemini API: token counting</a></li><li><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Gemini API pricing</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmonitor-ai-latency-errors-costs-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmonitor-ai-latency-errors-costs-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-tokens-latency-cost-mobile/index.html"><small>Android AI and Generative AI</small>AI Tokens, Latency, and Cost Optimization for Mobile Apps</a></li><li><a href="../../android/android-analytics-crash-reporting/index.html"><small>App Publishing, Monetization, and Product Development</small>Analytics and Crash Reporting for Android Apps</a></li><li><a href="../../android/ai-fallbacks-android/index.html"><small>Android AI Projects and Production</small>Fallbacks When AI Is Unavailable</a></li><li><a href="../../android/ai-privacy-data-retention/index.html"><small>Android AI Projects and Production</small>AI Privacy and Data Retention in Android Apps</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/monitor-ai-latency-errors-costs/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/monitor-ai-latency-errors-costs/&amp;text=Monitoring AI Latency, Errors, and Inference Costs" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/monitor-ai-latency-errors-costs/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#metrics">What to measure</a></li><li><a href="#pipeline">Instrumentation overview</a></li><li><a href="#client">Client instrumentation</a></li><li><a href="#tokens">Token usage and cost</a></li><li><a href="#alerts">Dashboards, alerts and budgets</a></li><li><a href="#quality">Quality signals</a></li><li><a href="#optimise">Acting on the data</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmonitor-ai-latency-errors-costs-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmonitor-ai-latency-errors-costs-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

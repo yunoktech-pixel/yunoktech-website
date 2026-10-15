@@ -1,0 +1,291 @@
+<!--meta
+{
+  "seo_title": "Gemini API Integration in Android Using Kotlin",
+  "description": "Integrate the Gemini API in an Android app with Kotlin and Firebase AI Logic: setup, App Check, system instructions, streaming into Compose, images, errors and cost control.",
+  "primary_keyword": "gemini api android kotlin",
+  "keywords": ["firebase ai logic android", "gemini api kotlin example", "generateContentStream kotlin", "gemini android tutorial", "app check gemini", "gemini jetpack compose", "gemini multimodal android"],
+  "intent": "Tutorial / implementation",
+  "lede": "A complete, production-minded walkthrough for calling Gemini from an Android app in Kotlin: Firebase AI Logic setup, App Check protection, model configuration, streaming responses into Jetpack Compose, sending images, and handling the errors you'll actually see.",
+  "date": "2026-10-14",
+  "cta": "ai",
+  "related": ["ai-chatbot-jetpack-compose", "cloud-ai-vs-on-device-ai-android", "choose-ai-model-android-app", "gemini-nano-ml-kit-genai-android"],
+  "refs": [
+    ["Firebase AI Logic: Get started (Android)", "https://firebase.google.com/docs/ai-logic/get-started?platform=android"],
+    ["Generate text with Firebase AI Logic", "https://firebase.google.com/docs/ai-logic/generate-text?platform=android"],
+    ["Multi-turn chat with Firebase AI Logic", "https://firebase.google.com/docs/ai-logic/chat?platform=android"],
+    ["App Check for Firebase AI Logic", "https://firebase.google.com/docs/ai-logic/app-check"],
+    ["Gemini models", "https://ai.google.dev/gemini-api/docs/models"],
+    ["Gemini API pricing", "https://ai.google.dev/gemini-api/docs/pricing"]
+  ]
+}
+-->
+<p class="ad-lead">Most "Gemini in Android" tutorials stop at one <code>generateContent()</code> call with an API key pasted into <code>BuildConfig</code>. That works in a demo and becomes a security incident in production. This guide builds the feature the way you'd actually ship it.</p>
+<p>It's for intermediate Android developers comfortable with Kotlin, coroutines and Compose. You'll integrate Gemini through <strong>Firebase AI Logic</strong>, Google's recommended client SDK for calling Gemini from mobile apps, protect it with <strong>App Check</strong>, configure the model, stream output into a Compose screen, send images, and handle errors and cost.</p>
+
+<div class="note"><b>Versions and model names</b>
+<p>The SDK and Gemini models evolve quickly. The code below follows the Firebase AI Logic documentation at the time of writing, which uses <code>firebase-ai</code> through the Firebase BoM and the <code>gemini-3.8-flash</code> model in its examples. Check the <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">current models page</a> and Firebase release notes before you ship.</p></div>
+
+<h2 id="architecture">How the pieces fit</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gem-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-gem-title fig-gem-desc">
+    <title id="fig-gem-title">Gemini request path through Firebase AI Logic with App Check</title>
+    <desc id="fig-gem-desc">The Compose screen sends a prompt to the ViewModel, which calls a repository using the Firebase AI Logic SDK. The SDK attaches an App Check token proving the request comes from your genuine app, sends it to the Firebase AI Logic proxy, which calls the Gemini model and streams chunks back to the UI.</desc>
+    <defs><marker id="g1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 70 H146 M262 70 H288 M418 70 H444 M582 70 H608" marker-end="url(#g1)"/>
+    <path class="d-dash" d="M650 100 V150 H60 V104" marker-end="url(#g1)"/><text class="d-s" x="356" y="168" text-anchor="middle">streamed chunks → StateFlow → recomposition</text>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="110" height="60" rx="12"/><text class="d-t" x="65" y="66" text-anchor="middle">Compose</text><text class="d-s" x="65" y="84" text-anchor="middle">prompt + output</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="150" y="40" width="112" height="60" rx="12"/><text class="d-t" x="206" y="66" text-anchor="middle">ViewModel</text><text class="d-s" x="206" y="84" text-anchor="middle">UiState</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="292" y="40" width="126" height="60" rx="12"/><text class="d-t" x="355" y="66" text-anchor="middle">Firebase AI SDK</text><text class="d-s" x="355" y="84" text-anchor="middle">+ App Check token</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="448" y="40" width="134" height="60" rx="12"/><text class="d-t" x="515" y="66" text-anchor="middle">AI Logic proxy</text><text class="d-s" x="515" y="84" text-anchor="middle">verifies, forwards</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="612" y="40" width="98" height="60" rx="12"/><text class="d-t" x="661" y="74" text-anchor="middle">Gemini</text></g>
+    <circle class="d-dot" r="6" style="offset-path:path('M120 70 H612');--dur:2.2s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M650 100 V150 H60 V104');--dur:2.2s;--delay:1.6s"/>
+  </svg>
+  <figcaption id="fig-gem-cap">Your app never holds a Gemini API key. Firebase's proxy verifies the App Check token and calls Gemini on your behalf.</figcaption>
+</figure>
+
+<h2 id="setup">Step 1: Set up Firebase and AI Logic</h2>
+<ol class="steps">
+  <li><strong>Create or open a Firebase project</strong> in the Firebase console and register your Android app with its exact package name.</li>
+  <li><strong>Enable Firebase AI Logic</strong> in the console and choose a Gemini API provider. The <em>Gemini Developer API</em> has a no-cost tier for getting started. <em>Vertex AI Gemini API</em> suits enterprise and Google Cloud requirements.</li>
+  <li><strong>Download <code>google-services.json</code></strong> into your <code>app/</code> directory.</li>
+  <li><strong>Add the Google services plugin and dependencies</strong> as shown below.</li>
+</ol>
+<code-block lang="kts" file="build.gradle.kts (project)">
+plugins {
+    // ...existing Android/Kotlin plugins
+    id("com.google.gms.google-services") version "<latest>" apply false
+}
+</code-block>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins {
+    // ...
+    id("com.google.gms.google-services")
+}
+
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:<latest>"))
+    implementation("com.google.firebase:firebase-ai")
+
+    // App Check: Play Integrity for release builds, debug provider for local development
+    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    debugImplementation("com.google.firebase:firebase-appcheck-debug")
+}
+</code-block>
+
+<h2 id="app-check">Step 2: Protect the endpoint with App Check</h2>
+<p>Because the app calls Gemini through Firebase, anyone who copies your Firebase configuration could try to call it too. <strong>App Check</strong> attaches an attestation token, from Play Integrity on real devices, so Firebase can reject requests that don't come from your genuine app. Firebase's documentation states that App Check is enforced for AI Logic from July 2026, so set it up from day one.</p>
+<code-block lang="kotlin" file="App.kt">
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Firebase.initialize(this)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            if (BuildConfig.DEBUG) DebugAppCheckProviderFactory.getInstance()
+            else PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+    }
+}
+</code-block>
+<div class="warn"><b>Debug tokens are secrets</b>
+<p>The debug provider logs a debug token, which you register in the Firebase console. Don't commit it to a public repository, and never ship a debug build or debug provider in production.</p></div>
+
+<h2 id="first-call">Step 3: Your first request</h2>
+<p>Create the model once, for example in a repository provided by dependency injection, and call it from a coroutine. In Kotlin the SDK methods are <code>suspend</code> functions:</p>
+<code-block lang="kotlin" file="GeminiTextRepository.kt">
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.content
+import com.google.firebase.ai.type.generationConfig
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
+
+class GeminiTextRepository(modelName: String = "gemini-3.8-flash") {
+
+    private val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+        modelName = modelName,
+        // Keep answers focused and bounded: lower temperature, capped output length.
+        generationConfig = generationConfig {
+            temperature = 0.4f
+            maxOutputTokens = 800
+        },
+        // System instructions shape every response; users can't see or change them.
+        systemInstruction = content {
+            text(
+                "You are a concise assistant inside a study app for Android developers. " +
+                "Answer in plain English, use short paragraphs, and say when you are unsure."
+            )
+        },
+    )
+
+    /** Single response: simplest, but the user waits for the whole answer. */
+    suspend fun explain(topic: String): String =
+        model.generateContent("Explain $topic in under 150 words.").text.orEmpty()
+
+    /** Streaming response: text appears progressively, which feels much faster. */
+    fun explainStream(topic: String): Flow<String> =
+        model.generateContentStream("Explain $topic in under 150 words.")
+            .mapNotNull { chunk -> chunk.text }
+}
+</code-block>
+
+<h2 id="viewmodel">Step 4: Model the UI state and stream into it</h2>
+<p>A streamed AI response has more states than a typical network call: idle, waiting for the first token, streaming, complete and failed. Model them explicitly so the UI can show the right affordances, such as a <em>Stop</em> button while streaming.</p>
+<code-block lang="kotlin" file="ExplainViewModel.kt">
+sealed interface ExplainUiState {
+    data object Idle : ExplainUiState
+    data object Waiting : ExplainUiState                          // request sent, no text yet
+    data class Streaming(val text: String) : ExplainUiState
+    data class Done(val text: String) : ExplainUiState
+    data class Error(val message: String, val partial: String = "") : ExplainUiState
+}
+
+class ExplainViewModel(private val repository: GeminiTextRepository) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<ExplainUiState>(ExplainUiState.Idle)
+    val uiState: StateFlow<ExplainUiState> = _uiState.asStateFlow()
+
+    private var job: Job? = null
+
+    fun explain(topic: String) {
+        if (topic.isBlank()) return
+        job?.cancel()                                            // one request at a time
+        job = viewModelScope.launch {
+            _uiState.value = ExplainUiState.Waiting
+            val buffer = StringBuilder()
+            try {
+                repository.explainStream(topic.take(500)).collect { chunk ->   // cap user input length
+                    buffer.append(chunk)
+                    _uiState.value = ExplainUiState.Streaming(buffer.toString())
+                }
+                _uiState.value = ExplainUiState.Done(buffer.toString())
+            } catch (e: CancellationException) {
+                _uiState.value = ExplainUiState.Done(buffer.toString())   // user pressed Stop
+                throw e
+            } catch (e: Exception) {
+                _uiState.value = ExplainUiState.Error(e.toUserMessage(), buffer.toString())
+            }
+        }
+    }
+
+    fun stop() { job?.cancel() }
+}
+</code-block>
+
+<h2 id="compose-ui">Step 5: The Compose screen</h2>
+<code-block lang="kotlin" file="ExplainScreen.kt">
+@Composable
+fun ExplainScreen(viewModel: ExplainViewModel) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var topic by rememberSaveable { mutableStateOf("") }
+    val busy = state is ExplainUiState.Waiting || state is ExplainUiState.Streaming
+
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        OutlinedTextField(
+            value = topic,
+            onValueChange = { topic = it },
+            label = { Text("What should I explain?") },
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(Modifier.padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { viewModel.explain(topic) }, enabled = !busy && topic.isNotBlank()) { Text("Explain") }
+            if (busy) OutlinedButton(onClick = viewModel::stop) { Text("Stop") }
+        }
+
+        when (val s = state) {
+            ExplainUiState.Idle -> Text("Ask about any Android topic.", style = MaterialTheme.typography.bodyMedium)
+            ExplainUiState.Waiting -> LinearProgressIndicator(Modifier.fillMaxWidth())
+            is ExplainUiState.Streaming -> AiText(s.text)
+            is ExplainUiState.Done -> AiText(s.text)
+            is ExplainUiState.Error -> {
+                if (s.partial.isNotEmpty()) AiText(s.partial)
+                Text(s.message, color = MaterialTheme.colorScheme.error)
+                TextButton(onClick = { viewModel.explain(topic) }) { Text("Try again") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AiText(text: String) {
+    Column(Modifier.verticalScroll(rememberScrollState())) {
+        Text("AI-generated · may contain mistakes", style = MaterialTheme.typography.labelSmall)
+        Text(text, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+</code-block>
+
+<h2 id="images">Step 6: Sending images (multimodal input)</h2>
+<p>Gemini models accept images alongside text. Build a multi-part <code>content</code> block. Downscale large photos first: smaller images upload faster and use fewer input tokens.</p>
+<code-block lang="kotlin" file="Describe a photo">
+suspend fun describeForAltText(photo: Bitmap): String {
+    val scaled = photo.scaleToMaxSide(1024)          // your helper: keep aspect ratio, max 1024 px
+    val prompt = content {
+        image(scaled)
+        text("Write one sentence of alt text for this image for a screen-reader user. No preamble.")
+    }
+    return model.generateContent(prompt).text.orEmpty()
+}
+
+fun Bitmap.scaleToMaxSide(max: Int): Bitmap {
+    val ratio = max.toFloat() / maxOf(width, height)
+    if (ratio >= 1f) return this
+    return Bitmap.createScaledBitmap(this, (width * ratio).toInt(), (height * ratio).toInt(), true)
+}
+</code-block>
+
+<h2 id="errors">Step 7: Handle the errors you'll actually see</h2>
+<p>Map SDK exceptions to messages a user can act on, and log the technical details for yourself. The Firebase AI SDK throws subclasses of <code>FirebaseAIException</code>. Check the API reference for the full current list.</p>
+<code-block lang="kotlin" file="Errors.kt">
+fun Throwable.toUserMessage(): String = when (this) {
+    is java.io.IOException -> "You appear to be offline. Check your connection and try again."
+    is com.google.firebase.ai.type.QuotaExceededException -> "The assistant is busy right now. Please try again in a minute."
+    is com.google.firebase.ai.type.PromptBlockedException -> "That request can't be answered. Try rephrasing it."
+    is com.google.firebase.ai.type.FirebaseAIException -> "The assistant couldn't respond. Please try again."
+    else -> "Something went wrong. Please try again."
+}
+</code-block>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Requests rejected after enabling enforcement</td><td>App Check token missing or invalid</td><td>Register the debug token for debug builds; use Play Integrity for release; check SHA-256 fingerprints in Firebase</td></tr>
+    <tr><td>Model not found / invalid model</td><td>Retired or misspelled model name</td><td>Check the current models list; keep the name in remote config</td></tr>
+    <tr><td>Quota or rate-limit errors</td><td>Free-tier limits or bursts</td><td>Backoff and retry; upgrade the plan; add per-user limits</td></tr>
+    <tr><td>Empty or truncated text</td><td><code>maxOutputTokens</code> too low, or response stopped by safety filters</td><td>Raise the limit sensibly; inspect the finish reason; handle null <code>text</code></td></tr>
+    <tr><td>UI freezes while streaming</td><td>Heavy work per chunk, such as re-parsing Markdown on every token</td><td>Throttle UI updates or parse on a background dispatcher</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="cost">Cost and abuse control</h2>
+<ul>
+  <li><strong>Cap input and output.</strong> Truncate user input (the <code>take(500)</code> above) and set <code>maxOutputTokens</code>.</li>
+  <li><strong>Ask for brevity in the prompt.</strong> "Under 150 words" reduces output tokens and latency.</li>
+  <li><strong>Debounce and deduplicate.</strong> Never call the model on every keystroke.</li>
+  <li><strong>Cache deterministic results</strong> such as "explain topic X", keyed by input and prompt version.</li>
+  <li><strong>Add per-user quotas.</strong> If you need them, or need multiple providers or private data retrieval, move calls behind your own backend.</li>
+  <li><strong>Monitor usage</strong> in the Firebase and Google Cloud consoles, and set budget alerts.</li>
+</ul>
+
+<h2 id="use-cases">Use cases this pattern fits</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Learning app: "Explain this concept"</h3><p>Short, bounded prompts with a system instruction for tone. Streaming makes answers feel instant. Low risk, high value.</p></div>
+  <div class="card usecase"><h3>Accessibility: alt text for user photos</h3><p>Multimodal input generates draft descriptions that the user reviews and edits before posting. Labelled as AI-generated.</p></div>
+  <div class="card usecase"><h3>Content app: title and tag suggestions</h3><p>Suggest, don't decide: the user picks from the generated options. Cache results per item.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I put a Gemini API key in BuildConfig instead?</summary><div><p>You shouldn't. Anything in an APK can be extracted, and a leaked key can be abused at your expense. Use Firebase AI Logic with App Check, or your own backend.</p></div></details>
+  <details><summary>What happened to the old Google AI client SDK for Android?</summary><div><p>Google now directs Android developers to Firebase AI Logic for calling Gemini from mobile apps. If you have older code using the previous client SDK, migrate it following Firebase's migration guide.</p></div></details>
+  <details><summary>Gemini Developer API or Vertex AI?</summary><div><p>The Gemini Developer API is the quickest start and has a no-cost tier. Vertex AI suits organisations that need Google Cloud enterprise controls and data governance. Firebase AI Logic supports both, and switching is mostly a backend parameter change.</p></div></details>
+  <details><summary>How do I build a multi-turn chat?</summary><div><p>Use <code>model.startChat(history)</code> and <code>sendMessageStream()</code>. The full project, including history trimming, is in <a href="../ai-chatbot-jetpack-compose/index.html">Build an AI Chatbot with Kotlin and Jetpack Compose</a>.</p></div></details>
+  <details><summary>Does this work offline?</summary><div><p>No, cloud models need connectivity. For offline features, see <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI</a> or hybrid inference.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A production-ready Gemini integration is more than one API call: <strong>Firebase AI Logic for the SDK, App Check for protection, a system instruction and generation limits for predictable output, streaming state in the ViewModel, and honest error handling in the UI</strong>. With those pieces in place, adding a new AI feature is mostly a matter of writing a good prompt.</p>
+<p>Next step: build the explain screen above with your own system instruction, then turn it into a full conversation in <a href="../ai-chatbot-jetpack-compose/index.html">Build an AI Chatbot Using Kotlin and Jetpack Compose</a>.</p>

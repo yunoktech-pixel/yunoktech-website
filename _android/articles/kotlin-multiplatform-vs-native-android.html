@@ -1,0 +1,127 @@
+<!--meta
+{
+  "seo_title": "Kotlin Multiplatform vs Native Android Development",
+  "description": "Kotlin Multiplatform vs native Android: what KMP shares, Compose Multiplatform for UI, expect/actual, architecture, team impact, risks and a decision guide with code.",
+  "primary_keyword": "kotlin multiplatform vs native android",
+  "keywords": ["kotlin multiplatform android ios", "kmp vs native", "compose multiplatform ios", "expect actual kotlin", "share business logic android ios", "kmp architecture"],
+  "lede": "Kotlin Multiplatform (KMP) lets Android and iOS share Kotlin code while each keeps native capabilities. It isn't all-or-nothing: you can share a single module or nearly the whole app. Here's what KMP shares, how it compares with a native-only Android app, and how to decide.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["compose-multiplatform-vs-kotlin-multiplatform", "clean-architecture-android", "kotlin-vs-java-android", "multi-module-architecture-android"],
+  "refs": [
+    ["Kotlin Multiplatform overview", "https://kotlinlang.org/docs/multiplatform/get-started.html"],
+    ["Stability of supported platforms", "https://kotlinlang.org/docs/multiplatform/supported-platforms.html"],
+    ["Expected and actual declarations", "https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html"],
+    ["Kotlin Multiplatform on Android Developers", "https://developer.android.com/kotlin/multiplatform"],
+    ["Compose Multiplatform 1.8.0: iOS stable (JetBrains blog)", "https://blog.jetbrains.com/kotlin/2025/05/compose-multiplatform-1-8-0-released-compose-multiplatform-for-ios-is-stable-and-production-ready/"]
+  ]
+}
+-->
+<p class="ad-lead">Your company has an Android app in Kotlin and an iOS app in Swift. The same validation rules, pricing logic and API models are written twice, and they drift apart. Kotlin Multiplatform promises to write that logic once, without forcing either app into a non-native framework.</p>
+<p>This guide explains what KMP is, what you can share, how it compares with native-only Android development, and how to decide whether it fits your team.</p>
+
+<h2 id="status">Where KMP stands</h2>
+<ul>
+  <li><strong>Kotlin Multiplatform</strong> is stable, and Google announced official support for using it to share business logic between Android and iOS in 2024. Several Jetpack libraries, such as Room, DataStore, ViewModel and Lifecycle, now support KMP targets.</li>
+  <li><strong>Compose Multiplatform</strong> (from JetBrains) extends Compose UI beyond Android. JetBrains declared Compose for iOS stable and production-ready in version 1.8.0, released in 2025.</li>
+</ul>
+<p>Check the current platform stability page before you commit, since targets and libraries evolve.</p>
+
+<h2 id="what-is-shared">What can be shared</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-kmp-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-kmp-t fig-kmp-d">
+    <title id="fig-kmp-t">Kotlin Multiplatform sharing spectrum</title>
+    <desc id="fig-kmp-d">A shared Kotlin module contains domain models, business rules, networking with Ktor, persistence with Room or SQLDelight, and optionally ViewModels. Android uses it from Jetpack Compose UI; iOS uses it from SwiftUI, or both use Compose Multiplatform UI if UI is also shared. Platform-specific code uses expect and actual declarations.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="210" y="10" width="300" height="130" rx="14"/><text class="d-t" x="360" y="36" text-anchor="middle">shared (commonMain, Kotlin)</text>
+      <text class="d-s" x="360" y="62" text-anchor="middle">models · business rules · validation</text>
+      <text class="d-s" x="360" y="84" text-anchor="middle">networking (Ktor) · persistence (Room/SQLDelight)</text>
+      <text class="d-s" x="360" y="106" text-anchor="middle">repositories · optionally ViewModels</text>
+      <text class="d-s" x="360" y="128" text-anchor="middle">expect/actual for platform APIs</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="20" y="170" width="250" height="66" rx="12"/><text class="d-t" x="145" y="196" text-anchor="middle">androidApp</text><text class="d-s" x="145" y="218" text-anchor="middle">Jetpack Compose UI</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="450" y="170" width="250" height="66" rx="12"/><text class="d-t" x="575" y="196" text-anchor="middle">iosApp</text><text class="d-s" x="575" y="218" text-anchor="middle">SwiftUI, or Compose Multiplatform</text></g>
+    <path class="d-line" d="M300 140 L170 170 M420 140 L550 170"/>
+  </svg>
+  <figcaption id="fig-kmp-cap">Teams usually start by sharing the data and domain layers and keep native UI. Sharing UI with Compose Multiplatform is a separate, optional step.</figcaption>
+</figure>
+
+<h2 id="expect-actual">expect/actual: reaching platform APIs</h2>
+<code-block lang="kotlin" file="shared/src/commonMain/kotlin/Platform.kt">
+// Declared in common code...
+expect fun currentTimeMillis(): Long
+expect fun randomUuid(): String
+</code-block>
+<code-block lang="kotlin" file="shared/src/androidMain/kotlin/Platform.android.kt">
+actual fun currentTimeMillis(): Long = System.currentTimeMillis()
+actual fun randomUuid(): String = java.util.UUID.randomUUID().toString()
+</code-block>
+<code-block lang="kotlin" file="shared/src/iosMain/kotlin/Platform.ios.kt">
+import platform.Foundation.NSDate
+import platform.Foundation.NSUUID
+import platform.Foundation.timeIntervalSince1970
+
+actual fun currentTimeMillis(): Long = (NSDate().timeIntervalSince1970 * 1000).toLong()
+actual fun randomUuid(): String = NSUUID().UUIDString()
+</code-block>
+<p>In practice, prefer <strong>interfaces plus dependency injection</strong> for larger platform services (location, secure storage), and keep <code>expect</code>/<code>actual</code> for small utilities.</p>
+
+<h2 id="shared-example">A shared business rule</h2>
+<code-block lang="kotlin" file="shared/src/commonMain/kotlin/Pricing.kt">
+data class CartLine(val sku: String, val unitPaise: Long, val qty: Int)
+
+/** One implementation used by both apps: no more Android/iOS pricing mismatches. */
+fun cartTotalPaise(lines: List<CartLine>, couponPercent: Int = 0): Long {
+    require(couponPercent in 0..100)
+    val subtotal = lines.sumOf { it.unitPaise * it.qty }
+    return subtotal - subtotal * couponPercent / 100
+}
+</code-block>
+<p>The shared function is tested once in <code>commonTest</code>, and the tests run on every target.</p>
+
+<h2 id="comparison">KMP vs native-only Android</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Native Android only</th><th>Kotlin Multiplatform</th></tr></thead>
+  <tbody>
+    <tr><td>Code reuse with iOS</td><td>None</td><td>Logic (and optionally UI) shared</td></tr>
+    <tr><td>Android libraries</td><td>Entire Android/Java ecosystem</td><td>Shared code needs KMP-compatible libraries (Ktor, kotlinx.serialization, KMP-enabled Jetpack)</td></tr>
+    <tr><td>Build complexity</td><td>Standard Gradle Android build</td><td>Multiplatform Gradle setup, Xcode integration, iOS build times</td></tr>
+    <tr><td>Team skills</td><td>Android/Kotlin</td><td>Kotlin plus enough iOS knowledge to integrate and debug</td></tr>
+    <tr><td>Platform look and feel</td><td>Fully native</td><td>Fully native with shared logic; a shared UI needs care on iOS conventions</td></tr>
+    <tr><td>Adoption risk</td><td>Low</td><td>Incremental: start with one module</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">When KMP is a good fit</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Fits well</h3><ul><li>Android and iOS apps with substantial shared business logic</li><li>Kotlin-strong teams wanting consistency across platforms</li><li>Offline-first apps with complex sync rules</li><li>SDKs shipped to both platforms</li></ul></div>
+  <div class="card usecase"><h3>Weaker fit</h3><ul><li>Android-only products with no iOS plans</li><li>Apps that are mostly thin UI over an API</li><li>Teams with no capacity to own iOS integration</li><li>Heavy reliance on Android-only libraries in core logic</li></ul></div>
+</div>
+
+<h2 id="adoption">An incremental adoption path</h2>
+<ol class="steps">
+  <li><strong>Structure the Android app cleanly first.</strong> A pure-Kotlin domain layer is easy to move. See <a href="../clean-architecture-android/index.html">Clean Architecture</a>.</li>
+  <li><strong>Create a <code>shared</code> module</strong> with one feature's models and business rules, and consume it from Android.</li>
+  <li><strong>Integrate it into iOS</strong> as a framework, and agree ownership with the iOS team.</li>
+  <li><strong>Move networking and persistence</strong> with KMP libraries once the workflow is proven.</li>
+  <li><strong>Evaluate shared UI</strong> with Compose Multiplatform screen by screen, if it makes sense.</li>
+</ol>
+
+<h2 id="pitfalls">Pitfalls</h2>
+<ul>
+  <li>Forcing Android-only types (Context, LiveData) into shared code.</li>
+  <li>Underestimating iOS-side work: build integration, Swift interop ergonomics, and debugging.</li>
+  <li>Sharing too early, before the business rules are stable.</li>
+  <li>Choosing libraries without checking KMP support for all your targets.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Kotlin Multiplatform the same as Flutter?</summary><div><p>No. Flutter shares UI and logic in Dart with its own rendering engine. KMP shares Kotlin code and lets each platform keep native UI, or optionally share UI with Compose Multiplatform.</p></div></details>
+  <details><summary>Do Android developers need to learn Swift?</summary><div><p>Not deeply, but you need enough to integrate the shared framework and collaborate with iOS developers.</p></div></details>
+  <details><summary>Can I use Jetpack Compose code on iOS?</summary><div><p>With Compose Multiplatform, much Compose UI code can run on iOS, but Android-specific APIs and libraries must be replaced or abstracted.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Native Android remains the simplest choice for Android-only products. <strong>Kotlin Multiplatform</strong> becomes compelling when you maintain both Android and iOS apps with meaningful shared logic, and it can be adopted one module at a time. Clean, pure-Kotlin layers are the foundation that makes either path work.</p>
+<p>Next step: compare UI-sharing options in <a href="../compose-multiplatform-vs-kotlin-multiplatform/index.html">Compose Multiplatform vs Kotlin Multiplatform</a>.</p>

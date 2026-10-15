@@ -1,0 +1,135 @@
+<!--meta
+{
+  "seo_title": "Deep Links and Android App Links: Complete Guide",
+  "description": "Implement deep links and verified Android App Links: intent filters, assetlinks.json, autoVerify, handling links in Compose Navigation, testing with adb, troubleshooting verification and security.",
+  "primary_keyword": "android app links",
+  "keywords": ["deep links android", "assetlinks.json", "autoverify android", "compose navigation deep link", "test deep link adb", "app links verification failed"],
+  "lede": "A link in an email, a QR code or a notification should open the exact screen in your app, not a browser. Deep links make that possible, and verified Android App Links make it seamless and secure. Here's how to set them up end to end.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["compose-navigation", "android-app-components", "firebase-cloud-messaging-push-notifications", "android-app-security-best-practices"],
+  "refs": [
+    ["About deep links and App Links", "https://developer.android.com/training/app-links"],
+    ["Add Android App Links", "https://developer.android.com/training/app-links/about"],
+    ["Verify Android App Links", "https://developer.android.com/training/app-links/verify-android-applinks"],
+    ["Digital Asset Links", "https://developers.google.com/digital-asset-links/v1/getting-started"]
+  ]
+}
+-->
+<p class="ad-lead">There are three kinds of links that can open your app: custom-scheme deep links (<code>myapp://</code>), unverified web links (which show a disambiguation dialog or open the browser), and verified Android App Links that open your app directly because you've proved you own the domain.</p>
+
+<h2 id="types">Deep links vs App Links</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-dl-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-dl-t fig-dl-d">
+    <title id="fig-dl-t">How Android resolves a link</title>
+    <desc id="fig-dl-d">A user taps https://example.com/product/42. If the app has a verified App Link for example.com, Android opens the app directly. Otherwise the link opens in the browser or a chooser. Custom scheme links like myapp://product/42 only work if an app handles that scheme, and have no ownership verification.</desc>
+    <defs><marker id="dlm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M210 100 H260 M440 70 H490 M440 140 H490" marker-end="url(#dlm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="70" width="190" height="60" rx="12"/><text class="d-t" x="115" y="96" text-anchor="middle">Tap link</text><text class="d-s" x="115" y="114" text-anchor="middle">https://example.com/p/42</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="262" y="70" width="178" height="60" rx="12"/><text class="d-t" x="351" y="96" text-anchor="middle">Domain verified</text><text class="d-s" x="351" y="114" text-anchor="middle">for this app?</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="492" y="40" width="210" height="56" rx="12"/><text class="d-t" x="597" y="66" text-anchor="middle">Yes → open app</text><text class="d-s" x="597" y="84" text-anchor="middle">directly</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="492" y="112" width="210" height="56" rx="12"/><text class="d-t" x="597" y="138" text-anchor="middle">No → browser</text><text class="d-s" x="597" y="156" text-anchor="middle">(or chooser)</text></g>
+  </svg>
+  <figcaption id="fig-dl-cap">Since Android 12, unverified web links open in the browser by default.</figcaption>
+</figure>
+
+<h2 id="manifest">Step 1: Intent filter</h2>
+<code-block lang="xml" file="AndroidManifest.xml">
+<activity android:name=".MainActivity" android:exported="true">
+    <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https" />
+        <data android:host="example.com" />
+        <data android:pathPrefix="/product/" />
+    </intent-filter>
+</activity>
+</code-block>
+
+<h2 id="assetlinks">Step 2: Publish assetlinks.json</h2>
+<p>Host this at <code>https://example.com/.well-known/assetlinks.json</code>, served over HTTPS with <code>Content-Type: application/json</code> and no redirects:</p>
+<code-block lang="json" file=".well-known/assetlinks.json">
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.example.shop",
+    "sha256_cert_fingerprints": [
+      "AB:CD:...:EF"
+    ]
+  }
+}]
+</code-block>
+<div class="callout warn"><b>Use the right fingerprint</b><p>With Play App Signing, use the <em>app signing key</em> fingerprint from Play Console (Setup → App signing), not only your upload key. Include your debug key's fingerprint separately if you want verification in debug builds.</p></div>
+
+<h2 id="handle">Step 3: Handle the link</h2>
+<p>With Navigation Compose, declare deep links on destinations:</p>
+<code-block lang="kotlin" file="Navigation Compose deep link">
+@Serializable data class Product(val id: String)
+
+composable<Product>(
+    deepLinks = listOf(navDeepLink<Product>(basePath = "https://example.com/product"))
+) { entry ->
+    val product = entry.toRoute<Product>()
+    ProductScreen(product.id)
+}
+</code-block>
+<p>Or handle intents manually (for example with Navigation 3 or custom routing):</p>
+<code-block lang="kotlin" file="Manual parsing">
+fun parseDeepLink(uri: Uri?): AppRoute? {
+    if (uri?.host != "example.com") return null
+    val segments = uri.pathSegments
+    return when {
+        segments.size == 2 && segments[0] == "product" -> AppRoute.Product(segments[1])
+        else -> null
+    }
+}
+// Call from onCreate(intent) and onNewIntent(intent)
+</code-block>
+
+<h2 id="test">Step 4: Test</h2>
+<code-block lang="bash" file="adb commands">
+# Open a link
+adb shell am start -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "https://example.com/product/42"
+
+# Check verification state
+adb shell pm get-app-links com.example.shop
+
+# Re-run verification after fixing assetlinks.json
+adb shell pm verify-app-links --re-verify com.example.shop
+</code-block>
+<p>Android Studio's App Links Assistant also helps generate and validate these files.</p>
+
+<h2 id="security">Security</h2>
+<ul>
+  <li>Treat link parameters as untrusted input: validate IDs and never perform sensitive actions (payments, deletes) directly from a link without confirmation.</li>
+  <li>Require authentication before showing protected content.</li>
+  <li>Prefer verified App Links over custom schemes, which any app can claim.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Marketing emails</h3><p>Links open product pages in the app when installed, the website otherwise.</p></div>
+  <div class="card usecase"><h3>Notifications</h3><p>Use the same routes for notification taps and links, so navigation logic is shared.</p></div>
+  <div class="card usecase"><h3>Password reset</h3><p>Verified links route reset tokens safely into the app.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Verification fails:</strong> wrong fingerprint, a redirect on assetlinks.json, the wrong content type, or a host in the intent filter not covered by the file. Every host listed must verify.</li>
+  <li><strong>Link opens browser in debug:</strong> the debug signing key isn't in assetlinks.json.</li>
+  <li><strong>Screen opens twice:</strong> handle <code>onNewIntent</code> and set an appropriate launch mode.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are Firebase Dynamic Links still an option?</summary><div><p>No. Firebase Dynamic Links has been shut down. Use App Links with your own domain, plus a web fallback.</p></div></details>
+  <details><summary>Do I need a website?</summary><div><p>For verified App Links, yes: you need a domain you control to host assetlinks.json.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>verified App Links</strong>: add an intent filter with <code>autoVerify</code>, publish a correct <strong>assetlinks.json</strong> with the app signing fingerprint, route links through your navigation, test with <code>adb</code>, and validate parameters as untrusted input.</p>
+<p>Next step: extend your app to the home screen with <a href="../android-app-widgets-shortcuts/index.html">App Widgets and Shortcuts</a>.</p>

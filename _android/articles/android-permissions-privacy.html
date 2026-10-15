@@ -1,0 +1,143 @@
+<!--meta
+{
+  "seo_title": "Android Permissions and Privacy Best Practices",
+  "description": "Request Android permissions the right way: runtime permissions in Compose, rationale UX, alternatives like the Photo Picker, approximate location, data minimisation and Play Data safety.",
+  "primary_keyword": "android permissions best practices",
+  "keywords": ["runtime permissions compose", "photo picker android", "approximate location android", "permission rationale ux", "play data safety form", "android privacy best practices"],
+  "lede": "Every permission you request is a trust decision for the user, and a policy obligation for you. Modern Android offers privacy-preserving alternatives for many old permission requests. Here's how to request less, ask better, and stay compliant.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["android-app-security-best-practices", "firebase-cloud-messaging-push-notifications", "protect-user-data-ai-android-apps", "android-privacy-accessibility-reliability"],
+  "refs": [
+    ["Permissions on Android", "https://developer.android.com/guide/topics/permissions/overview"],
+    ["Request runtime permissions", "https://developer.android.com/training/permissions/requesting"],
+    ["Photo picker", "https://developer.android.com/training/data-storage/shared/photopicker"],
+    ["Request location permissions", "https://developer.android.com/develop/sensors-and-location/location/permissions"],
+    ["Play Console: Data safety section", "https://support.google.com/googleplay/android-developer/answer/10787469"]
+  ]
+}
+-->
+<p class="ad-lead">A camera app asking for contacts, a flashlight asking for location: users notice, and they uninstall. Google Play also restricts sensitive permissions and requires accurate data disclosures. Good permission design is both better UX and better compliance.</p>
+
+<h2 id="principles">Principles</h2>
+<ol class="steps">
+  <li><strong>Avoid the permission</strong> if a privacy-preserving API exists (Photo Picker, document picker, Credential Manager).</li>
+  <li><strong>Ask in context</strong>, when the user triggers the feature, not at app launch.</li>
+  <li><strong>Request the minimum</strong>: approximate instead of precise location, and foreground instead of background.</li>
+  <li><strong>Degrade gracefully</strong> when denied: the rest of the app must keep working.</li>
+</ol>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pf-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-pf-t fig-pf-d">
+    <title id="fig-pf-t">Runtime permission request flow</title>
+    <desc id="fig-pf-d">The user taps a feature. If the permission is already granted, use the feature. If not and a rationale should be shown, explain why in your own UI first. Then the system permission dialog appears. If granted, continue; if denied, offer a fallback; if permanently denied, offer a link to app settings.</desc>
+    <defs><marker id="pfm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="80" width="120" height="56" rx="12"/><text class="d-t" x="70" y="106" text-anchor="middle">User taps</text><text class="d-s" x="70" y="124" text-anchor="middle">"Scan receipt"</text></g>
+    <path class="d-flow" d="M130 108 H160" marker-end="url(#pfm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="164" y="80" width="130" height="56" rx="12"/><text class="d-t" x="229" y="106" text-anchor="middle">Granted?</text><text class="d-s" x="229" y="124" text-anchor="middle">check first</text></g>
+    <path class="d-flow" d="M229 80 V40 H560 V60" marker-end="url(#pfm)"/><text class="d-s" x="400" y="34" text-anchor="middle">yes</text>
+    <path class="d-flow" d="M294 108 H324" marker-end="url(#pfm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="328" y="80" width="130" height="56" rx="12"/><text class="d-t" x="393" y="106" text-anchor="middle">Rationale</text><text class="d-s" x="393" y="124" text-anchor="middle">your own UI</text></g>
+    <path class="d-flow" d="M458 108 H488" marker-end="url(#pfm)"/>
+    <g class="d-step" style="--i:3"><rect class="d-box" x="492" y="80" width="130" height="56" rx="12"/><text class="d-t" x="557" y="106" text-anchor="middle">System dialog</text></g>
+    <rect class="d-green" x="500" y="60" width="120" height="16" rx="4"/><text class="d-s" x="560" y="72" text-anchor="middle">use feature</text>
+    <path class="d-flow" d="M557 136 V170" marker-end="url(#pfm)"/>
+    <g class="d-step" style="--i:4"><rect class="d-red" x="440" y="174" width="270" height="40" rx="10"/><text class="d-s" x="575" y="198" text-anchor="middle">denied → fallback · permanently → Settings link</text></g>
+  </svg>
+  <figcaption id="fig-pf-cap">Explain before asking, and always have a path forward when the answer is no.</figcaption>
+</figure>
+
+<h2 id="compose">Requesting permissions in Compose</h2>
+<code-block lang="kotlin" file="CameraPermissionGate.kt">
+@Composable
+fun CameraFeatureButton(onCameraReady: () -> Unit) {
+    val context = LocalContext.current
+    var showRationale by remember { mutableStateOf(false) }
+    var showSettingsHint by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) onCameraReady()
+        else {
+            val activity = context.findActivity()
+            // If the system won't show a rationale after a denial, the user chose "don't ask again".
+            showSettingsHint = activity != null &&
+                !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+        }
+    }
+
+    Button(onClick = {
+        when {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED -> onCameraReady()
+            else -> showRationale = true
+        }
+    }) { Text("Scan receipt") }
+
+    if (showRationale) AlertDialog(
+        onDismissRequest = { showRationale = false },
+        title = { Text("Camera access") },
+        text = { Text("We use the camera only to scan receipts. Photos stay on your device unless you choose to upload them.") },
+        confirmButton = { TextButton(onClick = { showRationale = false; launcher.launch(Manifest.permission.CAMERA) }) { Text("Continue") } },
+        dismissButton = { TextButton(onClick = { showRationale = false }) { Text("Not now") } },
+    )
+
+    if (showSettingsHint) TextButton(onClick = {
+        context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)))
+    }) { Text("Enable camera in Settings") }
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+</code-block>
+
+<h2 id="alternatives">Permission-free alternatives</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Instead of</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Pick photos/videos</td><td>Storage or media read permissions</td><td><strong>Photo Picker</strong> (<code>PickVisualMedia</code>)</td></tr>
+    <tr><td>Open a document</td><td>Broad storage access</td><td>Storage Access Framework (<code>OpenDocument</code>)</td></tr>
+    <tr><td>Take one photo</td><td>CAMERA in your own camera UI (if not needed)</td><td>Camera intent (<code>TakePicture</code>)</td></tr>
+    <tr><td>Rough location (weather, city)</td><td>ACCESS_FINE_LOCATION</td><td>ACCESS_COARSE_LOCATION (approximate)</td></tr>
+    <tr><td>Sign-in with saved credentials</td><td>Reading accounts</td><td>Credential Manager</td></tr>
+  </tbody>
+</table>
+</div>
+<code-block lang="kotlin" file="Photo Picker: no storage permission needed">
+val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    uri?.let(onImagePicked)
+}
+// pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+</code-block>
+
+<h2 id="sensitive">Sensitive and restricted permissions</h2>
+<p>Background location, SMS and call log, all-files access, exact alarms, accessibility services and others are restricted by Google Play policy and require declarations or justifications. Use them only when they're core to your app's functionality, and check current Play policy before building features around them.</p>
+
+<h2 id="disclosure">Disclosure and Data safety</h2>
+<ul>
+  <li>Your Play Console <strong>Data safety</strong> form must accurately describe data collection and sharing, including by SDKs.</li>
+  <li>Provide a <strong>privacy policy</strong> that matches actual behaviour.</li>
+  <li>Use <strong>prominent in-app disclosure</strong> before collecting sensitive data where Play policy requires it.</li>
+  <li>Audit third-party SDKs: their collection counts as yours.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Profile photo</h3><p>The Photo Picker, with no permission at all.</p></div>
+  <div class="card usecase"><h3>Weather app</h3><p>Approximate location, requested when the user taps "Use my location", with manual city entry as a fallback.</p></div>
+  <div class="card usecase"><h3>Delivery notifications</h3><p>POST_NOTIFICATIONS requested after the first order, not on first launch.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I request several permissions at once?</summary><div><p>You can, with <code>RequestMultiplePermissions</code>, but users trust focused, contextual requests more. Bundle only those needed for one feature.</p></div></details>
+  <details><summary>What happens if the user selects "Only this time"?</summary><div><p>The permission is granted temporarily and revoked later. Always re-check before use.</p></div></details>
+  <details><summary>Do unused apps lose permissions?</summary><div><p>Yes. Android can auto-reset permissions for apps that haven't been used for a while, so always check at runtime.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Request <strong>fewer, smaller, contextual</strong> permissions, explain <strong>why</strong> before asking, prefer <strong>privacy-preserving APIs</strong> like the Photo Picker, handle denial gracefully, and keep your <strong>Data safety</strong> disclosures accurate.</p>
+<p>Next step: add strong, convenient authentication with <a href="../biometric-authentication-android/index.html">Biometric Authentication on Android</a>.</p>

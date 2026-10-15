@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testing ViewModels with Coroutines and Flow | Yunok Tech</title>
+  <meta name="description" content="Test Android ViewModels that use coroutines and Flow: MainDispatcherRule, runTest, virtual time, StateFlow with stateIn, Turbine, testing errors, debounce and SavedStateHandle.">
+  <meta name="keywords" content="testing viewmodel coroutines flow, runTest viewmodel, MainDispatcherRule, test stateflow android, turbine flow testing, advanceUntilIdle, test dispatcher kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/testing-viewmodels-coroutines-flow/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/testing-viewmodels-coroutines-flow/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Testing ViewModels with Coroutines and Flow">
+  <meta property="og:description" content="Test Android ViewModels that use coroutines and Flow: MainDispatcherRule, runTest, virtual time, StateFlow with stateIn, Turbine, testing errors, debounce and SavedStateHandle.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Testing ViewModels with Coroutines and Flow">
+  <meta name="twitter:description" content="Test Android ViewModels that use coroutines and Flow: MainDispatcherRule, runTest, virtual time, StateFlow with stateIn, Turbine, testing errors, debounce and SavedStateHandle.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Testing ViewModels with Coroutines and Flow", "description": "Test Android ViewModels that use coroutines and Flow: MainDispatcherRule, runTest, virtual time, StateFlow with stateIn, Turbine, testing errors, debounce and SavedStateHandle.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "runTest viewmodel, MainDispatcherRule, test stateflow android, turbine flow testing, advanceUntilIdle, test dispatcher kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/testing-viewmodels-coroutines-flow/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Testing ViewModels with Coroutines and Flow", "item": "https://yunoktech.com/android/testing-viewmodels-coroutines-flow/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Testing ViewModels with Coroutines and Flow</h1>
+    <p class="ad-lede">ViewModels launch coroutines on Dispatchers.Main, collect Flows and use delays, all of which make naive tests hang, flake or pass for the wrong reason. With kotlinx-coroutines-test and a few patterns, ViewModel tests become fast and deterministic.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#model">The testing model</a></li><li><a href="#rule">1. Replace Dispatchers.Main</a></li><li><a href="#vm">The ViewModel under test</a></li><li><a href="#tests">2. Tests with virtual time</a></li><li><a href="#turbine">3. Turbine for flow assertions</a></li><li><a href="#io">4. Inject the other dispatchers too</a></li><li><a href="#saved-state">5. SavedStateHandle</a></li><li><a href="#use-cases">What to cover</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">The first ViewModel test many developers write fails with "Module with the Main dispatcher had failed to initialize". The second passes, even though the code is broken, because the assertion ran before the coroutine finished. Both come from not controlling dispatchers and time.</p>
+
+<h2 id="model">The testing model</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-tm-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-tm-t fig-tm-d">
+    <title id="fig-tm-t">Controlling dispatchers and time in coroutine tests</title>
+    <desc id="fig-tm-d">MainDispatcherRule replaces Dispatchers.Main with a test dispatcher. runTest provides a TestScope with a virtual-time scheduler shared with the test dispatcher. Injected dispatchers in repositories also use the test dispatcher. advanceUntilIdle and advanceTimeBy move virtual time so delays complete instantly.</desc>
+    <rect class="d-violet" x="20" y="20" width="200" height="70" rx="12"/><text class="d-t" x="120" y="50" text-anchor="middle">MainDispatcherRule</text><text class="d-s" x="120" y="70" text-anchor="middle">Main → TestDispatcher</text>
+    <rect class="d-blue" x="260" y="20" width="200" height="70" rx="12"/><text class="d-t" x="360" y="50" text-anchor="middle">runTest { }</text><text class="d-s" x="360" y="70" text-anchor="middle">virtual time scheduler</text>
+    <rect class="d-green" x="500" y="20" width="200" height="70" rx="12"/><text class="d-t" x="600" y="50" text-anchor="middle">Injected dispatchers</text><text class="d-s" x="600" y="70" text-anchor="middle">IO/Default → test</text>
+    <rect class="d-amber" x="160" y="120" width="400" height="56" rx="12"/><text class="d-t" x="360" y="144" text-anchor="middle">advanceUntilIdle() · advanceTimeBy(ms)</text><text class="d-s" x="360" y="164" text-anchor="middle">delays complete instantly, deterministically</text>
+    <path class="d-line" d="M120 90 L300 120 M360 90 V120 M600 90 L420 120"/>
+  </svg>
+  <figcaption id="fig-tm-cap">Replace every dispatcher with test dispatchers that share one scheduler, and you control time completely.</figcaption>
+</figure>
+
+<h2 id="rule">1. Replace Dispatchers.Main</h2>
+<figure class="code"><figcaption><span class="file">MainDispatcherRule.kt (src/test)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">MainDispatcherRule</span>(
+    <span class="tk-k">val</span> testDispatcher: <span class="tk-t">TestDispatcher</span> = <span class="tk-t">UnconfinedTestDispatcher</span>(),
+) : <span class="tk-t">TestWatcher</span>() {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> starting(description: <span class="tk-t">Description</span>) = <span class="tk-t">Dispatchers</span>.setMain(testDispatcher)
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> finished(description: <span class="tk-t">Description</span>) = <span class="tk-t">Dispatchers</span>.resetMain()
+}</code></pre></figure>
+<p><code>UnconfinedTestDispatcher</code> starts coroutines eagerly, which suits simple state assertions. <code>StandardTestDispatcher</code> queues them until you advance the scheduler, which suits testing intermediate states such as Loading.</p>
+
+<h2 id="vm">The ViewModel under test</h2>
+<figure class="code"><figcaption><span class="file">SearchViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SearchViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repo: <span class="tk-t">SearchRepository</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> query = <span class="tk-t">MutableStateFlow</span>(<span class="tk-s">""</span>)
+
+    <span class="tk-a">@OptIn</span>(<span class="tk-t">FlowPreview</span>::<span class="tk-k">class</span>, <span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+    <span class="tk-k">val</span> state: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SearchState</span>&gt; = query
+        .debounce(<span class="tk-n">300</span>)
+        .distinctUntilChanged()
+        .flatMapLatest { q -&gt;
+            <span class="tk-k">if</span> (q.isBlank()) flowOf(<span class="tk-t">SearchState</span>.<span class="tk-t">Idle</span>)
+            <span class="tk-k">else</span> flow {
+                emit(<span class="tk-t">SearchState</span>.<span class="tk-t">Loading</span>)
+                emit(runCatching { repo.search(q) }.fold(
+                    onSuccess = { <span class="tk-t">SearchState</span>.<span class="tk-t">Results</span>(it) },
+                    onFailure = { <span class="tk-t">SearchState</span>.<span class="tk-t">Error</span>(<span class="tk-s">"Search failed"</span>) },
+                ))
+            }
+        }
+        .stateIn(viewModelScope, <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>), <span class="tk-t">SearchState</span>.<span class="tk-t">Idle</span>)
+
+    <span class="tk-k">fun</span> onQueryChange(q: <span class="tk-t">String</span>) { query.<span class="tk-k">value</span> = q }
+}</code></pre></figure>
+
+<h2 id="tests">2. Tests with virtual time</h2>
+<figure class="code"><figcaption><span class="file">SearchViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">SearchViewModelTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> mainRule = <span class="tk-t">MainDispatcherRule</span>(<span class="tk-t">StandardTestDispatcher</span>())
+
+    <span class="tk-k">private</span> <span class="tk-k">class</span> <span class="tk-t">FakeRepo</span>(<span class="tk-k">var</span> fail: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>) : <span class="tk-t">SearchRepository</span> {
+        <span class="tk-k">var</span> calls = <span class="tk-n">0</span>
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(q: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; {
+            calls++
+            <span class="tk-k">if</span> (fail) <span class="tk-k">throw</span> <span class="tk-t">IOException</span>()
+            <span class="tk-k">return</span> listOf(<span class="tk-s">"$q result"</span>)
+        }
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `debounces typing and shows results`() = runTest(mainRule.testDispatcher) {
+        <span class="tk-k">val</span> repo = <span class="tk-t">FakeRepo</span>()
+        <span class="tk-k">val</span> vm = <span class="tk-t">SearchViewModel</span>(repo)
+        <span class="tk-k">val</span> states = mutableListOf&lt;<span class="tk-t">SearchState</span>&gt;()
+        backgroundScope.launch { vm.state.toList(states) }      <span class="tk-c">// keeps WhileSubscribed active</span>
+
+        vm.onQueryChange(<span class="tk-s">"k"</span>); vm.onQueryChange(<span class="tk-s">"ko"</span>); vm.onQueryChange(<span class="tk-s">"kotlin"</span>)
+        advanceTimeBy(<span class="tk-n">299</span>); runCurrent()
+        assertEquals(<span class="tk-n">0</span>, repo.calls)                            <span class="tk-c">// still within debounce window</span>
+
+        advanceUntilIdle()
+        assertEquals(<span class="tk-n">1</span>, repo.calls)                            <span class="tk-c">// only the final query searched</span>
+        assertEquals(<span class="tk-t">SearchState</span>.<span class="tk-t">Results</span>(listOf(<span class="tk-s">"kotlin result"</span>)), states.last())
+        assertTrue(<span class="tk-t">SearchState</span>.<span class="tk-t">Loading</span> <span class="tk-k">in</span> states)              <span class="tk-c">// intermediate state observed</span>
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `failure shows error`() = runTest(mainRule.testDispatcher) {
+        <span class="tk-k">val</span> vm = <span class="tk-t">SearchViewModel</span>(<span class="tk-t">FakeRepo</span>(fail = <span class="tk-k">true</span>))
+        backgroundScope.launch { vm.state.collect {} }
+        vm.onQueryChange(<span class="tk-s">"x"</span>)
+        advanceUntilIdle()
+        assertEquals(<span class="tk-t">SearchState</span>.<span class="tk-t">Error</span>(<span class="tk-s">"Search failed"</span>), vm.state.<span class="tk-k">value</span>)
+    }
+}</code></pre></figure>
+<p>Passing <code>mainRule.testDispatcher</code> to <code>runTest</code> makes the test and <code>viewModelScope</code> share one scheduler, so advancing time affects both.</p>
+
+<h2 id="turbine">3. Turbine for flow assertions</h2>
+<figure class="code"><figcaption><span class="file">With Turbine</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `emits loading then results`() = runTest(mainRule.testDispatcher) {
+    <span class="tk-k">val</span> vm = <span class="tk-t">SearchViewModel</span>(<span class="tk-t">FakeRepo</span>())
+    vm.state.test {
+        assertEquals(<span class="tk-t">SearchState</span>.<span class="tk-t">Idle</span>, awaitItem())
+        vm.onQueryChange(<span class="tk-s">"compose"</span>)
+        assertEquals(<span class="tk-t">SearchState</span>.<span class="tk-t">Loading</span>, awaitItem())
+        assertEquals(<span class="tk-t">SearchState</span>.<span class="tk-t">Results</span>(listOf(<span class="tk-s">"compose result"</span>)), awaitItem())
+        cancelAndIgnoreRemainingEvents()
+    }
+}</code></pre></figure>
+<p>Turbine's <code>test {}</code> collects in order and fails on unexpected or missing emissions. That's excellent for testing sequences.</p>
+
+<h2 id="io">4. Inject the other dispatchers too</h2>
+<p>If a repository uses <code>withContext(Dispatchers.IO)</code> directly, tests run that code on real threads and lose determinism. Inject dispatchers and pass the test dispatcher in tests. See <a href="../hilt-dependency-injection/index.html">Hilt qualifiers</a>.</p>
+
+<h2 id="saved-state">5. SavedStateHandle</h2>
+<figure class="code"><figcaption><span class="file">Restoring state in tests</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> vm = <span class="tk-t">FiltersViewModel</span>(<span class="tk-t">SavedStateHandle</span>(mapOf(<span class="tk-s">"filter"</span> to <span class="tk-s">"UNREAD"</span>)))
+assertEquals(<span class="tk-t">Filter</span>.<span class="tk-t">UNREAD</span>, vm.uiState.<span class="tk-k">value</span>.filter)</code></pre></figure>
+
+<h2 id="use-cases">What to cover</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Happy path</h3><p>The event leads to the expected final state.</p></div>
+  <div class="card usecase"><h3>Failure paths</h3><p>Network errors, empty results and retries.</p></div>
+  <div class="card usecase"><h3>Timing</h3><p>Debounce, timeouts and cancellation of outdated requests.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>Thread.sleep</code> or real delays in tests.</li>
+  <li>Asserting <code>stateIn(WhileSubscribed)</code> values without any collector, so the upstream never runs.</li>
+  <li>Creating a new <code>StandardTestDispatcher()</code> in the rule and another in <code>runTest</code>, giving two schedulers where time doesn't advance together.</li>
+  <li>Using <code>runBlocking</code> instead of <code>runTest</code>, which runs real time and is slow.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why does runTest skip my delays?</summary><div><p>That's the point: virtual time. <code>delay(5_000)</code> completes instantly when the scheduler advances.</p></div></details>
+  <details><summary>Do I need Turbine?</summary><div><p>No, collecting into a list works. Turbine makes sequence assertions clearer and fails fast on unexpected events.</p></div></details>
+  <details><summary>How do I test LiveData?</summary><div><p>Use <code>InstantTaskExecutorRule</code> from <code>androidx.arch.core:core-testing</code>, or convert to Flow with <code>asFlow()</code>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Deterministic ViewModel tests need three things: <strong>Main replaced with a test dispatcher</strong>, <strong><code>runTest</code> sharing that scheduler</strong>, and <strong>injected dispatchers everywhere else</strong>. Collect StateFlows in <code>backgroundScope</code> or use Turbine, and drive time explicitly.</p>
+<p>Next step: test what the user actually sees with <a href="../compose-ui-testing/index.html">UI Testing in Jetpack Compose</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing Kotlin coroutines on Android</a></li><li><a href="https://developer.android.com/kotlin/flow/test" target="_blank" rel="noopener">Testing Kotlin flows on Android</a></li><li><a href="https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/" target="_blank" rel="noopener">kotlinx-coroutines-test</a></li><li><a href="https://github.com/cashapp/turbine" target="_blank" rel="noopener">Turbine</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dtesting-viewmodels-coroutines-flow-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dtesting-viewmodels-coroutines-flow-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li><li><a href="../../android/flow-vs-stateflow-vs-sharedflow/index.html"><small>Kotlin Programming</small>Flow vs StateFlow vs SharedFlow</a></li><li><a href="../../android/viewmodel-stateflow-ui-state/index.html"><small>Android Architecture and Clean Code</small>Managing UI State with ViewModel and StateFlow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/testing-viewmodels-coroutines-flow/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/testing-viewmodels-coroutines-flow/&amp;text=Testing ViewModels with Coroutines and Flow" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/testing-viewmodels-coroutines-flow/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#model">The testing model</a></li><li><a href="#rule">1. Replace Dispatchers.Main</a></li><li><a href="#vm">The ViewModel under test</a></li><li><a href="#tests">2. Tests with virtual time</a></li><li><a href="#turbine">3. Turbine for flow assertions</a></li><li><a href="#io">4. Inject the other dispatchers too</a></li><li><a href="#saved-state">5. SavedStateHandle</a></li><li><a href="#use-cases">What to cover</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dtesting-viewmodels-coroutines-flow-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dtesting-viewmodels-coroutines-flow-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

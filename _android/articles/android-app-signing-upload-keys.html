@@ -1,0 +1,110 @@
+<!--meta
+{
+  "seo_title": "Android App Signing and Upload Keys Explained",
+  "description": "How Android app signing works with Play App Signing: app signing key vs upload key, creating a keystore, signing in Gradle and CI, SHA fingerprints, losing a key and key rotation.",
+  "primary_keyword": "android app signing upload key",
+  "keywords": ["play app signing", "upload key vs app signing key", "create keystore android", "sha-1 fingerprint play console", "lost upload key android", "signing config gradle"],
+  "lede": "Every Android app must be signed, and the signature ties all future updates to you. Lose control of the wrong key and you can't update your app. Play App Signing makes this much safer, if you understand which key does what.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["publish-android-app-google-play", "android-ci-cd-github-actions", "prepare-android-app-production", "firebase-authentication-android"],
+  "refs": [
+    ["Sign your app", "https://developer.android.com/studio/publish/app-signing"],
+    ["Use Play App Signing", "https://support.google.com/googleplay/android-developer/answer/9842756"],
+    ["Reset a lost upload key", "https://developer.android.com/studio/publish/app-signing#reset_upload_key"],
+    ["APK Signature Scheme v3 key rotation", "https://source.android.com/docs/security/features/apksigning/v3"]
+  ]
+}
+-->
+<p class="ad-lead">Android uses signatures to verify that an update comes from the same developer as the installed app. Before Play App Signing, losing your one keystore meant you could never update your app again. Today the model separates responsibilities between two keys, and that makes it much safer.</p>
+
+<h2 id="two-keys">Two keys, two jobs</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sign-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-sign-t fig-sign-d">
+    <title id="fig-sign-t">Play App Signing key flow</title>
+    <desc id="fig-sign-d">The developer signs the App Bundle with the upload key and uploads it. Google Play verifies the upload signature, then re-signs the generated APKs with the app signing key, which Google stores securely. Users' devices verify the app signing key on install and update.</desc>
+    <defs><marker id="sgm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M180 80 H246 M450 80 H516" marker-end="url(#sgm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="160" height="80" rx="12"/><text class="d-t" x="100" y="70" text-anchor="middle">You / CI</text><text class="d-s" x="100" y="92" text-anchor="middle">sign AAB with</text><text class="d-s" x="100" y="108" text-anchor="middle">🔑 upload key</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="250" y="40" width="200" height="80" rx="12"/><text class="d-t" x="350" y="70" text-anchor="middle">Google Play</text><text class="d-s" x="350" y="92" text-anchor="middle">verifies upload key, re-signs</text><text class="d-s" x="350" y="108" text-anchor="middle">with 🔐 app signing key</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="520" y="40" width="180" height="80" rx="12"/><text class="d-t" x="610" y="70" text-anchor="middle">User devices</text><text class="d-s" x="610" y="92" text-anchor="middle">verify app signing</text><text class="d-s" x="610" y="108" text-anchor="middle">key on install/update</text></g>
+    <text class="d-s" x="350" y="160" text-anchor="middle">Lost upload key → can be reset with Google support.</text>
+    <text class="d-s" x="350" y="180" text-anchor="middle">App signing key → stored by Google, never on your laptop.</text>
+  </svg>
+  <figcaption id="fig-sign-cap">The key users' devices trust stays safe with Google. The key you handle daily can be replaced if lost.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>App signing key</th><th>Upload key</th></tr></thead>
+  <tbody>
+    <tr><td>Who holds it</td><td>Google (Play App Signing)</td><td>You / your CI</td></tr>
+    <tr><td>Signs</td><td>APKs delivered to users</td><td>Bundles you upload to Play</td></tr>
+    <tr><td>If lost</td><td>Not your problem (Google stores it)</td><td>Request an upload key reset</td></tr>
+    <tr><td>Fingerprint used for</td><td>Google sign-in, Maps restrictions, App Links, Firebase</td><td>Debugging pre-Play builds signed with the upload key</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="create">Creating an upload key</h2>
+<p>In Android Studio, use <strong>Build → Generate Signed Bundle / APK</strong> and create a new keystore, or use <code>keytool</code>:</p>
+<code-block lang="bash" file="Terminal">
+keytool -genkeypair -v -keystore upload-keystore.jks -alias upload \
+  -keyalg RSA -keysize 4096 -validity 10000
+# Store the .jks and passwords in a password manager / secrets vault, NOT in Git.
+</code-block>
+
+<h2 id="gradle">Signing in Gradle without committing secrets</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+android {
+    signingConfigs {
+        create("release") {
+            val props = rootProject.file("keystore.properties")
+            if (props.exists()) {
+                val p = java.util.Properties().apply { load(props.inputStream()) }
+                storeFile = file(p.getProperty("storeFile"))
+                storePassword = p.getProperty("storePassword")
+                keyAlias = p.getProperty("keyAlias")
+                keyPassword = p.getProperty("keyPassword")
+            }
+        }
+    }
+    buildTypes { release { signingConfig = signingConfigs.getByName("release") } }
+}
+// keystore.properties is listed in .gitignore. CI uses environment variables instead.
+</code-block>
+<p>For CI, see <a href="../android-ci-cd-github-actions/index.html">CI/CD with GitHub Actions</a>.</p>
+
+<h2 id="fingerprints">SHA fingerprints: the classic sign-in bug</h2>
+<p>Many APIs (Google Sign-In / Credential Manager, Firebase, Maps key restrictions, App Links) need your certificate's SHA-1 or SHA-256 fingerprint. With Play App Signing, production installs are signed by Google's <strong>app signing key</strong>, so register <em>that</em> fingerprint (found in Play Console → App integrity), plus your upload key and debug key fingerprints for other builds.</p>
+<code-block lang="bash" file="Get fingerprints locally">
+./gradlew signingReport          # debug and configured release fingerprints
+keytool -list -v -keystore upload-keystore.jks -alias upload
+</code-block>
+
+<h2 id="lost">If you lose the upload key</h2>
+<ol class="steps">
+  <li>Generate a new upload key and export its certificate.</li>
+  <li>Request an upload key reset in the Play Console. The account owner submits it.</li>
+  <li>After approval, sign uploads with the new key, and update CI secrets.</li>
+</ol>
+
+<h2 id="rotation">Key rotation</h2>
+<p>Play supports upgrading the app signing key for new installs and updates on supported Android versions, using APK Signature Scheme v3 rotation. This is an advanced operation. Read Google's guidance carefully, and update every fingerprint-dependent integration afterwards.</p>
+
+<h2 id="use-cases">Scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Google sign-in works in debug, fails from Play</h3><p>Register the app signing key's SHA fingerprint from Play Console.</p></div>
+  <div class="card usecase"><h3>Developer leaves the team</h3><p>The upload key lives in a shared vault and CI, not on one laptop, and access is reviewed.</p></div>
+  <div class="card usecase"><h3>Migrating an old app</h3><p>Opt in to Play App Signing by uploading your existing app signing key securely, following Play's flow.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I sideload a Play build and an Android Studio build side by side?</summary><div><p>Not with the same <code>applicationId</code> and different signatures. Uninstall first, or use an <code>applicationIdSuffix</code> for debug builds.</p></div></details>
+  <details><summary>Is the upload key the same as the debug key?</summary><div><p>No. The debug key is auto-generated by Android Studio for local builds. Never use it for Play uploads.</p></div></details>
+  <details><summary>How long should the key be valid?</summary><div><p>Long, typically 25+ years (<code>-validity 10000</code> days). Play requires validity beyond a minimum date.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>With Play App Signing, <strong>Google protects the app signing key</strong>, and you manage a <strong>replaceable upload key</strong>. Keep keystores and passwords out of Git, register the <strong>right SHA fingerprints</strong>, and store signing material in a shared vault and CI.</p>
+<p>Next step: finish your release checklist with <a href="../prepare-android-app-production/index.html">How to Prepare an Android App for Production</a>.</p>

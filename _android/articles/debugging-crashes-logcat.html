@@ -1,0 +1,125 @@
+<!--meta
+{
+  "seo_title": "Debugging Android Crashes with Logcat (Step by Step)",
+  "description": "Debug Android crashes with Logcat: reading stack traces, filtering logs, common exceptions and fixes, breakpoints, crash reporting with Crashlytics, and logging best practices.",
+  "primary_keyword": "debug android crash logcat",
+  "keywords": ["logcat filter android studio", "read stack trace android", "android crash fatal exception", "crashlytics android", "android logging best practices", "caused by exception android"],
+  "lede": "When an Android app crashes, Logcat holds the answer, usually in the first few lines of a stack trace. This guide teaches you to find the right lines quickly, interpret common exceptions, and turn a crash into a fix and a test.",
+  "date": "2026-10-15",
+  "cta": "beginner",
+  "related": ["android-beginner-mistakes", "android-anr-errors", "debug-android-errors-with-ai", "android-analytics-crash-reporting"],
+  "refs": [
+    ["View logs with Logcat", "https://developer.android.com/studio/debug/logcat"],
+    ["Debug your app", "https://developer.android.com/studio/debug"],
+    ["Crashes (Android vitals)", "https://developer.android.com/topic/performance/vitals/crash"],
+    ["Firebase Crashlytics", "https://firebase.google.com/docs/crashlytics"]
+  ]
+}
+-->
+<p class="ad-lead">"The app stopped" tells the user nothing and you even less. Logcat, Android's system log, records exactly which exception was thrown, where, and why. Learning to read it is one of the highest-leverage debugging skills you can build.</p>
+
+<h2 id="filter">Find the crash in Logcat</h2>
+<p>Android Studio's Logcat supports query filters. Useful ones:</p>
+<code-block lang="text" file="Logcat filter examples">
+package:mine level:error          # only your app, errors and above
+package:mine tag:OrderRepo        # one tag from your app
+FATAL EXCEPTION                   # search for crash headers
+is:crash                          # crashes only (newer Logcat versions)
+</code-block>
+
+<h2 id="anatomy">Anatomy of a stack trace</h2>
+<code-block lang="text" file="A typical crash (illustrative)">
+FATAL EXCEPTION: main
+Process: com.example.shop, PID: 12345
+java.lang.IllegalStateException: Product price missing for id=42
+    at com.example.shop.cart.CartMapper.toUi(CartMapper.kt:18)
+    at com.example.shop.cart.CartViewModel$load$1.invokeSuspend(CartViewModel.kt:34)
+    at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(...)
+    at kotlinx.coroutines.DispatchedTask.run(...)
+    ...
+Caused by: kotlinx.serialization.MissingFieldException: Field 'price' is required ...
+    at com.example.shop.api.ProductDto$$serializer.deserialize(...)
+</code-block>
+<figure class="diagram" role="group" aria-labelledby="fig-st-cap3">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-st-t3 fig-st-d3">
+    <title id="fig-st-t3">How to read an Android stack trace</title>
+    <desc id="fig-st-d3">Step one: read the exception type and message. Step two: find the first line in your own package, which is where to start looking. Step three: read the Caused by section, which often contains the root cause. Framework and library frames below are usually context.</desc>
+    <rect class="d-red" x="20" y="20" width="210" height="140" rx="12"/><text class="d-t" x="125" y="48" text-anchor="middle">1. Exception + message</text><text class="d-s" x="125" y="78" text-anchor="middle">what went wrong</text><text class="d-s" x="125" y="98" text-anchor="middle">IllegalStateException:</text><text class="d-s" x="125" y="114" text-anchor="middle">"price missing"</text>
+    <rect class="d-amber" x="255" y="20" width="210" height="140" rx="12"/><text class="d-t" x="360" y="48" text-anchor="middle">2. First frame in YOUR code</text><text class="d-s" x="360" y="78" text-anchor="middle">where to look</text><text class="d-s" x="360" y="98" text-anchor="middle">CartMapper.kt:18</text>
+    <rect class="d-violet" x="490" y="20" width="210" height="140" rx="12"/><text class="d-t" x="595" y="48" text-anchor="middle">3. "Caused by"</text><text class="d-s" x="595" y="78" text-anchor="middle">the root cause</text><text class="d-s" x="595" y="98" text-anchor="middle">API omitted 'price'</text>
+  </svg>
+  <figcaption id="fig-st-cap3">Most crashes are solved by these three reads. Framework frames below your code are usually context, not cause.</figcaption>
+</figure>
+
+<h2 id="common">Common exceptions and their usual fixes</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Exception</th><th>Usual cause</th><th>Typical fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>NullPointerException</code></td><td><code>!!</code>, platform types from Java, uninitialised <code>lateinit</code></td><td>Model nullability; safe calls; initialise properly</td></tr>
+    <tr><td><code>IllegalStateException</code></td><td>Invalid state: fragment not attached, <code>checkNotNull</code> failed, ViewModel misuse</td><td>Fix lifecycle timing; validate inputs earlier</td></tr>
+    <tr><td><code>NetworkOnMainThreadException</code></td><td>Network call on the main thread</td><td>Coroutines + suspend APIs</td></tr>
+    <tr><td><code>IndexOutOfBoundsException</code></td><td>Stale index, list changed</td><td>Use stable keys/IDs; <code>getOrNull</code></td></tr>
+    <tr><td><code>ClassCastException</code></td><td>Wrong type assumption, often from Bundles or reflection</td><td>Type-safe navigation arguments; safe casts</td></tr>
+    <tr><td><code>Resources$NotFoundException</code></td><td>Passing an Int value where a resource ID is expected (<code>setText(42)</code>)</td><td>Convert to String; check resource qualifiers</td></tr>
+    <tr><td><code>SecurityException</code></td><td>Missing runtime permission</td><td>Request permission; check before use</td></tr>
+    <tr><td><code>TransactionTooLargeException</code></td><td>Large Bundle (saved state, intent extras)</td><td>Pass IDs; persist large data elsewhere</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="debugger">From crash to fix: using the debugger</h2>
+<ol class="steps">
+  <li>Click the file link in the stack trace (for example <code>CartMapper.kt:18</code>) to jump to the line.</li>
+  <li>Set a breakpoint there, or an <strong>exception breakpoint</strong> for that exception type (Run → View Breakpoints).</li>
+  <li>Run in debug and reproduce. Inspect variables and the call stack when it stops.</li>
+  <li>Write a unit test that reproduces the failing input, fix the code, and watch the test pass.</li>
+</ol>
+<code-block lang="kotlin" file="Regression test for the crash above">
+@Test
+fun `product without price is shown as unavailable instead of crashing`() {
+    val ui = CartMapper.toUi(ProductDto(id = "42", name = "Mug", price = null))
+    assertEquals("Unavailable", ui.priceText)
+}
+</code-block>
+
+<h2 id="logging">Logging well</h2>
+<code-block lang="kotlin" file="Structured, safe logging">
+private const val TAG = "OrderRepo"
+
+suspend fun placeOrder(order: Order) {
+    Log.d(TAG, "placeOrder items=${order.items.size} total=${order.totalPaise}")   // no personal data
+    try {
+        api.place(order.toDto())
+    } catch (e: IOException) {
+        Log.w(TAG, "placeOrder failed: network", e)       // include the throwable for its stack trace
+        throw e
+    }
+}
+</code-block>
+<ul>
+  <li>Use levels meaningfully: <code>d</code> for debug detail, <code>i</code> for milestones, <code>w</code> for recoverable problems, <code>e</code> for failures.</li>
+  <li>Never log tokens, passwords or personal data.</li>
+  <li>Strip verbose logs from release builds (for example with a logging wrapper or Timber's debug tree).</li>
+</ul>
+
+<h2 id="production">Crashes in production</h2>
+<p>Logcat only shows <em>your</em> device. For users' crashes, use <strong>Android vitals</strong> in the Play Console and a crash reporter such as <strong>Firebase Crashlytics</strong>. Upload R8 mapping files so stack traces are readable (see <a href="../proguard-r8-explained/index.html">R8</a>), and add breadcrumbs and custom keys (screen name, feature flag) to reproduce context.</p>
+
+<h2 id="use-cases">Debugging scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Crash only in release</h3><p>Usually R8 or reflection. Reproduce with a minified build and add a targeted keep rule.</p></div>
+  <div class="card usecase"><h3>Crash after returning from background</h3><p>Usually process death and a missing <code>lateinit</code> or state. Test with "Don't keep activities".</p></div>
+  <div class="card usecase"><h3>Crash on one manufacturer</h3><p>Check Android version, permissions behaviour and WebView or OEM differences in vitals breakdowns.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Logcat is too noisy. What can I do?</summary><div><p>Filter by <code>package:mine</code> and level, create saved filters, and use consistent tags.</p></div></details>
+  <details><summary>Why don't I see my logs?</summary><div><p>Check the selected device and process, the filter, and that your logging isn't stripped in that build variant.</p></div></details>
+  <details><summary>Can AI help read stack traces?</summary><div><p>Yes. Tools like Gemini in Android Studio can explain traces and suggest causes, but verify suggestions against the code. See <a href="../debug-android-errors-with-ai/index.html">Debugging with AI</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>To debug a crash: <strong>filter Logcat</strong>, read the <strong>exception and message</strong>, jump to the <strong>first frame in your code</strong>, check <strong>"Caused by"</strong>, reproduce with breakpoints, and lock in the fix with a <strong>regression test</strong>. Use Android vitals and Crashlytics for production crashes.</p>
+<p>Next step: automate your quality checks with <a href="../android-ci-cd-github-actions/index.html">CI/CD for Android with GitHub Actions</a>.</p>

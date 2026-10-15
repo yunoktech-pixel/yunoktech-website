@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Basics Every Android Developer Should Know | Yunok Tech</title>
+  <meta name="description" content="The Kotlin basics Android developers use daily: val vs var, types, functions, string templates, when, classes, null safety, collections, lambdas and scope functions, with Android examples.">
+  <meta name="keywords" content="kotlin basics for android, learn kotlin for android, kotlin tutorial beginners, kotlin val vs var, kotlin when expression, kotlin scope functions, kotlin lambdas android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-basics-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-basics-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Basics Every Android Developer Should Know">
+  <meta property="og:description" content="The Kotlin basics Android developers use daily: val vs var, types, functions, string templates, when, classes, null safety, collections, lambdas and scope functions, with Android examples.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Basics Every Android Developer Should Know">
+  <meta name="twitter:description" content="The Kotlin basics Android developers use daily: val vs var, types, functions, string templates, when, classes, null safety, collections, lambdas and scope functions, with Android examples.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Basics Every Android Developer Should Know", "description": "The Kotlin basics Android developers use daily: val vs var, types, functions, string templates, when, classes, null safety, collections, lambdas and scope functions, with Android examples.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Kotlin Programming", "keywords": "learn kotlin for android, kotlin tutorial beginners, kotlin val vs var, kotlin when expression, kotlin scope functions, kotlin lambdas android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-basics-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Basics Every Android Developer Should Know", "item": "https://yunoktech.com/android/kotlin-basics-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Basics Every Android Developer Should Know</h1>
+    <p class="ad-lede">You don't need all of Kotlin to build Android apps, but you need a core set fluently. This guide covers exactly that core, with examples drawn from real Android code rather than abstract puzzles.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#variables">1. val, var and type inference</a></li><li><a href="#functions">2. Functions, default and named arguments</a></li><li><a href="#strings">3. String templates</a></li><li><a href="#when">4. if and when are expressions</a></li><li><a href="#classes">5. Classes, properties and objects</a></li><li><a href="#null-safety">6. Null safety in one minute</a></li><li><a href="#collections">7. Collections and lambdas</a></li><li><a href="#lambdas">8. Lambdas and trailing lambda syntax</a></li><li><a href="#scope">9. Scope functions: let, apply, also, run, with</a></li><li><a href="#android-patterns">10. Putting it together: a realistic Android snippet</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Kotlin is a big language, with coroutines, generics, DSLs, multiplatform and more. Beginners often try to learn it all at once. You'll be far more productive if you first master the <strong>small core you'll use in every Android file</strong>, then pick up the advanced features as you need them.</p>
+<p>Every example below is runnable in the <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a> or shows a real Android pattern.</p>
+
+<h2 id="variables">1. val, var and type inference</h2>
+<figure class="code"><figcaption><span class="file">Variables</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> appName = <span class="tk-s">"NotiVault"</span>        <span class="tk-c">// read-only reference (prefer this)</span>
+<span class="tk-k">var</span> unreadCount = <span class="tk-n">0</span>              <span class="tk-c">// mutable: use only when the value must change</span>
+unreadCount += <span class="tk-n">1</span>
+
+<span class="tk-k">val</span> price: <span class="tk-t">Double</span> = <span class="tk-n">499.0</span>        <span class="tk-c">// explicit type when it improves clarity</span>
+<span class="tk-k">val</span> tags = listOf(<span class="tk-s">"kotlin"</span>, <span class="tk-s">"android"</span>)   <span class="tk-c">// inferred as List&lt;String&gt;</span></code></pre></figure>
+<div class="tip"><b>Rule of thumb</b><p>Default to <code>val</code>. Immutable values make code, and especially UI state, easier to reason about.</p></div>
+
+<h2 id="functions">2. Functions, default and named arguments</h2>
+<figure class="code"><figcaption><span class="file">Functions</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> formatPrice(amount: <span class="tk-t">Double</span>, currency: <span class="tk-t">String</span> = <span class="tk-s">"₹"</span>, decimals: <span class="tk-t">Int</span> = <span class="tk-n">2</span>): <span class="tk-t">String</span> =
+    <span class="tk-s">"$currency${"</span>%.${decimals}f<span class="tk-s">".format(amount)}"</span>
+
+formatPrice(<span class="tk-n">1299.5</span>)                       <span class="tk-c">// ₹1299.50</span>
+formatPrice(<span class="tk-n">19.99</span>, currency = <span class="tk-s">"$"</span>)        <span class="tk-c">// named argument: clear at the call site</span></code></pre></figure>
+<p>Default arguments remove the need for overloads, and named arguments make calls self-documenting. Compose relies on both heavily, for example <code>Text(text = "Hi", maxLines = 1)</code>.</p>
+
+<h2 id="strings">3. String templates</h2>
+<figure class="code"><figcaption><span class="file">Templates</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> name = <span class="tk-s">"Kamal"</span>
+<span class="tk-k">val</span> items = <span class="tk-n">3</span>
+println(<span class="tk-s">"Hi $name, you have $items items"</span>)             <span class="tk-c">// simple values</span>
+println(<span class="tk-s">"Total: ${items * 199} (${if (items &gt; 1) "</span>items<span class="tk-s">" else "</span>item<span class="tk-s">"})"</span>)   <span class="tk-c">// expressions</span></code></pre></figure>
+
+<h2 id="when">4. if and when are expressions</h2>
+<figure class="code"><figcaption><span class="file">when as an expression</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> label = <span class="tk-k">when</span> (statusCode) {
+    <span class="tk-n">200</span> -&gt; <span class="tk-s">"OK"</span>
+    <span class="tk-n">401</span>, <span class="tk-n">403</span> -&gt; <span class="tk-s">"Please sign in again"</span>
+    <span class="tk-k">in</span> <span class="tk-n">500</span>..<span class="tk-n">599</span> -&gt; <span class="tk-s">"Server problem, try later"</span>
+    <span class="tk-k">else</span> -&gt; <span class="tk-s">"Unexpected error ($statusCode)"</span>
+}
+
+<span class="tk-k">val</span> badge = <span class="tk-k">if</span> (unreadCount &gt; <span class="tk-n">99</span>) <span class="tk-s">"99+"</span> <span class="tk-k">else</span> unreadCount.toString()</code></pre></figure>
+
+<h2 id="classes">5. Classes, properties and objects</h2>
+<figure class="code"><figcaption><span class="file">Classes</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">Counter</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> max: <span class="tk-t">Int</span>) {       <span class="tk-c">// primary constructor + property</span>
+    <span class="tk-k">var</span> <span class="tk-k">value</span> = <span class="tk-n">0</span>
+        <span class="tk-k">private</span> <span class="tk-k">set</span>                          <span class="tk-c">// readable outside, writable only inside</span>
+
+    <span class="tk-k">fun</span> increment() { <span class="tk-k">if</span> (<span class="tk-k">value</span> &lt; max) <span class="tk-k">value</span>++ }
+}
+
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">User</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> name: <span class="tk-t">String</span>)   <span class="tk-c">// equals/hashCode/toString/copy for free</span>
+
+<span class="tk-k">object</span> <span class="tk-t">Analytics</span> {                           <span class="tk-c">// a singleton</span>
+    <span class="tk-k">fun</span> log(event: <span class="tk-t">String</span>) = println(<span class="tk-s">"event: $event"</span>)
+}</code></pre></figure>
+<p>Data classes, sealed classes and enums each get their own article: <a href="../kotlin-data-sealed-enum-classes/index.html">Data, Sealed and Enum Classes</a>.</p>
+
+<h2 id="null-safety">6. Null safety in one minute</h2>
+<figure class="code"><figcaption><span class="file">Null safety</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">var</span> nickname: <span class="tk-t">String</span>? = <span class="tk-k">null</span>                <span class="tk-c">// the ? means "may be null"</span>
+<span class="tk-k">val</span> length = nickname?.length ?: <span class="tk-n">0</span>          <span class="tk-c">// safe call + Elvis default</span>
+nickname?.let { println(<span class="tk-s">"Hello, $it"</span>) }    <span class="tk-c">// run only when not null</span></code></pre></figure>
+<p>Full details are in <a href="../kotlin-null-safety/index.html">Kotlin Null Safety Explained</a>.</p>
+
+<h2 id="collections">7. Collections and lambdas</h2>
+<figure class="code"><figcaption><span class="file">Collections</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Order</span>(<span class="tk-k">val</span> id: <span class="tk-t">Int</span>, <span class="tk-k">val</span> total: <span class="tk-t">Double</span>, <span class="tk-k">val</span> paid: <span class="tk-t">Boolean</span>)
+
+<span class="tk-k">val</span> orders = listOf(<span class="tk-t">Order</span>(<span class="tk-n">1</span>, <span class="tk-n">250.0</span>, <span class="tk-k">true</span>), <span class="tk-t">Order</span>(<span class="tk-n">2</span>, <span class="tk-n">999.0</span>, <span class="tk-k">false</span>), <span class="tk-t">Order</span>(<span class="tk-n">3</span>, <span class="tk-n">120.0</span>, <span class="tk-k">true</span>))
+
+<span class="tk-k">val</span> paidTotal = orders.filter { it.paid }.sumOf { it.total }        <span class="tk-c">// 370.0</span>
+<span class="tk-k">val</span> ids = orders.map { it.id }                                       <span class="tk-c">// [1, 2, 3]</span>
+<span class="tk-k">val</span> biggest = orders.maxByOrNull { it.total }                        <span class="tk-c">// Order(2, …)</span>
+<span class="tk-k">val</span> byStatus = orders.groupBy { <span class="tk-k">if</span> (it.paid) <span class="tk-s">"Paid"</span> <span class="tk-k">else</span> <span class="tk-s">"Pending"</span> }</code></pre></figure>
+<p><code>it</code> is the implicit name of a single lambda parameter. More in <a href="../kotlin-collections-functional/index.html">Collections and Functional Programming</a>.</p>
+
+<h2 id="lambdas">8. Lambdas and trailing lambda syntax</h2>
+<p>If a function's last parameter is a function, you can pass the lambda outside the parentheses. This is why Compose code looks like a tree:</p>
+<figure class="code"><figcaption><span class="file">Trailing lambdas in Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">Button</span>(onClick = { viewModel.save() }) {     <span class="tk-c">// the content lambda trails the call</span>
+    <span class="tk-t">Text</span>(<span class="tk-s">"Save"</span>)
+}
+
+<span class="tk-t">Column</span> {                                       <span class="tk-c">// only a lambda: no parentheses needed</span>
+    <span class="tk-t">Text</span>(<span class="tk-s">"Title"</span>)
+    <span class="tk-t">Text</span>(<span class="tk-s">"Subtitle"</span>)
+}</code></pre></figure>
+
+<h2 id="scope">9. Scope functions: let, apply, also, run, with</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Function</th><th>Object reference</th><th>Returns</th><th>Typical Android use</th></tr></thead>
+  <tbody>
+    <tr><td><code>let</code></td><td><code>it</code></td><td>Lambda result</td><td>Run code only for non-null values</td></tr>
+    <tr><td><code>apply</code></td><td><code>this</code></td><td>The object</td><td>Configure an object (Intent, Bundle, Paint)</td></tr>
+    <tr><td><code>also</code></td><td><code>it</code></td><td>The object</td><td>Side effects such as logging</td></tr>
+    <tr><td><code>run</code></td><td><code>this</code></td><td>Lambda result</td><td>Compute a value from an object's members</td></tr>
+    <tr><td><code>with</code></td><td><code>this</code></td><td>Lambda result</td><td>Call several members of one object</td></tr>
+  </tbody>
+</table>
+</div>
+<figure class="code"><figcaption><span class="file">apply and let in practice</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> intent = <span class="tk-t">Intent</span>(context, <span class="tk-t">DetailActivity</span>::<span class="tk-k">class</span>.java).apply {
+    putExtra(<span class="tk-s">"articleId"</span>, article.id)
+    addFlags(<span class="tk-t">Intent</span>.<span class="tk-t">FLAG_ACTIVITY_SINGLE_TOP</span>)
+}
+
+savedInstanceState?.getString(<span class="tk-s">"query"</span>)?.let { restoredQuery -&gt; viewModel.onQueryChange(restoredQuery) }</code></pre></figure>
+<div class="warn"><b>Don't over-nest</b><p>Chains like <code>a?.let { b?.apply { also { … } } }</code> hurt readability. A plain <code>if</code> is often clearer.</p></div>
+
+<h2 id="android-patterns">10. Putting it together: a realistic Android snippet</h2>
+<figure class="code"><figcaption><span class="file">ArticlesViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ArticleUi</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> title: <span class="tk-t">String</span>, <span class="tk-k">val</span> isNew: <span class="tk-t">Boolean</span>)
+
+<span class="tk-k">class</span> <span class="tk-t">ArticlesViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repo: <span class="tk-t">ArticleRepository</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _items = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">ArticleUi</span>&gt;&gt;(emptyList())
+    <span class="tk-k">val</span> items: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">ArticleUi</span>&gt;&gt; = _items.asStateFlow()
+
+    <span class="tk-k">fun</span> load(now: <span class="tk-t">Long</span> = <span class="tk-t">System</span>.currentTimeMillis()) = viewModelScope.launch {
+        <span class="tk-k">val</span> dayMillis = <span class="tk-n">24</span> * <span class="tk-n">60</span> * <span class="tk-n">60</span> * <span class="tk-n">1000L</span>
+        _items.<span class="tk-k">value</span> = repo.getArticles()
+            .sortedByDescending { it.publishedAt }
+            .map { <span class="tk-t">ArticleUi</span>(it.id, it.title.trim(), isNew = now - it.publishedAt &lt; dayMillis) }
+    }
+}</code></pre></figure>
+<p>Data classes, <code>val</code>, collection operations, lambdas, named arguments and an expression-bodied function all appear in ten lines. This is everyday Android Kotlin.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>var</code> everywhere, out of Java habit.</li>
+  <li>Writing Java-style getters and setters instead of properties.</li>
+  <li>Using <code>==</code> versus <code>===</code> incorrectly: <code>==</code> is structural equality (like <code>equals</code>); <code>===</code> compares references.</li>
+  <li>Forgetting that <code>listOf</code> returns a read-only list. Use <code>mutableListOf</code> or, better, create a new list.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How long does it take to learn Kotlin basics?</summary><div><p>With prior programming experience, a week or two of focused practice. As a first language, plan three to four weeks before moving to Android.</p></div></details>
+  <details><summary>Do I need to learn coroutines as part of the basics?</summary><div><p>Learn them right after the basics, once you start Android. They have their own guide: <a href="../kotlin-coroutines-flow-android/index.html">Coroutines and Flow Explained</a>.</p></div></details>
+  <details><summary>Where can I practise?</summary><div><p>The Kotlin Playground, Kotlin Koans and small console exercises, then real Android screens.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>The Kotlin you'll use daily on Android is a compact set: <strong>val and var, functions with defaults, templates, when expressions, classes and data classes, null safety, collections, lambdas and a few scope functions</strong>. Master these and Android code becomes much easier to read and write.</p>
+<p>Next step: go deeper on the feature that prevents the most crashes, <a href="../kotlin-null-safety/index.html">Kotlin Null Safety</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/basic-syntax.html" target="_blank" rel="noopener">Kotlin basic syntax</a></li><li><a href="https://kotlinlang.org/docs/idioms.html" target="_blank" rel="noopener">Kotlin idioms</a></li><li><a href="https://kotlinlang.org/docs/scope-functions.html" target="_blank" rel="noopener">Scope functions</a></li><li><a href="https://developer.android.com/kotlin/style-guide" target="_blank" rel="noopener">Kotlin style guide for Android</a></li><li><a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-basics-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-basics-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-null-safety/index.html"><small>Kotlin Programming</small>Kotlin Null Safety Explained with Examples</a></li><li><a href="../../android/kotlin-data-sealed-enum-classes/index.html"><small>Kotlin Programming</small>Data Classes, Sealed Classes, and Enum Classes</a></li><li><a href="../../android/kotlin-collections-functional/index.html"><small>Kotlin Programming</small>Kotlin Collections and Functional Programming</a></li><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-basics-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-basics-android/&amp;text=Kotlin Basics Every Android Developer Should Know" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-basics-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#variables">1. val, var and type inference</a></li><li><a href="#functions">2. Functions, default and named arguments</a></li><li><a href="#strings">3. String templates</a></li><li><a href="#when">4. if and when are expressions</a></li><li><a href="#classes">5. Classes, properties and objects</a></li><li><a href="#null-safety">6. Null safety in one minute</a></li><li><a href="#collections">7. Collections and lambdas</a></li><li><a href="#lambdas">8. Lambdas and trailing lambda syntax</a></li><li><a href="#scope">9. Scope functions: let, apply, also, run, with</a></li><li><a href="#android-patterns">10. Putting it together: a realistic Android snippet</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-basics-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-basics-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

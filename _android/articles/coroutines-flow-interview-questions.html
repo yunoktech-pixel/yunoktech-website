@@ -1,0 +1,97 @@
+<!--meta
+{
+  "seo_title": "Coroutines and Flow Interview Questions (Android)",
+  "description": "Kotlin coroutines and Flow interview questions with answers and code: scopes, jobs, dispatchers, cancellation, exceptions, launch vs async, cold vs hot flows, operators, testing.",
+  "primary_keyword": "coroutines interview questions",
+  "keywords": ["kotlin flow interview questions", "coroutine exception handling interview", "launch vs async", "supervisorjob interview", "stateflow sharedflow interview", "coroutine testing interview"],
+  "lede": "Coroutines and Flow questions test whether you can write asynchronous Android code that is correct under cancellation, failure and lifecycle changes. Here are the questions interviewers commonly ask, with precise answers and short code you can explain.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-coroutines-flow-android", "flow-vs-stateflow-vs-sharedflow", "kotlin-suspend-functions", "testing-viewmodels-coroutines-flow"],
+  "refs": [
+    ["Coroutines guide (Kotlin)", "https://kotlinlang.org/docs/coroutines-guide.html"],
+    ["Coroutine exceptions handling", "https://kotlinlang.org/docs/exception-handling.html"],
+    ["Kotlin flows on Android", "https://developer.android.com/kotlin/flow"],
+    ["Coroutines best practices", "https://developer.android.com/kotlin/coroutines/coroutines-best-practices"]
+  ]
+}
+-->
+<p class="ad-lead">Many candidates can launch a coroutine. Fewer can explain what happens when one child fails, why a <code>catch (e: Exception)</code> breaks cancellation, or how <code>stateIn</code> shares an upstream. Those are exactly the questions that distinguish experienced Android developers.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-coq-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-coq-t fig-coq-d">
+    <title id="fig-coq-t">Failure propagation with Job versus SupervisorJob</title>
+    <desc id="fig-coq-d">Left: with a regular Job, when child B fails, the parent is cancelled and so is sibling A. Right: with a SupervisorJob, child B's failure does not cancel the parent or sibling A; B must handle its own exception.</desc>
+    <text class="d-t" x="180" y="22" text-anchor="middle">Job / coroutineScope</text>
+    <rect class="d-red" x="120" y="34" width="120" height="40" rx="8"/><text class="d-s" x="180" y="58" text-anchor="middle">parent ✗ cancelled</text>
+    <rect class="d-red" x="40" y="110" width="120" height="40" rx="8"/><text class="d-s" x="100" y="134" text-anchor="middle">child A ✗</text>
+    <rect class="d-red" x="200" y="110" width="120" height="40" rx="8"/><text class="d-s" x="260" y="134" text-anchor="middle">child B fails</text>
+    <path class="d-line" d="M160 74 L100 110 M200 74 L260 110"/>
+    <text class="d-t" x="540" y="22" text-anchor="middle">SupervisorJob / supervisorScope</text>
+    <rect class="d-green" x="480" y="34" width="120" height="40" rx="8"/><text class="d-s" x="540" y="58" text-anchor="middle">parent ✓ continues</text>
+    <rect class="d-green" x="400" y="110" width="120" height="40" rx="8"/><text class="d-s" x="460" y="134" text-anchor="middle">child A ✓</text>
+    <rect class="d-red" x="560" y="110" width="120" height="40" rx="8"/><text class="d-s" x="620" y="134" text-anchor="middle">child B fails</text>
+    <path class="d-line" d="M520 74 L460 110 M560 74 L620 110"/>
+    <text class="d-s" x="360" y="180" text-anchor="middle">viewModelScope uses a SupervisorJob, so one failed launch doesn't kill the others.</text>
+  </svg>
+  <figcaption id="fig-coq-cap">A favourite interview topic: draw this and explain it.</figcaption>
+</figure>
+
+<h2 id="basics">Basics</h2>
+<h3>launch vs async?</h3>
+<p><code>launch</code> returns a <code>Job</code> for fire-and-forget work. <code>async</code> returns a <code>Deferred&lt;T&gt;</code> you <code>await</code>. Use <code>async</code> for parallel work whose results you combine, inside <code>coroutineScope</code>.</p>
+<h3>Is a coroutine a thread?</h3>
+<p>No. It's a lightweight unit of work that runs on threads provided by dispatchers, and it doesn't hold a thread while suspended.</p>
+<h3>What does <code>withContext</code> do?</h3>
+<p>It switches the dispatcher (and context) for a block and returns its result, which is the standard way to make a suspend function main-safe.</p>
+
+<h2 id="cancellation">Cancellation and exceptions</h2>
+<h3>How is cancellation implemented?</h3>
+<p>Cooperatively: suspension points check for cancellation and throw <code>CancellationException</code>. CPU-bound loops should call <code>ensureActive()</code> or <code>yield()</code>.</p>
+<h3>What's wrong with this code?</h3>
+<code-block lang="kotlin" file="Interview snippet">
+viewModelScope.launch {
+    try {
+        repository.sync()
+    } catch (e: Exception) {   // catches CancellationException too
+        _state.value = Error
+    }
+}
+</code-block>
+<p>It swallows cancellation, so a cancelled coroutine may continue and update state after the screen is gone. Catch specific exceptions, or rethrow <code>CancellationException</code>.</p>
+<h3>How do exceptions propagate in launch vs async?</h3>
+<p>In <code>launch</code>, uncaught exceptions propagate to the parent (or a <code>CoroutineExceptionHandler</code> at the root). In <code>async</code>, they're stored in the Deferred and thrown on <code>await</code>, and they still cancel the parent in a regular scope.</p>
+<h3>What does CoroutineExceptionHandler do?</h3>
+<p>It handles uncaught exceptions in root coroutines (launch-based) as a last resort, for example logging. It doesn't recover the failed coroutine, and it isn't invoked for <code>async</code> or for child coroutines.</p>
+
+<h2 id="android">Android specifics</h2>
+<h3>Which scopes do you use on Android?</h3>
+<p><code>viewModelScope</code> for screen work, <code>lifecycleScope</code> with <code>repeatOnLifecycle</code> for UI collection, an injected application scope for work that must outlive screens, and WorkManager for guaranteed background work.</p>
+<h3>Why is GlobalScope discouraged?</h3>
+<p>It isn't tied to any lifecycle, so work leaks, can't be cancelled structurally, and errors are easy to lose.</p>
+
+<h2 id="flow">Flow</h2>
+<h3>Cold vs hot flows?</h3>
+<p>Cold flows run their producer per collector (<code>flow { }</code>, Room queries). Hot flows exist independently and share emissions (<code>StateFlow</code>, <code>SharedFlow</code>).</p>
+<h3>StateFlow vs SharedFlow vs LiveData?</h3>
+<p>StateFlow has a current value, conflation and equality-based de-duplication, which suits UI state. SharedFlow is configurable (replay, buffer). LiveData is lifecycle-aware but Android-only and less flexible.</p>
+<h3>What does <code>flatMapLatest</code> do, and when would you use it?</h3>
+<p>It cancels the previous inner flow when a new value arrives, as in search-as-you-type, so outdated results never overwrite new ones.</p>
+<h3>Explain <code>stateIn(scope, WhileSubscribed(5000), initial)</code>.</h3>
+<p>It converts a cold flow into a shared StateFlow. The upstream runs while there are subscribers, and stops five seconds after the last one leaves, which survives rotation.</p>
+<h3>What is backpressure in Flow?</h3>
+<p>Flow is sequential by default: the producer suspends until the collector processes each value. Operators like <code>buffer</code>, <code>conflate</code> and <code>collectLatest</code> change that behaviour.</p>
+
+<h2 id="testing">Testing</h2>
+<h3>How do you test coroutine code deterministically?</h3>
+<p>Use <code>runTest</code> with a test dispatcher shared with a <code>Dispatchers.setMain</code> rule, inject other dispatchers, and use virtual time (<code>advanceTimeBy</code>, <code>advanceUntilIdle</code>). Collect StateFlows in <code>backgroundScope</code>, or use Turbine. See <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Will they ask about Channels?</summary><div><p>Sometimes: Channel vs SharedFlow, buffered channels for one-off events, and <code>receiveAsFlow</code>. Know the delivery semantics: each element goes to one receiver.</p></div></details>
+  <details><summary>Should I mention RxJava?</summary><div><p>If you've used it, compare: coroutines integrate with Kotlin and Jetpack, and Flow covers most Rx use cases. Migration can be gradual.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Coroutine interviews focus on <strong>structured concurrency, cancellation, exception propagation, Android scopes, cold vs hot flows, key operators and testing</strong>. Explain each with a small snippet and the bug it prevents.</p>
+<p>Next step: tackle bigger-picture questions in <a href="../android-system-design-interview/index.html">Android System Design Interview Questions</a>.</p>

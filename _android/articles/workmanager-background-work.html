@@ -1,0 +1,159 @@
+<!--meta
+{
+  "seo_title": "WorkManager in Android: Background Work Guide (Kotlin)",
+  "description": "Schedule reliable background work with WorkManager: CoroutineWorker, constraints, one-time and periodic work, unique work, chaining, input/output data, retries, expedited work, Hilt and testing.",
+  "primary_keyword": "workmanager android",
+  "keywords": ["coroutineworker kotlin", "periodic work request android", "workmanager constraints", "unique work workmanager", "expedited work android", "android background tasks"],
+  "lede": "Uploading a photo, syncing data overnight, cleaning old files: work that must finish even if the user leaves the app or the device restarts. WorkManager is the recommended API for this persistent background work. Here's how to use it properly.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-foreground-services", "offline-first-android-architecture", "android-app-components", "kotlin-coroutines-flow-android"],
+  "refs": [
+    ["Background work overview", "https://developer.android.com/develop/background-work/background-tasks"],
+    ["WorkManager guide", "https://developer.android.com/develop/background-work/background-tasks/persistent"],
+    ["Define work requests", "https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work"],
+    ["Testing WorkManager", "https://developer.android.com/develop/background-work/background-tasks/testing/persistent/integration-testing"]
+  ]
+}
+-->
+<p class="ad-lead">Android aggressively limits background execution to save battery. WorkManager works within those limits: it persists scheduled work in a database, respects constraints like network and charging, retries with backoff, and survives app restarts and reboots.</p>
+
+<h2 id="when">When to use WorkManager</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-wm-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-wm-t fig-wm-d">
+    <title id="fig-wm-t">Choosing a background work API</title>
+    <desc id="fig-wm-d">Work tied to a screen uses coroutines in viewModelScope. Persistent work that must complete, possibly deferred, uses WorkManager. User-visible ongoing work like media playback or navigation uses a foreground service. Exact-time user-facing events like alarms use AlarmManager.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="165" height="130" rx="12"/><text class="d-t" x="92" y="60" text-anchor="middle">Coroutines</text><text class="d-s" x="92" y="88" text-anchor="middle">while screen</text><text class="d-s" x="92" y="106" text-anchor="middle">is active</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="187" y="30" width="165" height="130" rx="12"/><text class="d-t" x="270" y="60" text-anchor="middle">WorkManager</text><text class="d-s" x="270" y="88" text-anchor="middle">must finish,</text><text class="d-s" x="270" y="106" text-anchor="middle">can be deferred</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="364" y="30" width="165" height="130" rx="12"/><text class="d-t" x="446" y="60" text-anchor="middle">Foreground service</text><text class="d-s" x="446" y="88" text-anchor="middle">user-visible,</text><text class="d-s" x="446" y="106" text-anchor="middle">ongoing now</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="541" y="30" width="169" height="130" rx="12"/><text class="d-t" x="625" y="60" text-anchor="middle">AlarmManager</text><text class="d-s" x="625" y="88" text-anchor="middle">exact time,</text><text class="d-s" x="625" y="106" text-anchor="middle">user-facing alarm</text></g>
+    <text class="d-s" x="360" y="188" text-anchor="middle">WorkManager is the default for persistent work.</text>
+  </svg>
+  <figcaption id="fig-wm-cap">Pick the API by whether work must persist, must run now, and whether the user sees it.</figcaption>
+</figure>
+
+<h2 id="setup">Setup and a CoroutineWorker</h2>
+<code-block lang="kts" file="build.gradle.kts">
+dependencies {
+    implementation("androidx.work:work-runtime-ktx:2.10.0") // check for the latest stable version
+}
+</code-block>
+<code-block lang="kotlin" file="SyncWorker.kt">
+class SyncWorker(
+    appContext: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(appContext, params) {
+
+    override suspend fun doWork(): Result {
+        val since = inputData.getLong(KEY_SINCE, 0L)
+        return try {
+            val count = syncRepository().syncChangesSince(since)     // suspend, main-safe
+            Result.success(workDataOf(KEY_COUNT to count))
+        } catch (e: IOException) {
+            if (runAttemptCount < 5) Result.retry() else Result.failure()
+        }
+    }
+
+    companion object {
+        const val KEY_SINCE = "since"
+        const val KEY_COUNT = "count"
+    }
+}
+</code-block>
+<p>Return <code>success</code>, <code>retry</code> (uses backoff) or <code>failure</code>. Treat work as idempotent: it may run more than once.</p>
+
+<h2 id="enqueue">Enqueue with constraints</h2>
+<code-block lang="kotlin" file="Scheduling work">
+val constraints = Constraints.Builder()
+    .setRequiredNetworkType(NetworkType.CONNECTED)
+    .setRequiresBatteryNotLow(true)
+    .build()
+
+// One-time, unique: avoid duplicate syncs if the user taps twice
+val oneTime = OneTimeWorkRequestBuilder<SyncWorker>()
+    .setConstraints(constraints)
+    .setInputData(workDataOf(SyncWorker.KEY_SINCE to lastSync))
+    .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
+    .build()
+WorkManager.getInstance(context)
+    .enqueueUniqueWork("sync", ExistingWorkPolicy.KEEP, oneTime)
+
+// Periodic: minimum interval is 15 minutes
+val periodic = PeriodicWorkRequestBuilder<SyncWorker>(12, TimeUnit.HOURS)
+    .setConstraints(constraints)
+    .build()
+WorkManager.getInstance(context)
+    .enqueueUniquePeriodicWork("periodic-sync", ExistingPeriodicWorkPolicy.KEEP, periodic)
+</code-block>
+<div class="callout note"><b>Timing isn't exact</b><p>WorkManager runs work when constraints are met and the system allows. Doze and App Standby buckets can delay it. Don't use it when work must happen at a precise time.</p></div>
+
+<h2 id="chain">Chaining and observing</h2>
+<code-block lang="kotlin" file="Chain and observe">
+WorkManager.getInstance(context)
+    .beginUniqueWork("upload", ExistingWorkPolicy.REPLACE, compressRequest)
+    .then(uploadRequest)          // receives compress output as input
+    .then(cleanupRequest)
+    .enqueue()
+
+// Observe progress/state as Flow (e.g. in a ViewModel)
+val uploadState: Flow<WorkInfo.State?> =
+    WorkManager.getInstance(context)
+        .getWorkInfosForUniqueWorkFlow("upload")
+        .map { infos -> infos.lastOrNull()?.state }
+</code-block>
+
+<h2 id="expedited">Expedited and long-running work</h2>
+<ul>
+  <li><strong>Expedited work</strong> (<code>setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)</code>): for short, important tasks the user started, like sending a message. Subject to quotas.</li>
+  <li><strong>Long-running work</strong>: call <code>setForeground(...)</code> from the worker to run as a foreground service with a notification, declaring the right foreground service type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</li>
+</ul>
+
+<h2 id="hilt">Dependency injection with Hilt</h2>
+<code-block lang="kotlin" file="HiltWorker">
+@HiltWorker
+class SyncWorker @AssistedInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
+    private val repository: SyncRepository,
+) : CoroutineWorker(appContext, params) {
+    override suspend fun doWork(): Result = /* ... */ Result.success()
+}
+// Application implements Configuration.Provider with HiltWorkerFactory,
+// and the default WorkManager initializer is removed in the manifest.
+</code-block>
+
+<h2 id="testing">Testing</h2>
+<code-block lang="kotlin" file="SyncWorkerTest.kt">
+@Test
+fun syncWorker_succeeds() = runTest {
+    val worker = TestListenableWorkerBuilder<SyncWorker>(context)
+        .setInputData(workDataOf(SyncWorker.KEY_SINCE to 0L))
+        .build()
+    val result = worker.doWork()
+    assertTrue(result is ListenableWorker.Result.Success)
+}
+</code-block>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Offline-first sync</h3><p>Push queued local changes when the network returns. See <a href="../offline-first-android-architecture/index.html">Offline-First Apps</a>.</p></div>
+  <div class="card usecase"><h3>Media upload</h3><p>Compress, upload and clean up as a chain, with progress shown in the UI.</p></div>
+  <div class="card usecase"><h3>Maintenance</h3><p>Periodic cache cleanup or database pruning while charging.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Work never runs:</strong> check constraints, inspect with Background Task Inspector in Android Studio, and check if the app is force-stopped (force-stop cancels scheduled work until the app is opened again).</li>
+  <li><strong>Duplicate work:</strong> use unique work with the right existing-work policy.</li>
+  <li><strong>Hilt worker crashes on creation:</strong> the custom WorkManager configuration or initializer removal is missing.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does WorkManager survive reboots?</summary><div><p>Yes. Work is persisted and rescheduled after reboot.</p></div></details>
+  <details><summary>Can periodic work run every minute?</summary><div><p>No. The minimum interval is 15 minutes. For real-time updates use push messages (FCM) or a foreground service when appropriate.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use WorkManager for <strong>persistent, deferrable work</strong>: write idempotent <strong>CoroutineWorkers</strong>, add <strong>constraints</strong>, use <strong>unique work</strong> to avoid duplicates, <strong>chain</strong> steps, observe state as Flow, and test with <code>TestListenableWorkerBuilder</code>.</p>
+<p>Next step: handle ongoing, user-visible tasks with <a href="../android-foreground-services/index.html">Foreground Services in Android</a>.</p>

@@ -1,0 +1,131 @@
+<!--meta
+{
+  "seo_title": "On-Device Image and Text Processing on Android",
+  "description": "Process images and text on device with ML Kit: text recognition, image labeling, object detection, language identification, translation, entity extraction, smart reply and GenAI image description, with CameraX.",
+  "primary_keyword": "on device image text processing android",
+  "keywords": ["ml kit text recognition kotlin", "ml kit image labeling", "ml kit translation offline", "entity extraction ml kit", "camerax ml kit analyzer", "ocr android offline"],
+  "lede": "Many useful AI features need no cloud calls at all. ML Kit runs text recognition, image labeling, translation and more directly on the device: fast, private and free. Here's a practical tour with Kotlin and CameraX.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["llms-vs-traditional-machine-learning", "ai-image-description-android", "litert-litert-lm-android", "ai-photo-caption-generator-android"],
+  "refs": [
+    ["ML Kit", "https://developers.google.com/ml-kit"],
+    ["Text recognition v2", "https://developers.google.com/ml-kit/vision/text-recognition/v2/android"],
+    ["Image labeling", "https://developers.google.com/ml-kit/vision/image-labeling/android"],
+    ["On-device translation", "https://developers.google.com/ml-kit/language/translation/android"],
+    ["CameraX ML Kit Analyzer", "https://developer.android.com/media/camera/camerax/mlkitanalyzer"]
+  ]
+}
+-->
+<p class="ad-lead">ML Kit's vision and language APIs use compact, task-specific models. They run in milliseconds, work offline, and keep data on the phone, often making them a better first choice than an LLM. See <a href="../llms-vs-traditional-machine-learning/index.html">LLMs vs Traditional ML</a>.</p>
+
+<h2 id="catalog">What's available</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>API</th><th>Does</th><th>Example feature</th></tr></thead>
+  <tbody>
+    <tr><td>Text recognition</td><td>OCR for Latin, Devanagari, Chinese, Japanese, Korean scripts</td><td>Scan receipts, notes</td></tr>
+    <tr><td>Image labeling</td><td>General labels (food, plant, dog…)</td><td>Auto-tag photos</td></tr>
+    <tr><td>Object detection</td><td>Locate and track objects</td><td>Visual product search</td></tr>
+    <tr><td>Barcode scanning</td><td>1D/2D codes</td><td>QR payments, inventory</td></tr>
+    <tr><td>Face detection, pose, segmentation</td><td>Landmarks, body pose, background</td><td>Filters, fitness</td></tr>
+    <tr><td>Language ID</td><td>Detect text language</td><td>Route to translation</td></tr>
+    <tr><td>Translation</td><td>Offline translation between many languages</td><td>Translate chat messages</td></tr>
+    <tr><td>Entity extraction</td><td>Addresses, dates, phone numbers, money</td><td>Smart actions in messages</td></tr>
+    <tr><td>GenAI Image Description (beta)</td><td>Short descriptions via Gemini Nano</td><td>Alt text. See <a href="../ai-image-description-android/index.html">Image Description</a>.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Some models are bundled with the app (bigger APK, available immediately); others are downloaded via Google Play services (smaller APK, needs a download first). Each API page lists the options.</p>
+
+<h2 id="pipeline">A camera pipeline</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-odp-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-odp-t fig-odp-d">
+    <title id="fig-odp-t">CameraX to ML Kit pipeline</title>
+    <desc id="fig-odp-d">CameraX ImageAnalysis provides frames; the MlKitAnalyzer runs a detector such as text recognition on each frame; results map to UI state in a ViewModel; the Compose UI draws overlays or shows extracted text.</desc>
+    <defs><marker id="odpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 80 H206 M370 80 H406 M550 80 H586" marker-end="url(#odpm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="50" width="150" height="60" rx="12"/><text class="d-t" x="95" y="76" text-anchor="middle">CameraX</text><text class="d-s" x="95" y="94" text-anchor="middle">frames</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="210" y="50" width="160" height="60" rx="12"/><text class="d-t" x="290" y="76" text-anchor="middle">MlKitAnalyzer</text><text class="d-s" x="290" y="94" text-anchor="middle">detector</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="410" y="50" width="140" height="60" rx="12"/><text class="d-t" x="480" y="76" text-anchor="middle">ViewModel</text><text class="d-s" x="480" y="94" text-anchor="middle">UI state</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="590" y="50" width="110" height="60" rx="12"/><text class="d-w" x="645" y="84" text-anchor="middle">Compose UI</text></g>
+  </svg>
+  <figcaption id="fig-odp-cap">Process frames continuously, but throttle state updates for a smooth UI.</figcaption>
+</figure>
+
+<h2 id="ocr">Text recognition from a photo</h2>
+<code-block lang="kotlin" file="TextScanner.kt">
+class TextScanner : AutoCloseable {
+    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+    suspend fun scan(context: Context, uri: Uri): String {
+        val image = InputImage.fromFilePath(context, uri)
+        return recognizer.process(image).await().text     // kotlinx-coroutines-play-services await()
+    }
+
+    override fun close() = recognizer.close()
+}
+</code-block>
+
+<h2 id="live">Live analysis with CameraX</h2>
+<code-block lang="kotlin" file="Live text recognition">
+val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+cameraController.setImageAnalysisAnalyzer(
+    ContextCompat.getMainExecutor(context),
+    MlKitAnalyzer(
+        listOf(recognizer),
+        ImageAnalysis.COORDINATE_SYSTEM_VIEW_REFERENCED,
+        ContextCompat.getMainExecutor(context),
+    ) { result ->
+        result.getValue(recognizer)?.let { text -> viewModel.onTextDetected(text.text) }
+    },
+)
+</code-block>
+
+<h2 id="language">Language: ID, translation, entities</h2>
+<code-block lang="kotlin" file="Translate and extract entities">
+suspend fun translateToEnglish(text: String): String {
+    val lang = LanguageIdentification.getClient().identifyLanguage(text).await()
+    if (lang == "und" || lang == "en") return text
+    val sourceLang = TranslateLanguage.fromLanguageTag(lang) ?: return text
+    val translator = Translation.getClient(
+        TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLang)
+            .setTargetLanguage(TranslateLanguage.ENGLISH)
+            .build()
+    )
+    return translator.use {
+        it.downloadModelIfNeeded(DownloadConditions.Builder().requireWifi().build()).await()
+        it.translate(text).await()
+    }
+}
+
+suspend fun findEntities(text: String): List<String> {
+    val extractor = EntityExtraction.getClient(
+        EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build()
+    )
+    return extractor.use {
+        it.downloadModelIfNeeded().await()
+        it.annotate(text).await().flatMap { a -> a.entities.map { e -> "${e.type}: ${text.substring(a.start, a.end)}" } }
+    }
+}
+</code-block>
+
+<h2 id="best-practices">Best practices</h2>
+<ul>
+  <li>Close detectors when done, and reuse clients during a session.</li>
+  <li>Downscale large images before processing to save time and memory.</li>
+  <li>Use confidence thresholds, and let users correct results.</li>
+  <li>Download language models over Wi-Fi with user-visible progress.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does ML Kit send images to Google?</summary><div><p>The on-device APIs process data locally. Review each API's documentation and your Play Data safety disclosures.</p></div></details>
+  <details><summary>How accurate is on-device translation?</summary><div><p>It's good for getting the gist, but less fluent than cloud translation. Label it as automatic translation.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>ML Kit gives you <strong>OCR, labeling, detection, translation and entity extraction on device</strong>: fast, private and free. Combine it with <strong>CameraX</strong> for live features, and add an LLM only when you need open-ended generation.</p>
+<p>Next step: make AI features work across devices and offline with <a href="../offline-ai-device-compatibility/index.html">Offline AI Features and Device Compatibility</a>.</p>

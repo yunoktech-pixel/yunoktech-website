@@ -1,0 +1,96 @@
+/* ==========================================================================
+   Course page: simple, clean theme.
+   Loaded after yt.css and only on course.html (body.yt-course). It removes
+   the aurora/gradient effects: a solid dark hero, then light content
+   sections with a single blue accent.
+   ========================================================================== */
+body.yt-course {
+  --a1: #0284c7; --a2: #0284c7; --a3: #0284c7;
+  --c-ink: #0f172a; --c-text: #334155; --c-muted: #64748b; --c-line: #e2e8f0; --c-soft: #e0f2fe;
+  background: #f8fafc; color: var(--c-text);
+}
+
+/* Remove decorative effects */
+.yt-course .yt-aurora, .yt-course .yt-gridbg, .yt-course .yt-progress { display: none; }
+.yt-course .yt-grad { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #0284c7; animation: none; }
+.yt-course .yt-btn.primary { background: #0284c7; box-shadow: none; }
+.yt-course .yt-btn.primary:hover { background: #0369a1; }
+.yt-course .yt-btn.primary::before { display: none; }
+.yt-course .yt-btn.wa { box-shadow: none; }
+.yt-course .nav-cta .btn-violet { background: #0284c7; box-shadow: none; }
+
+/* Hero: solid dark, normal height */
+.yt-course .yt-hero { min-height: 0; padding: 130px 0 70px; background: #0b1220; }
+.yt-course .yt-hero .yt-grad, .yt-course .yt-final .yt-grad { color: #38bdf8; }
+.yt-course .yt-hero .breadcrumb a { color: #7dd3fc; }
+.yt-course .yt-code { box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+.yt-course .yt-mini-phone { background: #1e293b; box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+.yt-course .yt-mini-screen { background: #fff; }
+.yt-course .yt-mini-screen button { background: #0284c7; box-shadow: none; }
+.yt-course .yt-marquee { background: #0b1220; }
+
+/* Light content sections */
+.yt-course .yt-sec { padding: 80px 0; background: #fff; }
+.yt-course .yt-sec.alt, .yt-course #founder { background: #f1f5f9; }
+.yt-course #faq { background: #fff; }
+.yt-course .yt-sec .yt-h2 { color: var(--c-ink); }
+.yt-course .yt-sec .yt-sub { color: var(--c-muted); }
+.yt-course .yt-tag { color: #0369a1; background: var(--c-soft); border-color: #bae6fd; }
+.yt-course .yt-tag::before { background: #0284c7; box-shadow: none; }
+
+/* Cards, modules, plans */
+.yt-course .yt-card, .yt-course .yt-module, .yt-course .yt-plan, .yt-course .yt-app,
+.yt-course .yt-founder-card, .yt-course .yt-nums div, .yt-course .faq-item {
+  background: #fff; border: 1px solid var(--c-line); box-shadow: 0 4px 16px rgba(15,23,42,.05);
+}
+.yt-course .yt-card::before { display: none; }
+.yt-course .yt-card:hover, .yt-course .yt-module:hover, .yt-course .yt-app:hover { border-color: #7dd3fc; box-shadow: 0 10px 28px rgba(14,165,233,.12); }
+.yt-course .yt-card .ico { background: var(--c-soft); }
+.yt-course .yt-card h3, .yt-course .yt-module h3, .yt-course .yt-plan h3, .yt-course .yt-app-body h3,
+.yt-course .yt-founder-card h3, .yt-course .yt-nums b { color: var(--c-ink); }
+.yt-course .yt-card p, .yt-course .yt-module li, .yt-course .yt-app-body p { color: var(--c-muted); }
+.yt-course .yt-module .wk { color: var(--c-line); }
+.yt-course .yt-check li { color: var(--c-text); }
+.yt-course .yt-check li::before { background: #0284c7; }
+.yt-course .yt-plan.featured { background: #fff; border: 2px solid #0284c7; box-shadow: 0 14px 36px rgba(2,132,199,.15); transform: none; }
+.yt-course .yt-plan.featured:hover { transform: translateY(-6px); }
+.yt-course .yt-plan .pop { background: #0284c7; }
+.yt-course .yt-plan .sub { color: #0369a1; }
+.yt-course .yt-sec .yt-btn.ghost { color: var(--c-ink); background: #fff; border-color: #cbd5e1; }
+.yt-course .yt-sec .yt-btn.ghost:hover { border-color: #0284c7; color: #0369a1; }
+
+/* Projects */
+.yt-course .yt-app-media { background: #f1f5f9 !important; }
+.yt-course .yt-app-media::after { display: none; }
+.yt-course .yt-app-body .meta { color: #0369a1; }
+
+/* Instructor */
+.yt-course .yt-avatar::before { display: none; }
+.yt-course .yt-avatar img { border-color: var(--c-soft); }
+.yt-course .yt-founder-card .role { color: #0369a1; }
+.yt-course .yt-founder-card .loc { color: var(--c-muted); }
+.yt-course .yt-founder-links a { color: var(--c-ink); background: #f1f5f9; border-color: var(--c-line); }
+.yt-course .yt-founder-links a:hover { border-color: #0284c7; background: var(--c-soft); }
+.yt-course .yt-founder strong { color: var(--c-ink) !important; }   /* overrides inline white */
+.yt-course .yt-nums div > span { color: var(--c-muted); }
+
+/* FAQ */
+.yt-course .faq-question { color: var(--c-ink); }
+.yt-course .faq-answer p { color: var(--c-muted); }
+.yt-course .faq-item.open { border-color: #0284c7; box-shadow: none; }
+.yt-course .faq-icon { background: var(--c-soft); border-color: var(--c-line); color: #0284c7; }
+.yt-course .faq-item.open .faq-icon { background: #0284c7; color: #fff; }
+
+/* Final call to action: solid dark band */
+.yt-course .yt-final, .yt-course #cta { padding: 90px 0; background: #0b1220; }
+.yt-course .yt-final .yt-sub { margin-inline: auto; }
+.yt-course .yt-final .yt-actions { justify-content: center; }
+
+/* Sticky enrol bar */
+.yt-course .yt-sticky { background: #fff; border-color: var(--c-line); box-shadow: 0 12px 36px rgba(15,23,42,.18); }
+.yt-course .yt-sticky b { color: var(--c-ink); }
+.yt-course .yt-sticky span { color: var(--c-muted); }
+
+/* Lightweight: no scroll-in / hero entrance animations, content shows immediately */
+.yt-course [data-anim], .yt-course .yt-hero-in > * { opacity: 1 !important; transform: none !important; filter: none !important; animation: none !important; transition: none !important; }
+.yt-course .yt-app:hover .yt-app-media > img { transform: none; }

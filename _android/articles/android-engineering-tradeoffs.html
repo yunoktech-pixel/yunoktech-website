@@ -1,0 +1,100 @@
+<!--meta
+{
+  "seo_title": "Engineering Trade-offs Every Android Developer Faces",
+  "description": "How senior Android engineers reason about trade-offs: native vs cross-platform, modularization, offline-first, Compose adoption, on-device vs cloud AI, testing depth, build vs buy, with a decision framework.",
+  "primary_keyword": "android engineering tradeoffs",
+  "keywords": ["software engineering trade offs", "android architecture decisions", "architecture decision record android", "senior android engineer thinking", "build vs buy mobile", "android tech decisions"],
+  "lede": "There's rarely a best architecture, library or approach, only trade-offs that fit a context. Senior engineers are distinguished less by knowing more patterns than by choosing wisely and explaining why. Here are the common Android trade-offs and a framework for deciding.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-architecture-at-scale", "android-system-design-interview", "senior-android-developer-interview", "android-developer-junior-to-senior"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Architecture recommendations", "https://developer.android.com/topic/architecture/recommendations"],
+    ["Architecture decision records (adr.github.io)", "https://adr.github.io/"]
+  ]
+}
+-->
+<p class="ad-lead">"It depends" is the honest answer to most engineering questions, but it's only useful when followed by "on what". This article names the forces behind common Android decisions so you can reason about them explicitly.</p>
+
+<h2 id="framework">A decision framework</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-to-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-to-t fig-to-d">
+    <title id="fig-to-t">Trade-off decision process</title>
+    <desc id="fig-to-d">Clarify the goal and constraints, list realistic options, compare them on the forces that matter such as user impact, team skills, cost, time and reversibility, decide and record why, then revisit when the context changes.</desc>
+    <defs><marker id="tom" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 80 H158 M280 80 H298 M420 80 H438 M560 80 H578" marker-end="url(#tom)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="50" width="130" height="60" rx="12"/><text class="d-t" x="75" y="76" text-anchor="middle">Goal +</text><text class="d-s" x="75" y="94" text-anchor="middle">constraints</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="160" y="50" width="120" height="60" rx="12"/><text class="d-t" x="220" y="76" text-anchor="middle">Options</text><text class="d-s" x="220" y="94" text-anchor="middle">2–3 real ones</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="300" y="50" width="120" height="60" rx="12"/><text class="d-t" x="360" y="76" text-anchor="middle">Compare</text><text class="d-s" x="360" y="94" text-anchor="middle">on forces</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="440" y="50" width="120" height="60" rx="12"/><text class="d-t" x="500" y="76" text-anchor="middle">Decide</text><text class="d-s" x="500" y="94" text-anchor="middle">+ record why</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="580" y="50" width="130" height="60" rx="12"/><text class="d-w" x="645" y="76" text-anchor="middle">Revisit</text><text class="d-w" x="645" y="94" text-anchor="middle">when context changes</text></g>
+  </svg>
+  <figcaption id="fig-to-cap">Reversibility matters: decide cheap-to-change things fast, and expensive-to-change things carefully.</figcaption>
+</figure>
+
+<h2 id="forces">The forces that usually matter</h2>
+<ul>
+  <li><strong>User impact:</strong> performance, reliability, UX quality.</li>
+  <li><strong>Team:</strong> size, skills, hiring market.</li>
+  <li><strong>Time and cost:</strong> to build, to maintain, infrastructure.</li>
+  <li><strong>Risk and reversibility:</strong> how hard to undo.</li>
+  <li><strong>Product horizon:</strong> prototype, growth or long-lived product.</li>
+</ul>
+
+<h2 id="common">Common Android trade-offs</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Decision</th><th>Option A favours…</th><th>Option B favours…</th></tr></thead>
+  <tbody>
+    <tr><td>Native vs cross-platform (<a href="../compose-multiplatform-vs-kotlin-multiplatform/index.html">KMP/CMP</a>, Flutter)</td><td>Native: platform UX, newest APIs, performance</td><td>Shared: one team, faster parity</td></tr>
+    <tr><td>Single module vs <a href="../android-modularization-strategies/index.html">modularization</a></td><td>Single: simplicity for small teams</td><td>Modules: build speed, ownership at scale</td></tr>
+    <tr><td><a href="../offline-first-android-architecture/index.html">Offline-first</a> vs online-only</td><td>Offline: resilience, speed</td><td>Online: simplicity, no sync conflicts</td></tr>
+    <tr><td>MVVM vs <a href="../mvi-vs-mvvm-android/index.html">MVI</a></td><td>MVVM: less ceremony</td><td>MVI: predictable complex state</td></tr>
+    <tr><td><a href="../cloud-ai-vs-on-device-ai-android/index.html">On-device vs cloud AI</a></td><td>On-device: privacy, offline, no per-call cost</td><td>Cloud: capability, device coverage</td></tr>
+    <tr><td>Build vs buy (auth, analytics, chat)</td><td>Build: control, no vendor lock-in</td><td>Buy: speed, maintained by experts</td></tr>
+    <tr><td>Testing depth</td><td>More tests: confidence, refactor safety</td><td>Fewer: speed early on (with risk)</td></tr>
+    <tr><td>Domain layer everywhere</td><td>Consistency, reuse</td><td>Skipping: less indirection for simple screens</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="worked">Worked example: should we add a domain layer?</h2>
+<ul>
+  <li><strong>Context:</strong> 6 developers, a growing app, business rules duplicated in 3 ViewModels.</li>
+  <li><strong>Options:</strong> (1) keep as is; (2) use cases only where logic is shared or complex; (3) mandatory domain layer.</li>
+  <li><strong>Forces:</strong> duplication causes bugs (user impact), the team knows the pattern, and adding use cases selectively is cheap and reversible.</li>
+  <li><strong>Decision:</strong> option 2, recorded in an ADR with a rule for when to add a use case.</li>
+</ul>
+
+<h2 id="adr">Record decisions</h2>
+<code-block lang="text" file="docs/adr/0007-selective-domain-layer.md">
+# 7. Use cases only for shared or complex business logic
+
+Status: Accepted (2026-10)
+Context: Pricing rules duplicated across Cart, Checkout and Orders ViewModels; bugs from drift.
+Decision: Add use cases when logic is reused by 2+ ViewModels or combines 2+ repositories.
+          Simple screens call repositories directly.
+Consequences: Less duplication; slight indirection; reviewers check the rule in PRs.
+Revisit: If team grows past ~15 devs or we adopt KMP shared logic.
+</code-block>
+
+<h2 id="pitfalls">Reasoning pitfalls</h2>
+<div class="cards">
+  <div class="card cons"><h3>Resume-driven development</h3><p>Choosing tech because it's exciting rather than because it fits.</p></div>
+  <div class="card cons"><h3>Copying big tech</h3><p>Their scale problems aren't yours. Patterns for 500 engineers can slow a team of 5.</p></div>
+  <div class="card cons"><h3>Ignoring reversibility</h3><p>Agonising over easily changed choices, while rushing hard-to-undo ones.</p></div>
+</div>
+
+<h2 id="interviews">In interviews</h2>
+<p>System design and senior interviews reward naming options, forces and a justified choice, plus what you'd monitor and when you'd revisit. See <a href="../android-system-design-interview/index.html">System Design Interview</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How do I get better at trade-offs?</summary><div><p>Write down decisions and their expected consequences, then review them months later. Read others' ADRs and post-mortems.</p></div></details>
+  <details><summary>What if the team disagrees?</summary><div><p>Agree on the forces and their priority first, run a small spike if facts are missing, then decide and commit, with a revisit date.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Good engineering decisions come from clarifying <strong>goals and constraints</strong>, comparing <strong>realistic options</strong> on the <strong>forces that matter</strong>, weighting <strong>reversibility</strong>, and <strong>recording</strong> why, so the team can revisit when context changes.</p>
+<p>Next step: apply this thinking to AI features with <a href="../llms-vs-traditional-machine-learning/index.html">LLMs vs Traditional Machine Learning</a>.</p>

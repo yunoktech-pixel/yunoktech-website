@@ -1,0 +1,191 @@
+<!--meta
+{
+  "seo_title": "Pagination with Paging 3 in Android (Compose)",
+  "description": "Implement pagination with Paging 3 in Android: PagingSource, Pager, cachedIn, LazyPagingItems in Compose, load states, retry, RemoteMediator with Room and testing.",
+  "primary_keyword": "paging 3 android",
+  "keywords": ["paging 3 compose", "pagingsource kotlin", "remotemediator room", "collectAsLazyPagingItems", "infinite scroll android", "paging load state"],
+  "lede": "Loading thousands of items at once wastes data, memory and time. Paging 3 loads data page by page as the user scrolls, handles loading and error states, deduplicates requests, and works with Room for offline caching.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["lazycolumn-vs-column", "room-database-kotlin", "offline-first-android-architecture", "retrofit-android-guide"],
+  "refs": [
+    ["Paging library overview", "https://developer.android.com/topic/libraries/architecture/paging/v3-overview"],
+    ["Load and display paged data", "https://developer.android.com/topic/libraries/architecture/paging/v3-paged-data"],
+    ["Page from network and database (RemoteMediator)", "https://developer.android.com/topic/libraries/architecture/paging/v3-network-db"],
+    ["Test your Paging implementation", "https://developer.android.com/topic/libraries/architecture/paging/test"]
+  ]
+}
+-->
+<p class="ad-lead">A hand-rolled infinite scroll has to track the current page, avoid duplicate requests while scrolling fast, show a footer spinner, handle errors with retry, reset on refresh, and survive rotation. Paging 3 handles all of this. You implement one function that loads a page.</p>
+
+<h2 id="pieces">The pieces</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pg-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-pg-t fig-pg-d">
+    <title id="fig-pg-t">Paging 3 data flow</title>
+    <desc id="fig-pg-d">A PagingSource loads pages from the API. A Pager in the repository creates a Flow of PagingData. The ViewModel caches it with cachedIn. Compose collects it as LazyPagingItems and LazyColumn requests more pages as the user scrolls.</desc>
+    <defs><marker id="pgm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H176 M310 70 H336 M490 70 H516" marker-end="url(#pgm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="140" height="60" rx="12"/><text class="d-t" x="80" y="64" text-anchor="middle">PagingSource</text><text class="d-s" x="80" y="82" text-anchor="middle">load(page)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="180" y="40" width="130" height="60" rx="12"/><text class="d-t" x="245" y="64" text-anchor="middle">Pager</text><text class="d-s" x="245" y="82" text-anchor="middle">Flow&lt;PagingData&gt;</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="340" y="40" width="150" height="60" rx="12"/><text class="d-t" x="415" y="64" text-anchor="middle">ViewModel</text><text class="d-s" x="415" y="82" text-anchor="middle">cachedIn(scope)</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="40" width="190" height="60" rx="12"/><text class="d-t" x="615" y="64" text-anchor="middle">LazyPagingItems</text><text class="d-s" x="615" y="82" text-anchor="middle">LazyColumn</text></g>
+    <path class="d-dash" d="M615 100 V150 H80 V104" marker-end="url(#pgm)"/><text class="d-s" x="350" y="168" text-anchor="middle">scrolling near the end triggers the next load</text>
+  </svg>
+  <figcaption id="fig-pg-cap">The UI drives loading. Paging prefetches the next page before the user reaches the end.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation("androidx.paging:paging-runtime:<paging-version>")
+    implementation("androidx.paging:paging-compose:<paging-version>")
+    testImplementation("androidx.paging:paging-testing:<paging-version>")
+}
+</code-block>
+
+<h2 id="source">1. PagingSource</h2>
+<code-block lang="kotlin" file="ArticlePagingSource.kt">
+class ArticlePagingSource(
+    private val api: ArticleApi,
+    private val query: String,
+) : PagingSource<Int, Article>() {
+
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Article> {
+        val page = params.key ?: 1
+        return try {
+            val items = api.search(query, page = page, pageSize = params.loadSize).map { it.toDomain() }
+            LoadResult.Page(
+                data = items,
+                prevKey = if (page == 1) null else page - 1,
+                nextKey = if (items.isEmpty()) null else page + 1,
+            )
+        } catch (e: IOException) {
+            LoadResult.Error(e)
+        } catch (e: HttpException) {
+            LoadResult.Error(e)
+        }
+    }
+
+    // Which page to load when the list is refreshed (e.g. after invalidation), based on scroll position
+    override fun getRefreshKey(state: PagingState<Int, Article>): Int? =
+        state.anchorPosition?.let { anchor ->
+            state.closestPageToPosition(anchor)?.let { it.prevKey?.plus(1) ?: it.nextKey?.minus(1) }
+        }
+}
+</code-block>
+<p>If your API uses cursors instead of page numbers, use the cursor string as the key type.</p>
+
+<h2 id="pager">2. Pager and ViewModel</h2>
+<code-block lang="kotlin" file="SearchViewModel.kt">
+class SearchViewModel(private val api: ArticleApi) : ViewModel() {
+    private val query = MutableStateFlow("android")
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val results: Flow<PagingData<Article>> = query
+        .flatMapLatest { q ->
+            Pager(PagingConfig(pageSize = 20, prefetchDistance = 5, enablePlaceholders = false)) {
+                ArticlePagingSource(api, q)
+            }.flow
+        }
+        .cachedIn(viewModelScope)        // survive rotation; share between collectors
+
+    fun search(q: String) { query.value = q }
+}
+</code-block>
+
+<h2 id="compose">3. Compose UI with load states</h2>
+<code-block lang="kotlin" file="SearchResults.kt">
+@Composable
+fun SearchResults(viewModel: SearchViewModel) {
+    val items = viewModel.results.collectAsLazyPagingItems()
+
+    when (val refresh = items.loadState.refresh) {
+        is LoadState.Loading -> if (items.itemCount == 0) { FullScreenLoading(); return }
+        is LoadState.Error -> if (items.itemCount == 0) {
+            FullScreenError(refresh.error.message ?: "Couldn't load", onRetry = items::retry); return
+        }
+        is LoadState.NotLoading -> if (items.itemCount == 0 && refresh.endOfPaginationReached) { EmptyState(); return }
+    }
+
+    LazyColumn {
+        items(count = items.itemCount, key = items.itemKey { it.id }) { index ->
+            items[index]?.let { ArticleRow(it) }
+        }
+        when (val append = items.loadState.append) {
+            is LoadState.Loading -> item { LoadingFooter() }
+            is LoadState.Error -> item { RetryFooter(onRetry = items::retry) }
+            else -> Unit
+        }
+    }
+}
+</code-block>
+
+<h2 id="mediator">4. Network + Room with RemoteMediator</h2>
+<p>For offline support, the database becomes the source of truth. Room provides the <code>PagingSource</code>, and a <code>RemoteMediator</code> fetches pages from the network into Room when the local data runs out or needs refreshing:</p>
+<code-block lang="kotlin" file="ArticleRemoteMediator.kt (outline)">
+@OptIn(ExperimentalPagingApi::class)
+class ArticleRemoteMediator(
+    private val api: ArticleApi,
+    private val db: AppDatabase,
+) : RemoteMediator<Int, ArticleEntity>() {
+
+    override suspend fun load(loadType: LoadType, state: PagingState<Int, ArticleEntity>): MediatorResult {
+        val page = when (loadType) {
+            LoadType.REFRESH -> 1
+            LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+            LoadType.APPEND -> db.remoteKeysDao().lastKey()?.nextPage
+                ?: return MediatorResult.Success(endOfPaginationReached = true)
+        }
+        return try {
+            val response = api.list(page = page, pageSize = state.config.pageSize)
+            db.withTransaction {
+                if (loadType == LoadType.REFRESH) { db.articleDao().clearAll(); db.remoteKeysDao().clear() }
+                db.remoteKeysDao().insert(RemoteKey(nextPage = if (response.isEmpty()) null else page + 1))
+                db.articleDao().insertAll(response.map { it.toEntity() })
+            }
+            MediatorResult.Success(endOfPaginationReached = response.isEmpty())
+        } catch (e: IOException) {
+            MediatorResult.Error(e)
+        }
+    }
+}
+// Pager(config, remoteMediator = ArticleRemoteMediator(api, db)) { db.articleDao().pagingSource() }
+</code-block>
+
+<h2 id="testing">Testing</h2>
+<code-block lang="kotlin" file="ArticlePagingSourceTest.kt">
+@Test
+fun `loads first page and sets next key`() = runTest {
+    val source = ArticlePagingSource(FakeArticleApi(totalItems = 45), query = "kotlin")
+    val pager = TestPager(PagingConfig(pageSize = 20), source)
+    val result = pager.refresh() as PagingSource.LoadResult.Page
+    assertEquals(20, result.data.size)
+    assertEquals(2, result.nextKey)
+}
+</code-block>
+
+<h2 id="use-cases">Where Paging fits</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Search results</h3><p>Network-only PagingSource, recreated per query with <code>flatMapLatest</code>.</p></div>
+  <div class="card usecase"><h3>Feeds with offline</h3><p>RemoteMediator plus Room, so cached pages appear instantly and new pages load as needed.</p></div>
+  <div class="card usecase"><h3>Large local tables</h3><p>Room's built-in PagingSource for chat history or logs with tens of thousands of rows.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Forgetting <code>cachedIn(viewModelScope)</code>, which reloads everything on rotation.</li>
+  <li>Transforming <code>PagingData</code> after <code>cachedIn</code>. Apply <code>map</code> and <code>filter</code> before caching.</li>
+  <li>Missing stable keys in the LazyColumn.</li>
+  <li>Unstable sort order on the server, causing duplicates or gaps between pages.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I modify items, such as toggling a like, in paged data?</summary><div><p>With RemoteMediator plus Room, update the database and the paged list updates automatically. For network-only paging, invalidate the source or overlay local state.</p></div></details>
+  <details><summary>Should I enable placeholders?</summary><div><p>Only if you know the total count and want stable scrollbar sizing. Most apps disable them.</p></div></details>
+  <details><summary>Is Paging overkill for 100 items?</summary><div><p>Usually yes. Load them at once into a LazyColumn. Paging shines with large or unbounded datasets.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Paging 3 gives you <strong>incremental loading, deduplication, load states and retry</strong> for the price of a <code>PagingSource</code>. Cache in the ViewModel, render with <code>LazyPagingItems</code> and stable keys, and add a <code>RemoteMediator</code> with Room for offline-first feeds.</p>
+<p>Next step: add user accounts with <a href="../firebase-authentication-android/index.html">Firebase Authentication in Android</a>.</p>

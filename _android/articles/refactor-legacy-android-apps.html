@@ -1,0 +1,131 @@
+<!--meta
+{
+  "seo_title": "How to Refactor Legacy Android Applications Safely",
+  "description": "A safe, incremental process for refactoring legacy Android apps: characterization tests, strangler pattern, extracting ViewModels and repositories, Java to Kotlin, XML to Compose.",
+  "primary_keyword": "refactor legacy android app",
+  "keywords": ["legacy android code", "strangler fig pattern android", "characterization tests", "java to kotlin migration", "god activity refactor", "incremental refactoring android"],
+  "lede": "Legacy Android apps often have 3,000-line Activities, AsyncTasks, no tests and code nobody dares touch. A rewrite is tempting and usually a mistake. Here's a step-by-step approach that improves the code while the app keeps shipping.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["migrate-legacy-android-modern-architecture", "ai-understand-legacy-java-code", "mvvm-architecture-android", "kotlin-vs-java-android"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Add Kotlin to an existing app", "https://developer.android.com/kotlin/add-kotlin"],
+    ["Migration strategy to Compose", "https://developer.android.com/develop/ui/compose/migrate/strategy"],
+    ["Fundamentals of testing Android apps", "https://developer.android.com/training/testing/fundamentals"]
+  ]
+}
+-->
+<p class="ad-lead">"Let's rewrite it properly" is the most expensive sentence in software. While the rewrite is built, the old app still needs features and fixes, the rewrite chases a moving target, and years of hidden edge-case handling get lost. Incremental refactoring keeps delivering value and reduces risk with every step.</p>
+
+<h2 id="principles">Principles of safe refactoring</h2>
+<ul>
+  <li><strong>Refactoring changes structure, not behaviour.</strong> Keep these in separate commits from feature changes.</li>
+  <li><strong>Get a safety net first:</strong> tests, or at least reproducible manual checks and crash monitoring.</li>
+  <li><strong>Small steps</strong> that can be released independently.</li>
+  <li><strong>Prioritise by pain:</strong> refactor what you change often or what crashes most.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sf-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-sf-t fig-sf-d">
+    <title id="fig-sf-t">Strangler fig refactoring over time</title>
+    <desc id="fig-sf-d">Release 1: mostly legacy code with a small new module. Release 2: more features moved to new architecture. Release 3: legacy shrinks to a small remnant. New code grows around and gradually replaces the old system while the app keeps shipping.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="20" y="40" width="180" height="120" rx="12"/><rect class="d-green" x="20" y="130" width="60" height="30" rx="6"/><text class="d-t" x="110" y="30" text-anchor="middle">Release N</text><text class="d-s" x="110" y="100" text-anchor="middle">legacy</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-red" x="270" y="40" width="180" height="120" rx="12"/><rect class="d-green" x="270" y="90" width="120" height="70" rx="6"/><text class="d-t" x="360" y="30" text-anchor="middle">N + 3</text><text class="d-s" x="330" y="130" text-anchor="middle">new</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="520" y="40" width="180" height="120" rx="12"/><rect class="d-red" x="640" y="40" width="60" height="40" rx="6"/><text class="d-t" x="610" y="30" text-anchor="middle">N + 8</text><text class="d-s" x="590" y="110" text-anchor="middle">modern</text></g>
+  </svg>
+  <figcaption id="fig-sf-cap">The strangler fig pattern: new code grows around the old and replaces it piece by piece, with every release still shippable.</figcaption>
+</figure>
+
+<h2 id="steps">A step-by-step playbook</h2>
+<ol class="steps">
+  <li><strong>Map the app.</strong> List screens, entry points, background work and third-party SDKs. Find the top crashes and the most-edited files in Git history.</li>
+  <li><strong>Update the build.</strong> Recent AGP, Gradle and Kotlin, a version catalog, R8 enabled. Many later steps depend on modern tooling.</li>
+  <li><strong>Add characterization tests</strong> around code you'll touch. They capture <em>current</em> behaviour, even if it's odd.</li>
+  <li><strong>Extract logic out of Activities</strong> into ViewModels and plain classes, without changing behaviour.</li>
+  <li><strong>Introduce repositories</strong> around scattered network and database code.</li>
+  <li><strong>Replace deprecated async</strong> (AsyncTask, raw threads, deep callback chains) with coroutines, one feature at a time.</li>
+  <li><strong>Write new code in Kotlin</strong>, and convert old files when you touch them.</li>
+  <li><strong>Build new screens in Compose</strong>, and migrate old screens when they're redesigned.</li>
+</ol>
+
+<h2 id="characterization">Characterization tests</h2>
+<code-block lang="kotlin" file="Lock in existing behaviour before changing it">
+class LegacyPriceCalculatorTest {
+    // We don't know if these results are "right"; we record what the app does today.
+    @Test fun `legacy rounding for discounted items`() {
+        val calc = LegacyPriceCalculator()
+        assertEquals(84.0, calc.finalPrice(99.0, discountPercent = 15), 0.0001)   // floors to rupees: keep it
+        assertEquals(0.0, calc.finalPrice(10.0, discountPercent = 120), 0.0001)   // clamps: keep it
+    }
+}
+</code-block>
+
+<h2 id="extract">Extracting a ViewModel from a god Activity</h2>
+<code-block lang="kotlin" file="Before (simplified)">
+class OrdersActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_orders)
+        object : AsyncTask<Void, Void, List<Order>>() {          // deprecated; leaks on rotation
+            override fun doInBackground(vararg p: Void?) = Api.getOrders()
+            override fun onPostExecute(result: List<Order>) { adapter.submitList(result) }
+        }.execute()
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="After: same behaviour, testable structure">
+class OrdersViewModel(private val repository: OrdersRepository) : ViewModel() {
+    private val _orders = MutableStateFlow<List<Order>>(emptyList())
+    val orders: StateFlow<List<Order>> = _orders.asStateFlow()
+    init { viewModelScope.launch { _orders.value = repository.getOrders() } }
+}
+
+class OrdersActivity : AppCompatActivity() {
+    private val viewModel: OrdersViewModel by viewModels { OrdersViewModelFactory(appContainer) }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_orders)              // UI unchanged
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) { viewModel.orders.collect(adapter::submitList) }
+        }
+    }
+}
+</code-block>
+<p>The XML and adapter stay the same, so the UI is untouched. Later, the screen can move to Compose with the same ViewModel.</p>
+
+<h2 id="seams">Creating seams</h2>
+<p>Legacy code often calls static singletons (<code>Api.getOrders()</code>). Wrap them behind interfaces so new code can be tested:</p>
+<code-block lang="kotlin" file="Seam around a static API">
+interface OrdersRepository { suspend fun getOrders(): List<Order> }
+
+class LegacyOrdersRepository : OrdersRepository {
+    override suspend fun getOrders() = withContext(Dispatchers.IO) { Api.getOrders() }   // existing call
+}
+</code-block>
+
+<h2 id="use-cases">Prioritisation examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Top crash in checkout</h3><p>Refactor checkout first: tests, extract a ViewModel, fix the crash, then continue modernising that area.</p></div>
+  <div class="card usecase"><h3>Feature work in profile</h3><p>Combine it: modernise profile while building the requested feature, in separate commits.</p></div>
+  <div class="card usecase"><h3>Stable, untouched settings screen</h3><p>Leave it. Old but working code that never changes doesn't need refactoring.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Big-bang rewrites, or long-lived refactoring branches.</li>
+  <li>Mixing behaviour changes with refactoring in one PR.</li>
+  <li>"Fixing" odd legacy behaviour that users or other systems depend on, without confirming first.</li>
+  <li>Introducing every modern library at once (Hilt, Compose, Navigation, KMP) and overwhelming the team.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>When is a rewrite justified?</summary><div><p>Rarely: when the platform or product has fundamentally changed, the codebase is small, or the old code genuinely can't be built and maintained. Even then, consider rewriting incrementally.</p></div></details>
+  <details><summary>Can AI tools help?</summary><div><p>Yes, for explaining unfamiliar code, drafting characterization tests and converting Java to Kotlin, with careful review. See <a href="../ai-understand-legacy-java-code/index.html">Using AI to Understand Legacy Java Code</a>.</p></div></details>
+  <details><summary>How do I convince stakeholders?</summary><div><p>Tie refactoring to measurable outcomes: crash rate, time to deliver features in an area, or onboarding time. Then show progress release by release.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Refactor legacy Android apps <strong>incrementally</strong>: build a safety net, extract ViewModels and repositories, replace deprecated async with coroutines, and adopt Kotlin and Compose as you touch code, all while shipping every release.</p>
+<p>Next step: scale these practices across teams in <a href="../scaling-android-codebase-teams/index.html">Scaling an Android Codebase Across Multiple Teams</a>.</p>

@@ -1,0 +1,148 @@
+<!--meta
+{
+  "seo_title": "Design Patterns Every Android Developer Should Know",
+  "description": "Practical design patterns in Android with Kotlin: Repository, Observer, Factory, Builder, Adapter, Decorator, Strategy, Singleton, Facade and State, with where Android uses them.",
+  "primary_keyword": "android design patterns",
+  "keywords": ["design patterns kotlin", "observer pattern android flow", "builder pattern kotlin", "strategy pattern android", "adapter pattern android", "decorator pattern kotlin"],
+  "lede": "You already use design patterns every day in Android, often without naming them: Flow is Observer, Retrofit.Builder is Builder, Hilt modules are Factories. Recognising patterns helps you read libraries faster, communicate designs, and choose solutions deliberately.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["solid-principles-android", "repository-pattern-android", "kotlin-delegation", "android-architecture-interview-questions"],
+  "refs": [
+    ["Kotlin idioms", "https://kotlinlang.org/docs/idioms.html"],
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Kotlin delegation", "https://kotlinlang.org/docs/delegation.html"]
+  ]
+}
+-->
+<p class="ad-lead">Design patterns are named, reusable solutions to recurring design problems. Kotlin removes the boilerplate many of them needed in Java, but the ideas remain essential, especially for reading codebases and discussing designs in reviews and interviews.</p>
+
+<h2 id="map">Patterns at a glance</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Pattern</th><th>Problem it solves</th><th>Where Android uses it</th></tr></thead>
+  <tbody>
+    <tr><td>Observer</td><td>Notify many listeners of changes</td><td>Flow, StateFlow, LiveData, Compose state</td></tr>
+    <tr><td>Repository</td><td>Hide data sources behind one API</td><td>Data layer</td></tr>
+    <tr><td>Builder</td><td>Construct complex objects step by step</td><td>Retrofit.Builder, NotificationCompat.Builder, Room.databaseBuilder</td></tr>
+    <tr><td>Factory</td><td>Centralise creation logic</td><td>ViewModelProvider.Factory, Hilt @Provides</td></tr>
+    <tr><td>Singleton</td><td>One shared instance</td><td>Kotlin <code>object</code>, Hilt @Singleton</td></tr>
+    <tr><td>Adapter</td><td>Make incompatible interfaces work together</td><td>RecyclerView.Adapter, Retrofit CallAdapter, callback → suspend wrappers</td></tr>
+    <tr><td>Decorator</td><td>Add behaviour by wrapping</td><td>OkHttp interceptors, Compose Modifiers, <code>by</code> delegation</td></tr>
+    <tr><td>Strategy</td><td>Swap algorithms at runtime</td><td>Sorting comparators, payment handlers, retry policies</td></tr>
+    <tr><td>Facade</td><td>Simple interface over a complex subsystem</td><td>Media3 player, your own SDK wrappers</td></tr>
+    <tr><td>State</td><td>Behaviour depends on state</td><td>Sealed UiState with <code>when</code>, MVI reducers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="observer">Observer</h2>
+<code-block lang="kotlin" file="Flow is Observer with structured lifecycles">
+class CartStore {
+    private val _items = MutableStateFlow<List<CartItem>>(emptyList())
+    val items: StateFlow<List<CartItem>> = _items.asStateFlow()     // observers subscribe here
+    fun add(item: CartItem) = _items.update { it + item }          // all observers notified
+}
+</code-block>
+<p>Unlike classic listener lists, Flow ties subscriptions to coroutine scopes, so forgetting to unregister is much harder.</p>
+
+<h2 id="builder">Builder, and when Kotlin replaces it</h2>
+<code-block lang="kotlin" file="Named arguments often replace builders">
+// Java-style builder
+val request = Request.Builder().url(url).header("Accept", "application/json").build()
+
+// Kotlin: named + default arguments do the same for your own classes
+data class UploadRequest(val uri: Uri, val compress: Boolean = true, val maxSizeMb: Int = 10)
+val upload = UploadRequest(uri = photo, maxSizeMb = 5)
+</code-block>
+
+<h2 id="factory">Factory</h2>
+<code-block lang="kotlin" file="Creating the right parser">
+interface FeedParser { fun parse(raw: String): List<FeedItem> }
+
+object FeedParserFactory {
+    fun create(contentType: String): FeedParser = when {
+        contentType.contains("json") -> JsonFeedParser()
+        contentType.contains("xml") -> RssFeedParser()
+        else -> error("Unsupported content type: $contentType")
+    }
+}
+</code-block>
+
+<h2 id="adapter">Adapter</h2>
+<code-block lang="kotlin" file="Adapting a callback SDK to coroutines">
+suspend fun LegacyAuthClient.signInSuspending(email: String, password: String): Session =
+    suspendCancellableCoroutine { cont ->
+        signIn(email, password, object : AuthCallback {
+            override fun onSuccess(session: Session) = cont.resume(session)
+            override fun onError(error: Exception) = cont.resumeWithException(error)
+        })
+    }
+</code-block>
+
+<h2 id="decorator">Decorator</h2>
+<code-block lang="kotlin" file="OkHttp interceptor decorates every request">
+class AuthInterceptor(private val tokens: TokenProvider) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request().newBuilder()
+            .header("Authorization", "Bearer ${tokens.current()}")
+            .build()
+        return chain.proceed(request)
+    }
+}
+</code-block>
+<p>Compose's <code>Modifier</code> chain is also a decorator chain: each modifier wraps the next. Kotlin class delegation (<code>by</code>) makes decorators of interfaces trivial. See <a href="../kotlin-delegation/index.html">Kotlin Delegation</a>.</p>
+
+<h2 id="strategy">Strategy</h2>
+<code-block lang="kotlin" file="Pluggable sorting">
+enum class SortOption(val comparator: Comparator<Product>) {
+    PRICE_LOW(compareBy { it.pricePaise }),
+    PRICE_HIGH(compareByDescending { it.pricePaise }),
+    RATING(compareByDescending<Product> { it.rating }.thenBy { it.name }),
+}
+fun List<Product>.sorted(option: SortOption) = sortedWith(option.comparator)
+</code-block>
+
+<h2 id="facade">Facade</h2>
+<code-block lang="kotlin" file="Hide a complex SDK behind your own API">
+interface Analytics {
+    fun screen(name: String)
+    fun event(name: String, params: Map<String, Any> = emptyMap())
+}
+// One implementation talks to the analytics SDK(s); the app sees only these two methods.
+</code-block>
+
+<h2 id="singleton">Singleton: use with care</h2>
+<p>Kotlin's <code>object</code> makes singletons trivial, which makes them easy to overuse. Global singletons with state hurt testability. Prefer DI-scoped singletons (<code>@Singleton</code> in Hilt), which can be replaced in tests.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-dp-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-dp-t fig-dp-d">
+    <title id="fig-dp-t">Patterns across a typical Android request path</title>
+    <desc id="fig-dp-d">A ViewModel observes a StateFlow (Observer) from a Repository (Repository pattern), which uses Retrofit built with a Builder, with OkHttp interceptors as Decorators, and an analytics Facade.</desc>
+    <defs><marker id="dpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-blue" x="10" y="50" width="130" height="60" rx="10"/><text class="d-t" x="75" y="76" text-anchor="middle">ViewModel</text><text class="d-s" x="75" y="94" text-anchor="middle">Observer</text>
+    <rect class="d-violet" x="190" y="50" width="130" height="60" rx="10"/><text class="d-t" x="255" y="76" text-anchor="middle">Repository</text><text class="d-s" x="255" y="94" text-anchor="middle">Repository</text>
+    <rect class="d-amber" x="370" y="50" width="130" height="60" rx="10"/><text class="d-t" x="435" y="76" text-anchor="middle">Retrofit</text><text class="d-s" x="435" y="94" text-anchor="middle">Builder · Adapter</text>
+    <rect class="d-green" x="550" y="50" width="160" height="60" rx="10"/><text class="d-t" x="630" y="76" text-anchor="middle">OkHttp</text><text class="d-s" x="630" y="94" text-anchor="middle">Decorator chain</text>
+    <path class="d-flow" d="M140 80 H186 M320 80 H366 M500 80 H546" marker-end="url(#dpm)"/>
+  </svg>
+  <figcaption id="fig-dp-cap">A single network call passes through four or five patterns. Naming them makes the design easier to discuss.</figcaption>
+</figure>
+
+<h2 id="use-cases">Choosing patterns</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Many variants of behaviour</h3><p>Strategy (with DI multibinding if the variants are pluggable).</p></div>
+  <div class="card usecase"><h3>Ugly third-party API</h3><p>Facade or Adapter, so the rest of the app stays clean and the SDK is replaceable.</p></div>
+  <div class="card usecase"><h3>Cross-cutting behaviour</h3><p>Decorator: logging, caching and auth headers without touching core logic.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are design patterns outdated in Kotlin?</summary><div><p>Some implementations are simpler (builders, singletons, decorators), but the concepts remain useful vocabulary and design tools.</p></div></details>
+  <details><summary>Is MVVM a design pattern?</summary><div><p>It's an architectural pattern: a larger-scale structure built from smaller patterns such as Observer.</p></div></details>
+  <details><summary>Which patterns come up in Android interviews?</summary><div><p>Repository, Observer, Singleton (and its pitfalls), Factory, Builder, Adapter and Decorator, usually with an Android example.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android code is full of design patterns: <strong>Observer</strong> in Flow, <strong>Builder</strong> in SDK setup, <strong>Decorator</strong> in interceptors and modifiers, <strong>Adapter</strong> around callbacks, <strong>Strategy</strong> for interchangeable behaviour, and <strong>Facade</strong> over complex SDKs. Use Kotlin features to implement them lightly, and name them to communicate clearly.</p>
+<p>Next step: apply these tools to old code in <a href="../refactor-legacy-android-apps/index.html">How to Refactor Legacy Android Applications</a>.</p>

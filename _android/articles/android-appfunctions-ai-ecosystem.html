@@ -1,0 +1,114 @@
+<!--meta
+{
+  "seo_title": "Android AppFunctions and the Android AI Ecosystem",
+  "description": "What Android AppFunctions are, how apps expose capabilities to AI agents and assistants, the Jetpack library (alpha), design and security considerations, and how AppFunctions fit with Gemini Nano, ML Kit GenAI and cloud AI.",
+  "primary_keyword": "android appfunctions",
+  "keywords": ["appfunctions jetpack", "android ai agents apps", "expose app functions to gemini", "android mcp", "android ai ecosystem", "agentic android apps"],
+  "lede": "AI assistants are moving from answering questions to taking actions inside apps. Android AppFunctions is the platform's way for apps to describe capabilities that authorised agents can discover and call. The Jetpack library is in alpha, so here's the concept, the shape of the API, and how to prepare without over-committing.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["function-calling-ai-android", "ai-agents-android-development", "gemini-nano-ml-kit-genai-android", "ai-in-android-development"],
+  "refs": [
+    ["AppFunctions overview", "https://developer.android.com/ai/appfunctions"],
+    ["AppFunctions Jetpack releases", "https://developer.android.com/jetpack/androidx/releases/appfunctions"],
+    ["AI on Android", "https://developer.android.com/ai"],
+    ["Function calling with the Gemini API", "https://ai.google.dev/gemini-api/docs/function-calling"]
+  ]
+}
+-->
+<p class="ad-lead">Today, if you ask an assistant to "add milk to my shopping list", it either can't or relies on brittle UI automation. AppFunctions lets your app declare a function like <code>addItem(list, item)</code> with structured parameters, so an authorised agent can call it directly, while your app keeps control of the logic.</p>
+
+<div class="callout warn"><b>Early-stage API</b><p>The <code>androidx.appfunctions</code> library is in <strong>alpha</strong> (1.0.0-alpha10 as of July 2026), and APIs have changed between alphas. Integration with Gemini was in private preview as of May 2026. Code below shows the shape of the API. Check the release notes for current names before building.</p></div>
+
+<h2 id="concept">How it fits together</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-af-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-af-t fig-af-d">
+    <title id="fig-af-t">AppFunctions flow</title>
+    <desc id="fig-af-d">An app declares functions with annotations; a compiler generates metadata and indexes them with the system. An authorised agent such as an assistant searches available functions, the model decides which to call with which parameters, the system routes the call to the app, and the app executes its own logic and returns a structured result.</desc>
+    <defs><marker id="afm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M200 70 H246 M440 70 H486 M590 100 V140 M486 170 H440 M246 170 H200" marker-end="url(#afm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="180" height="60" rx="12"/><text class="d-t" x="110" y="66" text-anchor="middle">Your app</text><text class="d-s" x="110" y="84" text-anchor="middle">declares functions</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="250" y="40" width="190" height="60" rx="12"/><text class="d-t" x="345" y="66" text-anchor="middle">System index</text><text class="d-s" x="345" y="84" text-anchor="middle">metadata, permissions</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="490" y="40" width="210" height="60" rx="12"/><text class="d-t" x="595" y="66" text-anchor="middle">Agent / assistant</text><text class="d-s" x="595" y="84" text-anchor="middle">search + choose call</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="490" y="140" width="210" height="60" rx="12"/><text class="d-t" x="595" y="166" text-anchor="middle">Execute request</text><text class="d-s" x="595" y="184" text-anchor="middle">routed by system</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="250" y="140" width="190" height="60" rx="12"/><text class="d-t" x="345" y="166" text-anchor="middle">App logic runs</text><text class="d-s" x="345" y="184" text-anchor="middle">validates, executes</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="20" y="140" width="180" height="60" rx="12"/><text class="d-w" x="110" y="166" text-anchor="middle">Structured</text><text class="d-w" x="110" y="184" text-anchor="middle">result</text></g>
+  </svg>
+  <figcaption id="fig-af-cap">The model chooses; your app executes. Same idea as function calling, but across apps on the device.</figcaption>
+</figure>
+
+<h2 id="shape">The shape of the API</h2>
+<p>You annotate functions in a service class, and a KSP compiler (<code>appfunctions-compiler</code>) generates metadata. In recent alphas, functions are declared in an <code>AppFunctionService</code> marked as an entry point. Illustrative only:</p>
+<code-block lang="kotlin" file="Illustrative AppFunctions declaration (alpha)">
+// Dependencies (check versions): androidx.appfunctions:appfunctions,
+// appfunctions-service, and ksp("androidx.appfunctions:appfunctions-compiler")
+
+@AppFunctionSerializable
+data class ShoppingItem(val id: String, val name: String)
+
+class ShoppingFunctions @Inject constructor(private val repo: ShoppingRepository) {
+
+    /**
+     * Adds an item to the user's shopping list.
+     * @param name The item name, e.g. "milk".
+     * @return The created item.
+     */
+    @AppFunction
+    suspend fun addItem(context: AppFunctionContext, name: String): ShoppingItem {
+        require(name.isNotBlank() && name.length <= 100)        // validate model-provided input
+        return repo.add(name.trim()).let { ShoppingItem(it.id, it.name) }
+    }
+}
+</code-block>
+<p>KDoc descriptions matter: they help the model understand when and how to call your function, as tool descriptions do in <a href="../function-calling-ai-android/index.html">function calling</a>.</p>
+
+<h2 id="design">Designing good app functions</h2>
+<ul>
+  <li><strong>Expose intents, not UI steps:</strong> <code>createNote(title, body)</code>, not "tap FAB, type text".</li>
+  <li><strong>Small, typed parameters</strong> with clear descriptions and validation.</li>
+  <li><strong>Idempotency or confirmation</strong> for actions with side effects.</li>
+  <li><strong>Read functions</strong> (search, get status) are lower risk. Start there.</li>
+  <li><strong>Reuse your domain layer</strong>: functions should call the same use cases as your UI. See <a href="../android-use-cases-domain-layer/index.html">Use Cases</a>.</li>
+</ul>
+
+<h2 id="security">Security and user trust</h2>
+<ul>
+  <li>Only authorised callers can execute app functions (system-mediated permissions). Don't build custom backdoors.</li>
+  <li>Treat parameters as untrusted model output: validate, bound and sanitise.</li>
+  <li>Require user confirmation in your app for sensitive actions (payments, deletes, sending messages).</li>
+  <li>Respect the user's sign-in state and app-level privacy settings.</li>
+  <li>Be mindful of prompt injection: content an agent read elsewhere may try to trigger your functions. See <a href="../prompt-injection-android-ai/index.html">Prompt Injection</a>.</li>
+</ul>
+
+<h2 id="ecosystem">The wider Android AI ecosystem</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Piece</th><th>Role</th><th>Status (verify current)</th></tr></thead>
+  <tbody>
+    <tr><td>Gemini Nano + ML Kit GenAI APIs</td><td>On-device summarise, rewrite, describe, prompt</td><td>Beta; device support varies</td></tr>
+    <tr><td>Firebase AI Logic</td><td>Cloud Gemini from apps, hybrid inference</td><td>GA; hybrid is experimental</td></tr>
+    <tr><td>LiteRT / LiteRT-LM</td><td>Run your own models on device</td><td>See docs</td></tr>
+    <tr><td>AppFunctions</td><td>Let agents act inside your app</td><td>Alpha</td></tr>
+    <tr><td>Gemini in Android Studio</td><td>AI for developers</td><td>Available</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="prepare">How to prepare now</h2>
+<ol class="steps">
+  <li>Structure business logic as clean, testable use cases, which is good architecture anyway.</li>
+  <li>List your app's top user intents that would make sense as voice or agent actions.</li>
+  <li>Prototype with the alpha in a branch, behind a flag, and track release notes.</li>
+  <li>Design confirmation UX for side-effecting actions.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is AppFunctions the same as App Actions?</summary><div><p>No. App Actions used built-in intents and shortcuts.xml for Assistant. AppFunctions is a newer, function-based mechanism designed for AI agents. Check the docs for migration guidance.</p></div></details>
+  <details><summary>Which devices support it?</summary><div><p>AppFunctions relies on platform support in recent Android versions. Check the official docs for current requirements.</p></div></details>
+  <details><summary>Should I ship it in production?</summary><div><p>Treat it as experimental while it's alpha: prototype, but expect API changes.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AppFunctions lets apps <strong>expose typed capabilities to AI agents</strong>, with the system mediating access and your app executing the logic. It's early (alpha), but clean use cases, validated inputs and confirmation for sensitive actions will prepare your app for agent-driven interactions.</p>
+<p>Next step: build apps everyone can trust and use with <a href="../android-privacy-accessibility-reliability/index.html">Privacy, Accessibility and Reliability</a>.</p>

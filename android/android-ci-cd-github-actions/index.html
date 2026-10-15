@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CI/CD for Android with GitHub Actions (Step by Step) | Yunok Tech</title>
+  <meta name="description" content="Set up CI/CD for Android with GitHub Actions: build, lint and unit tests on every PR, Gradle caching, signed release bundles with secrets, and automated upload to Google Play testing tracks.">
+  <meta name="keywords" content="android ci cd github actions, github actions android build, gradle cache github actions, sign android app ci, upload aab play store ci, android pull request checks, fastlane github actions">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-ci-cd-github-actions/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-ci-cd-github-actions/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="CI/CD for Android with GitHub Actions (Step by Step)">
+  <meta property="og:description" content="Set up CI/CD for Android with GitHub Actions: build, lint and unit tests on every PR, Gradle caching, signed release bundles with secrets, and automated upload to Google Play testing tracks.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="CI/CD for Android with GitHub Actions (Step by Step)">
+  <meta name="twitter:description" content="Set up CI/CD for Android with GitHub Actions: build, lint and unit tests on every PR, Gradle caching, signed release bundles with secrets, and automated upload to Google Play testing tracks.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "CI/CD for Android with GitHub Actions", "description": "Set up CI/CD for Android with GitHub Actions: build, lint and unit tests on every PR, Gradle caching, signed release bundles with secrets, and automated upload to Google Play testing tracks.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "github actions android build, gradle cache github actions, sign android app ci, upload aab play store ci, android pull request checks, fastlane github actions", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-ci-cd-github-actions/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "CI/CD for Android with GitHub Actions", "item": "https://yunoktech.com/android/android-ci-cd-github-actions/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">CI/CD for Android with GitHub Actions</h1>
+    <p class="ad-lede">Continuous integration catches broken builds and failing tests before they reach main. Continuous delivery turns a tag into a signed release on Google Play without anyone's laptop. This guide builds both with GitHub Actions, step by step and securely.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#pipeline">The pipeline</a></li><li><a href="#ci">CI workflow for pull requests</a></li><li><a href="#signing">Signing in CI without leaking keys</a></li><li><a href="#cd">CD workflow on tags</a></li><li><a href="#versioning">Versioning</a></li><li><a href="#speed">Keeping CI fast</a></li><li><a href="#use-cases">Pipeline stages by team size</a></li><li><a href="#security">Security checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"It builds on my machine" isn't a release process. With CI, every pull request is built, linted and tested on a clean machine. With CD, releases are reproducible, signed with protected credentials, and uploaded consistently.</p>
+
+<h2 id="pipeline">The pipeline</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ci-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ci-t fig-ci-d">
+    <title id="fig-ci-t">Android CI/CD pipeline with GitHub Actions</title>
+    <desc id="fig-ci-d">On every pull request: checkout, set up JDK and Gradle cache, run lint, unit tests and assemble debug, then report results. On a version tag: build a signed release App Bundle using secrets, upload the mapping file and bundle, and publish to the Google Play internal testing track.</desc>
+    <defs><marker id="cim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">Pull request (CI)</text>
+    <path class="d-flow" d="M140 60 H160 M290 60 H310 M460 60 H480" marker-end="url(#cim)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="34" width="120" height="52" rx="10"/><text class="d-s" x="80" y="64" text-anchor="middle">checkout + JDK</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="164" y="34" width="126" height="52" rx="10"/><text class="d-s" x="227" y="64" text-anchor="middle">Gradle cache</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="314" y="34" width="146" height="52" rx="10"/><text class="d-s" x="387" y="64" text-anchor="middle">lint · test · assemble</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="484" y="34" width="216" height="52" rx="10"/><text class="d-s" x="592" y="64" text-anchor="middle">✓ status check on PR</text></g>
+    <text class="d-t" x="20" y="130">Tag v1.4.0 (CD)</text>
+    <path class="d-flow" d="M200 170 H230 M410 170 H440" marker-end="url(#cim)"/>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="20" y="144" width="180" height="52" rx="10"/><text class="d-s" x="110" y="174" text-anchor="middle">signed bundleRelease</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="234" y="144" width="176" height="52" rx="10"/><text class="d-s" x="322" y="174" text-anchor="middle">mapping + artifacts</text></g>
+    <g class="d-step" style="--i:6"><rect class="d-green" x="444" y="144" width="256" height="52" rx="10"/><text class="d-s" x="572" y="174" text-anchor="middle">upload to Play internal track</text></g>
+  </svg>
+  <figcaption id="fig-ci-cap">CI on every change, CD on tags. Production promotion stays a deliberate human decision.</figcaption>
+</figure>
+
+<h2 id="ci">CI workflow for pull requests</h2>
+<figure class="code"><figcaption><span class="file">.github/workflows/android-ci.yml</span><span class="lang">YAML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-yaml">name: Android CI
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: <span class="tk-k">true</span>          <span class="tk-c"># stop outdated runs when new commits arrive</span>
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: <span class="tk-n">30</span>
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: <span class="tk-n">17</span>          <span class="tk-c"># match what your AGP version requires</span>
+      - uses: gradle/actions/setup-gradle@v4   <span class="tk-c"># Gradle caching + build scans support</span>
+      - name: Lint, unit tests, debug build
+        run: ./gradlew lintDebug testDebugUnitTest assembleDebug --stacktrace
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: <span class="tk-s">'**/build/reports/**'</span></code></pre></figure>
+<p>Pin action versions you trust, and update them deliberately. Make the workflow a <strong>required status check</strong> in branch protection so failing PRs can't merge.</p>
+
+<h2 id="signing">Signing in CI without leaking keys</h2>
+<p>Store the <strong>upload keystore</strong> as a base64-encoded secret, plus its passwords, in GitHub Actions secrets. With Play App Signing, Google holds the app signing key, and your CI only needs the upload key.</p>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts (signing from environment)</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">android {
+    signingConfigs {
+        create(<span class="tk-s">"release"</span>) {
+            <span class="tk-k">val</span> ksPath = <span class="tk-t">System</span>.getenv(<span class="tk-s">"UPLOAD_KEYSTORE_PATH"</span>)
+            <span class="tk-k">if</span> (ksPath != <span class="tk-k">null</span>) {
+                storeFile = file(ksPath)
+                storePassword = <span class="tk-t">System</span>.getenv(<span class="tk-s">"UPLOAD_KEYSTORE_PASSWORD"</span>)
+                keyAlias = <span class="tk-t">System</span>.getenv(<span class="tk-s">"UPLOAD_KEY_ALIAS"</span>)
+                keyPassword = <span class="tk-t">System</span>.getenv(<span class="tk-s">"UPLOAD_KEY_PASSWORD"</span>)
+            }
+        }
+    }
+    buildTypes {
+        release { signingConfig = signingConfigs.getByName(<span class="tk-s">"release"</span>) }
+    }
+}</code></pre></figure>
+
+<h2 id="cd">CD workflow on tags</h2>
+<figure class="code"><figcaption><span class="file">.github/workflows/android-release.yml</span><span class="lang">YAML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-yaml">name: Android Release
+on:
+  push:
+    tags: [ <span class="tk-s">'v*'</span> ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production        <span class="tk-c"># optional: require approval for this environment</span>
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: <span class="tk-n">17</span> }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Decode upload keystore
+        run: echo <span class="tk-s">"${{ secrets.UPLOAD_KEYSTORE_BASE64 }}"</span> | base64 --decode &gt; <span class="tk-s">"$RUNNER_TEMP/upload.jks"</span>
+      - name: Build signed bundle
+        env:
+          UPLOAD_KEYSTORE_PATH: ${{ runner.temp }}/upload.jks
+          UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: |
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/mapping/release/mapping.txt
+      <span class="tk-c"># Upload to Play (internal track) using the Play Developer API via your chosen tool,</span>
+      <span class="tk-c"># e.g. a Gradle Play Publisher task or fastlane supply, authenticated with a</span>
+      <span class="tk-c"># service account JSON stored as a secret.</span></code></pre></figure>
+
+<h2 id="versioning">Versioning</h2>
+<figure class="code"><figcaption><span class="file">Version code from CI</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">android {
+    defaultConfig {
+        versionCode = <span class="tk-t">System</span>.getenv(<span class="tk-s">"GITHUB_RUN_NUMBER"</span>)?.toInt() ?: <span class="tk-n">1</span>   <span class="tk-c">// always increasing</span>
+        versionName = <span class="tk-t">System</span>.getenv(<span class="tk-s">"GITHUB_REF_NAME"</span>)?.removePrefix(<span class="tk-s">"v"</span>) ?: <span class="tk-s">"dev"</span>
+    }
+}</code></pre></figure>
+
+<h2 id="speed">Keeping CI fast</h2>
+<ul>
+  <li>Use Gradle caching (<code>setup-gradle</code>) and configuration cache where possible.</li>
+  <li>Run only affected modules' tests in large multi-module projects.</li>
+  <li>Run instrumented tests and benchmarks on a schedule or merge queue, rather than on every push, with Gradle Managed Devices or a device cloud.</li>
+</ul>
+
+<h2 id="use-cases">Pipeline stages by team size</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Solo developer</h3><p>A CI workflow on PRs, with manual releases from CI artifacts.</p></div>
+  <div class="card usecase"><h3>Small team</h3><p>CI plus automated internal-track uploads on tags, with manual promotion to production.</p></div>
+  <div class="card usecase"><h3>Large team</h3><p>A merge queue, sharded tests, screenshot tests, nightly benchmarks and a release train with staged rollouts.</p></div>
+</div>
+
+<h2 id="security">Security checklist</h2>
+<ul>
+  <li>☐ Keystore and service account only in encrypted secrets; never in the repository</li>
+  <li>☐ Release workflow limited to protected tags or branches; environment approvals for production</li>
+  <li>☐ Workflows from forks can't access secrets (GitHub's default for <code>pull_request</code>)</li>
+  <li>☐ Minimal permissions for the Play service account (specific app, release manager role)</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should CI build release or debug?</summary><div><p>Build debug and run tests on every PR for speed. Also build the release variant regularly (at least on main) to catch R8 and signing issues early.</p></div></details>
+  <details><summary>Fastlane or Gradle plugin for Play uploads?</summary><div><p>Both work. Fastlane has a broad ecosystem, and Gradle-based publishing keeps everything in the build. Choose one and document it.</p></div></details>
+  <details><summary>Can I run emulator tests on GitHub Actions?</summary><div><p>Yes, with hardware-accelerated runners or Gradle Managed Devices, though they're slower and costlier than unit tests. Many teams run them less frequently.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android CI/CD with GitHub Actions means <strong>lint, tests and builds on every PR</strong>, <strong>Gradle caching for speed</strong>, <strong>signing from encrypted secrets</strong>, and <strong>tag-based release bundles uploaded to a Play testing track</strong>, with human approval for production.</p>
+<p>Next step: explore AI in Android apps, starting with <a href="../ml-kit-genai-apis/index.html">ML Kit GenAI APIs Explained</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions documentation</a></li><li><a href="https://github.com/gradle/actions" target="_blank" rel="noopener">gradle/actions (setup-gradle)</a></li><li><a href="https://developer.android.com/studio/publish/app-signing" target="_blank" rel="noopener">Sign your app</a></li><li><a href="https://developers.google.com/android-publisher" target="_blank" rel="noopener">Google Play Developer API</a></li><li><a href="https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions" target="_blank" rel="noopener">Using secrets in GitHub Actions</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-ci-cd-github-actions-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-ci-cd-github-actions-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/android-app-signing-upload-keys/index.html"><small>App Publishing, Monetization, and Product Development</small>Android App Signing and Upload Keys Explained</a></li><li><a href="../../android/publish-android-app-google-play/index.html"><small>App Publishing, Monetization, and Product Development</small>How to Publish an Android App on Google Play</a></li><li><a href="../../android/scaling-android-codebase-teams/index.html"><small>Android Architecture and Clean Code</small>Scaling an Android Codebase Across Multiple Teams</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-ci-cd-github-actions/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-ci-cd-github-actions/&amp;text=CI/CD for Android with GitHub Actions" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-ci-cd-github-actions/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#pipeline">The pipeline</a></li><li><a href="#ci">CI workflow for pull requests</a></li><li><a href="#signing">Signing in CI without leaking keys</a></li><li><a href="#cd">CD workflow on tags</a></li><li><a href="#versioning">Versioning</a></li><li><a href="#speed">Keeping CI fast</a></li><li><a href="#use-cases">Pipeline stages by team size</a></li><li><a href="#security">Security checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-ci-cd-github-actions-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-ci-cd-github-actions-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

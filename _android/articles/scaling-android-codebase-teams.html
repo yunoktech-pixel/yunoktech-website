@@ -1,0 +1,125 @@
+<!--meta
+{
+  "seo_title": "Scaling an Android Codebase Across Multiple Teams",
+  "description": "How to scale an Android codebase for many teams: ownership, modules, platform team, design system, code review, CI, feature flags, release trains and architecture decision records.",
+  "primary_keyword": "scaling android codebase",
+  "keywords": ["android platform team", "codeowners android", "feature flags android", "release train mobile", "android ci at scale", "architecture decision records"],
+  "lede": "One team can keep an Android app consistent through conversation. Five teams can't. Scaling a codebase means turning shared understanding into structure: modules, ownership, automation, a design system and explicit decisions.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-modularization-strategies", "android-architecture-at-scale", "android-ci-cd-github-actions", "multi-module-architecture-android"],
+  "refs": [
+    ["Guide to Android app modularization", "https://developer.android.com/topic/modularization"],
+    ["Recommendations for Android architecture", "https://developer.android.com/topic/architecture/recommendations"],
+    ["GitHub CODEOWNERS", "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners"],
+    ["Play Console: staged rollouts", "https://support.google.com/googleplay/android-developer/answer/6346149"]
+  ]
+}
+-->
+<p class="ad-lead">When a third and fourth team join the Android app, symptoms appear quickly: merge conflicts in the same files, inconsistent patterns, CI taking an hour, "who owns this?" questions, and releases blocked by one team's unfinished feature. These are organisational problems that need technical support.</p>
+
+<h2 id="pillars">The pillars of a scalable codebase</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sc-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-sc-t fig-sc-d">
+    <title id="fig-sc-t">Pillars of scaling an Android codebase</title>
+    <desc id="fig-sc-d">Six pillars support many teams shipping safely: modular structure with ownership, a platform team, a shared design system, automated quality gates in CI, feature flags with release trains, and documented architecture decisions.</desc>
+    <rect class="d-dark" x="160" y="10" width="400" height="40" rx="10"/><text class="d-w" x="360" y="35" text-anchor="middle">Many teams shipping independently and safely</text>
+    <rect class="d-blue" x="20" y="70" width="105" height="120" rx="10"/><text class="d-t" x="72" y="100" text-anchor="middle">Modules</text><text class="d-s" x="72" y="124" text-anchor="middle">+ owners</text>
+    <rect class="d-violet" x="137" y="70" width="105" height="120" rx="10"/><text class="d-t" x="189" y="100" text-anchor="middle">Platform</text><text class="d-s" x="189" y="124" text-anchor="middle">team</text>
+    <rect class="d-green" x="254" y="70" width="105" height="120" rx="10"/><text class="d-t" x="306" y="100" text-anchor="middle">Design</text><text class="d-s" x="306" y="124" text-anchor="middle">system</text>
+    <rect class="d-amber" x="371" y="70" width="105" height="120" rx="10"/><text class="d-t" x="423" y="100" text-anchor="middle">CI gates</text><text class="d-s" x="423" y="124" text-anchor="middle">automated</text>
+    <rect class="d-blue" x="488" y="70" width="105" height="120" rx="10"/><text class="d-t" x="540" y="100" text-anchor="middle">Flags +</text><text class="d-s" x="540" y="124" text-anchor="middle">release train</text>
+    <rect class="d-violet" x="605" y="70" width="95" height="120" rx="10"/><text class="d-t" x="652" y="100" text-anchor="middle">ADRs</text><text class="d-s" x="652" y="124" text-anchor="middle">decisions</text>
+  </svg>
+  <figcaption id="fig-sc-cap">No single pillar is enough. Together they let teams move fast without stepping on each other.</figcaption>
+</figure>
+
+<h2 id="ownership">1. Modules and ownership</h2>
+<p>Feature modules map to teams, and core modules map to a platform team. A <code>CODEOWNERS</code> file routes reviews automatically:</p>
+<code-block lang="text" file=".github/CODEOWNERS">
+/feature/checkout/     @shop/checkout-android
+/feature/search/       @shop/discovery-android
+/core/designsystem/    @shop/design-system
+/core/network/         @shop/android-platform
+/build-logic/          @shop/android-platform
+</code-block>
+<p>See <a href="../android-modularization-strategies/index.html">Modularization Strategies</a> for module slicing.</p>
+
+<h2 id="platform">2. A platform (or "core") team</h2>
+<p>As the app grows, someone must own build tooling, CI, shared libraries, dependency upgrades, performance and app-wide concerns such as startup and security. A small platform team provides these as products for feature teams: documented, versioned and supported.</p>
+
+<h2 id="design-system">3. A shared design system</h2>
+<p>A <code>:core:designsystem</code> module with themed Compose components, tokens and screenshot tests keeps the UI consistent and prevents five slightly different buttons. See <a href="../material3-theming-dynamic-color/index.html">Material 3 Theming</a>.</p>
+
+<h2 id="ci">4. Automated quality gates</h2>
+<ul>
+  <li>Build, unit tests, lint and static analysis (for example detekt or ktlint) on every PR.</li>
+  <li>Module dependency rules checked automatically.</li>
+  <li>Screenshot tests for the design system and key screens.</li>
+  <li>Performance benchmarks on a schedule, with regression alerts.</li>
+  <li>Build caching and test sharding to keep CI fast. See <a href="../android-ci-cd-github-actions/index.html">CI/CD with GitHub Actions</a>.</li>
+</ul>
+
+<h2 id="flags">5. Feature flags and release trains</h2>
+<p>With many teams, waiting for every feature to be "done" before releasing doesn't work. Instead:</p>
+<ul>
+  <li><strong>Release trains:</strong> branch and release on a fixed cadence, such as weekly or every two weeks.</li>
+  <li><strong>Feature flags:</strong> merge unfinished work behind flags, and enable it remotely when ready.</li>
+  <li><strong>Staged rollouts</strong> on Google Play, with crash-rate monitoring before going to 100%.</li>
+</ul>
+<code-block lang="kotlin" file="A small, testable flag abstraction">
+interface FeatureFlags {
+    fun isEnabled(flag: Flag): Boolean
+}
+enum class Flag(val key: String, val default: Boolean) {
+    NEW_CHECKOUT("new_checkout", false),
+    UPI_AUTOPAY("upi_autopay", false),
+}
+
+@Composable
+fun CheckoutEntry(flags: FeatureFlags, onLegacy: () -> Unit, onNew: () -> Unit) {
+    if (flags.isEnabled(Flag.NEW_CHECKOUT)) onNew() else onLegacy()
+}
+</code-block>
+<div class="warn"><b>Flags are debt</b><p>Remove flags once a feature is fully launched. Track an owner and an expiry date for each one.</p></div>
+
+<h2 id="adrs">6. Architecture decision records (ADRs)</h2>
+<p>Short documents that record significant decisions: context, decision and consequences. For example, "We use Navigation 3 for new features" or "Repositories throw; ViewModels map errors". They prevent decisions being re-argued and help new developers understand <em>why</em>.</p>
+<code-block lang="text" file="docs/adr/0007-error-handling.md">
+# 7. Error handling between data and UI layers
+Status: Accepted (2026-09)
+Context: Teams handled network errors inconsistently (Result, exceptions, nullable).
+Decision: Repositories throw typed exceptions; ViewModels map them to UiState messages.
+Consequences: Consistent tests and UI; Result types allowed only inside data layer.
+</code-block>
+
+<h2 id="use-cases">Scaling milestones</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Team size</th><th>Typical needs</th></tr></thead>
+  <tbody>
+    <tr><td>1–5 developers</td><td>Shared conventions, code review, CI basics</td></tr>
+    <tr><td>5–15</td><td>Feature modules, CODEOWNERS, design system, feature flags</td></tr>
+    <tr><td>15+</td><td>Platform team, release trains, dependency rules, ADRs, performance monitoring</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Relying on tribal knowledge instead of documented conventions and automated checks.</li>
+  <li>A "common" module that everyone edits, which becomes a merge-conflict hotspot.</li>
+  <li>Feature flags that are never removed.</li>
+  <li>The platform team becoming a gatekeeper instead of an enabler.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Monorepo or multiple repositories?</summary><div><p>Most Android apps use one repository with many modules. Atomic changes across modules are simpler, and build caching mitigates scale.</p></div></details>
+  <details><summary>How do we keep architecture consistent?</summary><div><p>Use templates (convention plugins and module templates), documented ADRs, lint rules and review by owners, rather than relying on memory.</p></div></details>
+  <details><summary>When do we need a platform team?</summary><div><p>When build, CI and shared-library work regularly blocks feature teams, or no one owns app-wide quality.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Scaling an Android codebase means <strong>structure (modules and owners), enablement (platform team and design system), automation (CI gates) and controlled delivery (flags and release trains)</strong>, held together by documented decisions.</p>
+<p>Next step: go deeper into the data layer, starting with <a href="../retrofit-android-guide/index.html">Retrofit in Android: Complete Guide</a>.</p>

@@ -1,0 +1,144 @@
+<!--meta
+{
+  "seo_title": "Compose UI Testing and Screenshot Testing Guide",
+  "description": "Test Jetpack Compose UIs: semantics-based UI tests with createComposeRule, finders and assertions, testing stateless screens, plus screenshot testing to catch visual regressions.",
+  "primary_keyword": "compose screenshot testing",
+  "keywords": ["compose ui test", "createComposeRule", "compose testTag", "compose preview screenshot testing", "visual regression android", "roborazzi paparazzi"],
+  "lede": "Functional UI tests check that a screen behaves correctly. Screenshot tests check that it still looks correct. Compose makes both practical. This guide covers semantics-based UI tests and screenshot testing, and shows how to structure screens so tests stay simple.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-ui-testing", "compose-state-hoisting", "android-unit-testing-junit", "android-ci-cd-github-actions"],
+  "refs": [
+    ["Testing your Compose layout", "https://developer.android.com/develop/ui/compose/testing"],
+    ["Compose testing cheatsheet", "https://developer.android.com/develop/ui/compose/testing/testing-cheatsheet"],
+    ["Compose Preview Screenshot Testing", "https://developer.android.com/studio/preview/compose-screenshot-testing"],
+    ["Screenshot testing overview", "https://developer.android.com/training/testing/ui-tests/screenshot"]
+  ]
+}
+-->
+<p class="ad-lead">A refactor changes padding in a shared component, and twenty screens shift by 8dp. A colour token is renamed, and the error state becomes unreadable in dark mode. Unit tests won't catch either. UI tests catch broken behaviour, and screenshot tests catch broken visuals.</p>
+
+<h2 id="pyramid">Where UI and screenshot tests fit</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-tp-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-tp-t fig-tp-d">
+    <title id="fig-tp-t">Android testing pyramid with screenshot tests</title>
+    <desc id="fig-tp-d">Many fast unit tests at the base for ViewModels and logic; screenshot tests of components and screens in several states; Compose UI tests for interactions; a few end-to-end tests at the top.</desc>
+    <polygon points="360,10 700,200 20,200" class="d-box"/>
+    <rect class="d-red" x="300" y="30" width="120" height="30" rx="6"/><text class="d-s" x="360" y="50" text-anchor="middle">few E2E tests</text>
+    <rect class="d-amber" x="240" y="72" width="240" height="32" rx="6"/><text class="d-s" x="360" y="93" text-anchor="middle">Compose UI tests: interactions</text>
+    <rect class="d-violet" x="170" y="116" width="380" height="32" rx="6"/><text class="d-s" x="360" y="137" text-anchor="middle">Screenshot tests: components × states × themes</text>
+    <rect class="d-green" x="90" y="160" width="540" height="32" rx="6"/><text class="d-s" x="360" y="181" text-anchor="middle">Unit tests: ViewModels, reducers, mappers (most tests)</text>
+  </svg>
+  <figcaption id="fig-tp-cap">Most confidence should come from fast unit tests. UI and screenshot tests cover what unit tests can't see.</figcaption>
+</figure>
+
+<h2 id="testable">Make screens testable first</h2>
+<p>Split each screen into a <strong>Route</strong> (connects to the ViewModel) and a stateless <strong>Screen</strong> (renders a UiState and emits events). Tests and previews then drive the Screen directly with any state. See <a href="../compose-state-hoisting/index.html">State Hoisting</a>.</p>
+
+<h2 id="ui-tests">Compose UI tests</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    androidTestImplementation(platform("androidx.compose:compose-bom:<latest>"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+</code-block>
+<code-block lang="kotlin" file="LoginScreenTest.kt (androidTest)">
+class LoginScreenTest {
+    @get:Rule val compose = createComposeRule()
+
+    @Test
+    fun signInDisabledUntilEmailValid_thenEmitsEvent() {
+        var signInClicked = false
+        var state by mutableStateOf(LoginUiState())
+
+        compose.setContent {
+            AppTheme {
+                LoginContent(
+                    state = state,
+                    onEmailChange = { state = state.copy(email = it, canSubmit = it.contains("@")) },
+                    onSignIn = { signInClicked = true },
+                )
+            }
+        }
+
+        compose.onNodeWithText("Sign in").assertIsNotEnabled()
+        compose.onNodeWithText("Email").performTextInput("dev@example.com")
+        compose.onNodeWithText("Sign in").assertIsEnabled().performClick()
+        assertTrue(signInClicked)
+    }
+}
+</code-block>
+<ul>
+  <li><strong>Finders</strong> (<code>onNodeWithText</code>, <code>onNodeWithContentDescription</code>, <code>onNodeWithTag</code>) query the <strong>semantics tree</strong>, the same information accessibility services use. Good semantics make tests easier too.</li>
+  <li>Use <code>Modifier.testTag("…")</code> only when no user-visible text or description identifies a node.</li>
+  <li>Compose tests synchronise with the UI automatically, waiting for recomposition and animations to idle. For async work, use <code>waitUntil { }</code>.</li>
+</ul>
+<p>More patterns: <a href="../compose-ui-testing/index.html">UI Testing in Jetpack Compose</a>.</p>
+
+<h2 id="screenshot">Screenshot testing</h2>
+<p>A screenshot test renders a composable, saves a <strong>reference image</strong>, and on later runs compares the new rendering against it, failing on visual differences.</p>
+<h3 id="options">Your options</h3>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tool</th><th>How it renders</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Compose Preview Screenshot Testing (Google)</td><td>Turns <code>@Preview</code> functions into screenshot tests, run on the JVM</td><td>Alpha at the time of writing; setup is moving to AGP test suites. Check the current docs.</td></tr>
+    <tr><td>Roborazzi</td><td>JVM via Robolectric</td><td>Popular open-source option; integrates with Robolectric tests</td></tr>
+    <tr><td>Paparazzi</td><td>JVM using layoutlib</td><td>Open source; no device needed</td></tr>
+    <tr><td>Device/emulator-based</td><td>On real rendering stack</td><td>Most realistic, slower and noisier in CI</td></tr>
+  </tbody>
+</table>
+</div>
+<h3 id="preview-tests">Previews as screenshot tests</h3>
+<p>With Google's tool, previews placed in the screenshot test source set become tests. A multi-preview annotation makes each component render in several configurations:</p>
+<code-block lang="kotlin" file="Multi-preview annotation (shared)">
+@Preview(name = "Light", showBackground = true)
+@Preview(name = "Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Large font", showBackground = true, fontScale = 1.5f)
+annotation class ThemePreviews
+</code-block>
+<code-block lang="kotlin" file="src/screenshotTest/.../OrderCardScreenshots.kt">
+@ThemePreviews
+@Composable
+fun OrderCardDelivered() = AppTheme { OrderCard(sampleOrder(status = Delivered)) }
+
+@ThemePreviews
+@Composable
+fun OrderCardFailedPayment() = AppTheme { OrderCard(sampleOrder(status = PaymentFailed)) }
+</code-block>
+<p>You then run a Gradle task to <em>update</em> reference images and another to <em>validate</em> against them. The exact task names depend on the plugin version and whether you use the newer test-suite setup, so follow the current documentation.</p>
+
+<h2 id="ci">Running in CI</h2>
+<ol class="steps">
+  <li>Commit reference images to the repository (or Git LFS).</li>
+  <li>Run validation on every pull request, and publish the diff report as a CI artifact.</li>
+  <li>When a change is intentional, regenerate references in the same PR so reviewers see the visual diff.</li>
+  <li>Pin fonts, locale and rendering settings so images are deterministic.</li>
+</ol>
+
+<h2 id="use-cases">What to screenshot</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design-system components</h3><p>Buttons, cards and inputs in every state (enabled, disabled, error, loading), in light and dark, at large font scale.</p></div>
+  <div class="card usecase"><h3>Key screens</h3><p>Empty, loading, error and populated states of high-traffic screens.</p></div>
+  <div class="card usecase"><h3>Localisation</h3><p>Long-text languages and RTL layouts, where truncation and alignment bugs hide.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Screenshotting screens that load live data or show the current time. Inject fixed data and clocks.</li>
+  <li>Hundreds of near-duplicate screenshots that nobody reviews.</li>
+  <li>Using test tags everywhere instead of improving semantics.</li>
+  <li>Blindly accepting regenerated references without looking at diffs.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do Compose UI tests need a device?</summary><div><p>Instrumented tests run on a device or emulator. Compose UI tests can also run on the JVM with Robolectric for faster feedback.</p></div></details>
+  <details><summary>Are screenshot tests flaky?</summary><div><p>JVM-rendered screenshots are generally stable when inputs are deterministic. Device-based screenshots can vary with GPU and OS differences, so use tolerances.</p></div></details>
+  <details><summary>Should I replace UI tests with screenshot tests?</summary><div><p>No. They complement each other: screenshots verify appearance, and UI tests verify behaviour and interaction.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Structure screens as <strong>stateless, previewable composables</strong>, then use <strong>semantics-based UI tests</strong> for behaviour and <strong>screenshot tests</strong> for appearance across states, themes and font sizes. Run both in CI, and review visual diffs like code.</p>
+<p>Next step: make those screens work beautifully on every form factor with <a href="../compose-adaptive-ui-tablets-foldables/index.html">Adaptive UI for Tablets and Foldables</a>.</p>

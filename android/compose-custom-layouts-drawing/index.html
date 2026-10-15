@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Layouts and Drawing in Jetpack Compose | Yunok Tech</title>
+  <meta name="description" content="Build custom Compose layouts with Layout and the layout modifier, and draw with Canvas, drawBehind and drawWithCache: measurement constraints, a flow layout, a ring chart and accessibility.">
+  <meta name="keywords" content="compose custom layout, compose Layout composable, compose canvas drawing, drawWithCache, compose measure constraints, custom chart compose, compose semantics custom component">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/compose-custom-layouts-drawing/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/compose-custom-layouts-drawing/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Custom Layouts and Drawing in Jetpack Compose">
+  <meta property="og:description" content="Build custom Compose layouts with Layout and the layout modifier, and draw with Canvas, drawBehind and drawWithCache: measurement constraints, a flow layout, a ring chart and accessibility.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Custom Layouts and Drawing in Jetpack Compose">
+  <meta name="twitter:description" content="Build custom Compose layouts with Layout and the layout modifier, and draw with Canvas, drawBehind and drawWithCache: measurement constraints, a flow layout, a ring chart and accessibility.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Custom Layouts and Drawing in Compose", "description": "Build custom Compose layouts with Layout and the layout modifier, and draw with Canvas, drawBehind and drawWithCache: measurement constraints, a flow layout, a ring chart and accessibility.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Jetpack Compose", "keywords": "compose Layout composable, compose canvas drawing, drawWithCache, compose measure constraints, custom chart compose, compose semantics custom component", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/compose-custom-layouts-drawing/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Custom Layouts and Drawing in Compose", "item": "https://yunoktech.com/android/compose-custom-layouts-drawing/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Custom Layouts and Drawing in Compose</h1>
+    <p class="ad-lede">Row, Column and Box cover most screens, but sooner or later you need a chart, a tag cloud or a timeline that no built-in component draws. Compose makes custom layout and drawing far simpler than custom Views. Here's how measurement works, plus two complete examples.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#model">How Compose layout works</a></li><li><a href="#flow-layout">Example 1: A simple wrapping tag layout</a></li><li><a href="#layout-modifier">The layout modifier for a single element</a></li><li><a href="#drawing">Drawing: Canvas, drawBehind and drawWithCache</a></li><li><a href="#ring-chart">Example 2: An accessible progress ring chart</a></li><li><a href="#use-cases">When to go custom</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">With Views, a custom component meant subclassing View, overriding <code>onMeasure</code>, <code>onLayout</code> and <code>onDraw</code>, and declaring XML attributes. In Compose, layout is one function that measures children and places them, and drawing is a lambda with a canvas.</p>
+
+<h2 id="model">How Compose layout works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ly-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-ly-t fig-ly-d">
+    <title id="fig-ly-t">Compose single-pass layout: constraints down, sizes up, then placement</title>
+    <desc id="fig-ly-d">A parent passes constraints, minimum and maximum width and height, down to each child. Each child measures itself and returns a size. The parent decides its own size and places each child at a position.</desc>
+    <defs><marker id="lym" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="270" y="10" width="180" height="44" rx="10"/><text class="d-t" x="360" y="37" text-anchor="middle">Parent layout</text></g>
+    <path class="d-flow" d="M320 54 L170 112" marker-end="url(#lym)"/><text class="d-s" x="200" y="78">1. constraints ↓</text>
+    <path class="d-dash" d="M190 116 L340 58" marker-end="url(#lym)"/><text class="d-s" x="300" y="104">2. size ↑</text>
+    <path class="d-flow" d="M400 54 L550 112" marker-end="url(#lym)"/><text class="d-s" x="490" y="78">3. place(x, y)</text>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="90" y="116" width="160" height="50" rx="10"/><text class="d-t" x="170" y="146" text-anchor="middle">Child A</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="470" y="116" width="160" height="50" rx="10"/><text class="d-t" x="550" y="146" text-anchor="middle">Child B</text></g>
+  </svg>
+  <figcaption id="fig-ly-cap">Each child is measured once per layout pass, which is why Compose avoids the exponential cost of nested View measurement.</figcaption>
+</figure>
+
+<h2 id="flow-layout">Example 1: A simple wrapping tag layout</h2>
+<p>Compose already provides <code>FlowRow</code> for this. Building a simplified version yourself is the best way to learn the <code>Layout</code> API:</p>
+<figure class="code"><figcaption><span class="file">TagWrapLayout.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">TagWrapLayout</span>(
+    modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>,
+    horizontalGap: <span class="tk-t">Dp</span> = <span class="tk-n">8</span>.dp,
+    verticalGap: <span class="tk-t">Dp</span> = <span class="tk-n">8</span>.dp,
+    content: <span class="tk-a">@Composable</span> () -&gt; <span class="tk-t">Unit</span>,
+) {
+    <span class="tk-t">Layout</span>(content = content, modifier = modifier) { measurables, constraints -&gt;
+        <span class="tk-k">val</span> hGap = horizontalGap.roundToPx()
+        <span class="tk-k">val</span> vGap = verticalGap.roundToPx()
+        <span class="tk-c">// Children may be any width up to ours; never force a minimum on them.</span>
+        <span class="tk-k">val</span> childConstraints = constraints.copy(minWidth = <span class="tk-n">0</span>, minHeight = <span class="tk-n">0</span>)
+        <span class="tk-k">val</span> placeables = measurables.map { it.measure(childConstraints) }
+
+        <span class="tk-c">// Compute positions row by row.</span>
+        <span class="tk-k">val</span> positions = <span class="tk-t">ArrayList</span>&lt;<span class="tk-t">IntOffset</span>&gt;(placeables.size)
+        <span class="tk-k">var</span> x = <span class="tk-n">0</span>; <span class="tk-k">var</span> y = <span class="tk-n">0</span>; <span class="tk-k">var</span> rowHeight = <span class="tk-n">0</span>
+        placeables.forEach { p -&gt;
+            <span class="tk-k">if</span> (x &gt; <span class="tk-n">0</span> &amp;&amp; x + p.width &gt; constraints.maxWidth) {   <span class="tk-c">// wrap to next row</span>
+                x = <span class="tk-n">0</span>; y += rowHeight + vGap; rowHeight = <span class="tk-n">0</span>
+            }
+            positions += <span class="tk-t">IntOffset</span>(x, y)
+            x += p.width + hGap
+            rowHeight = maxOf(rowHeight, p.height)
+        }
+        <span class="tk-k">val</span> height = (y + rowHeight).coerceIn(constraints.minHeight, constraints.maxHeight)
+
+        layout(width = constraints.maxWidth, height = height) {
+            placeables.forEachIndexed { i, p -&gt; p.place(positions[i]) }
+        }
+    }
+}</code></pre></figure>
+<p>This assumes a bounded maximum width, which is the normal case inside a screen. Inside a horizontally scrolling parent, <code>maxWidth</code> would be infinite, and you'd need to handle that.</p>
+
+<h2 id="layout-modifier">The layout modifier for a single element</h2>
+<figure class="code"><figcaption><span class="file">Baseline-to-top padding</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> <span class="tk-t">Modifier</span>.firstBaselineToTop(distance: <span class="tk-t">Dp</span>) = layout { measurable, constraints -&gt;
+    <span class="tk-k">val</span> placeable = measurable.measure(constraints)
+    <span class="tk-k">val</span> baseline = placeable[<span class="tk-t">FirstBaseline</span>]
+    check(baseline != <span class="tk-t">AlignmentLine</span>.<span class="tk-t">Unspecified</span>)
+    <span class="tk-k">val</span> y = distance.roundToPx() - baseline
+    layout(placeable.width, placeable.height + y) { placeable.placeRelative(<span class="tk-n">0</span>, y) }
+}</code></pre></figure>
+
+<h2 id="drawing">Drawing: Canvas, drawBehind and drawWithCache</h2>
+<ul>
+  <li><strong><code>Canvas(modifier) { … }</code></strong>: a composable that is purely a drawing surface.</li>
+  <li><strong><code>Modifier.drawBehind</code></strong>: draw behind a composable's content, for example custom backgrounds.</li>
+  <li><strong><code>Modifier.drawWithCache</code></strong>: create objects (paths, brushes) once and reuse them until the size or state changes.</li>
+</ul>
+
+<h2 id="ring-chart">Example 2: An accessible progress ring chart</h2>
+<figure class="code"><figcaption><span class="file">ProgressRing.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ProgressRing</span>(
+    progress: <span class="tk-t">Float</span>,                  <span class="tk-c">// 0f..1f</span>
+    label: <span class="tk-t">String</span>,
+    modifier: <span class="tk-t">Modifier</span> = <span class="tk-t">Modifier</span>,
+    strokeWidth: <span class="tk-t">Dp</span> = <span class="tk-n">12</span>.dp,
+    trackColor: <span class="tk-t">Color</span> = <span class="tk-t">MaterialTheme</span>.colorScheme.surfaceVariant,
+    progressColor: <span class="tk-t">Color</span> = <span class="tk-t">MaterialTheme</span>.colorScheme.primary,
+) {
+    <span class="tk-k">val</span> animated <span class="tk-k">by</span> animateFloatAsState(progress.coerceIn(<span class="tk-n">0f</span>, <span class="tk-n">1f</span>), label = <span class="tk-s">"ring"</span>)
+    <span class="tk-t">Box</span>(
+        modifier = modifier
+            .size(<span class="tk-n">120</span>.dp)
+            .semantics(mergeDescendants = <span class="tk-k">true</span>) {
+                contentDescription = <span class="tk-s">"$label: ${(progress * 100).roundToInt()} percent"</span>
+                progressBarRangeInfo = <span class="tk-t">ProgressBarRangeInfo</span>(progress, <span class="tk-n">0f</span>..<span class="tk-n">1f</span>)
+            }
+            .drawWithCache {
+                <span class="tk-k">val</span> stroke = <span class="tk-t">Stroke</span>(width = strokeWidth.toPx(), cap = <span class="tk-t">StrokeCap</span>.<span class="tk-t">Round</span>)
+                <span class="tk-k">val</span> inset = stroke.width / <span class="tk-n">2</span>
+                <span class="tk-k">val</span> arcSize = <span class="tk-t">Size</span>(size.width - stroke.width, size.height - stroke.width)
+                onDrawBehind {
+                    drawArc(trackColor, <span class="tk-n">0f</span>, <span class="tk-n">360f</span>, <span class="tk-k">false</span>, <span class="tk-t">Offset</span>(inset, inset), arcSize, style = stroke)
+                    drawArc(progressColor, -<span class="tk-n">90f</span>, <span class="tk-n">360f</span> * animated, <span class="tk-k">false</span>, <span class="tk-t">Offset</span>(inset, inset), arcSize, style = stroke)
+                }
+            },
+        contentAlignment = <span class="tk-t">Alignment</span>.<span class="tk-t">Center</span>,
+    ) {
+        <span class="tk-t">Text</span>(<span class="tk-s">"${(animated * 100).roundToInt()}%"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.titleLarge)
+    }
+}</code></pre></figure>
+<p>Because <code>animated</code> is read inside the draw lambda, each animation frame only redraws, with no recomposition of the ring. The <code>semantics</code> block makes the chart understandable to TalkBack users, which custom drawing would otherwise lose.</p>
+
+<h2 id="use-cases">When to go custom</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Charts and gauges</h3><p>Lightweight bar, line or ring charts drawn with Canvas, avoiding a heavy charting library for simple needs.</p></div>
+  <div class="card usecase"><h3>Special arrangements</h3><p>Timelines, staggered badges and overlapping avatars that Row and Column can't express cleanly.</p></div>
+  <div class="card usecase"><h3>Decorations</h3><p>Dashed borders, gradient strokes and ticket notches with <code>drawBehind</code> or custom <code>Shape</code>s.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Measuring a child twice in one layout pass, which isn't allowed. Use intrinsic measurements or <code>SubcomposeLayout</code> if you truly need it.</li>
+  <li>Allocating Paths and Brushes in <code>drawBehind</code> every frame. Use <code>drawWithCache</code>.</li>
+  <li>Ignoring constraints, for example returning a size larger than <code>maxWidth</code>.</li>
+  <li>Forgetting semantics, which makes custom components invisible to screen readers.</li>
+  <li>Ignoring right-to-left layouts. Use <code>placeRelative</code> for direction-aware placement.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>When should I use SubcomposeLayout?</summary><div><p>When a child's content depends on another child's measured size, as in <code>BoxWithConstraints</code> or some table layouts. It's more expensive, so prefer <code>Layout</code> when possible.</p></div></details>
+  <details><summary>Can I use Android's Canvas APIs?</summary><div><p>Yes, via <code>drawIntoCanvas { it.nativeCanvas }</code> for things like advanced text drawing, though Compose's DrawScope covers most needs.</p></div></details>
+  <details><summary>How do I handle touches on a custom drawing?</summary><div><p>Use <code>Modifier.pointerInput</code> with gesture detectors such as <code>detectTapGestures</code>, and map touch positions to your drawn shapes.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Custom Compose components come down to two tools: <strong><code>Layout</code></strong> (constraints down, sizes up, then place) and <strong>drawing modifiers</strong> (<code>Canvas</code>, <code>drawBehind</code>, <code>drawWithCache</code>). Read animated state in the draw phase, cache drawing objects, and always add semantics.</p>
+<p>Next step: lock in your UI's correctness with <a href="../compose-ui-screenshot-testing/index.html">Compose UI Testing and Screenshot Testing</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/layouts/custom" target="_blank" rel="noopener">Custom layouts</a></li><li><a href="https://developer.android.com/develop/ui/compose/graphics/draw/overview" target="_blank" rel="noopener">Graphics in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/graphics/draw/modifiers" target="_blank" rel="noopener">Graphics modifiers</a></li><li><a href="https://developer.android.com/develop/ui/compose/accessibility/semantics" target="_blank" rel="noopener">Semantics in Compose</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-custom-layouts-drawing-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-custom-layouts-drawing-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-performance-optimization/index.html"><small>Jetpack Compose</small>Compose Performance Optimization</a></li><li><a href="../../android/composable-functions-explained/index.html"><small>Jetpack Compose</small>Composable Functions Explained</a></li><li><a href="../../android/compose-animations-beginners/index.html"><small>Jetpack Compose</small>Jetpack Compose Animations for Beginners</a></li><li><a href="../../android/android-privacy-accessibility-reliability/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Building Android Apps for Privacy, Accessibility, and Reliability</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/compose-custom-layouts-drawing/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/compose-custom-layouts-drawing/&amp;text=Custom Layouts and Drawing in Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/compose-custom-layouts-drawing/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#model">How Compose layout works</a></li><li><a href="#flow-layout">Example 1: A simple wrapping tag layout</a></li><li><a href="#layout-modifier">The layout modifier for a single element</a></li><li><a href="#drawing">Drawing: Canvas, drawBehind and drawWithCache</a></li><li><a href="#ring-chart">Example 2: An accessible progress ring chart</a></li><li><a href="#use-cases">When to go custom</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-custom-layouts-drawing-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dcompose-custom-layouts-drawing-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

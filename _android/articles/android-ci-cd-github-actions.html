@@ -1,0 +1,175 @@
+<!--meta
+{
+  "seo_title": "CI/CD for Android with GitHub Actions (Step by Step)",
+  "description": "Set up CI/CD for Android with GitHub Actions: build, lint and unit tests on every PR, Gradle caching, signed release bundles with secrets, and automated upload to Google Play testing tracks.",
+  "primary_keyword": "android ci cd github actions",
+  "keywords": ["github actions android build", "gradle cache github actions", "sign android app ci", "upload aab play store ci", "android pull request checks", "fastlane github actions"],
+  "lede": "Continuous integration catches broken builds and failing tests before they reach main. Continuous delivery turns a tag into a signed release on Google Play without anyone's laptop. This guide builds both with GitHub Actions, step by step and securely.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["android-unit-testing-junit", "android-app-signing-upload-keys", "publish-android-app-google-play", "scaling-android-codebase-teams"],
+  "refs": [
+    ["GitHub Actions documentation", "https://docs.github.com/en/actions"],
+    ["gradle/actions (setup-gradle)", "https://github.com/gradle/actions"],
+    ["Sign your app", "https://developer.android.com/studio/publish/app-signing"],
+    ["Google Play Developer API", "https://developers.google.com/android-publisher"],
+    ["Using secrets in GitHub Actions", "https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions"]
+  ]
+}
+-->
+<p class="ad-lead">"It builds on my machine" isn't a release process. With CI, every pull request is built, linted and tested on a clean machine. With CD, releases are reproducible, signed with protected credentials, and uploaded consistently.</p>
+
+<h2 id="pipeline">The pipeline</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ci-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ci-t fig-ci-d">
+    <title id="fig-ci-t">Android CI/CD pipeline with GitHub Actions</title>
+    <desc id="fig-ci-d">On every pull request: checkout, set up JDK and Gradle cache, run lint, unit tests and assemble debug, then report results. On a version tag: build a signed release App Bundle using secrets, upload the mapping file and bundle, and publish to the Google Play internal testing track.</desc>
+    <defs><marker id="cim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">Pull request (CI)</text>
+    <path class="d-flow" d="M140 60 H160 M290 60 H310 M460 60 H480" marker-end="url(#cim)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="34" width="120" height="52" rx="10"/><text class="d-s" x="80" y="64" text-anchor="middle">checkout + JDK</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="164" y="34" width="126" height="52" rx="10"/><text class="d-s" x="227" y="64" text-anchor="middle">Gradle cache</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="314" y="34" width="146" height="52" rx="10"/><text class="d-s" x="387" y="64" text-anchor="middle">lint · test · assemble</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="484" y="34" width="216" height="52" rx="10"/><text class="d-s" x="592" y="64" text-anchor="middle">✓ status check on PR</text></g>
+    <text class="d-t" x="20" y="130">Tag v1.4.0 (CD)</text>
+    <path class="d-flow" d="M200 170 H230 M410 170 H440" marker-end="url(#cim)"/>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="20" y="144" width="180" height="52" rx="10"/><text class="d-s" x="110" y="174" text-anchor="middle">signed bundleRelease</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="234" y="144" width="176" height="52" rx="10"/><text class="d-s" x="322" y="174" text-anchor="middle">mapping + artifacts</text></g>
+    <g class="d-step" style="--i:6"><rect class="d-green" x="444" y="144" width="256" height="52" rx="10"/><text class="d-s" x="572" y="174" text-anchor="middle">upload to Play internal track</text></g>
+  </svg>
+  <figcaption id="fig-ci-cap">CI on every change, CD on tags. Production promotion stays a deliberate human decision.</figcaption>
+</figure>
+
+<h2 id="ci">CI workflow for pull requests</h2>
+<code-block lang="yaml" file=".github/workflows/android-ci.yml">
+name: Android CI
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true          # stop outdated runs when new commits arrive
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17          # match what your AGP version requires
+      - uses: gradle/actions/setup-gradle@v4   # Gradle caching + build scans support
+      - name: Lint, unit tests, debug build
+        run: ./gradlew lintDebug testDebugUnitTest assembleDebug --stacktrace
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/build/reports/**'
+</code-block>
+<p>Pin action versions you trust, and update them deliberately. Make the workflow a <strong>required status check</strong> in branch protection so failing PRs can't merge.</p>
+
+<h2 id="signing">Signing in CI without leaking keys</h2>
+<p>Store the <strong>upload keystore</strong> as a base64-encoded secret, plus its passwords, in GitHub Actions secrets. With Play App Signing, Google holds the app signing key, and your CI only needs the upload key.</p>
+<code-block lang="kts" file="app/build.gradle.kts (signing from environment)">
+android {
+    signingConfigs {
+        create("release") {
+            val ksPath = System.getenv("UPLOAD_KEYSTORE_PATH")
+            if (ksPath != null) {
+                storeFile = file(ksPath)
+                storePassword = System.getenv("UPLOAD_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("UPLOAD_KEY_ALIAS")
+                keyPassword = System.getenv("UPLOAD_KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        release { signingConfig = signingConfigs.getByName("release") }
+    }
+}
+</code-block>
+
+<h2 id="cd">CD workflow on tags</h2>
+<code-block lang="yaml" file=".github/workflows/android-release.yml">
+name: Android Release
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production        # optional: require approval for this environment
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Decode upload keystore
+        run: echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+      - name: Build signed bundle
+        env:
+          UPLOAD_KEYSTORE_PATH: ${{ runner.temp }}/upload.jks
+          UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          UPLOAD_KEY_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: |
+            app/build/outputs/bundle/release/*.aab
+            app/build/outputs/mapping/release/mapping.txt
+      # Upload to Play (internal track) using the Play Developer API via your chosen tool,
+      # e.g. a Gradle Play Publisher task or fastlane supply, authenticated with a
+      # service account JSON stored as a secret.
+</code-block>
+
+<h2 id="versioning">Versioning</h2>
+<code-block lang="kts" file="Version code from CI">
+android {
+    defaultConfig {
+        versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toInt() ?: 1   // always increasing
+        versionName = System.getenv("GITHUB_REF_NAME")?.removePrefix("v") ?: "dev"
+    }
+}
+</code-block>
+
+<h2 id="speed">Keeping CI fast</h2>
+<ul>
+  <li>Use Gradle caching (<code>setup-gradle</code>) and configuration cache where possible.</li>
+  <li>Run only affected modules' tests in large multi-module projects.</li>
+  <li>Run instrumented tests and benchmarks on a schedule or merge queue, rather than on every push, with Gradle Managed Devices or a device cloud.</li>
+</ul>
+
+<h2 id="use-cases">Pipeline stages by team size</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Solo developer</h3><p>A CI workflow on PRs, with manual releases from CI artifacts.</p></div>
+  <div class="card usecase"><h3>Small team</h3><p>CI plus automated internal-track uploads on tags, with manual promotion to production.</p></div>
+  <div class="card usecase"><h3>Large team</h3><p>A merge queue, sharded tests, screenshot tests, nightly benchmarks and a release train with staged rollouts.</p></div>
+</div>
+
+<h2 id="security">Security checklist</h2>
+<ul>
+  <li>☐ Keystore and service account only in encrypted secrets; never in the repository</li>
+  <li>☐ Release workflow limited to protected tags or branches; environment approvals for production</li>
+  <li>☐ Workflows from forks can't access secrets (GitHub's default for <code>pull_request</code>)</li>
+  <li>☐ Minimal permissions for the Play service account (specific app, release manager role)</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should CI build release or debug?</summary><div><p>Build debug and run tests on every PR for speed. Also build the release variant regularly (at least on main) to catch R8 and signing issues early.</p></div></details>
+  <details><summary>Fastlane or Gradle plugin for Play uploads?</summary><div><p>Both work. Fastlane has a broad ecosystem, and Gradle-based publishing keeps everything in the build. Choose one and document it.</p></div></details>
+  <details><summary>Can I run emulator tests on GitHub Actions?</summary><div><p>Yes, with hardware-accelerated runners or Gradle Managed Devices, though they're slower and costlier than unit tests. Many teams run them less frequently.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android CI/CD with GitHub Actions means <strong>lint, tests and builds on every PR</strong>, <strong>Gradle caching for speed</strong>, <strong>signing from encrypted secrets</strong>, and <strong>tag-based release bundles uploaded to a Play testing track</strong>, with human approval for production.</p>
+<p>Next step: explore AI in Android apps, starting with <a href="../ml-kit-genai-apis/index.html">ML Kit GenAI APIs Explained</a>.</p>

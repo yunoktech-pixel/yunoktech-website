@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MockK vs Mockito for Kotlin Testing (Android) | Yunok Tech</title>
+  <meta name="description" content="MockK vs Mockito (with mockito-kotlin) compared for Android: final classes, coroutines, syntax, relaxed mocks, verification, performance, and when fakes are better than both.">
+  <meta name="keywords" content="mockk vs mockito, mockk coroutines coEvery, mockito kotlin final classes, mocking kotlin android, mockk relaxed mock, fakes vs mocks kotlin, verify suspend function">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/mockk-vs-mockito/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/mockk-vs-mockito/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="MockK vs Mockito for Kotlin Testing (Android)">
+  <meta property="og:description" content="MockK vs Mockito (with mockito-kotlin) compared for Android: final classes, coroutines, syntax, relaxed mocks, verification, performance, and when fakes are better than both.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="MockK vs Mockito for Kotlin Testing (Android)">
+  <meta name="twitter:description" content="MockK vs Mockito (with mockito-kotlin) compared for Android: final classes, coroutines, syntax, relaxed mocks, verification, performance, and when fakes are better than both.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "MockK vs Mockito for Kotlin Testing", "description": "MockK vs Mockito (with mockito-kotlin) compared for Android: final classes, coroutines, syntax, relaxed mocks, verification, performance, and when fakes are better than both.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "mockk coroutines coEvery, mockito kotlin final classes, mocking kotlin android, mockk relaxed mock, fakes vs mocks kotlin, verify suspend function", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/mockk-vs-mockito/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "MockK vs Mockito for Kotlin Testing", "item": "https://yunoktech.com/android/mockk-vs-mockito/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">MockK vs Mockito for Kotlin Testing</h1>
+    <p class="ad-lede">MockK was built for Kotlin; Mockito comes from Java but works well with mockito-kotlin. Both can mock suspend functions and final classes today. The bigger question is often whether you should be mocking at all.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#same-test">The same test in both</a></li><li><a href="#comparison">Comparison</a></li><li><a href="#fakes">Often better: fakes</a></li><li><a href="#when-mock">When mocks are the right tool</a></li><li><a href="#use-cases">Team recommendations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Kotlin classes are final by default, suspend functions take hidden continuation parameters, and top-level functions and objects aren't ordinary Java classes. Early Mockito struggled with all of that, which is why MockK became popular in Android. Both libraries have matured, so the choice is now mostly about style.</p>
+
+<h2 id="same-test">The same test in both</h2>
+<figure class="code"><figcaption><span class="file">MockK</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `refresh shows error <span class="tk-k">when</span> repository fails`() = runTest {
+    <span class="tk-k">val</span> repo = mockk&lt;<span class="tk-t">ArticleRepository</span>&gt;()
+    coEvery { repo.refresh() } throws <span class="tk-t">IOException</span>()
+    every { repo.observeArticles() } returns flowOf(emptyList())
+
+    <span class="tk-k">val</span> vm = <span class="tk-t">ArticlesViewModel</span>(repo)
+    vm.refresh(); advanceUntilIdle()
+
+    assertEquals(<span class="tk-s">"Couldn't refresh"</span>, vm.uiState.<span class="tk-k">value</span>.message)
+    coVerify(exactly = <span class="tk-n">1</span>) { repo.refresh() }
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">Mockito + mockito-kotlin</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `refresh shows error <span class="tk-k">when</span> repository fails`() = runTest {
+    <span class="tk-k">val</span> repo = mock&lt;<span class="tk-t">ArticleRepository</span>&gt; {
+        onBlocking { refresh() } doThrow <span class="tk-t">IOException</span>()      <span class="tk-c">// doThrow works with checked exceptions too</span>
+        on { observeArticles() } doReturn flowOf(emptyList())
+    }
+
+    <span class="tk-k">val</span> vm = <span class="tk-t">ArticlesViewModel</span>(repo)
+    vm.refresh(); advanceUntilIdle()
+
+    assertEquals(<span class="tk-s">"Couldn't refresh"</span>, vm.uiState.<span class="tk-k">value</span>.message)
+    verifyBlocking(repo, times(<span class="tk-n">1</span>)) { refresh() }
+}</code></pre></figure>
+
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>MockK</th><th>Mockito (+ mockito-kotlin)</th></tr></thead>
+  <tbody>
+    <tr><td>Kotlin-first API</td><td>Yes (<code>every</code>, <code>coEvery</code>, DSL)</td><td>Via mockito-kotlin extensions</td></tr>
+    <tr><td>Final classes</td><td>Supported</td><td>Supported (inline mock maker is the default in recent versions)</td></tr>
+    <tr><td>Suspend functions</td><td><code>coEvery</code> / <code>coVerify</code></td><td><code>onBlocking</code> / <code>verifyBlocking</code></td></tr>
+    <tr><td>Objects, top-level and extension functions, constructors</td><td><code>mockkObject</code>, <code>mockkStatic</code>, <code>mockkConstructor</code></td><td>Limited (static mocking via <code>mockStatic</code>)</td></tr>
+    <tr><td>Relaxed mocks</td><td><code>mockk(relaxed = true)</code></td><td>Default answers (null/zero), RETURNS_DEEP_STUBS</td></tr>
+    <tr><td>Speed</td><td>Can be slower to initialise</td><td>Generally fast</td></tr>
+    <tr><td>Ecosystem familiarity</td><td>Very common in Kotlin Android projects</td><td>Universal in Java and Android</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="fakes">Often better: fakes</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-fm-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-fm-t fig-fm-d">
+    <title id="fig-fm-t">Fakes versus mocks</title>
+    <desc id="fig-fm-d">A mock is configured per test with stubbed calls and verifies interactions, coupling tests to implementation. A fake is a reusable working implementation with real behaviour, so tests assert outcomes and survive refactoring.</desc>
+    <rect class="d-amber" x="30" y="20" width="300" height="120" rx="14"/><text class="d-t" x="180" y="48" text-anchor="middle">Mock</text><text class="d-s" x="180" y="74" text-anchor="middle">stub each call per test</text><text class="d-s" x="180" y="94" text-anchor="middle">verify interactions</text><text class="d-s" x="180" y="114" text-anchor="middle">couples to implementation</text>
+    <rect class="d-green" x="390" y="20" width="300" height="120" rx="14"/><text class="d-t" x="540" y="48" text-anchor="middle">Fake</text><text class="d-s" x="540" y="74" text-anchor="middle">working in-memory implementation</text><text class="d-s" x="540" y="94" text-anchor="middle">assert outcomes (state)</text><text class="d-s" x="540" y="114" text-anchor="middle">reusable, refactor-friendly</text>
+  </svg>
+  <figcaption id="fig-fm-cap">Use fakes for your own interfaces (repositories, data sources), and mocks for interaction checks or awkward third-party types.</figcaption>
+</figure>
+<figure class="code"><figcaption><span class="file">FakeArticleRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">FakeArticleRepository</span> : <span class="tk-t">ArticleRepository</span> {
+    <span class="tk-k">val</span> articles = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;&gt;(emptyList())
+    <span class="tk-k">var</span> failRefresh = <span class="tk-k">false</span>
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> observeArticles(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;&gt; = articles
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refresh() { <span class="tk-k">if</span> (failRefresh) <span class="tk-k">throw</span> <span class="tk-t">IOException</span>() }
+}</code></pre></figure>
+
+<h2 id="when-mock">When mocks are the right tool</h2>
+<ul>
+  <li>Verifying a side effect happened exactly once (analytics event, logger call).</li>
+  <li>Third-party classes that are hard to fake and that you don't wrap.</li>
+  <li>Simulating rare failures in deep collaborators.</li>
+</ul>
+
+<h2 id="use-cases">Team recommendations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Kotlin-only Android app</h3><p>MockK for its Kotlin-native API, with fakes for repositories.</p></div>
+  <div class="card usecase"><h3>Mixed Java/Kotlin codebase</h3><p>Mockito with mockito-kotlin keeps one library for both languages.</p></div>
+  <div class="card usecase"><h3>Large test suites</h3><p>Prefer fakes. Measure mock initialisation cost if tests feel slow.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Mocking data classes and value types. Just create real instances.</li>
+  <li>Relaxed mocks everywhere, which hide missing stubs and let tests pass vacuously.</li>
+  <li>Verifying every call, which breaks tests on harmless refactors.</li>
+  <li>Mocking the class under test.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I use both in one project?</summary><div><p>You can, but pick one as the standard to keep tests consistent.</p></div></details>
+  <details><summary>Do I need special setup for final classes with Mockito?</summary><div><p>Recent Mockito versions use the inline mock maker by default, which supports final classes. Older setups needed explicit configuration.</p></div></details>
+  <details><summary>What about mocking Android framework classes?</summary><div><p>Avoid it. Wrap framework calls behind your own interfaces, or use Robolectric when you need real behaviour.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>MockK</strong> offers the most Kotlin-native API, and <strong>Mockito with mockito-kotlin</strong> is equally capable for most needs. For your own repositories and data sources, <strong>fakes</strong> usually produce clearer, more robust tests than either.</p>
+<p>Next step: find a different kind of bug in <a href="../android-memory-leaks/index.html">Android Memory Leaks: Causes and Solutions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://mockk.io/" target="_blank" rel="noopener">MockK</a></li><li><a href="https://site.mockito.org/" target="_blank" rel="noopener">Mockito</a></li><li><a href="https://github.com/mockito/mockito-kotlin" target="_blank" rel="noopener">mockito-kotlin</a></li><li><a href="https://developer.android.com/training/testing/fundamentals/test-doubles" target="_blank" rel="noopener">Use test doubles in Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmockk-vs-mockito-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmockk-vs-mockito-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-unit-testing-junit/index.html"><small>Testing, Debugging, and Performance</small>Unit Testing in Android with JUnit</a></li><li><a href="../../android/testing-viewmodels-coroutines-flow/index.html"><small>Testing, Debugging, and Performance</small>Testing ViewModels with Coroutines and Flow</a></li><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li><li><a href="../../android/ai-unit-test-generation-android/index.html"><small>AI Tools for Android Developers</small>AI-Assisted Unit Test Generation for Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/mockk-vs-mockito/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/mockk-vs-mockito/&amp;text=MockK vs Mockito for Kotlin Testing" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/mockk-vs-mockito/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#same-test">The same test in both</a></li><li><a href="#comparison">Comparison</a></li><li><a href="#fakes">Often better: fakes</a></li><li><a href="#when-mock">When mocks are the right tool</a></li><li><a href="#use-cases">Team recommendations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmockk-vs-mockito-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmockk-vs-mockito-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

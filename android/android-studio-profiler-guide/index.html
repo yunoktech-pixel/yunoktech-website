@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Studio Profiler: A Practical Guide | Yunok Tech</title>
+  <meta name="description" content="Use the Android Studio Profiler effectively: CPU traces and system traces, memory and heap dumps, allocation tracking, network inspection, energy and power, profileable builds and workflows.">
+  <meta name="keywords" content="android studio profiler, cpu profiler android, system trace perfetto, heap dump android studio, profileable build, android network inspector, jank detection android studio">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-studio-profiler-guide/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-studio-profiler-guide/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android Studio Profiler: A Practical Guide">
+  <meta property="og:description" content="Use the Android Studio Profiler effectively: CPU traces and system traces, memory and heap dumps, allocation tracking, network inspection, energy and power, profileable builds and workflows.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Testing, Debugging, and Performance">
+  <meta name="twitter:title" content="Android Studio Profiler: A Practical Guide">
+  <meta name="twitter:description" content="Use the Android Studio Profiler effectively: CPU traces and system traces, memory and heap dumps, allocation tracking, network inspection, energy and power, profileable builds and workflows.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android Studio Profiler: A Practical Guide", "description": "Use the Android Studio Profiler effectively: CPU traces and system traces, memory and heap dumps, allocation tracking, network inspection, energy and power, profileable builds and workflows.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Testing, Debugging, and Performance", "keywords": "cpu profiler android, system trace perfetto, heap dump android studio, profileable build, android network inspector, jank detection android studio", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-studio-profiler-guide/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android Studio Profiler: A Practical Guide", "item": "https://yunoktech.com/android/android-studio-profiler-guide/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#testing">Testing, Debugging, and Performance</a></nav>
+    <span class="ad-chip">🧪 Testing, Debugging, and Performance</span>
+    <h1 id="article-title">Android Studio Profiler: A Practical Guide</h1>
+    <p class="ad-lede">The Android Studio Profiler answers the questions you'd otherwise guess at: what is the main thread doing during that stutter? Why is memory climbing? Which request is slow? This guide shows which tool to use for each question and how to read the results.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#which">Which tool for which question</a></li><li><a href="#profileable">Profile the right build</a></li><li><a href="#trace">Reading a system trace</a></li><li><a href="#custom-traces">Add your own trace sections</a></li><li><a href="#memory">Memory investigations</a></li><li><a href="#network">Network Inspector</a></li><li><a href="#use-cases">Example investigations</a></li><li><a href="#tips">Tips</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Performance problems hide behind assumptions. "The list is slow because of images" might really be a database query on the main thread. The Profiler replaces guesses with timelines, stacks and allocations. You only need to know which tool answers which question.</p>
+
+<h2 id="which">Which tool for which question</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Question</th><th>Tool / task</th></tr></thead>
+  <tbody>
+    <tr><td>Why is startup or a screen slow?</td><td>System trace (or CPU callstack sampling)</td></tr>
+    <tr><td>Why does scrolling stutter?</td><td>System trace: frames, main and RenderThread, jank markers</td></tr>
+    <tr><td>Which functions use the most CPU?</td><td>CPU callstack sample / method trace, flame chart</td></tr>
+    <tr><td>Is memory leaking or spiking?</td><td>Heap dump, Java/Kotlin allocation tracking</td></tr>
+    <tr><td>What requests are made, and how long do they take?</td><td>Network Inspector (App Inspection)</td></tr>
+    <tr><td>What's draining battery?</td><td>Power Profiler, Background Task Inspector</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="profileable">Profile the right build</h2>
+<p>Debuggable builds behave differently: extra checks and no R8 optimisation. For realistic CPU and timing data, profile a <strong>profileable</strong> release-like build. Android Studio lets you choose "Profile with low overhead" (profileable) or "Profile with complete data" (debuggable). Use debuggable only when you need the extra detail, such as some memory features.</p>
+<figure class="code"><figcaption><span class="file">AndroidManifest.xml (release-like build)</span><span class="lang">XML</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-xml"><span class="tk-tag">&lt;application</span><span class="tk-tag">&gt;</span>
+    <span class="tk-c">&lt;!-- Allows profiling tools to attach to a non-debuggable build --&gt;</span>
+    <span class="tk-tag">&lt;profileable</span> <span class="tk-at">android:shell</span>=<span class="tk-s">"true"</span> <span class="tk-tag">/&gt;</span>
+<span class="tk-tag">&lt;/application</span><span class="tk-tag">&gt;</span></code></pre></figure>
+
+<h2 id="trace">Reading a system trace</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tr-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-tr-t fig-tr-d">
+    <title id="fig-tr-t">Reading a system trace for jank</title>
+    <desc id="fig-tr-d">A system trace shows frame rows with one long red frame, the main thread with a long slice for a database query inside the click handler, and RenderThread waiting. The long main-thread slice aligned with the janky frame reveals the cause.</desc>
+    <text class="d-s" x="20" y="34">Frames</text>
+    <rect class="d-green" x="120" y="22" width="50" height="18" rx="3"/><rect class="d-green" x="176" y="22" width="50" height="18" rx="3"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="232" y="22" width="220" height="18" rx="3"/></g>
+    <rect class="d-green" x="458" y="22" width="50" height="18" rx="3"/><rect class="d-green" x="514" y="22" width="50" height="18" rx="3"/>
+    <text class="d-s" x="20" y="84">main</text>
+    <rect class="d-blue" x="120" y="70" width="40" height="22" rx="3"/><rect class="d-blue" x="176" y="70" width="40" height="22" rx="3"/>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="232" y="70" width="216" height="22" rx="3"/><text class="d-s" x="340" y="86" text-anchor="middle">onClick → db.query()</text></g>
+    <text class="d-s" x="20" y="134">RenderThread</text>
+    <rect class="d-violet" x="160" y="120" width="20" height="22" rx="3"/><rect class="d-violet" x="216" y="120" width="20" height="22" rx="3"/>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="448" y="120" width="30" height="22" rx="3"/></g>
+    <path class="d-dash" d="M232 14 V160 M452 14 V160"/>
+    <text class="d-t" x="342" y="190" text-anchor="middle">Long main-thread slice under the red frame = the cause</text>
+  </svg>
+  <figcaption id="fig-tr-cap">Line up the janky frame with the threads below it. The slice that spans it is your suspect.</figcaption>
+</figure>
+<ol class="steps">
+  <li>Record a system trace while reproducing the problem, keeping the recording short and focused.</li>
+  <li>Find long or red frames in the frame lifecycle and jank tracks.</li>
+  <li>Look at the <strong>main thread</strong> during that frame: what slice spans it?</li>
+  <li>Zoom in and follow nested slices down to your code.</li>
+</ol>
+
+<h2 id="custom-traces">Add your own trace sections</h2>
+<figure class="code"><figcaption><span class="file">Custom trace markers</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> androidx.tracing.trace
+
+<span class="tk-k">fun</span> buildFeed(items: <span class="tk-t">List</span>&lt;<span class="tk-t">Post</span>&gt;): <span class="tk-t">List</span>&lt;<span class="tk-t">FeedRow</span>&gt; = trace(<span class="tk-s">"FeedMapper.buildFeed"</span>) {
+    items.map { it.toRow() }        <span class="tk-c">// appears as a named slice in system traces</span>
+}</code></pre></figure>
+<p>Named sections make traces readable, so you can see your own code, not just framework calls. Compose also emits composition tracing when the runtime tracing dependency is added.</p>
+
+<h2 id="memory">Memory investigations</h2>
+<ul>
+  <li><strong>Sawtooth pattern</strong> (rise then drop at each GC) is normal. A <strong>steady climb</strong> across repeated actions suggests a leak.</li>
+  <li><strong>Heap dump:</strong> filter by class (for example your Activity) and inspect instance counts and references. See <a href="../android-memory-leaks/index.html">Memory Leaks</a>.</li>
+  <li><strong>Allocation tracking:</strong> find code allocating many short-lived objects during scroll or animation (GC churn causes jank).</li>
+</ul>
+
+<h2 id="network">Network Inspector</h2>
+<p>App Inspection's Network Inspector shows each request's URL, timing, size, headers and payload for supported networking libraries such as OkHttp. Use it to spot duplicate requests, oversized payloads and slow endpoints.</p>
+
+<h2 id="use-cases">Example investigations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Janky list</h3><p>A system trace showed date formatting with a new formatter per row on main. Fix: format once in the ViewModel.</p></div>
+  <div class="card usecase"><h3>Slow screen open</h3><p>A trace showed three sequential network calls. Fix: run them in parallel with <code>async</code> and show cached data first.</p></div>
+  <div class="card usecase"><h3>Memory growth</h3><p>The heap dump had 12 instances of a destroyed Activity. Fix: unregister the listener held by a singleton.</p></div>
+</div>
+
+<h2 id="tips">Tips</h2>
+<ul>
+  <li>Reproduce on a <strong>mid-range physical device</strong> whenever possible.</li>
+  <li>Keep recordings <strong>short</strong>: a few seconds around the problem.</li>
+  <li>Compare <strong>before and after</strong> traces when you make a fix.</li>
+  <li>Automate checks with <strong>Macrobenchmark</strong> once you've found the problem.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Profiler or Perfetto UI?</summary><div><p>Android Studio's system trace view uses Perfetto data. The standalone Perfetto UI offers advanced querying (SQL) and is useful for deep analysis or traces captured outside Studio.</p></div></details>
+  <details><summary>Why are my traces different from what users see?</summary><div><p>Debuggable builds, fast development devices, and warm caches all hide real problems. Use profileable builds on representative devices.</p></div></details>
+  <details><summary>Method tracing slows my app down. Is that normal?</summary><div><p>Yes. Instrumented method tracing has high overhead. Use sampling for timing, and method tracing only for call details.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Match the question to the tool: <strong>system traces for slowness and jank</strong>, <strong>heap dumps and allocations for memory</strong>, <strong>Network Inspector for requests</strong>, and the <strong>Power Profiler for battery</strong>. Profile profileable builds on real devices, add custom trace sections, and verify every fix.</p>
+<p>Next step: handle the failures you find in <a href="../debugging-crashes-logcat/index.html">Debugging Crashes with Logcat</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/profile" target="_blank" rel="noopener">Profile your app performance</a></li><li><a href="https://developer.android.com/studio/profile/record-traces" target="_blank" rel="noopener">Record traces (CPU / system traces)</a></li><li><a href="https://developer.android.com/studio/profile/memory-profiler" target="_blank" rel="noopener">Memory Profiler</a></li><li><a href="https://developer.android.com/studio/debug/network-profiler" target="_blank" rel="noopener">Network Inspector</a></li><li><a href="https://developer.android.com/studio/profile#profileable-apps" target="_blank" rel="noopener">Configure profileable apps</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-studio-profiler-guide-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-studio-profiler-guide-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Performance work starts with understanding how Android apps are built and how they behave at runtime. Strengthen those fundamentals and the profiling tools start to make sense.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li><li><a href="../../android/android-memory-leaks/index.html"><small>Testing, Debugging, and Performance</small>Android Memory Leaks: Causes and Solutions</a></li><li><a href="../../android/reduce-android-app-startup-time/index.html"><small>Testing, Debugging, and Performance</small>Reducing Android App Startup Time</a></li><li><a href="../../android/debugging-crashes-logcat/index.html"><small>Testing, Debugging, and Performance</small>Debugging Crashes with Logcat</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-studio-profiler-guide/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-studio-profiler-guide/&amp;text=Android Studio Profiler: A Practical Guide" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-studio-profiler-guide/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#which">Which tool for which question</a></li><li><a href="#profileable">Profile the right build</a></li><li><a href="#trace">Reading a system trace</a></li><li><a href="#custom-traces">Add your own trace sections</a></li><li><a href="#memory">Memory investigations</a></li><li><a href="#network">Network Inspector</a></li><li><a href="#use-cases">Example investigations</a></li><li><a href="#tips">Tips</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-studio-profiler-guide-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-studio-profiler-guide-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

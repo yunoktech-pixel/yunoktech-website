@@ -1,0 +1,102 @@
+<!--meta
+{
+  "seo_title": "How to Improve Android App Ratings and Reviews",
+  "description": "Improve your Google Play rating ethically: fix what drives 1-star reviews, use the In-App Review API at the right moment, reply to reviews, in-app feedback channels and quality metrics.",
+  "primary_keyword": "improve android app ratings",
+  "keywords": ["in app review api android", "google play rating improve", "reply to play store reviews", "app store reviews strategy", "in app feedback android", "ratings policy google play"],
+  "lede": "Ratings influence installs, but you can't buy or trick your way to a good rating without risking policy violations. The sustainable path is fixing what makes users unhappy, asking happy users at the right moment, and responding well to feedback.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["google-play-console-guide", "android-store-listing-optimization", "android-analytics-crash-reporting", "maintaining-android-apps-lessons"],
+  "refs": [
+    ["Google Play In-App Review API", "https://developer.android.com/guide/playcore/in-app-review"],
+    ["Ratings and reviews in Play Console", "https://support.google.com/googleplay/android-developer/answer/138230"],
+    ["Play policy: ratings, reviews and installs", "https://support.google.com/googleplay/android-developer/answer/9898684"],
+    ["Android vitals", "https://developer.android.com/topic/performance/vitals"]
+  ]
+}
+-->
+<p class="ad-lead">Read your one-star reviews and patterns appear: "crashes when I open the camera", "lost my data after the update", "too many ads", "can't log in". Most low ratings come from a few fixable problems. Fixing those does more than any prompt strategy.</p>
+
+<h2 id="drivers">What drives ratings</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-rt-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-rt-t fig-rt-d">
+    <title id="fig-rt-t">Factors behind app ratings</title>
+    <desc id="fig-rt-d">Negative drivers: crashes and ANRs, data loss, intrusive ads, broken login, slowness, unexpected paywalls. Positive drivers: solving a real problem quickly, reliability, responsive support, and asking satisfied users at the right moment with the In-App Review API.</desc>
+    <rect class="d-red" x="20" y="20" width="320" height="150" rx="14"/><text class="d-t" x="180" y="46" text-anchor="middle">Pull ratings down</text>
+    <text class="d-s" x="180" y="74" text-anchor="middle">crashes · ANRs · data loss</text><text class="d-s" x="180" y="96" text-anchor="middle">intrusive ads · surprise paywalls</text><text class="d-s" x="180" y="118" text-anchor="middle">login problems · slowness</text><text class="d-s" x="180" y="140" text-anchor="middle">ignored complaints</text>
+    <rect class="d-green" x="380" y="20" width="320" height="150" rx="14"/><text class="d-t" x="540" y="46" text-anchor="middle">Pull ratings up</text>
+    <text class="d-s" x="540" y="74" text-anchor="middle">solves a real problem fast</text><text class="d-s" x="540" y="96" text-anchor="middle">stable, respectful UX</text><text class="d-s" x="540" y="118" text-anchor="middle">helpful replies and fixes</text><text class="d-s" x="540" y="140" text-anchor="middle">asking happy users at the right time</text>
+  </svg>
+  <figcaption id="fig-rt-cap">Remove the negative drivers first. They affect every user, while prompts reach only a few.</figcaption>
+</figure>
+
+<h2 id="fix">1. Fix what reviews and vitals tell you</h2>
+<ul>
+  <li>Filter reviews by keyword (crash, login, ads, slow) and by app version, and turn patterns into tickets.</li>
+  <li>Cross-check with Android vitals and crash reports. See <a href="../android-analytics-crash-reporting/index.html">Analytics and Crash Reporting</a>.</li>
+  <li>Prioritise data loss and crashes, then performance, then annoyances.</li>
+</ul>
+
+<h2 id="ask">2. Ask at the right moment with the In-App Review API</h2>
+<code-block lang="kotlin" file="ReviewPrompter.kt">
+// implementation("com.google.android.play:review-ktx:<version>")
+class ReviewPrompter(private val activity: Activity, private val prefs: ReviewPrefs) {
+    private val manager = ReviewManagerFactory.create(activity)
+
+    /** Call after a clear success moment, e.g. the 3rd completed order or a finished workout. */
+    suspend fun maybeAsk() {
+        if (!prefs.shouldAsk()) return                      // your own frequency rules (e.g. once per 90 days)
+        runCatching {
+            val info = manager.requestReview()              // ktx suspend
+            manager.launchReview(activity, info)            // Play decides whether to show it (quotas)
+            prefs.markAsked()
+        }
+    }
+}
+</code-block>
+<ul>
+  <li>Ask after <strong>positive moments</strong>, never on launch, during a task, or after an error.</li>
+  <li>Play enforces <strong>quotas</strong>, so the dialog may not appear. Don't build a UI that depends on it showing.</li>
+  <li>Don't ask "Do you like the app?" first and send only happy users to Play. Review gating like that is against Play policy.</li>
+</ul>
+
+<h2 id="feedback">3. Give unhappy users a better channel</h2>
+<p>Add an always-available "Send feedback" or "Report a problem" option in settings, with device info attached (with consent). Users who can reach you easily are less likely to vent in a one-star review, and you get actionable details.</p>
+
+<h2 id="reply">4. Reply to reviews well</h2>
+<ul>
+  <li>Reply quickly, personally and specifically. Avoid copy-paste templates.</li>
+  <li>Acknowledge the problem, give a workaround if one exists, and say when a fix ships.</li>
+  <li>After fixing, reply again. Users can update their rating.</li>
+</ul>
+<code-block lang="text" file="Example reply">
+Thanks for reporting this, and sorry about the crash when opening the camera on Android 15.
+We've fixed it in version 3.4.2, rolling out this week. If it still happens after updating,
+please write to support@yourapp.com with your device model so we can look into it.
+</code-block>
+
+<h2 id="policy">What not to do</h2>
+<ul>
+  <li>Offer incentives for ratings, or buy reviews: prohibited, and risky for your account.</li>
+  <li>Gate review prompts by sentiment.</li>
+  <li>Ask repeatedly or in disruptive moments.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Utility app with crash complaints</h3><p>Fix the top three crash clusters, then add review prompts after successful tasks. Rating improves over subsequent releases.</p></div>
+  <div class="card usecase"><h3>Ad complaints</h3><p>Remove interstitials on launch, use rewarded ads, add a remove-ads purchase.</p></div>
+  <div class="card usecase"><h3>Login issues</h3><p>Add Credential Manager, better error messages and an in-app help link.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How fast do ratings change?</summary><div><p>Play's displayed rating weights recent reviews, so improvements can show within weeks or months as new reviews arrive.</p></div></details>
+  <details><summary>Can I remove unfair reviews?</summary><div><p>You can flag reviews that violate Play's review policies. Ordinary negative reviews can't be removed. Reply and fix the issue instead.</p></div></details>
+  <details><summary>Should I prompt for reviews in a beta?</summary><div><p>Use direct feedback channels for testers. Review prompts are for production users.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Better ratings come from <strong>fixing crashes, data loss and annoyances</strong>, asking <strong>satisfied users at the right moment</strong> with the In-App Review API, offering an <strong>easy feedback channel</strong>, and <strong>replying helpfully</strong>, all within Play policy.</p>
+<p>Next step: convert listing visitors into installs with <a href="../android-store-listing-optimization/index.html">App Store Listing Optimization for Android</a>.</p>

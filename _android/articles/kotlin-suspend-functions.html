@@ -1,0 +1,137 @@
+<!--meta
+{
+  "seo_title": "Kotlin Suspend Functions Explained with Real Examples",
+  "description": "How Kotlin suspend functions work on Android: suspension vs blocking, continuations, main-safety, withContext, converting callbacks with suspendCancellableCoroutine, and timeouts.",
+  "primary_keyword": "kotlin suspend function",
+  "keywords": ["suspend function explained", "suspendCancellableCoroutine", "withContext dispatchers io", "main safe suspend function", "convert callback to coroutine", "withTimeout kotlin"],
+  "lede": "The suspend keyword is small, but it changes how you write every asynchronous operation on Android. Here's what suspension really means, how the compiler implements it, and how to write, wrap and call suspend functions correctly.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-coroutines-flow-android", "flow-vs-stateflow-vs-sharedflow", "rest-api-kotlin-coroutines", "testing-viewmodels-coroutines-flow"],
+  "refs": [
+    ["Composing suspending functions", "https://kotlinlang.org/docs/composing-suspending-functions.html"],
+    ["Coroutines on Android", "https://developer.android.com/kotlin/coroutines"],
+    ["Coroutines best practices", "https://developer.android.com/kotlin/coroutines/coroutines-best-practices"],
+    ["Cancellation and timeouts", "https://kotlinlang.org/docs/cancellation-and-timeouts.html"]
+  ]
+}
+-->
+<p class="ad-lead">Developers often describe a suspend function as "a function that runs in the background". That's wrong, and the misunderstanding causes real bugs. A suspend function can run on the main thread. What makes it special is that it can <em>pause</em> without blocking the thread.</p>
+
+<h2 id="definition">What suspend actually means</h2>
+<p>A <code>suspend</code> function can be paused at <strong>suspension points</strong> (calls to other suspend functions such as <code>delay</code>, a Retrofit call or <code>withContext</code>) and resumed later, possibly on a different thread. While it's paused, the thread it was using is free to do other work.</p>
+<p>Two rules follow:</p>
+<ul>
+  <li>Suspend functions can only be called from other suspend functions or from a coroutine (<code>launch</code>, <code>async</code>, <code>runTest</code>…).</li>
+  <li>Marking a function <code>suspend</code> does <strong>not</strong> move it off the main thread. If it does blocking work, it still blocks.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sus-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-sus-t fig-sus-d">
+    <title id="fig-sus-t">A suspend function pausing and resuming</title>
+    <desc id="fig-sus-d">On the main thread, loadProfile starts, reaches api.getUser and suspends. The main thread is free and draws frames. When the network result arrives, the coroutine resumes on main and updates the UI state.</desc>
+    <text class="d-t" x="20" y="24">Main thread timeline</text>
+    <rect class="d-box" x="20" y="36" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="24" y="40" width="130" height="36" rx="6"/><text class="d-s" x="89" y="62" text-anchor="middle">start loadProfile()</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="158" y="40" width="370" height="36" rx="6"/><text class="d-t" x="343" y="62" text-anchor="middle">suspended: thread free (frames, input)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="532" y="40" width="164" height="36" rx="6"/><text class="d-s" x="614" y="62" text-anchor="middle">resume → update state</text></g>
+    <text class="d-t" x="20" y="124">Network (OkHttp threads)</text>
+    <rect class="d-box" x="20" y="136" width="680" height="44" rx="8"/>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="158" y="140" width="370" height="36" rx="6"/><text class="d-s" x="343" y="162" text-anchor="middle">HTTP request in progress</text></g>
+    <path class="d-dash" d="M158 80 V136 M528 136 V80"/>
+  </svg>
+  <figcaption id="fig-sus-cap">Suspension hands the thread back. Resumption picks up exactly where the function left off, with local variables intact.</figcaption>
+</figure>
+
+<h2 id="how">How the compiler does it</h2>
+<p>The Kotlin compiler transforms each suspend function into a state machine. It adds a hidden <code>Continuation</code> parameter, an object holding "where to resume and with which local variables". At each suspension point, the function saves its state into the continuation and returns a special marker. When the awaited result is ready, the continuation is resumed, jumping back into the state machine. You never write this code, but knowing it exists explains why suspension is cheap: no thread is parked, only a small object.</p>
+
+<h2 id="writing">Writing main-safe suspend functions</h2>
+<p>Convention on Android: <strong>suspend functions should be main-safe</strong>, meaning safe to call from the main thread. Callers shouldn't need to know which dispatcher to use.</p>
+<code-block lang="kotlin" file="ImageRepository.kt">
+class ImageRepository(
+    private val context: Context,
+    private val io: CoroutineDispatcher = Dispatchers.IO,
+    private val cpu: CoroutineDispatcher = Dispatchers.Default,
+) {
+    /** Main-safe: switches to IO for disk and Default for CPU work. */
+    suspend fun saveThumbnail(source: Uri, name: String): File {
+        val bitmap = withContext(io) {
+            context.contentResolver.openInputStream(source).use { BitmapFactory.decodeStream(it) }
+        } ?: throw IOException("Could not decode image")
+
+        val thumb = withContext(cpu) { Bitmap.createScaledBitmap(bitmap, 256, 256, true) }
+
+        return withContext(io) {
+            File(context.filesDir, "$name.webp").also { file ->
+                file.outputStream().use { thumb.compress(Bitmap.CompressFormat.WEBP_LOSSY, 85, it) }
+            }
+        }
+    }
+}
+</code-block>
+<p>Retrofit and Room suspend functions are already main-safe. Don't wrap them in <code>withContext(Dispatchers.IO)</code>, because it adds nothing.</p>
+
+<h2 id="sequential-parallel">Sequential by default, parallel when you ask</h2>
+<code-block lang="kotlin" file="Sequential vs concurrent">
+// Sequential: second call waits for the first (correct when B needs A's result)
+val user = api.getUser(id)
+val orders = api.getOrders(user.accountId)
+
+// Concurrent: independent calls in parallel
+suspend fun loadDashboard(id: String): Dashboard = coroutineScope {
+    val profile = async { api.getProfile(id) }
+    val stats = async { api.getStats(id) }
+    Dashboard(profile.await(), stats.await())   // if one fails, the other is cancelled
+}
+</code-block>
+
+<h2 id="callbacks">Converting callback APIs to suspend functions</h2>
+<p>Many SDKs still use callbacks. Wrap them once with <code>suspendCancellableCoroutine</code>, and the rest of your code stays sequential:</p>
+<code-block lang="kotlin" file="LocationExtensions.kt">
+@SuppressLint("MissingPermission")   // caller must ensure location permission is granted
+suspend fun FusedLocationProviderClient.currentLocationOrNull(): Location? =
+    suspendCancellableCoroutine { cont ->
+        val cancellation = CancellationTokenSource()
+        getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cancellation.token)
+            .addOnSuccessListener { location -> cont.resume(location) }
+            .addOnFailureListener { error -> cont.resumeWithException(error) }
+        // If the coroutine is cancelled (user left the screen), cancel the underlying request too.
+        cont.invokeOnCancellation { cancellation.cancel() }
+    }
+</code-block>
+<p>For Google Play services <code>Task</code> APIs specifically, <code>kotlinx-coroutines-play-services</code> already provides <code>Task.await()</code>.</p>
+
+<h2 id="timeouts">Timeouts and cancellation</h2>
+<code-block lang="kotlin" file="Timeouts">
+val config = withTimeoutOrNull(3_000) { api.fetchRemoteConfig() }   // null if it takes > 3 s
+    ?: RemoteConfig.DEFAULT
+</code-block>
+<p>Cancellation is cooperative. Suspension points check for it automatically, but CPU-heavy loops should call <code>ensureActive()</code>. Never swallow <code>CancellationException</code> in a broad <code>catch</code>.</p>
+
+<h2 id="use-cases">Real-world examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Login flow</h3><p>Sequential suspend calls (authenticate, fetch profile, save token) read like a recipe, with one try/catch for failures.</p></div>
+  <div class="card usecase"><h3>Image picker</h3><p>Decode, resize and save with <code>withContext</code> switches inside one main-safe function, called from <code>viewModelScope</code>.</p></div>
+  <div class="card usecase"><h3>Legacy SDK</h3><p>Wrap the SDK's callbacks once with <code>suspendCancellableCoroutine</code>, so callers never see callbacks again.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Assuming <code>suspend</code> means "background thread".</li>
+  <li>Calling blocking APIs (<code>Thread.sleep</code>, <code>File.readText</code> on large files, blocking SDK calls) inside suspend functions without <code>withContext</code>.</li>
+  <li>Using <code>suspendCoroutine</code> instead of <code>suspendCancellableCoroutine</code>, which ignores cancellation and can leak work.</li>
+  <li>Resuming a continuation twice, which crashes with <code>IllegalStateException</code>. Guard callbacks that may fire more than once.</li>
+  <li>Using <code>runBlocking</code> to call suspend functions from app code.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a suspend function return a value?</summary><div><p>Yes. Suspend functions return values like any function. The caller simply suspends until the value is ready.</p></div></details>
+  <details><summary>Should every repository function be suspend?</summary><div><p>Functions that do I/O or long work should be suspend, or return Flow. Pure, fast computations don't need <code>suspend</code>.</p></div></details>
+  <details><summary>How do I call a suspend function from Java?</summary><div><p>Not directly in a convenient way. Expose a Java-friendly wrapper, for example one returning a <code>CompletableFuture</code> or using callbacks, from Kotlin.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A suspend function is a function that can <strong>pause without blocking</strong>, implemented by the compiler as a state machine with a continuation. Write them to be <strong>main-safe</strong> with <code>withContext</code>, run independent work in parallel with <code>async</code>, wrap callbacks with <code>suspendCancellableCoroutine</code>, and respect cancellation.</p>
+<p>Next step: make your APIs more expressive with <a href="../kotlin-extension-higher-order-functions/index.html">Extension and Higher-Order Functions</a>.</p>

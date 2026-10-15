@@ -1,0 +1,91 @@
+<!--meta
+{
+  "seo_title": "Gemini Nano vs Cloud Gemini Models on Android",
+  "description": "Compare Gemini Nano on-device (ML Kit GenAI, AICore) with cloud Gemini models via Firebase AI Logic: capability, device support, privacy, latency, cost, quotas, and hybrid inference with fallback.",
+  "primary_keyword": "gemini nano vs gemini cloud",
+  "keywords": ["gemini nano android", "firebase ai logic gemini", "hybrid inference android", "on device llm android", "aicore gemini nano devices", "gemini flash android"],
+  "lede": "Gemini Nano runs on the device, through Android's AICore. Cloud Gemini models run on Google's servers, reached from Android through Firebase AI Logic. They have very different capabilities and constraints, and you can combine them with hybrid inference.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["gemini-nano-ml-kit-genai-android", "gemini-api-android-kotlin", "cloud-ai-vs-on-device-ai-android", "offline-ai-device-compatibility"],
+  "refs": [
+    ["Gemini Nano on Android", "https://developer.android.com/ai/gemini-nano"],
+    ["ML Kit GenAI APIs", "https://developers.google.com/ml-kit/genai"],
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"],
+    ["Hybrid inference (Firebase AI Logic)", "https://firebase.google.com/docs/ai-logic/hybrid-on-device-inference"],
+    ["Gemini models", "https://ai.google.dev/gemini-api/docs/models"]
+  ]
+}
+-->
+<p class="ad-lead">Our <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud vs On-Device AI</a> article compares the approaches in general. This one is specific to Google's Gemini family on Android: what Nano can and can't do, what cloud models add, and how to use both.</p>
+
+<h2 id="paths">Two paths to Gemini</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gn-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-gn-t fig-gn-d">
+    <title id="fig-gn-t">Gemini Nano versus cloud Gemini architecture</title>
+    <desc id="fig-gn-d">On-device path: the app calls ML Kit GenAI APIs, which use AICore and Gemini Nano on supported devices; data stays on the device. Cloud path: the app calls Firebase AI Logic, protected by App Check, which calls cloud Gemini models such as Flash. Hybrid inference can prefer on-device and fall back to cloud.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="270" y="10" width="180" height="40" rx="10"/><text class="d-w" x="360" y="35" text-anchor="middle">Your app</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="20" y="70" width="320" height="50" rx="12"/><text class="d-t" x="180" y="100" text-anchor="middle">ML Kit GenAI APIs</text>
+    <rect class="d-green" x="20" y="132" width="320" height="50" rx="12"/><text class="d-t" x="180" y="155" text-anchor="middle">AICore → Gemini Nano</text><text class="d-s" x="180" y="172" text-anchor="middle">on supported devices</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="380" y="70" width="320" height="50" rx="12"/><text class="d-t" x="540" y="100" text-anchor="middle">Firebase AI Logic + App Check</text>
+    <rect class="d-blue" x="380" y="132" width="320" height="50" rx="12"/><text class="d-t" x="540" y="155" text-anchor="middle">Cloud Gemini models</text><text class="d-s" x="540" y="172" text-anchor="middle">Flash, Flash-Lite, Pro-class</text></g>
+    <g class="d-step" style="--i:3"><text class="d-s" x="360" y="212" text-anchor="middle">Hybrid inference: prefer on-device, fall back to cloud (experimental)</text></g>
+  </svg>
+  <figcaption id="fig-gn-cap">On-device keeps data local; cloud gives stronger models on every device.</figcaption>
+</figure>
+
+<h2 id="compare">Side-by-side</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Gemini Nano (on-device)</th><th>Cloud Gemini (Firebase AI Logic)</th></tr></thead>
+  <tbody>
+    <tr><td>Device support</td><td>Limited set of recent devices with AICore. Check the supported list.</td><td>Any device with network</td></tr>
+    <tr><td>Capability</td><td>Small model: summarise, rewrite, proofread, describe images, short prompts</td><td>Much stronger reasoning, long context, multimodal, tools</td></tr>
+    <tr><td>Input limits</td><td>Small context (e.g. summarisation under ~4,000 tokens)</td><td>Large context windows</td></tr>
+    <tr><td>Languages</td><td>Limited per feature (e.g. summarisation: English, Japanese, Korean)</td><td>Broad</td></tr>
+    <tr><td>Privacy</td><td>Data stays on device</td><td>Data sent to Google; review terms</td></tr>
+    <tr><td>Offline</td><td>Yes (after model download)</td><td>No</td></tr>
+    <tr><td>Cost</td><td>No per-call cost</td><td>Per-token pricing (free tier available)</td></tr>
+    <tr><td>Constraints</td><td>Foreground only, per-app quotas, battery limits</td><td>Rate limits, App Check enforcement</td></tr>
+    <tr><td>Status</td><td>ML Kit GenAI APIs in beta</td><td>Generally available</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Model names and limits change frequently. Current cloud models include <code>gemini-3.8-flash</code> and <code>gemini-3.5-flash-lite</code>. Check the models page before shipping.</p>
+
+<h2 id="hybrid">Hybrid inference</h2>
+<p>Firebase AI Logic offers <strong>experimental</strong> hybrid inference: the SDK uses on-device Gemini Nano when available, otherwise the cloud model:</p>
+<code-block lang="kotlin" file="Hybrid inference (experimental API)">
+val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+    modelName = "gemini-3.8-flash",                       // cloud fallback
+    onDeviceConfig = OnDeviceConfig(mode = InferenceMode.PREFER_ON_DEVICE),
+)
+val reply = model.generateContent("Rewrite politely: $draft").text
+</code-block>
+<p>Because the experimental API may change, follow the hybrid inference docs for the exact dependency and names.</p>
+<div class="callout warn"><b>Hybrid changes the privacy story</b><p>If the feature falls back to the cloud, data leaves the device on some phones. Disclose this, or offer an "on-device only" setting that disables the fallback for sensitive content.</p></div>
+
+<h2 id="choose">How to choose</h2>
+<ol class="steps">
+  <li><strong>Sensitive data, offline need, simple task</strong> → Nano where available, with a non-AI fallback elsewhere.</li>
+  <li><strong>Must work on every device, harder task</strong> → cloud Gemini.</li>
+  <li><strong>Simple task, wide reach, cost-sensitive</strong> → hybrid: Nano when present, cloud otherwise.</li>
+  <li><strong>Long documents or complex reasoning</strong> → cloud.</li>
+</ol>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Smart reply drafts</h3><p>Nano rewriting on supported devices: private, instant.</p></div>
+  <div class="card usecase"><h3>Study Q&amp;A</h3><p>Cloud model for reasoning over long material. See <a href="../ai-study-assistant-android/index.html">AI Study Assistant</a>.</p></div>
+  <div class="card usecase"><h3>Note summaries</h3><p>Hybrid: on-device when possible, cloud for long notes.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I call Gemini Nano with any prompt?</summary><div><p>ML Kit's Prompt API allows custom prompts on supported devices, within Nano's smaller capability and context limits. Task-specific APIs (summarise, rewrite) are more tuned.</p></div></details>
+  <details><summary>Is Nano free?</summary><div><p>There's no per-call charge, but it only runs on supported devices, in the foreground, within quotas.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Gemini Nano</strong> offers private, offline, free inference for simple tasks on supported devices. <strong>Cloud Gemini</strong> offers stronger models everywhere at a per-token cost. <strong>Hybrid inference</strong> combines them, with clear disclosure.</p>
+<p>Next step: run your own models on device with <a href="../litert-litert-lm-android/index.html">LiteRT and LiteRT-LM</a>.</p>

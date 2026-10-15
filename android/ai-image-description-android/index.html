@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Understanding and Description in Android Apps | Yunok Tech</title>
+  <meta name="description" content="Add image understanding to Android apps: ML Kit labeling and OCR, on-device Image Description, multimodal Gemini prompts, structured JSON outputs, privacy, accessibility and costs.">
+  <meta name="keywords" content="image description android ai, image recognition android kotlin, ml kit image labeling, gemini multimodal android, alt text generation android, ocr android ml kit, image understanding ai app">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-image-description-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-image-description-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Image Understanding and Description in Android Apps">
+  <meta property="og:description" content="Add image understanding to Android apps: ML Kit labeling and OCR, on-device Image Description, multimodal Gemini prompts, structured JSON outputs, privacy, accessibility and costs.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Image Understanding and Description in Android Apps">
+  <meta name="twitter:description" content="Add image understanding to Android apps: ML Kit labeling and OCR, on-device Image Description, multimodal Gemini prompts, structured JSON outputs, privacy, accessibility and costs.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Image Understanding and Description in Android Apps", "description": "Add image understanding to Android apps: ML Kit labeling and OCR, on-device Image Description, multimodal Gemini prompts, structured JSON outputs, privacy, accessibility and costs.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "image recognition android kotlin, ml kit image labeling, gemini multimodal android, alt text generation android, ocr android ml kit, image understanding ai app", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-image-description-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Image Understanding and Description in Android Apps", "item": "https://yunoktech.com/android/ai-image-description-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Image Understanding and Description in Android Apps</h1>
+    <p class="ad-lede">Phones are cameras first. Understanding images (reading text, recognising objects, describing scenes, answering questions about a photo) unlocks features from receipt scanning to accessibility. Here's how to choose between task-specific ML, on-device description and multimodal cloud models.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#options">Three levels of image understanding</a></li><li><a href="#mlkit">Task-specific: image labeling</a></li><li><a href="#on-device-desc">On-device description</a></li><li><a href="#multimodal">Multimodal Gemini with structured output</a></li><li><a href="#hybrid">Hybrid pattern: OCR first, then reason on text</a></li><li><a href="#privacy">Privacy and safety</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"What's in this image?" has many answers depending on the task. Is there a barcode? What does the text say? What objects are present? What's happening in the scene? Is this rash serious? (Don't build that last one casually.) The right tool depends on which question you're asking.</p>
+
+<h2 id="options">Three levels of image understanding</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-iu-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-iu-t fig-iu-d">
+    <title id="fig-iu-t">Choosing an image understanding approach</title>
+    <desc id="fig-iu-d">Task-specific ML Kit vision APIs such as text recognition, barcode scanning and image labeling are fast, free and on-device. On-device Image Description with Gemini Nano generates short natural-language descriptions on supported devices. Multimodal cloud Gemini answers open questions and returns structured data, with network and cost.</desc>
+    <rect class="d-green" x="20" y="30" width="210" height="140" rx="12"/><text class="d-t" x="125" y="56" text-anchor="middle">ML Kit vision</text><text class="d-s" x="125" y="82" text-anchor="middle">OCR · barcodes · labels</text><text class="d-s" x="125" y="100" text-anchor="middle">faces · objects · poses</text><text class="d-s" x="125" y="126" text-anchor="middle">on-device, broad devices</text>
+    <rect class="d-blue" x="255" y="30" width="210" height="140" rx="12"/><text class="d-t" x="360" y="56" text-anchor="middle">GenAI Image Description</text><text class="d-s" x="360" y="82" text-anchor="middle">short scene description</text><text class="d-s" x="360" y="100" text-anchor="middle">Gemini Nano</text><text class="d-s" x="360" y="126" text-anchor="middle">supported devices only</text>
+    <rect class="d-violet" x="490" y="30" width="210" height="140" rx="12"/><text class="d-t" x="595" y="56" text-anchor="middle">Multimodal Gemini</text><text class="d-s" x="595" y="82" text-anchor="middle">open questions, reasoning</text><text class="d-s" x="595" y="100" text-anchor="middle">structured JSON output</text><text class="d-s" x="595" y="126" text-anchor="middle">cloud: network + cost</text>
+  </svg>
+  <figcaption id="fig-iu-cap">Fixed perception tasks belong on the left. Open-ended understanding belongs on the right.</figcaption>
+</figure>
+
+<h2 id="mlkit">Task-specific: image labeling</h2>
+<figure class="code"><figcaption><span class="file">Labels.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// implementation("com.google.mlkit:image-labeling:&lt;version&gt;")</span>
+<span class="tk-k">val</span> labeler = <span class="tk-t">ImageLabeling</span>.getClient(<span class="tk-t">ImageLabelerOptions</span>.<span class="tk-t">Builder</span>().setConfidenceThreshold(<span class="tk-n">0.7f</span>).build())
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> labels(bitmap: <span class="tk-t">Bitmap</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; =
+    labeler.process(<span class="tk-t">InputImage</span>.fromBitmap(bitmap, <span class="tk-n">0</span>)).await().map { it.text }   <span class="tk-c">// e.g. ["Dog", "Grass"]</span></code></pre></figure>
+<p>Labels are fast and free, which is good for tagging, search and filters. They don't describe relationships ("a dog chasing a ball").</p>
+
+<h2 id="on-device-desc">On-device description</h2>
+<p>ML Kit's GenAI Image Description API produces a short natural-language description on supported devices. It's ideal for draft alt text that stays private. Code is in <a href="../ml-kit-genai-apis/index.html">ML Kit GenAI APIs Explained</a>.</p>
+
+<h2 id="multimodal">Multimodal Gemini with structured output</h2>
+<p>When you need specific information extracted from an image, ask a multimodal model for <strong>structured JSON</strong> matching a schema rather than free text:</p>
+<figure class="code"><figcaption><span class="file">ReceiptExtractor.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ReceiptInfo</span>(<span class="tk-k">val</span> merchant: <span class="tk-t">String</span>?, <span class="tk-k">val</span> totalPaise: <span class="tk-t">Long</span>?, <span class="tk-k">val</span> date: <span class="tk-t">String</span>?, <span class="tk-k">val</span> category: <span class="tk-t">String</span>?)
+
+<span class="tk-k">class</span> <span class="tk-t">ReceiptExtractor</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> schema = <span class="tk-t">Schema</span>.obj(
+        mapOf(
+            <span class="tk-s">"merchant"</span> to <span class="tk-t">Schema</span>.string(nullable = <span class="tk-k">true</span>),
+            <span class="tk-s">"totalPaise"</span> to <span class="tk-t">Schema</span>.long(description = <span class="tk-s">"Total amount in paise"</span>, nullable = <span class="tk-k">true</span>),
+            <span class="tk-s">"date"</span> to <span class="tk-t">Schema</span>.string(description = <span class="tk-s">"ISO-8601 date"</span>, nullable = <span class="tk-k">true</span>),
+            <span class="tk-s">"category"</span> to <span class="tk-t">Schema</span>.enumeration(listOf(<span class="tk-s">"food"</span>, <span class="tk-s">"travel"</span>, <span class="tk-s">"shopping"</span>, <span class="tk-s">"bills"</span>, <span class="tk-s">"other"</span>)),
+        )
+    )
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> model = <span class="tk-t">Firebase</span>.ai(backend = <span class="tk-t">GenerativeBackend</span>.googleAI()).generativeModel(
+        modelName = <span class="tk-s">"gemini-3.8-flash"</span>,            <span class="tk-c">// check current names</span>
+        generationConfig = generationConfig {
+            responseMimeType = <span class="tk-s">"application/json"</span>
+            responseSchema = schema
+            temperature = <span class="tk-n">0f</span>
+        },
+    )
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> extract(photo: <span class="tk-t">Bitmap</span>): <span class="tk-t">ReceiptInfo</span> {
+        <span class="tk-k">val</span> response = model.generateContent(content {
+            image(photo.scaleToMaxSide(<span class="tk-n">1280</span>))
+            text(<span class="tk-s">"Extract the receipt details. Use null when a value is not clearly visible."</span>)
+        })
+        <span class="tk-k">return</span> <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }.decodeFromString(response.text ?: <span class="tk-s">"{}"</span>)
+    }
+}</code></pre></figure>
+<p>Structured output reduces parsing errors, but values can still be wrong, so always let users review extracted data before saving. Schema helper names follow Firebase AI Logic's Kotlin SDK. Check the structured-output docs for your SDK version.</p>
+
+<h2 id="hybrid">Hybrid pattern: OCR first, then reason on text</h2>
+<p>For documents and receipts, running on-device OCR (ML Kit text recognition) first and sending only the extracted <em>text</em> to a cloud model is often cheaper and more private than sending the full photo, and accurate enough for many tasks.</p>
+
+<h2 id="privacy">Privacy and safety</h2>
+<ul>
+  <li>Photos often contain people, documents and locations. Get consent before cloud processing, and strip EXIF metadata (GPS) before uploading.</li>
+  <li>Don't build identification of real people from faces without strong legal and ethical review.</li>
+  <li>Avoid medical, legal or safety-critical judgements from images without professional oversight.</li>
+  <li>Downscale images: smaller uploads use fewer tokens, less data and less time.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Expense capture</h3><p>Receipt → structured fields → user confirms → saved.</p></div>
+  <div class="card usecase"><h3>Accessibility</h3><p>Draft alt text for user-posted images, edited by the poster.</p></div>
+  <div class="card usecase"><h3>Catalogue tagging</h3><p>On-device labels to auto-tag product photos for search.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I process camera frames in real time?</summary><div><p>Use CameraX with ML Kit's on-device vision APIs for real-time tasks such as barcodes or text. Cloud multimodal models are too slow and costly per frame.</p></div></details>
+  <details><summary>How large should uploaded images be?</summary><div><p>Downscale to the smallest size that preserves needed detail, often around 1024–1600 px on the long side for documents. Test accuracy against size.</p></div></details>
+  <details><summary>Can the model read Hindi or other scripts?</summary><div><p>ML Kit text recognition v2 supports several scripts, including Devanagari. Multimodal Gemini models handle many languages. Verify on your own samples.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Match the tool to the question: <strong>ML Kit vision</strong> for fixed perception tasks, <strong>on-device Image Description</strong> for private short descriptions, and <strong>multimodal Gemini with structured output</strong> for open questions and extraction. Combine OCR with text reasoning where you can, and keep users in the loop.</p>
+<p>Next step: add voice input with <a href="../speech-to-text-ai-voice-android/index.html">Speech-to-Text and AI Voice Features</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developers.google.com/ml-kit/vision/image-labeling" target="_blank" rel="noopener">ML Kit image labeling</a></li><li><a href="https://developers.google.com/ml-kit/vision/text-recognition/v2" target="_blank" rel="noopener">ML Kit text recognition v2</a></li><li><a href="https://developers.google.com/ml-kit/genai/image-description/android" target="_blank" rel="noopener">ML Kit GenAI Image Description</a></li><li><a href="https://firebase.google.com/docs/ai-logic/analyze-images?platform=android" target="_blank" rel="noopener">Firebase AI Logic: analyze images</a></li><li><a href="https://firebase.google.com/docs/ai-logic/generate-structured-output?platform=android" target="_blank" rel="noopener">Firebase AI Logic: structured output</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-image-description-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-image-description-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/on-device-image-text-processing/index.html"><small>Android AI Projects and Production</small>On-Device Image and Text Processing on Android</a></li><li><a href="../../android/ai-photo-caption-generator-android/index.html"><small>Android AI Projects and Production</small>Build an AI Photo Caption Generator for Android</a></li><li><a href="../../android/ml-kit-genai-apis/index.html"><small>Android AI and Generative AI</small>ML Kit GenAI APIs Explained</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-image-description-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-image-description-android/&amp;text=Image Understanding and Description in Android Apps" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-image-description-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#options">Three levels of image understanding</a></li><li><a href="#mlkit">Task-specific: image labeling</a></li><li><a href="#on-device-desc">On-device description</a></li><li><a href="#multimodal">Multimodal Gemini with structured output</a></li><li><a href="#hybrid">Hybrid pattern: OCR first, then reason on text</a></li><li><a href="#privacy">Privacy and safety</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-image-description-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-image-description-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

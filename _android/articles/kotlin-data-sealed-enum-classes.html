@@ -1,0 +1,158 @@
+<!--meta
+{
+  "seo_title": "Kotlin Data, Sealed and Enum Classes Explained",
+  "description": "When to use Kotlin data classes, sealed classes and interfaces, and enum classes in Android: UI state, results, events, exhaustive when, copy(), equality and common pitfalls.",
+  "primary_keyword": "kotlin sealed class vs enum vs data class",
+  "keywords": ["kotlin data class", "kotlin sealed interface", "kotlin enum class", "sealed class ui state android", "exhaustive when kotlin", "data object kotlin"],
+  "lede": "Three special kinds of classes do much of the modelling work in Android apps. Data classes hold values, enums list fixed options, and sealed types describe a closed set of possibilities. Choosing the right one makes impossible states impossible.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-null-safety", "mvi-vs-mvvm-android", "kotlin-basics-android", "viewmodel-stateflow-ui-state"],
+  "refs": [
+    ["Data classes", "https://kotlinlang.org/docs/data-classes.html"],
+    ["Sealed classes and interfaces", "https://kotlinlang.org/docs/sealed-classes.html"],
+    ["Enum classes", "https://kotlinlang.org/docs/enum-classes.html"],
+    ["Object declarations (data object)", "https://kotlinlang.org/docs/object-declarations.html"],
+    ["UI layer: UI state", "https://developer.android.com/topic/architecture/ui-layer"]
+  ]
+}
+-->
+<p class="ad-lead">Picture a screen state with <code>isLoading = true</code>, <code>error = "Timeout"</code> and a non-empty <code>items</code> list, all at once. Which one should the UI show? Bugs like this come from modelling data with the wrong shape. Kotlin gives you three tools to model it precisely.</p>
+
+<h2 id="quick-guide">Quick decision guide</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>You need to model…</th><th>Use</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>A bundle of values</td><td><strong>data class</strong></td><td><code>Article(id, title, author)</code></td></tr>
+    <tr><td>A fixed set of constants, each the same shape</td><td><strong>enum class</strong></td><td><code>SortOrder.NEWEST / OLDEST / POPULAR</code></td></tr>
+    <tr><td>A closed set of cases with different data</td><td><strong>sealed interface/class</strong></td><td><code>Loading</code>, <code>Success(items)</code>, <code>Error(message)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-s-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-s-t fig-s-d">
+    <title id="fig-s-t">Sealed interface with subtypes for screen state</title>
+    <desc id="fig-s-d">A sealed interface FeedState has three subtypes: Loading as a data object with no data, Success as a data class with a list of posts, and Error as a data class with a message and a retry flag. A when expression over FeedState must handle all three.</desc>
+    <defs><marker id="sl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+    <rect class="d-violet" x="260" y="10" width="200" height="46" rx="12"/><text class="d-t" x="360" y="38" text-anchor="middle">sealed interface FeedState</text>
+    <path class="d-line" d="M330 56 L130 106 M360 56 L360 106 M390 56 L590 106" marker-end="url(#sl)"/>
+    <rect class="d-box" x="40" y="110" width="180" height="60" rx="10"/><text class="d-t" x="130" y="136" text-anchor="middle">data object Loading</text><text class="d-s" x="130" y="156" text-anchor="middle">no data</text>
+    <rect class="d-green" x="270" y="110" width="180" height="60" rx="10"/><text class="d-t" x="360" y="136" text-anchor="middle">data class Success</text><text class="d-s" x="360" y="156" text-anchor="middle">posts: List&lt;Post&gt;</text>
+    <rect class="d-red" x="500" y="110" width="180" height="60" rx="10"/><text class="d-t" x="590" y="136" text-anchor="middle">data class Error</text><text class="d-s" x="590" y="156" text-anchor="middle">message, canRetry</text>
+    <text class="d-s" x="360" y="192" text-anchor="middle">when (state) { … } must cover all three, so the compiler enforces it</text>
+  </svg>
+  <figcaption id="fig-s-cap">A sealed type makes "loading and error at the same time" unrepresentable.</figcaption>
+</figure>
+
+<h2 id="data-classes">Data classes</h2>
+<p>A <code>data class</code> auto-generates <code>equals</code>, <code>hashCode</code>, <code>toString</code>, <code>copy</code> and <code>componentN</code> (destructuring) from its primary-constructor properties.</p>
+<code-block lang="kotlin" file="Data classes in UI state">
+data class CartItem(val productId: String, val name: String, val qty: Int, val unitPrice: Long)
+
+data class CartUiState(
+    val items: List<CartItem> = emptyList(),
+    val couponCode: String = "",
+    val isCheckingOut: Boolean = false,
+) {
+    val totalPaise: Long get() = items.sumOf { it.qty * it.unitPrice }   // derived, not stored
+}
+
+// Immutable update: produce a new state instead of mutating
+val updated = state.copy(items = state.items.map {
+    if (it.productId == "p1") it.copy(qty = it.qty + 1) else it
+})
+</code-block>
+<ul>
+  <li><strong>Equality matters for UI</strong>: <code>StateFlow</code> skips emitting a value equal to the current one, and Compose can skip recomposition when parameters are equal.</li>
+  <li><strong>Keep properties <code>val</code></strong> and collections immutable. A data class with <code>var</code>s can change while it's a key in a map, or while Compose holds it.</li>
+  <li>Only primary-constructor properties take part in <code>equals</code>, <code>copy</code> and <code>toString</code>. Properties in the body don't.</li>
+</ul>
+
+<h2 id="enums">Enum classes</h2>
+<code-block lang="kotlin" file="Enums with properties">
+enum class SortOrder(val labelRes: Int, val apiValue: String) {
+    NEWEST(R.string.sort_newest, "date_desc"),
+    OLDEST(R.string.sort_oldest, "date_asc"),
+    POPULAR(R.string.sort_popular, "views_desc");
+
+    companion object {
+        fun fromApi(value: String?): SortOrder = entries.firstOrNull { it.apiValue == value } ?: NEWEST
+    }
+}
+
+// Exhaustive when without else
+fun icon(order: SortOrder) = when (order) {
+    SortOrder.NEWEST -> Icons.Default.ArrowDownward
+    SortOrder.OLDEST -> Icons.Default.ArrowUpward
+    SortOrder.POPULAR -> Icons.Default.TrendingUp
+}
+</code-block>
+<p>Use <code>entries</code>, available in recent Kotlin versions, to iterate enum values, for example to build a filter-chip row. Be careful persisting <code>enum.name</code> or <code>ordinal</code>: renaming or reordering constants breaks stored data. Store an explicit, stable value instead.</p>
+
+<h2 id="sealed">Sealed classes and interfaces</h2>
+<p>A sealed type's subclasses are all known at compile time, because they must be declared in the same module and package. That lets <code>when</code> be <strong>exhaustive</strong>: add a new case and every <code>when</code> that doesn't handle it stops compiling.</p>
+<code-block lang="kotlin" file="FeedState.kt">
+sealed interface FeedState {
+    data object Loading : FeedState
+    data class Success(val posts: List<Post>, val isRefreshing: Boolean = false) : FeedState
+    data class Error(val message: String, val canRetry: Boolean) : FeedState
+}
+
+@Composable
+fun FeedScreen(state: FeedState, onRetry: () -> Unit) {
+    when (state) {
+        FeedState.Loading -> CircularProgressIndicator()
+        is FeedState.Success -> PostList(state.posts)               // smart cast: state.posts available
+        is FeedState.Error -> ErrorView(state.message, onRetry.takeIf { state.canRetry })
+    }
+}
+</code-block>
+<p><strong>Sealed interface vs sealed class:</strong> prefer <code>sealed interface</code> unless subtypes need shared state or constructor logic. Interfaces allow a class to belong to several sealed hierarchies and keep things lighter.</p>
+<p><strong><code>data object</code></strong> gives singleton cases a readable <code>toString()</code> ("Loading" instead of a hash), which helps logs and tests.</p>
+
+<h2 id="results">Sealed types for results and events</h2>
+<code-block lang="kotlin" file="Typed results from a repository">
+sealed interface LoginResult {
+    data class Success(val user: User) : LoginResult
+    data object InvalidCredentials : LoginResult
+    data object AccountLocked : LoginResult
+    data class NetworkError(val cause: Throwable) : LoginResult
+}
+
+fun messageFor(result: LoginResult): String = when (result) {
+    is LoginResult.Success -> "Welcome, ${result.user.name}"
+    LoginResult.InvalidCredentials -> "Email or password is incorrect"
+    LoginResult.AccountLocked -> "Account locked. Check your email."
+    is LoginResult.NetworkError -> "No connection. Try again."
+}
+</code-block>
+<p>Compared with throwing exceptions, typed results make every expected outcome visible in the function signature, so callers can't forget the "account locked" case.</p>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Screen state</h3><p>A sealed <code>UiState</code> for screens with mutually exclusive modes. A single data class works for forms where fields coexist.</p></div>
+  <div class="card usecase"><h3>MVI intents and effects</h3><p>A sealed <code>Intent</code> and <code>Effect</code>, so every user action and one-off effect is enumerable. See <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a>.</p></div>
+  <div class="card usecase"><h3>Settings options</h3><p>Enums for theme mode or sort order, with stable values stored in DataStore.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Adding an <code>else</code> branch to a <code>when</code> over a sealed type. That defeats exhaustiveness. List the cases instead.</li>
+  <li>Using booleans for mutually exclusive states (<code>isLoading</code>, <code>isError</code>, <code>isEmpty</code>).</li>
+  <li>Putting <code>var</code> or mutable lists inside data classes used as UI state.</li>
+  <li>Persisting enum ordinals.</li>
+  <li>Using sealed hierarchies for open-ended data, such as product categories from a server. Those should be data, not types.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a data class inherit from another class?</summary><div><p>A data class can implement interfaces and extend open or abstract classes (it can't be open itself). It commonly implements a sealed interface, as in the examples above.</p></div></details>
+  <details><summary>Enum or sealed class for a few states?</summary><div><p>If every case has the same shape and no per-case data, use an enum. If cases carry different data, use a sealed type.</p></div></details>
+  <details><summary>Are data classes slow because of generated methods?</summary><div><p>No. The generated methods are ordinary methods, and R8 removes unused ones in release builds.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>data classes</strong> for values, <strong>enums</strong> for fixed options, and <strong>sealed interfaces</strong> for closed sets of differently shaped cases. Together with exhaustive <code>when</code>, they let the compiler enforce that your UI handles every state, which removes a whole category of Android bugs.</p>
+<p>Next step: transform lists of these models fluently with <a href="../kotlin-collections-functional/index.html">Kotlin Collections and Functional Programming</a>.</p>

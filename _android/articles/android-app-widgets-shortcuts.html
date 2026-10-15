@@ -1,0 +1,148 @@
+<!--meta
+{
+  "seo_title": "Android App Widgets with Glance and App Shortcuts",
+  "description": "Build home screen widgets with Jetpack Glance and add static, dynamic and pinned app shortcuts: GlanceAppWidget, receivers, updates with WorkManager, actions, sizing, and best practices.",
+  "primary_keyword": "android app widgets glance",
+  "keywords": ["jetpack glance widget", "glanceappwidget kotlin", "android app shortcuts", "dynamic shortcuts android", "update widget workmanager", "pinned shortcuts android"],
+  "lede": "Widgets put live information on the home screen, and shortcuts let users jump straight to key actions with a long-press. Both increase engagement without opening the app. Jetpack Glance lets you build widgets with a Compose-style API.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["workmanager-background-work", "deep-links-app-links-android", "composable-functions-explained", "material3-theming-dynamic-color"],
+  "refs": [
+    ["Jetpack Glance", "https://developer.android.com/develop/ui/compose/glance"],
+    ["Create an app widget with Glance", "https://developer.android.com/develop/ui/compose/glance/create-app-widget"],
+    ["App widgets overview", "https://developer.android.com/develop/ui/views/appwidgets/overview"],
+    ["App shortcuts overview", "https://developer.android.com/develop/ui/views/launch/shortcuts"]
+  ]
+}
+-->
+<p class="ad-lead">Widgets run inside the launcher process, not your app, so they use RemoteViews under the hood. Glance hides that complexity behind composable-style functions, but its components are separate from regular Compose UI, so not every Compose API works in a widget.</p>
+
+<h2 id="architecture">How a Glance widget works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gw-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-gw-t fig-gw-d">
+    <title id="fig-gw-t">Glance widget architecture</title>
+    <desc id="fig-gw-d">Your app's data layer feeds a GlanceAppWidget whose provideGlance function builds content. Glance translates it into RemoteViews, which the launcher displays. Updates are triggered by the app, by WorkManager on a schedule, or by user actions in the widget.</desc>
+    <defs><marker id="gwm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 80 H206 M380 80 H416 M570 80 H606" marker-end="url(#gwm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="50" width="150" height="60" rx="12"/><text class="d-t" x="95" y="76" text-anchor="middle">Data layer</text><text class="d-s" x="95" y="94" text-anchor="middle">repo, DataStore</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="210" y="50" width="170" height="60" rx="12"/><text class="d-t" x="295" y="76" text-anchor="middle">GlanceAppWidget</text><text class="d-s" x="295" y="94" text-anchor="middle">provideGlance()</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="420" y="50" width="150" height="60" rx="12"/><text class="d-t" x="495" y="76" text-anchor="middle">RemoteViews</text><text class="d-s" x="495" y="94" text-anchor="middle">generated</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="610" y="50" width="100" height="60" rx="12"/><text class="d-w" x="660" y="84" text-anchor="middle">Launcher</text></g>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Updates: app calls update() · WorkManager schedule · user actions</text>
+  </svg>
+  <figcaption id="fig-gw-cap">Widgets don't update continuously. You push updates when data changes.</figcaption>
+</figure>
+
+<h2 id="glance">Build a widget with Glance</h2>
+<code-block lang="kts" file="build.gradle.kts">
+dependencies {
+    implementation("androidx.glance:glance-appwidget:1.1.1")   // check for the latest stable version
+    implementation("androidx.glance:glance-material3:1.1.1")
+}
+</code-block>
+<code-block lang="kotlin" file="TasksWidget.kt">
+class TasksWidget : GlanceAppWidget() {
+
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val tasks = TaskRepository.get(context).todayTasks()   // load data (suspend)
+        provideContent {
+            GlanceTheme {
+                Column(
+                    modifier = GlanceModifier.fillMaxSize()
+                        .background(GlanceTheme.colors.background)
+                        .padding(12.dp)
+                        .clickable(actionStartActivity<MainActivity>()),
+                ) {
+                    Text("Today (${tasks.size})", style = TextStyle(fontWeight = FontWeight.Bold))
+                    tasks.take(3).forEach { Text("• ${it.title}", maxLines = 1) }
+                }
+            }
+        }
+    }
+}
+
+class TasksWidgetReceiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = TasksWidget()
+}
+</code-block>
+<p>Note the imports: <code>androidx.glance.layout.Column</code> and <code>androidx.glance.text.Text</code>, not the Compose UI versions.</p>
+
+<h2 id="manifest">Register the widget</h2>
+<code-block lang="xml" file="AndroidManifest.xml + res/xml/tasks_widget_info.xml">
+<receiver android:name=".TasksWidgetReceiver" android:exported="true">
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
+    <meta-data android:name="android.appwidget.provider"
+        android:resource="@xml/tasks_widget_info" />
+</receiver>
+
+<!-- res/xml/tasks_widget_info.xml -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="180dp" android:minHeight="110dp"
+    android:targetCellWidth="3" android:targetCellHeight="2"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:description="@string/tasks_widget_description"
+    android:widgetCategory="home_screen" />
+</code-block>
+
+<h2 id="updates">Updating the widget</h2>
+<code-block lang="kotlin" file="Trigger updates">
+// After data changes in the app
+suspend fun refreshWidgets(context: Context) {
+    TasksWidget().updateAll(context)
+}
+
+// Periodically (minimum 15 min) with WorkManager
+class WidgetRefreshWorker(ctx: Context, p: WorkerParameters) : CoroutineWorker(ctx, p) {
+    override suspend fun doWork(): Result {
+        TasksWidget().updateAll(applicationContext)
+        return Result.success()
+    }
+}
+</code-block>
+<p>Avoid frequent <code>updatePeriodMillis</code> updates: they wake the device and drain battery. See <a href="../workmanager-background-work/index.html">WorkManager</a>.</p>
+
+<h2 id="shortcuts">App shortcuts</h2>
+<p>Shortcuts appear on long-press of the launcher icon. Use <strong>static</strong> shortcuts (XML) for core actions, <strong>dynamic</strong> ones for context-dependent actions, and <strong>pinned</strong> ones that the user adds to the home screen.</p>
+<code-block lang="kotlin" file="Dynamic shortcut">
+val shortcut = ShortcutInfoCompat.Builder(context, "new_task")
+    .setShortLabel("New task")
+    .setLongLabel("Create a new task")
+    .setIcon(IconCompat.createWithResource(context, R.drawable.ic_add))
+    .setIntent(Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/tasks/new"),
+        context, MainActivity::class.java))
+    .build()
+
+ShortcutManagerCompat.pushDynamicShortcut(context, shortcut)
+</code-block>
+<p>Route shortcut intents through the same navigation as <a href="../deep-links-app-links-android/index.html">deep links</a>.</p>
+
+<h2 id="best-practices">Best practices</h2>
+<ul>
+  <li>Design for multiple sizes, and use <code>SizeMode.Responsive</code> or <code>SizeMode.Exact</code> to adapt layouts.</li>
+  <li>Support dynamic colour with <code>GlanceTheme</code>.</li>
+  <li>Keep widgets glanceable: one purpose, a little key data, and a clear tap target.</li>
+  <li>Provide preview images or generated previews so the widget picker looks good.</li>
+  <li>Keep shortcut counts small (four or so are typically shown).</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Widget shows "Can't load widget":</strong> an exception in <code>provideGlance</code>, or an unsupported composable. Check Logcat.</li>
+  <li><strong>Widget not updating:</strong> call <code>update</code>/<code>updateAll</code> after data changes, and check that the work actually runs.</li>
+  <li><strong>Clicks do nothing:</strong> use Glance actions (<code>actionStartActivity</code>, <code>actionRunCallback</code>), not Compose <code>clickable</code> lambdas.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I use regular Compose in a widget?</summary><div><p>No. Glance provides its own composables that map to RemoteViews. The programming model is similar, but the components differ.</p></div></details>
+  <details><summary>Can widgets show lists?</summary><div><p>Yes. Glance offers <code>LazyColumn</code> for widgets, backed by RemoteViews collections.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>Glance</strong> for widgets with a Compose-like API, push updates when data changes (or with WorkManager), keep widgets <strong>glanceable and responsive</strong>, and add <strong>shortcuts</strong> for key actions routed through your navigation.</p>
+<p>Next step: build for the wrist with <a href="../wear-os-app-development/index.html">Wear OS App Development</a>.</p>

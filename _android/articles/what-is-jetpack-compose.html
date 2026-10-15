@@ -1,0 +1,141 @@
+<!--meta
+{
+  "seo_title": "What Is Jetpack Compose and Why Should You Learn It?",
+  "description": "Jetpack Compose explained: Android's declarative UI toolkit, how composition and recomposition work, its core building blocks, tooling, benefits, limits and how to start learning.",
+  "primary_keyword": "what is jetpack compose",
+  "keywords": ["jetpack compose tutorial", "declarative ui android", "compose recomposition", "learn jetpack compose", "compose vs views", "material 3 compose"],
+  "lede": "Jetpack Compose is Android's modern toolkit for building native UI with Kotlin functions instead of XML. Here's what it is, how it works under the hood, what makes it productive, where it can trip you up, and how to start learning it.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["jetpack-compose-vs-xml", "composable-functions-explained", "compose-state-management", "build-first-android-app"],
+  "refs": [
+    ["Jetpack Compose", "https://developer.android.com/compose"],
+    ["Thinking in Compose", "https://developer.android.com/develop/ui/compose/mental-model"],
+    ["Compose phases", "https://developer.android.com/develop/ui/compose/phases"],
+    ["Compose tutorial", "https://developer.android.com/develop/ui/compose/tutorial"],
+    ["Compose BOM", "https://developer.android.com/develop/ui/compose/bom"]
+  ]
+}
+-->
+<p class="ad-lead">For over a decade, Android UI meant XML layouts plus Kotlin or Java code that found views and mutated them. Jetpack Compose replaces that with something simpler to describe: <strong>UI is a function of state</strong>. You write Kotlin functions that describe what the screen should look like, and Compose keeps the screen in sync as the state changes.</p>
+
+<h2 id="definition">What Jetpack Compose is</h2>
+<p>Jetpack Compose is Google's <strong>declarative UI toolkit</strong> for Android, written in Kotlin and stable since 2021. It's the toolkit Google recommends for new Android UI. It includes:</p>
+<ul>
+  <li>a <strong>runtime</strong> that tracks state and decides what to update,</li>
+  <li>a <strong>Kotlin compiler plugin</strong> that transforms <code>@Composable</code> functions,</li>
+  <li><strong>UI and foundation libraries</strong>: layout, drawing, gestures, text and lazy lists,</li>
+  <li><strong>Material 3</strong> components and theming,</li>
+  <li><strong>tooling</strong>: previews, Layout Inspector integration and testing APIs.</li>
+</ul>
+
+<h2 id="hello">What Compose code looks like</h2>
+<code-block lang="kotlin" file="ProfileCard.kt">
+@Composable
+fun ProfileCard(name: String, role: String, isOnline: Boolean, onMessage: () -> Unit) {
+    Card(Modifier.fillMaxWidth().padding(16.dp)) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(12.dp).clip(CircleShape)
+                    .background(if (isOnline) Color(0xFF22C55E) else Color.Gray)
+            )
+            Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
+                Text(name, style = MaterialTheme.typography.titleMedium)
+                Text(role, style = MaterialTheme.typography.bodyMedium)
+            }
+            Button(onClick = onMessage) { Text("Message") }
+        }
+    }
+}
+</code-block>
+<p>There's no XML, no <code>findViewById</code> and no adapter. Structure, styling and behaviour live together in one function that's easy to preview and reuse.</p>
+
+<h2 id="how-it-works">How Compose works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cw-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-cw-t fig-cw-d">
+    <title id="fig-cw-t">Compose frame phases and recomposition</title>
+    <desc id="fig-cw-d">State changes trigger recomposition of composables that read the state. Each frame passes through three phases: composition decides what to show, layout measures and places, drawing renders pixels. Compose skips composables whose inputs did not change.</desc>
+    <defs><marker id="cw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 70 H168 M318 70 H346 M496 70 H524" marker-end="url(#cw)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="40" width="120" height="60" rx="12"/><text class="d-t" x="80" y="66" text-anchor="middle">State changes</text><text class="d-s" x="80" y="84" text-anchor="middle">count = 3</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="172" y="40" width="146" height="60" rx="12"/><text class="d-t" x="245" y="66" text-anchor="middle">1. Composition</text><text class="d-s" x="245" y="84" text-anchor="middle">what to show</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="350" y="40" width="146" height="60" rx="12"/><text class="d-t" x="423" y="66" text-anchor="middle">2. Layout</text><text class="d-s" x="423" y="84" text-anchor="middle">measure, place</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="528" y="40" width="170" height="60" rx="12"/><text class="d-t" x="613" y="66" text-anchor="middle">3. Drawing</text><text class="d-s" x="613" y="84" text-anchor="middle">pixels on screen</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Only composables that READ the changed state recompose.</text>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Others are skipped if their inputs are unchanged.</text>
+  </svg>
+  <figcaption id="fig-cw-cap">Recomposition is targeted. Compose re-runs only the functions affected by a state change, which is why it can be efficient despite "redrawing" declaratively.</figcaption>
+</figure>
+<ul>
+  <li><strong>Composition:</strong> the first run of your composables builds a tree, the composition, describing the UI.</li>
+  <li><strong>State:</strong> values held in <code>State</code> objects (<code>mutableStateOf</code>, <code>StateFlow</code> collected as state) are observed. When they change, Compose schedules recomposition.</li>
+  <li><strong>Recomposition:</strong> Compose re-runs only the composables that read the changed state, and skips others whose parameters haven't changed.</li>
+  <li><strong>Phases:</strong> each frame goes through composition, layout and drawing. Deferring state reads to later phases avoids unnecessary work.</li>
+</ul>
+
+<h2 id="building-blocks">Core building blocks</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Compose API</th></tr></thead>
+  <tbody>
+    <tr><td>Arrange children</td><td><code>Column</code>, <code>Row</code>, <code>Box</code>, <code>FlowRow</code></td></tr>
+    <tr><td>Scrolling lists</td><td><code>LazyColumn</code>, <code>LazyRow</code>, <code>LazyVerticalGrid</code></td></tr>
+    <tr><td>Size, padding, clicks, backgrounds</td><td><code>Modifier</code> chains</td></tr>
+    <tr><td>Screen structure</td><td><code>Scaffold</code>, <code>TopAppBar</code>, <code>NavigationBar</code></td></tr>
+    <tr><td>State</td><td><code>remember</code>, <code>rememberSaveable</code>, <code>mutableStateOf</code>, <code>collectAsStateWithLifecycle</code></td></tr>
+    <tr><td>Side effects</td><td><code>LaunchedEffect</code>, <code>DisposableEffect</code>, <code>rememberCoroutineScope</code></td></tr>
+    <tr><td>Animation</td><td><code>animate*AsState</code>, <code>AnimatedVisibility</code>, <code>AnimatedContent</code></td></tr>
+    <tr><td>Theming</td><td><code>MaterialTheme</code>, color schemes, dynamic color</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="benefits">Why learn Compose</h2>
+<div class="cards">
+  <div class="card pros"><h4>Benefits</h4><ul><li>Less code for most UIs; no adapters for lists</li><li>UI always consistent with state</li><li>Previews for any state you pass in</li><li>Easy reusable components, which are just functions</li><li>Modern Material 3 and adaptive layout APIs arrive Compose-first</li><li>Interoperates with existing Views</li></ul></div>
+  <div class="card cons"><h4>Things to learn carefully</h4><ul><li>State and recomposition mental model</li><li>Side-effect APIs and their lifecycles</li><li>Stability and performance in large lists</li><li>Debug builds are slower; judge performance on release builds</li></ul></div>
+</div>
+
+<h2 id="setup">Getting started</h2>
+<p>New Android Studio projects using the <em>Empty Activity</em> template include Compose. In an existing project, enable Compose and add the <strong>Compose BOM</strong>, which aligns the versions of all Compose libraries:</p>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins {
+    id("org.jetbrains.kotlin.plugin.compose")   // Compose compiler plugin (Kotlin 2.0+)
+}
+android {
+    buildFeatures { compose = true }
+}
+dependencies {
+    implementation(platform("androidx.compose:compose-bom:<latest>"))
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.activity:activity-compose:<latest>")
+}
+</code-block>
+
+<h2 id="use-cases">Where Compose fits</h2>
+<div class="cards">
+  <div class="card usecase"><h3>New apps</h3><p>Build everything in Compose with a single Activity and Compose navigation.</p></div>
+  <div class="card usecase"><h3>Existing View apps</h3><p>Add Compose screen by screen with <code>ComposeView</code>. See <a href="../jetpack-compose-vs-xml/index.html">Compose vs XML</a>.</p></div>
+  <div class="card usecase"><h3>Other surfaces</h3><p>Compose also powers Wear OS UI, Glance widgets and, via Compose Multiplatform, desktop and iOS.</p></div>
+</div>
+
+<h2 id="mistakes">Beginner mistakes</h2>
+<ul>
+  <li>Creating state without <code>remember</code>, so it resets on every recomposition.</li>
+  <li>Running side effects (network, analytics) directly in the composable body.</li>
+  <li>Expecting composables to run once or in a particular order. They may run often, in any order, and be skipped.</li>
+  <li>Passing ViewModels deep into reusable components instead of plain state and lambdas.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Jetpack Compose only for Android?</summary><div><p>Jetpack Compose targets Android. JetBrains' Compose Multiplatform brings the same programming model to desktop, web and iOS.</p></div></details>
+  <details><summary>Does Compose replace RecyclerView?</summary><div><p>In Compose UIs, <code>LazyColumn</code>, <code>LazyRow</code> and lazy grids replace RecyclerView for most use cases.</p></div></details>
+  <details><summary>Can I learn Compose without knowing XML Views?</summary><div><p>Yes. Start with Compose. Learn XML later if you work on older codebases.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Jetpack Compose is Android's declarative UI toolkit: <strong>Kotlin functions describe UI for the current state, and targeted recomposition keeps the screen in sync</strong>. It's the recommended way to build Android UI today, and learning its state model is the key to using it well.</p>
+<p>Next step: understand the unit of Compose UI in <a href="../composable-functions-explained/index.html">Composable Functions Explained</a>.</p>

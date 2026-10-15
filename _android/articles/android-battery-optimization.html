@@ -1,0 +1,113 @@
+<!--meta
+{
+  "seo_title": "Battery Optimization for Android Apps (Best Practices)",
+  "description": "Make Android apps battery-friendly: Doze and App Standby, WorkManager constraints, wake locks, location and sensors, network batching, foreground services and Android vitals battery metrics.",
+  "primary_keyword": "android battery optimization",
+  "keywords": ["doze mode android", "app standby buckets", "excessive wake locks", "workmanager constraints battery", "battery friendly location android", "power profiler android"],
+  "lede": "Users notice battery drain and uninstall the culprits. Android itself aggressively limits background activity to protect batteries. Battery-friendly apps work with those limits instead of fighting them.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["workmanager-background-work", "android-foreground-services", "websockets-vs-rest-android", "android-studio-profiler-guide"],
+  "refs": [
+    ["Optimize for battery life", "https://developer.android.com/topic/performance/power"],
+    ["Optimize for Doze and App Standby", "https://developer.android.com/training/monitoring-device-state/doze-standby"],
+    ["App Standby Buckets", "https://developer.android.com/topic/performance/appstandby"],
+    ["Excessive partial wake locks (Android vitals)", "https://developer.android.com/topic/performance/vitals/wakelock"],
+    ["Power Profiler", "https://developer.android.com/studio/profile/power-profiler"]
+  ]
+}
+-->
+<p class="ad-lead">The biggest battery consumers on a phone are the screen, the radios (cellular, Wi-Fi, GPS) and the CPU staying awake. Your app influences the last two directly: how often it wakes the device, uses the network, and requests location. Small design decisions add up to large differences.</p>
+
+<h2 id="platform">How Android protects battery</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-bt-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-bt-t fig-bt-d">
+    <title id="fig-bt-t">Android power management mechanisms</title>
+    <desc id="fig-bt-d">Doze defers network access, jobs and alarms when the device is idle, allowing periodic maintenance windows. App Standby Buckets limit background work based on how recently and often the app is used. Background execution limits restrict background services. Battery-related vitals report excessive wake locks and background activity.</desc>
+    <rect class="d-violet" x="20" y="30" width="160" height="130" rx="12"/><text class="d-t" x="100" y="58" text-anchor="middle">Doze</text><text class="d-s" x="100" y="84" text-anchor="middle">idle device: defers</text><text class="d-s" x="100" y="100" text-anchor="middle">network, jobs, alarms</text><text class="d-s" x="100" y="116" text-anchor="middle">maintenance windows</text>
+    <rect class="d-blue" x="196" y="30" width="160" height="130" rx="12"/><text class="d-t" x="276" y="58" text-anchor="middle">Standby Buckets</text><text class="d-s" x="276" y="84" text-anchor="middle">active → rare</text><text class="d-s" x="276" y="100" text-anchor="middle">less used apps get</text><text class="d-s" x="276" y="116" text-anchor="middle">fewer resources</text>
+    <rect class="d-amber" x="372" y="30" width="160" height="130" rx="12"/><text class="d-t" x="452" y="58" text-anchor="middle">Background limits</text><text class="d-s" x="452" y="84" text-anchor="middle">no free-running</text><text class="d-s" x="452" y="100" text-anchor="middle">background services</text>
+    <rect class="d-green" x="548" y="30" width="152" height="130" rx="12"/><text class="d-t" x="624" y="58" text-anchor="middle">Android vitals</text><text class="d-s" x="624" y="84" text-anchor="middle">wake lock and</text><text class="d-s" x="624" y="100" text-anchor="middle">background usage</text><text class="d-s" x="624" y="116" text-anchor="middle">metrics</text>
+  </svg>
+  <figcaption id="fig-bt-cap">Design background work so it fits these mechanisms, and let the system batch it efficiently.</figcaption>
+</figure>
+
+<h2 id="background">Background work: let WorkManager decide when</h2>
+<code-block lang="kotlin" file="Battery-aware periodic sync">
+val sync = PeriodicWorkRequestBuilder<SyncWorker>(12, TimeUnit.HOURS)
+    .setConstraints(
+        Constraints(
+            requiredNetworkType = NetworkType.UNMETERED,   // Wi-Fi, avoids mobile data
+            requiresBatteryNotLow = true,
+            requiresCharging = false,
+        )
+    )
+    .build()
+
+WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+    "content-sync", ExistingPeriodicWorkPolicy.KEEP, sync,
+)
+</code-block>
+<p>WorkManager respects Doze and standby, batches work with other apps, and retries with backoff. Choose the longest period your feature tolerates. See <a href="../workmanager-background-work/index.html">Background Work with WorkManager</a>.</p>
+
+<h2 id="wakelocks">Wake locks: avoid them</h2>
+<p>A partial wake lock keeps the CPU running with the screen off. Android vitals flags excessive wake lock usage. Most apps never need one directly: WorkManager holds wake locks for you while workers run. If you must use one, always set a timeout and release it in <code>finally</code>.</p>
+
+<h2 id="location">Location and sensors</h2>
+<code-block lang="kotlin" file="Balanced, lifecycle-bound location updates">
+val request = LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60_000L)
+    .setMinUpdateIntervalMillis(30_000L)
+    .setMinUpdateDistanceMeters(50f)          // skip updates for tiny movements
+    .build()
+// Start in onStart / LifecycleStartEffect, remove updates in onStop.
+</code-block>
+<ul>
+  <li>Use the <strong>lowest accuracy</strong> your feature needs (city weather doesn't need GPS precision).</li>
+  <li>Prefer the <strong>last known location</strong> or a single current-location request over continuous updates.</li>
+  <li>Stop updates when the UI isn't visible, unless the user explicitly started a tracking session (then use a foreground service).</li>
+</ul>
+
+<h2 id="network">Network</h2>
+<ul>
+  <li><strong>Batch and prefetch</strong>: fewer, larger requests let the radio sleep between them.</li>
+  <li><strong>Cache</strong> aggressively. See <a href="../android-caching-strategies/index.html">Caching Strategies</a>.</li>
+  <li><strong>Replace polling with push</strong> (FCM) for updates.</li>
+  <li>Keep <strong>WebSockets</strong> open only while the relevant screen is visible.</li>
+</ul>
+
+<h2 id="foreground">Foreground services</h2>
+<p>Foreground services are for ongoing, user-visible tasks (navigation, playback, workout tracking), and they require a notification and a declared type. Don't use them to keep the app alive for convenience. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</p>
+
+<h2 id="measure">Measuring battery impact</h2>
+<ul>
+  <li><strong>Android Studio Power Profiler</strong> (on supported devices) shows estimated power use by component.</li>
+  <li><strong>Background Task Inspector</strong> shows WorkManager jobs, alarms and wake locks.</li>
+  <li><strong>Battery Historian / bugreports</strong> for detailed investigation.</li>
+  <li><strong>Android vitals</strong> for field data on wake locks and background usage.</li>
+</ul>
+
+<h2 id="use-cases">Real examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>News app</h3><p>Replaced 15-minute polling with FCM-triggered refresh plus a 12-hour unmetered sync, which greatly reduced background network use.</p></div>
+  <div class="card usecase"><h3>Fitness tracker</h3><p>High-accuracy location only during a user-started workout in a foreground service, and none otherwise.</p></div>
+  <div class="card usecase"><h3>Chat app</h3><p>A socket only while a conversation is open, and FCM for everything else.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using AlarmManager exact alarms for routine sync.</li>
+  <li>Continuous GPS for features that need coarse location occasionally.</li>
+  <li>Retrying failed network calls in tight loops.</li>
+  <li>Asking users to disable battery optimisation for the app without a strong, policy-compliant reason.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why does my background work run late?</summary><div><p>Doze, standby buckets and manufacturer power management defer work. For work that must happen at an exact time, such as alarms the user set, use the appropriate exact-alarm APIs and permissions. Otherwise accept deferral.</p></div></details>
+  <details><summary>Do manufacturers add extra restrictions?</summary><div><p>Some OEMs apply additional battery management. Test on popular devices among your users and design for deferred work.</p></div></details>
+  <details><summary>Does dark mode save battery?</summary><div><p>On OLED screens, darker pixels use less power, so supporting dark theme can help users save battery.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Battery-friendly apps <strong>defer and batch background work with WorkManager</strong>, <strong>avoid manual wake locks</strong>, request <strong>only the location accuracy and frequency they need</strong>, <strong>push instead of poll</strong>, and measure with the Power Profiler and Android vitals.</p>
+<p>Next step: learn the tools in depth with <a href="../android-studio-profiler-guide/index.html">Android Studio Profiler: A Practical Guide</a>.</p>

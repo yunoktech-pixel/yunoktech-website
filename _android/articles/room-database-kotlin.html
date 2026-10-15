@@ -1,0 +1,190 @@
+<!--meta
+{
+  "seo_title": "Room Database Tutorial with Kotlin (Android)",
+  "description": "Learn Room with Kotlin step by step: entities, DAOs, Flow queries, suspend writes, relations, type converters, migrations, transactions, testing and performance tips.",
+  "primary_keyword": "room database kotlin",
+  "keywords": ["room database tutorial", "room dao flow", "room migrations", "room relations kotlin", "room typeconverter", "room ksp setup"],
+  "lede": "Room is Android's recommended SQLite library: compile-time-checked SQL, Kotlin coroutine and Flow support, and painless migrations. This tutorial builds a notes database from setup to migrations and tests.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["room-vs-datastore", "offline-first-android-architecture", "repository-pattern-android", "paging-3-pagination"],
+  "refs": [
+    ["Save data in a local database using Room", "https://developer.android.com/training/data-storage/room"],
+    ["Accessing data using Room DAOs", "https://developer.android.com/training/data-storage/room/accessing-data"],
+    ["Migrating Room databases", "https://developer.android.com/training/data-storage/room/migrating-db-versions"],
+    ["Define relationships between objects", "https://developer.android.com/training/data-storage/room/relationships"],
+    ["Test and debug your database", "https://developer.android.com/training/data-storage/room/testing-db"]
+  ]
+}
+-->
+<p class="ad-lead">Raw SQLite on Android means string queries that fail at runtime, cursor juggling and manual threading. Room keeps the power of SQL but checks your queries at compile time, maps rows to Kotlin classes, and exposes results as Flows that update automatically when data changes.</p>
+
+<h2 id="architecture">Room's three parts</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rm-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-rm-t fig-rm-d">
+    <title id="fig-rm-t">Room components</title>
+    <desc id="fig-rm-d">The RoomDatabase class is the access point and holds DAOs. DAOs declare queries with SQL annotations and return Flow or suspend results. Entities are data classes mapped to tables in SQLite.</desc>
+    <defs><marker id="rmm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M210 80 H246 M450 80 H486" marker-end="url(#rmm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="40" width="190" height="80" rx="12"/><text class="d-t" x="115" y="72" text-anchor="middle">AppDatabase</text><text class="d-s" x="115" y="92" text-anchor="middle">@Database, version</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="250" y="40" width="200" height="80" rx="12"/><text class="d-t" x="350" y="72" text-anchor="middle">NoteDao</text><text class="d-s" x="350" y="92" text-anchor="middle">@Query / @Upsert → Flow</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="490" y="40" width="210" height="80" rx="12"/><text class="d-t" x="595" y="72" text-anchor="middle">NoteEntity</text><text class="d-s" x="595" y="92" text-anchor="middle">@Entity → SQLite table</text></g>
+  </svg>
+  <figcaption id="fig-rm-cap">The database provides DAOs, and DAOs read and write entities. Room generates the implementation at compile time.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins { id("com.google.devtools.ksp") }
+dependencies {
+    implementation("androidx.room:room-runtime:<room-version>")
+    implementation("androidx.room:room-ktx:<room-version>")      // coroutines/Flow support
+    ksp("androidx.room:room-compiler:<room-version>")
+    testImplementation("androidx.room:room-testing:<room-version>")
+}
+</code-block>
+
+<h2 id="entity">Entities</h2>
+<code-block lang="kotlin" file="NoteEntity.kt">
+@Entity(
+    tableName = "notes",
+    indices = [Index("folderId"), Index("updatedAt")],
+)
+data class NoteEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val body: String,
+    val folderId: String?,
+    val pinned: Boolean = false,
+    val updatedAt: Long,                    // epoch millis: simple, sortable
+)
+
+@Entity(tableName = "folders")
+data class FolderEntity(@PrimaryKey val id: String, val name: String)
+</code-block>
+
+<h2 id="dao">DAOs</h2>
+<code-block lang="kotlin" file="NoteDao.kt">
+@Dao
+interface NoteDao {
+    // Observed query: re-emits whenever the notes table changes
+    @Query("SELECT * FROM notes ORDER BY pinned DESC, updatedAt DESC")
+    fun observeAll(): Flow<List<NoteEntity>>
+
+    @Query("SELECT * FROM notes WHERE title LIKE '%' || :query || '%' OR body LIKE '%' || :query || '%'")
+    fun search(query: String): Flow<List<NoteEntity>>
+
+    @Query("SELECT * FROM notes WHERE id = :id")
+    suspend fun getById(id: String): NoteEntity?
+
+    @Upsert
+    suspend fun upsert(note: NoteEntity)
+
+    @Query("DELETE FROM notes WHERE id = :id")
+    suspend fun delete(id: String)
+
+    @Query("UPDATE notes SET pinned = NOT pinned WHERE id = :id")
+    suspend fun togglePinned(id: String)
+}
+</code-block>
+<p>Room checks every SQL query against your schema at compile time, so a typo in a column name is a build error, not a crash. Suspend functions and Flow queries run off the main thread automatically.</p>
+
+<h2 id="database">The database</h2>
+<code-block lang="kotlin" file="AppDatabase.kt">
+@Database(entities = [NoteEntity::class, FolderEntity::class], version = 2, exportSchema = true)
+@TypeConverters(Converters::class)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun noteDao(): NoteDao
+    abstract fun folderDao(): FolderDao
+}
+
+// Provide ONE instance for the whole app (e.g. Hilt @Singleton)
+fun buildDatabase(context: Context): AppDatabase =
+    Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
+        .addMigrations(MIGRATION_1_2)
+        .build()
+</code-block>
+
+<h2 id="relations">Relations</h2>
+<code-block lang="kotlin" file="FolderWithNotes.kt">
+data class FolderWithNotes(
+    @Embedded val folder: FolderEntity,
+    @Relation(parentColumn = "id", entityColumn = "folderId")
+    val notes: List<NoteEntity>,
+)
+
+@Dao
+interface FolderDao {
+    @Transaction                                       // runs the two underlying queries atomically
+    @Query("SELECT * FROM folders ORDER BY name")
+    fun observeFoldersWithNotes(): Flow<List<FolderWithNotes>>
+}
+</code-block>
+
+<h2 id="converters">Type converters</h2>
+<code-block lang="kotlin" file="Converters.kt">
+class Converters {
+    @TypeConverter fun fromTags(tags: List<String>): String = tags.joinToString(",")
+    @TypeConverter fun toTags(value: String): List<String> = if (value.isEmpty()) emptyList() else value.split(",")
+}
+</code-block>
+<p>For queryable lists, prefer a separate table over a converted string.</p>
+
+<h2 id="migrations">Migrations</h2>
+<code-block lang="kotlin" file="Migrations.kt">
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE notes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_notes_updatedAt ON notes(updatedAt)")
+    }
+}
+</code-block>
+<p>With <code>exportSchema = true</code> and a configured schema directory, Room writes JSON schema files you commit to Git. They enable <strong>auto-migrations</strong> for simple changes and migration testing. Never use <code>fallbackToDestructiveMigration()</code> for user data you can't re-download.</p>
+
+<h2 id="testing">Testing a DAO</h2>
+<code-block lang="kotlin" file="NoteDaoTest.kt (androidTest)">
+@RunWith(AndroidJUnit4::class)
+class NoteDaoTest {
+    private lateinit var db: AppDatabase
+    private lateinit var dao: NoteDao
+
+    @Before fun setUp() {
+        db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), AppDatabase::class.java).build()
+        dao = db.noteDao()
+    }
+    @After fun tearDown() = db.close()
+
+    @Test fun pinnedNotesComeFirst() = runTest {
+        dao.upsert(NoteEntity("1", "Old", "", null, pinned = false, updatedAt = 2))
+        dao.upsert(NoteEntity("2", "Pinned", "", null, pinned = true, updatedAt = 1))
+        assertEquals(listOf("2", "1"), dao.observeAll().first().map { it.id })
+    }
+}
+</code-block>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Offline cache</h3><p>Room as the source of truth for API data. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p></div>
+  <div class="card usecase"><h3>User-created content</h3><p>Notes, tasks and expenses: data that must never be lost, with careful migrations.</p></div>
+  <div class="card usecase"><h3>Paged lists</h3><p>Return <code>PagingSource</code> from DAOs for huge tables. See <a href="../paging-3-pagination/index.html">Paging 3</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Creating multiple database instances. Use a singleton.</li>
+  <li>Missing indices on columns used in WHERE and ORDER BY clauses.</li>
+  <li>Exposing entities to the UI. Map them to domain models.</li>
+  <li><code>allowMainThreadQueries()</code> in production.</li>
+  <li>Destructive migration for important user data.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Room or SQLDelight?</summary><div><p>Room is Google's Android-first solution, and it now supports Kotlin Multiplatform too. SQLDelight generates Kotlin from SQL files and is also multiplatform. Both are solid choices.</p></div></details>
+  <details><summary>How do I do full-text search?</summary><div><p>Room supports SQLite FTS through <code>@Fts4</code> entities, which are much faster than <code>LIKE</code> for large text.</p></div></details>
+  <details><summary>Can I inspect the database while debugging?</summary><div><p>Yes. Android Studio's App Inspection includes a Database Inspector for live queries.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Room gives you <strong>compile-time-checked SQL</strong>, <strong>Flow-based observation</strong>, <strong>suspend writes</strong> and <strong>managed migrations</strong>. Use a single instance, index your queries, export schemas, test DAOs and migrations, and map entities before they reach the UI.</p>
+<p>Next step: decide what belongs in Room and what in DataStore with <a href="../room-vs-datastore/index.html">Room vs DataStore</a>.</p>

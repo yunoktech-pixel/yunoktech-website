@@ -1,0 +1,165 @@
+<!--meta
+{
+  "seo_title": "Offline-First Android App Architecture (Guide)",
+  "description": "Design offline-first Android apps: local database as source of truth, read and write paths, sync with WorkManager, conflict resolution, pending changes and UX for offline states.",
+  "primary_keyword": "offline-first android architecture",
+  "keywords": ["offline first android", "android sync workmanager", "single source of truth room", "conflict resolution mobile sync", "optimistic updates android", "offline mode android app"],
+  "lede": "Offline-first means the app works fully from local data and syncs with the server when it can. Users get instant screens and no lost work on bad networks. Here's the architecture, the sync strategies and the UX details that make it work.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["repository-pattern-android", "room-database-kotlin", "workmanager-background-work", "android-caching-strategies"],
+  "refs": [
+    ["Build an offline-first app", "https://developer.android.com/topic/architecture/data-layer/offline-first"],
+    ["Data layer", "https://developer.android.com/topic/architecture/data-layer"],
+    ["WorkManager", "https://developer.android.com/develop/background-work/background-tasks/persistent"],
+    ["Now in Android: offline-first sync", "https://github.com/android/nowinandroid/blob/main/docs/ArchitectureLearningJourney.md"]
+  ]
+}
+-->
+<p class="ad-lead">A field agent fills in an inspection form in a basement with no signal. A traveller checks their itinerary on airplane mode. A shopper on a crowded network taps "add to cart". In an online-only app, all three see spinners or errors. In an offline-first app, they don't notice the network at all.</p>
+
+<h2 id="principles">Core principles</h2>
+<ul>
+  <li><strong>The local database is the single source of truth.</strong> The UI reads only from it.</li>
+  <li><strong>Writes go local first</strong>, then sync to the server in the background.</li>
+  <li><strong>Sync is a separate, resilient process</strong> (WorkManager), not part of a screen.</li>
+  <li><strong>Conflicts have an explicit policy.</strong></li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-of-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-of-t fig-of-d">
+    <title id="fig-of-t">Offline-first read and write paths</title>
+    <desc id="fig-of-d">Read path: the UI observes Room through the repository. Write path: user edits are written to Room immediately with a pending sync flag and an outbox entry. A WorkManager sync worker, constrained to connected networks, pushes pending changes to the server and pulls remote changes into Room, which updates the UI automatically.</desc>
+    <defs><marker id="ofm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="90" width="130" height="66" rx="12"/><text class="d-t" x="85" y="120" text-anchor="middle">UI</text><text class="d-s" x="85" y="140" text-anchor="middle">observes</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="210" y="90" width="150" height="66" rx="12"/><text class="d-t" x="285" y="120" text-anchor="middle">Repository</text><text class="d-s" x="285" y="140" text-anchor="middle">local-first writes</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="420" y="90" width="150" height="66" rx="12"/><text class="d-t" x="495" y="116" text-anchor="middle">Room</text><text class="d-s" x="495" y="134" text-anchor="middle">data + outbox</text><text class="d-s" x="495" y="148" text-anchor="middle">source of truth</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="420" y="10" width="150" height="56" rx="12"/><text class="d-t" x="495" y="36" text-anchor="middle">SyncWorker</text><text class="d-s" x="495" y="54" text-anchor="middle">WorkManager</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="620" y="10" width="90" height="56" rx="12"/><text class="d-t" x="665" y="43" text-anchor="middle">Server</text></g>
+    <path class="d-flow" d="M210 110 H154" marker-end="url(#ofm)"/><text class="d-s" x="182" y="104" text-anchor="middle">Flow</text>
+    <path class="d-flow" d="M360 130 H416" marker-end="url(#ofm)"/><text class="d-s" x="388" y="148" text-anchor="middle">write</text>
+    <path class="d-flow" d="M416 106 H364" marker-end="url(#ofm)"/>
+    <path class="d-flow" d="M495 90 V70 M570 30 H616" marker-end="url(#ofm)"/>
+    <path class="d-dash" d="M616 50 H574 M495 66 V86" marker-end="url(#ofm)"/>
+    <text class="d-s" x="360" y="200" text-anchor="middle">User never waits for the network. Sync happens when constraints allow.</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M360 130 H420');--dur:1s"/>
+  </svg>
+  <figcaption id="fig-of-cap">Two separate loops: the UI loop (instant, local) and the sync loop (eventual, resilient).</figcaption>
+</figure>
+
+<h2 id="schema">Tracking local changes</h2>
+<code-block lang="kotlin" file="Entities with sync metadata">
+@Entity(tableName = "tasks")
+data class TaskEntity(
+    @PrimaryKey val id: String,                 // client-generated UUID: works offline
+    val title: String,
+    val done: Boolean,
+    val updatedAt: Long,                        // local modification time
+    val serverVersion: Long?,                   // version from server, for conflict detection
+    val pendingSync: Boolean = false,
+    val deleted: Boolean = false,               // soft delete until the server confirms
+)
+</code-block>
+<p>Client-generated IDs mean new items can be created and referenced offline, without waiting for a server ID.</p>
+
+<h2 id="write">The write path</h2>
+<code-block lang="kotlin" file="TaskRepository.kt">
+class TaskRepository(
+    private val dao: TaskDao,
+    private val syncScheduler: SyncScheduler,
+    private val clock: Clock,
+) {
+    fun observeTasks(): Flow<List<Task>> =
+        dao.observeVisible().map { list -> list.map(TaskEntity::toDomain) }   // WHERE deleted = 0
+
+    suspend fun toggleDone(id: String) {
+        dao.update(id) { it.copy(done = !it.done, updatedAt = clock.millis(), pendingSync = true) }
+        syncScheduler.requestSync()             // enqueue unique work; runs when online
+    }
+
+    suspend fun delete(id: String) {
+        dao.update(id) { it.copy(deleted = true, pendingSync = true, updatedAt = clock.millis()) }
+        syncScheduler.requestSync()
+    }
+}
+</code-block>
+
+<h2 id="sync">The sync worker</h2>
+<code-block lang="kotlin" file="SyncWorker.kt">
+@HiltWorker
+class SyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val dao: TaskDao,
+    private val api: TaskApi,
+) : CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result = try {
+        // 1. Push local changes
+        dao.pending().forEach { local ->
+            if (local.deleted) api.delete(local.id)
+            else {
+                val saved = api.upsert(local.toDto())          // server resolves version conflicts
+                dao.markSynced(local.id, saved.version)
+            }
+            if (local.deleted) dao.hardDelete(local.id)
+        }
+        // 2. Pull remote changes since last sync
+        val changes = api.changesSince(dao.maxServerVersion() ?: 0)
+        dao.applyRemote(changes.map { it.toEntity() })         // skip rows with pendingSync = true
+        Result.success()
+    } catch (e: IOException) {
+        Result.retry()                                          // backoff handled by WorkManager
+    }
+}
+
+class SyncScheduler(private val workManager: WorkManager) {
+    fun requestSync() = workManager.enqueueUniqueWork(
+        "sync", ExistingWorkPolicy.KEEP,
+        OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(Constraints(requiredNetworkType = NetworkType.CONNECTED))
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
+            .build(),
+    )
+}
+</code-block>
+<p>With <code>ExistingWorkPolicy.KEEP</code>, a change made while a sync is already running waits for the next sync. <code>APPEND_OR_REPLACE</code> queues a follow-up run instead. Pick the policy that fits your sync frequency.</p>
+
+<h2 id="conflicts">Conflict resolution strategies</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Strategy</th><th>How</th><th>Good for</th></tr></thead>
+  <tbody>
+    <tr><td>Last write wins</td><td>Newest timestamp or version wins</td><td>Simple personal data, low conflict risk</td></tr>
+    <tr><td>Server wins</td><td>Local change discarded on conflict; user notified</td><td>Shared, authoritative data (inventory)</td></tr>
+    <tr><td>Field-level merge</td><td>Merge non-overlapping field changes</td><td>Forms and records edited on several devices</td></tr>
+    <tr><td>User resolves</td><td>Show both versions</td><td>Documents where losing edits is unacceptable</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="ux">Offline UX</h2>
+<ul>
+  <li>Show a subtle "Offline: changes will sync" banner, not an error.</li>
+  <li>Mark unsynced items (a small clock icon), and show failures that need action.</li>
+  <li>Disable only the features that truly need the network, such as payments, and explain why.</li>
+  <li>Show "last updated" times for data that may be stale.</li>
+</ul>
+
+<h2 id="use-cases">Where offline-first matters most</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Field work</h3><p>Inspections, deliveries and surveys in areas with poor coverage.</p></div>
+  <div class="card usecase"><h3>Productivity</h3><p>Notes, tasks and to-do apps, where users expect instant saves.</p></div>
+  <div class="card usecase"><h3>Content</h3><p>News or courses downloaded for later, with progress synced when online.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does every app need to be offline-first?</summary><div><p>No. Real-time features such as payments, live bidding and video calls are inherently online. But caching reads and preserving user input help almost every app.</p></div></details>
+  <details><summary>How do I handle deleting items that were never synced?</summary><div><p>If an item was created locally and deleted before syncing, remove it locally and skip the server call entirely.</p></div></details>
+  <details><summary>Can I use Firestore's offline persistence instead?</summary><div><p>Yes. Firestore provides built-in offline caching and sync. It trades control and portability for convenience.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Offline-first architecture makes the <strong>local database the source of truth</strong>, writes locally with <strong>pending-sync metadata</strong>, syncs through a <strong>WorkManager</strong> worker with backoff, and resolves conflicts with an <strong>explicit policy</strong>. The result is an app that feels instant and never loses user work.</p>
+<p>Next step: handle large lists efficiently with <a href="../paging-3-pagination/index.html">Pagination with Paging 3</a>.</p>

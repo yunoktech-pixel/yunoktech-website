@@ -1,0 +1,118 @@
+<!--meta
+{
+  "seo_title": "MockK vs Mockito for Kotlin Testing (Android)",
+  "description": "MockK vs Mockito (with mockito-kotlin) compared for Android: final classes, coroutines, syntax, relaxed mocks, verification, performance, and when fakes are better than both.",
+  "primary_keyword": "mockk vs mockito",
+  "keywords": ["mockk coroutines coEvery", "mockito kotlin final classes", "mocking kotlin android", "mockk relaxed mock", "fakes vs mocks kotlin", "verify suspend function"],
+  "lede": "MockK was built for Kotlin; Mockito comes from Java but works well with mockito-kotlin. Both can mock suspend functions and final classes today. The bigger question is often whether you should be mocking at all.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["android-unit-testing-junit", "testing-viewmodels-coroutines-flow", "repository-pattern-android", "ai-unit-test-generation-android"],
+  "refs": [
+    ["MockK", "https://mockk.io/"],
+    ["Mockito", "https://site.mockito.org/"],
+    ["mockito-kotlin", "https://github.com/mockito/mockito-kotlin"],
+    ["Use test doubles in Android", "https://developer.android.com/training/testing/fundamentals/test-doubles"]
+  ]
+}
+-->
+<p class="ad-lead">Kotlin classes are final by default, suspend functions take hidden continuation parameters, and top-level functions and objects aren't ordinary Java classes. Early Mockito struggled with all of that, which is why MockK became popular in Android. Both libraries have matured, so the choice is now mostly about style.</p>
+
+<h2 id="same-test">The same test in both</h2>
+<code-block lang="kotlin" file="MockK">
+@Test
+fun `refresh shows error when repository fails`() = runTest {
+    val repo = mockk<ArticleRepository>()
+    coEvery { repo.refresh() } throws IOException()
+    every { repo.observeArticles() } returns flowOf(emptyList())
+
+    val vm = ArticlesViewModel(repo)
+    vm.refresh(); advanceUntilIdle()
+
+    assertEquals("Couldn't refresh", vm.uiState.value.message)
+    coVerify(exactly = 1) { repo.refresh() }
+}
+</code-block>
+<code-block lang="kotlin" file="Mockito + mockito-kotlin">
+@Test
+fun `refresh shows error when repository fails`() = runTest {
+    val repo = mock<ArticleRepository> {
+        onBlocking { refresh() } doThrow IOException()      // doThrow works with checked exceptions too
+        on { observeArticles() } doReturn flowOf(emptyList())
+    }
+
+    val vm = ArticlesViewModel(repo)
+    vm.refresh(); advanceUntilIdle()
+
+    assertEquals("Couldn't refresh", vm.uiState.value.message)
+    verifyBlocking(repo, times(1)) { refresh() }
+}
+</code-block>
+
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>MockK</th><th>Mockito (+ mockito-kotlin)</th></tr></thead>
+  <tbody>
+    <tr><td>Kotlin-first API</td><td>Yes (<code>every</code>, <code>coEvery</code>, DSL)</td><td>Via mockito-kotlin extensions</td></tr>
+    <tr><td>Final classes</td><td>Supported</td><td>Supported (inline mock maker is the default in recent versions)</td></tr>
+    <tr><td>Suspend functions</td><td><code>coEvery</code> / <code>coVerify</code></td><td><code>onBlocking</code> / <code>verifyBlocking</code></td></tr>
+    <tr><td>Objects, top-level and extension functions, constructors</td><td><code>mockkObject</code>, <code>mockkStatic</code>, <code>mockkConstructor</code></td><td>Limited (static mocking via <code>mockStatic</code>)</td></tr>
+    <tr><td>Relaxed mocks</td><td><code>mockk(relaxed = true)</code></td><td>Default answers (null/zero), RETURNS_DEEP_STUBS</td></tr>
+    <tr><td>Speed</td><td>Can be slower to initialise</td><td>Generally fast</td></tr>
+    <tr><td>Ecosystem familiarity</td><td>Very common in Kotlin Android projects</td><td>Universal in Java and Android</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="fakes">Often better: fakes</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-fm-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-fm-t fig-fm-d">
+    <title id="fig-fm-t">Fakes versus mocks</title>
+    <desc id="fig-fm-d">A mock is configured per test with stubbed calls and verifies interactions, coupling tests to implementation. A fake is a reusable working implementation with real behaviour, so tests assert outcomes and survive refactoring.</desc>
+    <rect class="d-amber" x="30" y="20" width="300" height="120" rx="14"/><text class="d-t" x="180" y="48" text-anchor="middle">Mock</text><text class="d-s" x="180" y="74" text-anchor="middle">stub each call per test</text><text class="d-s" x="180" y="94" text-anchor="middle">verify interactions</text><text class="d-s" x="180" y="114" text-anchor="middle">couples to implementation</text>
+    <rect class="d-green" x="390" y="20" width="300" height="120" rx="14"/><text class="d-t" x="540" y="48" text-anchor="middle">Fake</text><text class="d-s" x="540" y="74" text-anchor="middle">working in-memory implementation</text><text class="d-s" x="540" y="94" text-anchor="middle">assert outcomes (state)</text><text class="d-s" x="540" y="114" text-anchor="middle">reusable, refactor-friendly</text>
+  </svg>
+  <figcaption id="fig-fm-cap">Use fakes for your own interfaces (repositories, data sources), and mocks for interaction checks or awkward third-party types.</figcaption>
+</figure>
+<code-block lang="kotlin" file="FakeArticleRepository.kt">
+class FakeArticleRepository : ArticleRepository {
+    val articles = MutableStateFlow<List<Article>>(emptyList())
+    var failRefresh = false
+    override fun observeArticles(): Flow<List<Article>> = articles
+    override suspend fun refresh() { if (failRefresh) throw IOException() }
+}
+</code-block>
+
+<h2 id="when-mock">When mocks are the right tool</h2>
+<ul>
+  <li>Verifying a side effect happened exactly once (analytics event, logger call).</li>
+  <li>Third-party classes that are hard to fake and that you don't wrap.</li>
+  <li>Simulating rare failures in deep collaborators.</li>
+</ul>
+
+<h2 id="use-cases">Team recommendations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Kotlin-only Android app</h3><p>MockK for its Kotlin-native API, with fakes for repositories.</p></div>
+  <div class="card usecase"><h3>Mixed Java/Kotlin codebase</h3><p>Mockito with mockito-kotlin keeps one library for both languages.</p></div>
+  <div class="card usecase"><h3>Large test suites</h3><p>Prefer fakes. Measure mock initialisation cost if tests feel slow.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Mocking data classes and value types. Just create real instances.</li>
+  <li>Relaxed mocks everywhere, which hide missing stubs and let tests pass vacuously.</li>
+  <li>Verifying every call, which breaks tests on harmless refactors.</li>
+  <li>Mocking the class under test.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I use both in one project?</summary><div><p>You can, but pick one as the standard to keep tests consistent.</p></div></details>
+  <details><summary>Do I need special setup for final classes with Mockito?</summary><div><p>Recent Mockito versions use the inline mock maker by default, which supports final classes. Older setups needed explicit configuration.</p></div></details>
+  <details><summary>What about mocking Android framework classes?</summary><div><p>Avoid it. Wrap framework calls behind your own interfaces, or use Robolectric when you need real behaviour.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>MockK</strong> offers the most Kotlin-native API, and <strong>Mockito with mockito-kotlin</strong> is equally capable for most needs. For your own repositories and data sources, <strong>fakes</strong> usually produce clearer, more robust tests than either.</p>
+<p>Next step: find a different kind of bug in <a href="../android-memory-leaks/index.html">Android Memory Leaks: Causes and Solutions</a>.</p>

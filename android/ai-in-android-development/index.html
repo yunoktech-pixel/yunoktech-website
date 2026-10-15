@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI in Android Development: A Complete Developer&#x27;s Guide | Yunok Tech</title>
+  <meta name="description" content="What AI in Android development really means: ML Kit, LiteRT, Gemini Nano, cloud Gemini via Firebase AI Logic and AI coding tools, with architecture, code and trade-offs.">
+  <meta name="keywords" content="ai in android development, android ai, generative ai android, on-device ai android, gemini android, ml kit android, firebase ai logic, ai features in android apps, android machine learning">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-in-android-development/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-in-android-development/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="AI in Android Development: A Complete Developer&#x27;s Guide">
+  <meta property="og:description" content="What AI in Android development really means: ML Kit, LiteRT, Gemini Nano, cloud Gemini via Firebase AI Logic and AI coding tools, with architecture, code and trade-offs.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="AI in Android Development: A Complete Developer&#x27;s Guide">
+  <meta name="twitter:description" content="What AI in Android development really means: ML Kit, LiteRT, Gemini Nano, cloud Gemini via Firebase AI Logic and AI coding tools, with architecture, code and trade-offs.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "What Is AI in Android Development? A Complete Developer's Guide", "description": "What AI in Android development really means: ML Kit, LiteRT, Gemini Nano, cloud Gemini via Firebase AI Logic and AI coding tools, with architecture, code and trade-offs.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android AI and Generative AI", "keywords": "android ai, generative ai android, on-device ai android, gemini android, ml kit android, firebase ai logic, ai features in android apps, android machine learning", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-in-android-development/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "What Is AI in Android Development? A Complete Developer's Guide", "item": "https://yunoktech.com/android/ai-in-android-development/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">What Is AI in Android Development? A Complete Developer&#x27;s Guide</h1>
+    <p class="ad-lede">"Add AI to the app" can mean five very different things on Android, each with different costs, privacy implications and device requirements. This guide maps the whole landscape, shows a minimal example of each approach, and explains how to choose without the hype.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>9 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#two-meanings">Two meanings of &quot;AI in Android development&quot;</a></li><li><a href="#landscape">The landscape: five ways to add AI to an Android app</a></li><li><a href="#traditional-ml">Task-specific ML: still the right answer surprisingly often</a></li><li><a href="#on-device-genai">On-device generative AI: Gemini Nano</a></li><li><a href="#cloud-genai">Cloud generative AI: Gemini via Firebase AI Logic</a></li><li><a href="#architecture">Where AI fits in your app architecture</a></li><li><a href="#use-cases">Real-world use cases and the right tool for each</a></li><li><a href="#production-concerns">Production concerns teams underestimate</a></li><li><a href="#learning-path">A learning path through this series</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A product manager asks for "AI in the app". One developer imagines a chatbot. Another thinks of scanning receipts with the camera. A third plans to use AI to write the code faster. All three are "AI in Android development", but they share almost nothing in terms of architecture, cost, privacy or device support.</p>
+<p>This guide is the starting point for the Yunoktech Android AI series. It's for Android developers who know Kotlin and want a clear, accurate map of the field: what kinds of AI exist on Android today, where each one runs, what it costs, which Google SDK provides it, and how it fits into a normal app architecture.</p>
+
+<h2 id="two-meanings">Two meanings of "AI in Android development"</h2>
+<ol>
+  <li><strong>AI as a product feature</strong>: something your users experience, such as summarising a document, describing a photo, smart replies, semantic search or a support chat.</li>
+  <li><strong>AI as a development tool</strong>: assistants such as Gemini in Android Studio that help <em>you</em> write, explain, test and debug code. Your users never see these directly.</li>
+</ol>
+<p>Most of this article is about the first meaning. The development-tools side is covered in <a href="../gemini-in-android-studio/index.html">How to Use Gemini in Android Studio</a>.</p>
+
+<h2 id="landscape">The landscape: five ways to add AI to an Android app</h2>
+<p>Think of the options along two axes: <strong>what kind of model</strong> (a specialised task model or a general-purpose generative model) and <strong>where it runs</strong> (on the device or in the cloud).</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-land-cap">
+  <svg viewBox="0 0 720 330" role="img" aria-labelledby="fig-land-title fig-land-desc">
+    <title id="fig-land-title">Android AI landscape by model type and where it runs</title>
+    <desc id="fig-land-desc">A two-by-two grid. On-device task-specific: ML Kit vision and language APIs, and custom LiteRT models. On-device generative: Gemini Nano through ML Kit GenAI APIs via AICore. Cloud generative: Gemini through Firebase AI Logic, or any provider through your own backend. Cloud task-specific: hosted vision and speech APIs called from a backend.</desc>
+    <line class="d-line" x1="360" y1="30" x2="360" y2="310"/><line class="d-line" x1="40" y1="170" x2="700" y2="170"/>
+    <text class="d-s" x="200" y="22" text-anchor="middle">RUNS ON DEVICE</text><text class="d-s" x="530" y="22" text-anchor="middle">RUNS IN THE CLOUD</text>
+    <text class="d-s" x="28" y="100" text-anchor="middle" transform="rotate(-90 28 100)">TASK-SPECIFIC ML</text>
+    <text class="d-s" x="28" y="245" text-anchor="middle" transform="rotate(-90 28 245)">GENERATIVE AI</text>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="56" y="40" width="288" height="56" rx="12"/><text class="d-t" x="200" y="64" text-anchor="middle">① ML Kit vision &amp; language</text><text class="d-s" x="200" y="83" text-anchor="middle">text recognition, barcodes, translation</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="56" y="104" width="288" height="56" rx="12"/><text class="d-t" x="200" y="128" text-anchor="middle">② Custom models with LiteRT</text><text class="d-s" x="200" y="147" text-anchor="middle">your own trained model, bundled</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="56" y="184" width="288" height="110" rx="12"/><text class="d-t" x="200" y="216" text-anchor="middle">③ Gemini Nano (on-device LLM)</text><text class="d-s" x="200" y="238" text-anchor="middle">ML Kit GenAI APIs → AICore</text><text class="d-s" x="200" y="256" text-anchor="middle">summarize, proofread, rewrite,</text><text class="d-s" x="200" y="274" text-anchor="middle">describe images, prompt (beta)</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="376" y="184" width="310" height="52" rx="12"/><text class="d-t" x="531" y="207" text-anchor="middle">④ Cloud Gemini via Firebase AI Logic</text><text class="d-s" x="531" y="225" text-anchor="middle">Kotlin SDK, App Check protected</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-violet" x="376" y="242" width="310" height="52" rx="12"/><text class="d-t" x="531" y="265" text-anchor="middle">⑤ Any model via your own backend</text><text class="d-s" x="531" y="283" text-anchor="middle">Gemini, OpenAI, open models, RAG</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="376" y="40" width="310" height="120" rx="12"/><text class="d-t" x="531" y="90" text-anchor="middle">Hosted task APIs</text><text class="d-s" x="531" y="110" text-anchor="middle">e.g. cloud vision / speech services,</text><text class="d-s" x="531" y="128" text-anchor="middle">usually called from your backend</text></g>
+  </svg>
+  <figcaption id="fig-land-cap">The Android AI landscape. Many production apps combine two or more of these approaches, for example on-device for privacy-sensitive quick tasks and cloud for heavy reasoning.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Approach</th><th>Good for</th><th>Network</th><th>Cost model</th><th>Main limitation</th></tr></thead>
+  <tbody>
+    <tr><td>① ML Kit vision/language</td><td>OCR, barcodes, face/pose detection, translation, language ID</td><td>Not needed (bundled or downloaded models)</td><td>No per-request fee</td><td>Fixed tasks only, no free-form generation</td></tr>
+    <tr><td>② LiteRT custom model</td><td>Your own classifier, detector or recommender</td><td>Not needed</td><td>Your training and engineering time</td><td>You own the model lifecycle, size and accuracy</td></tr>
+    <tr><td>③ Gemini Nano (ML Kit GenAI)</td><td>Summaries, proofreading, rewriting, image descriptions, short prompts</td><td>Not needed after model download</td><td>No per-request fee</td><td>Only on supported devices; beta APIs; foreground only; per-app quota</td></tr>
+    <tr><td>④ Cloud Gemini (Firebase AI Logic)</td><td>Chat, reasoning, long documents, multimodal input</td><td>Required</td><td>Per token (free tier available)</td><td>Latency, data leaves the device, cost at scale</td></tr>
+    <tr><td>⑤ Your own backend</td><td>Multi-provider, RAG over private data, tools, strict control</td><td>Required</td><td>Per token + server costs</td><td>You build and operate the backend</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="traditional-ml">Task-specific ML: still the right answer surprisingly often</h2>
+<p>Before reaching for a large language model, ask whether the problem is really a <em>fixed task</em>. Reading text from a photo, scanning a barcode or detecting a language are solved problems with small, fast, free on-device models. An LLM would be slower, costlier and less predictable at them.</p>
+<figure class="code"><figcaption><span class="file">ReceiptScanner.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Dependencies (use the latest versions from the ML Kit release notes):</span>
+<span class="tk-c">//   implementation("com.google.mlkit:text-recognition:&lt;version&gt;")</span>
+<span class="tk-c">//   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:&lt;version&gt;")  // for await()</span>
+<span class="tk-k">import</span> com.google.mlkit.vision.common.<span class="tk-t">InputImage</span>
+<span class="tk-k">import</span> com.google.mlkit.vision.text.<span class="tk-t">TextRecognition</span>
+<span class="tk-k">import</span> com.google.mlkit.vision.text.latin.<span class="tk-t">TextRecognizerOptions</span>
+<span class="tk-k">import</span> kotlinx.coroutines.tasks.await
+
+<span class="tk-k">class</span> <span class="tk-t">ReceiptScanner</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> recognizer = <span class="tk-t">TextRecognition</span>.getClient(<span class="tk-t">TextRecognizerOptions</span>.<span class="tk-t">DEFAULT_OPTIONS</span>)
+
+    <span class="tk-c">/** Returns all recognised lines, top to bottom. Runs fully on-device. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> readLines(bitmap: <span class="tk-t">Bitmap</span>, rotationDegrees: <span class="tk-t">Int</span> = <span class="tk-n">0</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; {
+        <span class="tk-k">val</span> image = <span class="tk-t">InputImage</span>.fromBitmap(bitmap, rotationDegrees)
+        <span class="tk-k">val</span> result = recognizer.process(image).await()
+        <span class="tk-k">return</span> result.textBlocks.flatMap { block -&gt; block.lines.map { it.text } }
+    }
+
+    <span class="tk-k">fun</span> close() = recognizer.close()
+}</code></pre></figure>
+<p>A common and effective pattern combines both kinds: run on-device OCR first, then send only the <em>extracted text</em>, not the photo, to a generative model to categorise the expense. That reduces cost, latency and the amount of personal data that leaves the device.</p>
+
+<h2 id="on-device-genai">On-device generative AI: Gemini Nano</h2>
+<p><strong>Gemini Nano</strong> is Google's on-device foundation model. It runs inside <strong>AICore</strong>, an Android system service that downloads, updates and hardware-accelerates the model, so your APK doesn't carry a multi-gigabyte model file. Apps access it through the <strong>ML Kit GenAI APIs</strong>: Summarization, Proofreading, Rewriting and Image Description, plus a more flexible Prompt API. At the time of writing these APIs are in beta (speech recognition is alpha), so check the current status before you depend on them.</p>
+<p>The key constraints come straight from the official documentation:</p>
+<ul>
+  <li><strong>Device support is limited</strong> to specific recent devices from several manufacturers. Always call <code>checkFeatureStatus()</code> before showing the feature.</li>
+  <li><strong>Inference is allowed only while your app is the top foreground app.</strong> Background use, including from a foreground service, is blocked.</li>
+  <li><strong>AICore enforces a per-app inference quota</strong>, so bursts of requests can return a <code>BUSY</code> error. Retry with exponential backoff.</li>
+  <li><strong>Feature-specific limits apply</strong>. For example, summarisation input must be under about 4,000 tokens and supports a small set of languages.</li>
+</ul>
+<p>The full walkthrough with code is in <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI on Android</a>.</p>
+
+<h2 id="cloud-genai">Cloud generative AI: Gemini via Firebase AI Logic</h2>
+<p>For open-ended chat, complex reasoning, long documents or broad multilingual support, you need a larger cloud model. Google's recommended path for calling Gemini directly from an Android app is the <strong>Firebase AI Logic</strong> SDK. It supports Kotlin coroutines and Flow, and it integrates with <strong>Firebase App Check</strong> to help ensure requests come from your genuine app rather than from someone who extracted your configuration.</p>
+<figure class="code"><figcaption><span class="file">Minimal Gemini call (Kotlin)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// build.gradle.kts (app):</span>
+<span class="tk-c">//   implementation(platform("com.google.firebase:firebase-bom:&lt;latest&gt;"))</span>
+<span class="tk-c">//   implementation("com.google.firebase:firebase-ai")</span>
+<span class="tk-k">import</span> com.google.firebase.<span class="tk-t">Firebase</span>
+<span class="tk-k">import</span> com.google.firebase.ai.ai
+<span class="tk-k">import</span> com.google.firebase.ai.type.<span class="tk-t">GenerativeBackend</span>
+
+<span class="tk-c">// Model names change frequently: check the current list before release.</span>
+<span class="tk-k">private</span> <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">MODEL_NAME</span> = <span class="tk-s">"gemini-3.8-flash"</span>
+
+<span class="tk-k">val</span> model = <span class="tk-t">Firebase</span>.ai(backend = <span class="tk-t">GenerativeBackend</span>.googleAI()).generativeModel(<span class="tk-t">MODEL_NAME</span>)
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> suggestTitle(noteText: <span class="tk-t">String</span>): <span class="tk-t">String</span>? =
+    model.generateContent(<span class="tk-s">"Suggest a short, specific title (max 6 words) for this note:\n$noteText"</span>).text</code></pre></figure>
+<div class="warn"><b>Never ship a raw API key</b>
+<p>Don't embed a Gemini, OpenAI or any other provider's secret key in your APK. Anything in an APK can be extracted. Use Firebase AI Logic with App Check, or route requests through your own backend that holds the key and enforces per-user limits. Details are in <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android Using Kotlin</a>.</p></div>
+
+<h2 id="architecture">Where AI fits in your app architecture</h2>
+<p>AI calls are just another data source, and slow, fallible and sometimes costly ones at that. Treat them like a network repository: hide the provider behind an interface, call it from a ViewModel inside a coroutine, and model loading, streaming, success and error as UI state.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-arch-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-arch-title fig-arch-desc">
+    <title id="fig-arch-title">AI feature inside a layered Android architecture</title>
+    <desc id="fig-arch-desc">Compose UI talks to a ViewModel, which calls an AiRepository interface. Implementations include an on-device Gemini Nano source and a cloud Gemini source, chosen at runtime based on availability.</desc>
+    <defs><marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 95 H176 M326 95 H362 M520 80 L556 50 M520 110 L556 140" marker-end="url(#a1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="65" width="120" height="60" rx="12"/><text class="d-t" x="80" y="92" text-anchor="middle">Compose UI</text><text class="d-s" x="80" y="110" text-anchor="middle">renders AiUiState</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="180" y="65" width="146" height="60" rx="12"/><text class="d-t" x="253" y="92" text-anchor="middle">ViewModel</text><text class="d-s" x="253" y="110" text-anchor="middle">loading / stream / error</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="366" y="65" width="154" height="60" rx="12"/><text class="d-t" x="443" y="92" text-anchor="middle">AiRepository</text><text class="d-s" x="443" y="110" text-anchor="middle">interface + fallback</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="560" y="22" width="150" height="54" rx="12"/><text class="d-t" x="635" y="46" text-anchor="middle">On-device</text><text class="d-s" x="635" y="64" text-anchor="middle">Gemini Nano</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="560" y="114" width="150" height="54" rx="12"/><text class="d-t" x="635" y="138" text-anchor="middle">Cloud</text><text class="d-s" x="635" y="156" text-anchor="middle">Gemini / backend</text></g>
+  </svg>
+  <figcaption id="fig-arch-cap">The UI never knows which model answered. That lets you add fallbacks, switch providers, or A/B test models without touching screens.</figcaption>
+</figure>
+
+<figure class="code"><figcaption><span class="file">TextAssistant.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">/** What the app needs from "AI", independent of the provider. */</span>
+<span class="tk-k">interface</span> <span class="tk-t">TextAssistant</span> {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> isAvailable(): <span class="tk-t">Boolean</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>): <span class="tk-t">String</span>
+}
+
+<span class="tk-c">/** Tries on-device first (private, free), falls back to cloud when unavailable. */</span>
+<span class="tk-k">class</span> <span class="tk-t">FallbackTextAssistant</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> onDevice: <span class="tk-t">TextAssistant</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cloud: <span class="tk-t">TextAssistant</span>,
+) : <span class="tk-t">TextAssistant</span> {
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> isAvailable() = onDevice.isAvailable() || cloud.isAvailable()
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>): <span class="tk-t">String</span> =
+        <span class="tk-k">if</span> (onDevice.isAvailable()) onDevice.summarize(text) <span class="tk-k">else</span> cloud.summarize(text)
+}</code></pre></figure>
+<div class="note"><b>Privacy changes with the path</b>
+<p>If the fallback sends user text to the cloud, users must be told. Your privacy policy and the Play Console Data safety form need to reflect it. Some features should have no cloud fallback at all.</p></div>
+
+<h2 id="use-cases">Real-world use cases and the right tool for each</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Expense app: scan receipts</h3><dl><dt>Problem</dt><dd>Typing receipt totals is tedious.</dd><dt>Solution</dt><dd>On-device ML Kit OCR → optional cloud model to categorise the extracted text.</dd><dt>Why</dt><dd>OCR is a fixed task; only small text leaves the device.</dd><dt>Trade-off</dt><dd>Categorisation needs a network connection and costs tokens.</dd></dl></div>
+  <div class="card usecase"><h3>Messaging app: polish a reply</h3><dl><dt>Problem</dt><dd>Users want quick grammar fixes and tone changes.</dd><dt>Solution</dt><dd>ML Kit GenAI Proofreading/Rewriting on Gemini Nano.</dd><dt>Why</dt><dd>Private messages stay on the device; low latency; no per-call fee.</dd><dt>Trade-off</dt><dd>Only on supported devices, so hide the feature elsewhere or offer an opt-in cloud path.</dd></dl></div>
+  <div class="card usecase"><h3>Learning app: ask questions about course notes</h3><dl><dt>Problem</dt><dd>Answers must come from the course material, not the open internet.</dd><dt>Solution</dt><dd>Backend RAG: retrieve relevant notes, send them with the question to a cloud model.</dd><dt>Why</dt><dd>Grounding in your own content reduces hallucinations.</dd><dt>Trade-off</dt><dd>Requires a backend, embeddings and evaluation work.</dd></dl></div>
+</div>
+
+<h2 id="production-concerns">Production concerns teams underestimate</h2>
+<ul>
+  <li><strong>Non-determinism.</strong> The same prompt can produce different outputs. Design the UI for variation and let users edit or regenerate.</li>
+  <li><strong>Hallucinations.</strong> Models can state false things confidently. Don't present generated text as verified fact, especially in health, finance or legal contexts.</li>
+  <li><strong>Prompt injection.</strong> If the model reads untrusted content such as emails or web pages, that content can try to override your instructions. Never let model output trigger sensitive actions without validation or user confirmation.</li>
+  <li><strong>Cost and quotas.</strong> Cloud costs scale with tokens. On-device has quotas. Add per-user limits, caching and graceful "try again later" states.</li>
+  <li><strong>Evaluation.</strong> Keep a small set of real test inputs and review outputs whenever you change the prompt or the model version.</li>
+  <li><strong>Accessibility and UX.</strong> Label AI-generated content, stream long responses so the UI feels responsive, and always provide a non-AI path.</li>
+</ul>
+
+<h2 id="learning-path">A learning path through this series</h2>
+<ol class="steps">
+  <li><a href="../choose-ai-model-android-app/index.html">How to Choose the Right AI Model for an Android App</a>: a decision framework.</li>
+  <li><a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI for Android</a>: deployment trade-offs in depth.</li>
+  <li><a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android Using Kotlin</a>: your first cloud feature.</li>
+  <li><a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI on Android</a>: your first on-device feature.</li>
+  <li><a href="../ai-chatbot-jetpack-compose/index.html">Build an AI Chatbot with Kotlin and Jetpack Compose</a>: a complete project.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need to know machine learning to add AI to an Android app?</summary><div><p>No. ML Kit and Firebase AI Logic expose high-level Kotlin APIs. You need solid Android skills (coroutines, state management, error handling) plus an understanding of model limitations, privacy and cost. Training your own models with LiteRT is where ML knowledge becomes necessary.</p></div></details>
+  <details><summary>Does Gemini Nano work on every Android phone?</summary><div><p>No. It requires AICore and supported hardware, and the device list is published on the ML Kit GenAI page. Your app must check feature status at runtime and offer a fallback or hide the feature.</p></div></details>
+  <details><summary>Is it safe to call an AI API directly from the app?</summary><div><p>Only through a mechanism designed for it, such as Firebase AI Logic with App Check. Never embed a raw provider API key in the APK. For multi-provider setups or sensitive logic, use your own backend.</p></div></details>
+  <details><summary>Can I use OpenAI or other models in an Android app?</summary><div><p>Yes, typically through your own backend that holds the API key and calls the provider. The Android app talks to your backend, which also lets you switch providers later.</p></div></details>
+  <details><summary>What's the difference between ML Kit and ML Kit GenAI?</summary><div><p>Classic ML Kit provides task-specific models such as text recognition and barcode scanning. ML Kit GenAI provides generative features such as summarisation and rewriting, powered by Gemini Nano through AICore on supported devices.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI in Android development isn't one technology. It's a toolbox: <strong>task-specific on-device ML</strong> for fixed problems, <strong>Gemini Nano</strong> for private on-device generation on supported devices, and <strong>cloud models</strong> through Firebase AI Logic or your own backend for heavier reasoning. Whichever you choose, it slots into the same architecture you already know: a repository behind an interface, called from a ViewModel, with honest loading and error states.</p>
+<p>Next step: write down one AI feature idea for your app and decide which of the five approaches fits it. Then use the framework in <a href="../choose-ai-model-android-app/index.html">How to Choose the Right AI Model for an Android App</a> to check your choice.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/ai" target="_blank" rel="noopener">Android Developers: AI on Android</a></li><li><a href="https://developer.android.com/ai/gemini-nano" target="_blank" rel="noopener">Gemini Nano and AICore</a></li><li><a href="https://developers.google.com/ml-kit/genai" target="_blank" rel="noopener">ML Kit GenAI APIs</a></li><li><a href="https://developers.google.com/ml-kit" target="_blank" rel="noopener">ML Kit (vision and language APIs)</a></li><li><a href="https://firebase.google.com/docs/ai-logic" target="_blank" rel="noopener">Firebase AI Logic</a></li><li><a href="https://ai.google.dev/edge/litert" target="_blank" rel="noopener">LiteRT (Google AI Edge)</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Gemini models (Google AI for Developers)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-in-android-development-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-in-android-development-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/choose-ai-model-android-app/index.html"><small>Android AI and Generative AI</small>How to Choose the Right AI Model for an Android App</a></li><li><a href="../../android/cloud-ai-vs-on-device-ai-android/index.html"><small>Android AI and Generative AI</small>Cloud AI vs On-Device AI for Android</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/gemini-nano-ml-kit-genai-android/index.html"><small>Android AI and Generative AI</small>Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-in-android-development/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-in-android-development/&amp;text=What Is AI in Android Development? A Complete Developer&#x27;s Guide" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-in-android-development/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#two-meanings">Two meanings of &quot;AI in Android development&quot;</a></li><li><a href="#landscape">The landscape: five ways to add AI to an Android app</a></li><li><a href="#traditional-ml">Task-specific ML: still the right answer surprisingly often</a></li><li><a href="#on-device-genai">On-device generative AI: Gemini Nano</a></li><li><a href="#cloud-genai">Cloud generative AI: Gemini via Firebase AI Logic</a></li><li><a href="#architecture">Where AI fits in your app architecture</a></li><li><a href="#use-cases">Real-world use cases and the right tool for each</a></li><li><a href="#production-concerns">Production concerns teams underestimate</a></li><li><a href="#learning-path">A learning path through this series</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-in-android-development-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-in-android-development-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

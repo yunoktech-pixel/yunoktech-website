@@ -1,0 +1,96 @@
+<!--meta
+{
+  "seo_title": "Certificate Pinning in Android: Benefits and Limitations",
+  "description": "Certificate pinning on Android explained: what it protects against, pinning via network security config and OkHttp, backup pins, rotation, expiry, risks of bricking your app and alternatives.",
+  "primary_keyword": "certificate pinning android",
+  "keywords": ["ssl pinning android", "network security config pin-set", "okhttp certificate pinner", "public key pinning rotation", "mitm protection android", "pinning expiration"],
+  "lede": "Certificate pinning makes your app trust only specific keys for your servers, which blocks some man-in-the-middle attacks. Done carelessly, it can also lock every user out of your app when a certificate rotates. Here's when pinning is worth it and how to do it safely.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["android-app-security-best-practices", "okhttp-interceptors", "play-integrity-api-explained", "common-android-security-vulnerabilities"],
+  "refs": [
+    ["Network security configuration: pin a certificate", "https://developer.android.com/privacy-and-security/security-config#CertificatePinning"],
+    ["OkHttp (CertificatePinner): official repository", "https://github.com/square/okhttp"],
+    ["OWASP: pinning cheat sheet", "https://cheatsheetseries.owasp.org/cheatsheets/Pinning_Cheat_Sheet.html"]
+  ]
+}
+-->
+<p class="ad-lead">TLS already authenticates your server through trusted certificate authorities (CAs). Pinning adds a stricter rule: even a valid certificate from a trusted CA is rejected unless its public key matches one you've pinned. That protects against mis-issued certificates and some interception setups, at the cost of operational risk.</p>
+
+<h2 id="what">What pinning does and doesn't protect</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-pin-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-pin-t fig-pin-d">
+    <title id="fig-pin-t">How certificate pinning changes trust decisions</title>
+    <desc id="fig-pin-d">Without pinning, any certificate chaining to a trusted CA is accepted, including a mis-issued one or one from a CA installed on a corporate or compromised device. With pinning, the connection is accepted only if the server's public key matches a pinned hash; otherwise it fails.</desc>
+    <text class="d-t" x="180" y="22" text-anchor="middle">Without pinning</text>
+    <rect class="d-green" x="40" y="34" width="280" height="40" rx="8"/><text class="d-s" x="180" y="58" text-anchor="middle">valid cert from your CA → ✓</text>
+    <rect class="d-amber" x="40" y="82" width="280" height="40" rx="8"/><text class="d-s" x="180" y="106" text-anchor="middle">mis-issued cert, trusted CA → ✓ (risk)</text>
+    <rect class="d-amber" x="40" y="130" width="280" height="40" rx="8"/><text class="d-s" x="180" y="154" text-anchor="middle">interception proxy CA → depends</text>
+    <text class="d-t" x="540" y="22" text-anchor="middle">With pinning</text>
+    <rect class="d-green" x="400" y="34" width="280" height="40" rx="8"/><text class="d-s" x="540" y="58" text-anchor="middle">key matches pin → ✓</text>
+    <rect class="d-red" x="400" y="82" width="280" height="40" rx="8"/><text class="d-s" x="540" y="106" text-anchor="middle">mis-issued cert → ✗ blocked</text>
+    <rect class="d-red" x="400" y="130" width="280" height="40" rx="8"/><text class="d-s" x="540" y="154" text-anchor="middle">your own rotated key, unpinned → ✗ outage!</text>
+  </svg>
+  <figcaption id="fig-pin-cap">Pinning blocks unexpected certificates, including your own if you forget to pin the new key.</figcaption>
+</figure>
+<p>Android apps targeting API 24+ already ignore user-installed CAs by default, which blocks many casual interception setups. Pinning additionally defends against mis-issued certificates from trusted CAs. It does <strong>not</strong> stop an attacker who controls the device and modifies your app.</p>
+
+<h2 id="nsc">Pinning with Network Security Config</h2>
+<code-block lang="xml" file="res/xml/network_security_config.xml">
+<network-security-config>
+    <domain-config>
+        <domain includeSubdomains="true">api.example.com</domain>
+        <!-- Expiration: after this date pinning is NOT enforced, so old app versions keep working -->
+        <pin-set expiration="2027-06-30">
+            <!-- SHA-256 of the SubjectPublicKeyInfo: current key + at least one backup -->
+            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <pin digest="SHA-256">BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>
+</code-block>
+<p>The pin values above are placeholders. Compute real ones from your keys.</p>
+
+<h2 id="okhttp">Pinning with OkHttp</h2>
+<code-block lang="kotlin" file="CertificatePinner">
+val pinner = CertificatePinner.Builder()
+    .add("api.example.com", "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")   // current
+    .add("api.example.com", "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=")   // backup
+    .build()
+
+val client = OkHttpClient.Builder().certificatePinner(pinner).build()
+</code-block>
+<p>Prefer Network Security Config when possible: it's declarative, applies app-wide, and supports an expiration date.</p>
+
+<h2 id="safe">Pinning safely</h2>
+<ol class="steps">
+  <li><strong>Pin public keys, not certificates</strong>, and preferably an intermediate CA or your own key that you control across renewals.</li>
+  <li><strong>Always include backup pins</strong>: a second key you hold offline, or another CA you might move to.</li>
+  <li><strong>Set an expiration date</strong> so very old app versions don't break permanently.</li>
+  <li><strong>Coordinate with whoever manages certificates</strong>, such as the backend team or CDN, and document the rotation process.</li>
+  <li><strong>Monitor pinning failures</strong> and have a plan, such as a forced update, if something goes wrong.</li>
+</ol>
+
+<h2 id="decide">Should you pin?</h2>
+<div class="cards">
+  <div class="card pros"><h4>Consider pinning</h4><ul><li>Banking, payments, high-value targets</li><li>You control the certificate lifecycle</li><li>Strong operational processes</li></ul></div>
+  <div class="card cons"><h4>Probably don't</h4><ul><li>Third-party APIs or CDNs you don't control</li><li>No process for coordinated key rotation</li><li>Small teams where an outage risk outweighs the benefit</li></ul></div>
+</div>
+<p>For many apps, correct TLS, the default distrust of user CAs, server-side validation and <a href="../play-integrity-api-explained/index.html">Play Integrity</a> provide better risk reduction per unit of operational effort.</p>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Verify the pin values match the production chain before release, using a staging environment that mirrors production certificates.</li>
+  <li>Test that a deliberately wrong pin fails closed, and that debug overrides work for development proxies.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does pinning stop someone reverse engineering my API?</summary><div><p>Not reliably. An attacker controlling their own device can modify the app to remove pinning. Pinning protects honest users' connections, not your API from its own clients.</p></div></details>
+  <details><summary>What happens when my certificate renews?</summary><div><p>If the public key changes and isn't in your pin set, connections fail for every app version with the old pins. That's why key reuse, backup pins and expirations matter.</p></div></details>
+  <details><summary>Is pinning required by Google Play?</summary><div><p>No. It's an optional hardening measure.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Certificate pinning adds protection against <strong>mis-issued or unexpected certificates</strong>, but brings real <strong>outage risk</strong>. If you pin, pin public keys with backups and an expiration, coordinate rotations, and monitor. Otherwise, rely on solid TLS defaults and server-side controls.</p>
+<p>Next step: protect data at rest with <a href="../encrypted-data-storage-android/index.html">Encrypted Data Storage in Android</a>.</p>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Assisted Migration from XML to Jetpack Compose | Yunok Tech</title>
+  <meta name="description" content="Migrate XML layouts to Jetpack Compose with AI assistance: a screen-by-screen process, prompts, mapping Views to composables, preserving behaviour, interop, theming and visual regression tests.">
+  <meta name="keywords" content="migrate xml to compose ai, xml to compose conversion, ai convert layout to compose, compose migration strategy, recyclerview to lazycolumn, composeview interop, visual regression migration">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-migrate-xml-to-compose/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-migrate-xml-to-compose/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="AI-Assisted Migration from XML to Jetpack Compose">
+  <meta property="og:description" content="Migrate XML layouts to Jetpack Compose with AI assistance: a screen-by-screen process, prompts, mapping Views to composables, preserving behaviour, interop, theming and visual regression tests.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="AI Tools for Android Developers">
+  <meta name="twitter:title" content="AI-Assisted Migration from XML to Jetpack Compose">
+  <meta name="twitter:description" content="Migrate XML layouts to Jetpack Compose with AI assistance: a screen-by-screen process, prompts, mapping Views to composables, preserving behaviour, interop, theming and visual regression tests.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "AI-Assisted Migration from XML to Jetpack Compose", "description": "Migrate XML layouts to Jetpack Compose with AI assistance: a screen-by-screen process, prompts, mapping Views to composables, preserving behaviour, interop, theming and visual regression tests.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "AI Tools for Android Developers", "keywords": "xml to compose conversion, ai convert layout to compose, compose migration strategy, recyclerview to lazycolumn, composeview interop, visual regression migration", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-migrate-xml-to-compose/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "AI-Assisted Migration from XML to Jetpack Compose", "item": "https://yunoktech.com/android/ai-migrate-xml-to-compose/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-tools">AI Tools for Android Developers</a></nav>
+    <span class="ad-chip">🛠️ AI Tools for Android Developers</span>
+    <h1 id="article-title">AI-Assisted Migration from XML to Jetpack Compose</h1>
+    <p class="ad-lede">Converting XML layouts to Compose is repetitive work that AI does quickly, and subtly wrong if unsupervised. Combined with a disciplined migration process and screenshot tests, AI can cut the effort of moving to Compose substantially.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#process">A safe, repeatable process</a></li><li><a href="#prompt">Conversion prompt</a></li><li><a href="#mapping">View → Compose mapping reference</a></li><li><a href="#host">Hosting during migration</a></li><li><a href="#verify">Verifying equivalence</a></li><li><a href="#use-cases">Prioritising screens</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A typical XML screen involves a layout file, a Fragment with View Binding, a RecyclerView adapter, some custom styles and a few click listeners. Converting it to Compose is mostly mechanical, which suits AI, but behaviour hides in the details: focus handling, IME actions, accessibility, saved state.</p>
+
+<h2 id="process">A safe, repeatable process</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-xm-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-xm-t fig-xm-d">
+    <title id="fig-xm-t">Screen-by-screen XML to Compose migration with AI</title>
+    <desc id="fig-xm-d">Capture baseline screenshots and behaviour of the XML screen; use AI to convert layout and adapter into a stateless composable driven by the existing ViewModel state; host it with ComposeView; compare screenshots and run UI tests; then remove the old XML and adapter.</desc>
+    <defs><marker id="xmm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#xmm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Baseline</text><text class="d-s" x="70" y="84" text-anchor="middle">screens + tests</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">AI convert</text><text class="d-s" x="212" y="84" text-anchor="middle">stateless UI</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Host</text><text class="d-s" x="352" y="84" text-anchor="middle">ComposeView</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Compare</text><text class="d-s" x="497" y="84" text-anchor="middle">visual + behaviour</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="584" y="40" width="126" height="60" rx="12"/><text class="d-t" x="647" y="66" text-anchor="middle">Delete old</text><text class="d-s" x="647" y="84" text-anchor="middle">XML + adapter</text></g>
+  </svg>
+  <figcaption id="fig-xm-cap">The ViewModel stays the same, which keeps the migration focused on UI and easy to review.</figcaption>
+</figure>
+
+<h2 id="prompt">Conversion prompt</h2>
+<figure class="code"><figcaption><span class="file">Prompt</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Convert this screen to Jetpack Compose.
+Inputs: fragment_orders.xml, item_order.xml, OrdersAdapter.kt, OrdersFragment.kt, OrdersUiState.kt.
+Requirements:
+- Stateless `OrdersContent(state: OrdersUiState, onOrderClick: (String) -&gt; Unit, onRetry: () -&gt; Unit)`.
+- RecyclerView → LazyColumn with key = order.id; preserve item layout, spacing and text styles
+  using our AppTheme (Material 3) tokens, not raw colors.
+- Preserve behaviour: empty state, error + retry, swipe-to-refresh, content descriptions.
+- List anything in the XML you could not map exactly (custom attrs, styles, animations).
+- Add previews for loading, empty, error and 3 items.
+Do not change OrdersViewModel.</code></pre></figure>
+
+<h2 id="mapping">View → Compose mapping reference</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>XML / View</th><th>Compose</th><th>Watch out for</th></tr></thead>
+  <tbody>
+    <tr><td>LinearLayout (vertical/horizontal)</td><td><code>Column</code> / <code>Row</code></td><td>Weights → <code>Modifier.weight</code></td></tr>
+    <tr><td>ConstraintLayout</td><td><code>Row</code>/<code>Column</code>/<code>Box</code>, or <code>ConstraintLayout</code> for Compose</td><td>Prefer simple layouts where possible</td></tr>
+    <tr><td>RecyclerView + Adapter</td><td><code>LazyColumn</code> / <code>LazyVerticalGrid</code></td><td>Stable keys; item decorations</td></tr>
+    <tr><td>EditText</td><td><code>TextField</code> / <code>OutlinedTextField</code></td><td>IME actions, input types, state hoisting</td></tr>
+    <tr><td>SwipeRefreshLayout</td><td><code>PullToRefreshBox</code> (Material 3)</td><td>Refresh state from ViewModel</td></tr>
+    <tr><td>visibility="gone"</td><td>Conditional composition (<code>if</code>)</td><td>Animations (<code>AnimatedVisibility</code>)</td></tr>
+    <tr><td>Custom View</td><td>Rewrite, or wrap with <code>AndroidView</code></td><td>Keep complex working Views wrapped at first</td></tr>
+    <tr><td>Styles/themes</td><td><code>MaterialTheme</code> tokens</td><td>Bridge the XML theme and Compose theme during migration</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="host">Hosting during migration</h2>
+<figure class="code"><figcaption><span class="file">OrdersFragment.kt (after)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">OrdersFragment</span> : <span class="tk-t">Fragment</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> viewModel: <span class="tk-t">OrdersViewModel</span> <span class="tk-k">by</span> viewModels()
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCreateView(inflater: <span class="tk-t">LayoutInflater</span>, container: <span class="tk-t">ViewGroup</span>?, savedInstanceState: <span class="tk-t">Bundle</span>?) =
+        <span class="tk-t">ComposeView</span>(requireContext()).apply {
+            setViewCompositionStrategy(<span class="tk-t">ViewCompositionStrategy</span>.<span class="tk-t">DisposeOnViewTreeLifecycleDestroyed</span>)
+            setContent {
+                <span class="tk-t">AppTheme</span> {
+                    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+                    <span class="tk-t">OrdersContent</span>(state, onOrderClick = ::openOrder, onRetry = viewModel::retry)
+                }
+            }
+        }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> openOrder(id: <span class="tk-t">String</span>) { <span class="tk-c">/* existing navigation */</span> }
+}</code></pre></figure>
+
+<h2 id="verify">Verifying equivalence</h2>
+<ul>
+  <li><strong>Screenshot tests</strong> of the old and new screens across states, dark mode and large fonts. See <a href="../compose-ui-screenshot-testing/index.html">Screenshot Testing</a>.</li>
+  <li><strong>UI tests</strong> for interactions: clicks, retry, refresh, text input.</li>
+  <li><strong>Accessibility checks</strong> with TalkBack: reading order and descriptions often change silently.</li>
+  <li><strong>Performance</strong> on a release build: lazy lists with keys, no heavy work in item composables.</li>
+</ul>
+
+<h2 id="use-cases">Prioritising screens</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Start with</h3><p>Leaf screens with simple state, such as settings and detail pages, to build team patterns.</p></div>
+  <div class="card usecase"><h3>Then</h3><p>List screens with adapters, where Compose removes the most code.</p></div>
+  <div class="card usecase"><h3>Later</h3><p>Complex custom Views and heavy animations. Wrap first, rewrite when valuable.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can AI convert a whole app at once?</summary><div><p>It can generate a lot of code, but reviewing and verifying it all at once is impractical. Screen-by-screen migration with tests is far safer.</p></div></details>
+  <details><summary>Should navigation move to Compose first?</summary><div><p>Usually last. Migrate screens inside existing Fragments, then move navigation once most screens are composables.</p></div></details>
+  <details><summary>Will the app size grow during migration?</summary><div><p>Temporarily, since both UI systems ship. It typically improves once View-based dependencies are removed.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Let AI do the <strong>mechanical conversion</strong> of layouts and adapters into stateless composables, while you keep the <strong>ViewModel unchanged</strong>, host with <code>ComposeView</code>, and prove equivalence with <strong>screenshots, UI tests and accessibility checks</strong>, one screen at a time.</p>
+<p>Next step: understand the more autonomous tools in <a href="../ai-agents-android-development/index.html">AI Agents in Android Development</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/migrate/strategy" target="_blank" rel="noopener">Migration strategy</a></li><li><a href="https://developer.android.com/develop/ui/compose/migrate/migration-scenarios/recycler-view" target="_blank" rel="noopener">Migrate XML-based screens to Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/migrate/interoperability-apis" target="_blank" rel="noopener">Interoperability APIs</a></li><li><a href="https://developer.android.com/studio/preview/compose-screenshot-testing" target="_blank" rel="noopener">Compose screenshot testing</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-migrate-xml-to-compose-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-migrate-xml-to-compose-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/jetpack-compose-vs-xml/index.html"><small>Jetpack Compose</small>Jetpack Compose vs XML: Which Should You Learn?</a></li><li><a href="../../android/compose-ui-screenshot-testing/index.html"><small>Jetpack Compose</small>Compose UI Testing and Screenshot Testing</a></li><li><a href="../../android/generate-compose-ui-with-ai/index.html"><small>AI Tools for Android Developers</small>How to Generate Jetpack Compose UI with AI</a></li><li><a href="../../android/migrate-legacy-android-modern-architecture/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Migrating Legacy Android Apps to Modern Architecture</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-migrate-xml-to-compose/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-migrate-xml-to-compose/&amp;text=AI-Assisted Migration from XML to Jetpack Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-migrate-xml-to-compose/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#process">A safe, repeatable process</a></li><li><a href="#prompt">Conversion prompt</a></li><li><a href="#mapping">View → Compose mapping reference</a></li><li><a href="#host">Hosting during migration</a></li><li><a href="#verify">Verifying equivalence</a></li><li><a href="#use-cases">Prioritising screens</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-migrate-xml-to-compose-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-migrate-xml-to-compose-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an AI Study Assistant App for Android | Yunok Tech</title>
+  <meta name="description" content="Project guide: an Android study assistant that answers questions from the learner&#x27;s own notes, generates quizzes and flashcards, explains step by step, uses retrieval for grounding, and encourages learning over answer-copying.">
+  <meta name="keywords" content="ai study assistant android, ai tutor app android, quiz generator ai kotlin, flashcards ai android, rag study app, gemini education app, android ai project portfolio">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-study-assistant-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-study-assistant-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Build an AI Study Assistant App for Android">
+  <meta property="og:description" content="Project guide: an Android study assistant that answers questions from the learner&#x27;s own notes, generates quizzes and flashcards, explains step by step, uses retrieval for grounding, and encourages learning over answer-copying.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Build an AI Study Assistant App for Android">
+  <meta name="twitter:description" content="Project guide: an Android study assistant that answers questions from the learner&#x27;s own notes, generates quizzes and flashcards, explains step by step, uses retrieval for grounding, and encourages learning over answer-copying.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Build an AI Study Assistant for Android", "description": "Project guide: an Android study assistant that answers questions from the learner's own notes, generates quizzes and flashcards, explains step by step, uses retrieval for grounding, and encourages learning over answer-copying.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "ai tutor app android, quiz generator ai kotlin, flashcards ai android, rag study app, gemini education app, android ai project portfolio", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-study-assistant-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Build an AI Study Assistant for Android", "item": "https://yunoktech.com/android/ai-study-assistant-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Build an AI Study Assistant for Android</h1>
+    <p class="ad-lede">A good AI study assistant doesn't just hand out answers. It explains, quizzes and grounds itself in what the learner is actually studying. This project combines retrieval over notes, structured quiz generation, chat, and spaced-repetition flashcards.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#features">Features and architecture</a></li><li><a href="#ask">1. Ask with grounding (RAG)</a></li><li><a href="#quiz">2. Generate quizzes as structured data</a></li><li><a href="#flashcards">3. Flashcards with spaced repetition</a></li><li><a href="#learning">Design for learning, not copying</a></li><li><a href="#safety">Safety and privacy</a></li><li><a href="#evaluate">Evaluate quality</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Learners import notes or chapters, then ask questions, get explanations grounded in their material, and practise with generated quizzes and flashcards. The design goal is understanding, not shortcuts.</p>
+
+<h2 id="features">Features and architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sa-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-sa-t fig-sa-d">
+    <title id="fig-sa-t">Study assistant architecture</title>
+    <desc id="fig-sa-d">Study material is imported, chunked and embedded into a local vector index. Three features use it: Ask, which retrieves relevant chunks and answers with citations; Quiz, which generates structured questions from a chunk; and Flashcards, which are generated, then scheduled with spaced repetition stored in Room.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="20" width="220" height="60" rx="12"/><text class="d-t" x="130" y="46" text-anchor="middle">Notes / chapters</text><text class="d-s" x="130" y="64" text-anchor="middle">import, chunk, embed</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="260" y="20" width="200" height="60" rx="12"/><text class="d-t" x="360" y="46" text-anchor="middle">Local index</text><text class="d-s" x="360" y="64" text-anchor="middle">chunks + vectors (Room)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="20" y="110" width="220" height="70" rx="12"/><text class="d-t" x="130" y="138" text-anchor="middle">Ask</text><text class="d-s" x="130" y="158" text-anchor="middle">retrieve → answer + cite</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="260" y="110" width="200" height="70" rx="12"/><text class="d-t" x="360" y="138" text-anchor="middle">Quiz</text><text class="d-s" x="360" y="158" text-anchor="middle">JSON questions</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="480" y="110" width="220" height="70" rx="12"/><text class="d-t" x="590" y="138" text-anchor="middle">Flashcards</text><text class="d-s" x="590" y="158" text-anchor="middle">spaced repetition</text></g>
+    <text class="d-s" x="360" y="212" text-anchor="middle">All features ground on the learner's own material.</text>
+  </svg>
+  <figcaption id="fig-sa-cap">Grounding reduces hallucination and keeps answers relevant to the syllabus.</figcaption>
+</figure>
+
+<h2 id="ask">1. Ask with grounding (RAG)</h2>
+<p>Retrieve the most relevant chunks from the learner's notes, then answer using only them, with citations. See <a href="../rag-android-apps/index.html">RAG on Android</a> for indexing and retrieval details.</p>
+<figure class="code"><figcaption><span class="file">AskUseCase.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">AskUseCase</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> index: <span class="tk-t">NotesIndex</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> llm: <span class="tk-t">Llm</span>) {
+
+    <span class="tk-k">fun</span> ask(question: <span class="tk-t">String</span>, mode: <span class="tk-t">Mode</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt; = flow {
+        <span class="tk-k">val</span> hits = index.search(question, topK = <span class="tk-n">5</span>)
+        <span class="tk-k">if</span> (hits.isEmpty()) { emit(<span class="tk-s">"I couldn't find this in your notes. Try importing the relevant chapter."</span>); <span class="tk-k">return</span><span class="tk-a">@flow</span> }
+        <span class="tk-k">val</span> context = hits.joinToString(<span class="tk-s">"\n\n"</span>) { <span class="tk-s">"[${it.id}] ${it.text}"</span> }
+        <span class="tk-k">val</span> style = <span class="tk-k">when</span> (mode) {
+            <span class="tk-t">Mode</span>.<span class="tk-t">EXPLAIN</span> -&gt; <span class="tk-s">"Explain step by step for a student, then give one check-your-understanding question."</span>
+            <span class="tk-t">Mode</span>.<span class="tk-t">HINT</span> -&gt; <span class="tk-s">"Give a hint only, not the full answer. Encourage the student to try."</span>
+        }
+        emitAll(llm.stream(
+            <span class="tk-s">"You are a study tutor. Use ONLY the notes below. Cite sources like [id]. "</span> +
+            <span class="tk-s">"If the notes don't contain the answer, say so.\n$style\n\nNotes:\n$context\n\nQuestion: $question"</span>
+        ))
+    }
+    <span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">Mode</span> { <span class="tk-t">EXPLAIN</span>, <span class="tk-t">HINT</span> }
+}</code></pre></figure>
+
+<h2 id="quiz">2. Generate quizzes as structured data</h2>
+<figure class="code"><figcaption><span class="file">QuizGenerator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Question</span>(<span class="tk-k">val</span> prompt: <span class="tk-t">String</span>, <span class="tk-k">val</span> options: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;, <span class="tk-k">val</span> correctIndex: <span class="tk-t">Int</span>, <span class="tk-k">val</span> explanation: <span class="tk-t">String</span>)
+
+<span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Quiz</span>(<span class="tk-k">val</span> questions: <span class="tk-t">List</span>&lt;<span class="tk-t">Question</span>&gt;)
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> generateQuiz(llm: <span class="tk-t">Llm</span>, chunk: <span class="tk-t">String</span>, count: <span class="tk-t">Int</span> = <span class="tk-n">5</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">Question</span>&gt; {
+    <span class="tk-k">val</span> raw = llm.generateJson(
+        <span class="tk-s">"Create $count multiple-choice questions (4 options each) testing understanding of this text. "</span> +
+        <span class="tk-s">"Include a one-sentence explanation citing the text. Use only facts in the text.\n\n$chunk"</span>
+    )
+    <span class="tk-k">return</span> <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }.decodeFromString&lt;<span class="tk-t">Quiz</span>&gt;(raw).questions
+        .filter { q -&gt; q.options.size == <span class="tk-n">4</span> &amp;&amp; q.correctIndex <span class="tk-k">in</span> <span class="tk-n">0</span>..<span class="tk-n">3</span> &amp;&amp; q.options.toSet().size == <span class="tk-n">4</span> }
+}</code></pre></figure>
+<p>Validate every question: model output can have duplicate options or out-of-range answers.</p>
+
+<h2 id="flashcards">3. Flashcards with spaced repetition</h2>
+<figure class="code"><figcaption><span class="file">Simple spaced repetition scheduling</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Entity</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Card</span>(
+    <span class="tk-a">@PrimaryKey</span> <span class="tk-k">val</span> id: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> front: <span class="tk-t">String</span>, <span class="tk-k">val</span> back: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> intervalDays: <span class="tk-t">Int</span> = <span class="tk-n">0</span>, <span class="tk-k">val</span> ease: <span class="tk-t">Double</span> = <span class="tk-n">2.5</span>, <span class="tk-k">val</span> dueAt: <span class="tk-t">Long</span> = <span class="tk-n">0</span>,
+)
+
+<span class="tk-k">fun</span> <span class="tk-t">Card</span>.review(grade: <span class="tk-t">Int</span>, now: <span class="tk-t">Long</span>): <span class="tk-t">Card</span> {       <span class="tk-c">// grade: 0 = forgot, 1 = hard, 2 = good, 3 = easy</span>
+    <span class="tk-k">val</span> newEase = (ease + <span class="tk-n">0.1</span> - (<span class="tk-n">3</span> - grade) * <span class="tk-n">0.08</span>).coerceAtLeast(<span class="tk-n">1.3</span>)
+    <span class="tk-k">val</span> newInterval = <span class="tk-k">when</span> {
+        grade == <span class="tk-n">0</span> -&gt; <span class="tk-n">1</span>
+        intervalDays == <span class="tk-n">0</span> -&gt; <span class="tk-n">1</span>
+        intervalDays == <span class="tk-n">1</span> -&gt; <span class="tk-n">3</span>
+        <span class="tk-k">else</span> -&gt; (intervalDays * newEase).roundToInt()
+    }
+    <span class="tk-k">return</span> copy(intervalDays = newInterval, ease = newEase, dueAt = now + newInterval * <span class="tk-n">86_400_000L</span>)
+}</code></pre></figure>
+<p>This is a simplified SM-2-style scheduler. Learners can edit generated cards before saving them.</p>
+
+<h2 id="learning">Design for learning, not copying</h2>
+<ul>
+  <li>Offer <strong>Hint</strong> mode before full answers.</li>
+  <li>End explanations with a check question.</li>
+  <li>Show citations to the learner's notes, so they can verify.</li>
+  <li>Track quiz results to suggest weak topics.</li>
+  <li>Be clear that AI can be wrong. See <a href="../responsible-ai-ux-android/index.html">Responsible AI UX</a>.</li>
+</ul>
+
+<h2 id="safety">Safety and privacy</h2>
+<ul>
+  <li>If your audience includes minors, follow applicable regulations and platform policies (for example Google Play's Families policies).</li>
+  <li>Imported notes may be sent to a cloud model: disclose this and minimise what's sent (only retrieved chunks).</li>
+  <li>Treat imported content as untrusted: it may contain instructions aimed at the model. See <a href="../prompt-injection-android-ai/index.html">Prompt Injection</a>.</li>
+</ul>
+
+<h2 id="evaluate">Evaluate quality</h2>
+<p>Create a small test set of questions with known answers from sample notes, and check groundedness, correctness and refusal when information is missing. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can it work offline?</summary><div><p>Flashcard review works offline. Q&amp;A and generation need a model: cloud (online) or on-device (limited capability on supported devices).</p></div></details>
+  <details><summary>Why not just use a general chatbot?</summary><div><p>Grounding in the learner's material, quizzes and spaced repetition make it a learning tool rather than an answer machine.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A study assistant <strong>grounds answers in the learner's notes</strong> with citations, generates <strong>validated quizzes</strong> and <strong>flashcards with spaced repetition</strong>, and is designed to <strong>encourage understanding</strong>, with clear privacy and safety choices.</p>
+<p>Next step: handle data responsibly in <a href="../ai-privacy-data-retention/index.html">AI Privacy and Data Retention</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic" target="_blank" rel="noopener">Firebase AI Logic</a></li><li><a href="https://firebase.google.com/docs/ai-logic/generate-structured-output" target="_blank" rel="noopener">Structured output</a></li><li><a href="https://ai.google.dev/gemini-api/docs/embeddings" target="_blank" rel="noopener">Gemini embeddings</a></li><li><a href="https://pair.withgoogle.com/guidebook/" target="_blank" rel="noopener">Google: People + AI Guidebook</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-study-assistant-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-study-assistant-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/rag-android-apps/index.html"><small>Android AI and Generative AI</small>RAG for Android Apps: Connecting AI to Your Own Data</a></li><li><a href="../../android/ai-chatbot-jetpack-compose/index.html"><small>Android AI and Generative AI</small>Build an AI Chatbot Using Kotlin and Jetpack Compose</a></li><li><a href="../../android/ai-document-summarizer-android/index.html"><small>Android AI Projects and Production</small>Build an AI Document Summarizer for Android</a></li><li><a href="../../android/evaluate-ai-responses-hallucinations/index.html"><small>Android AI and Generative AI</small>Evaluating AI Responses and Reducing Hallucinations</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-study-assistant-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-study-assistant-android/&amp;text=Build an AI Study Assistant for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-study-assistant-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#features">Features and architecture</a></li><li><a href="#ask">1. Ask with grounding (RAG)</a></li><li><a href="#quiz">2. Generate quizzes as structured data</a></li><li><a href="#flashcards">3. Flashcards with spaced repetition</a></li><li><a href="#learning">Design for learning, not copying</a></li><li><a href="#safety">Safety and privacy</a></li><li><a href="#evaluate">Evaluate quality</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-study-assistant-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-study-assistant-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

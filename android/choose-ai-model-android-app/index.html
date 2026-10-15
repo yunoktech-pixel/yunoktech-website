@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Choose the Right AI Model for an Android App | Yunok Tech</title>
+  <meta name="description" content="A practical framework for choosing an AI model for Android: task fit, privacy, latency, cost, quality and device reach, with a decision diagram, Kotlin routing code and evaluation tips.">
+  <meta name="keywords" content="choose ai model for android app, ai model selection android, on-device vs cloud model, gemini nano vs gemini flash, llm for mobile app, ai cost estimation mobile, evaluate llm android, hybrid ai android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/choose-ai-model-android-app/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/choose-ai-model-android-app/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="How to Choose the Right AI Model for an Android App">
+  <meta property="og:description" content="A practical framework for choosing an AI model for Android: task fit, privacy, latency, cost, quality and device reach, with a decision diagram, Kotlin routing code and evaluation tips.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="How to Choose the Right AI Model for an Android App">
+  <meta name="twitter:description" content="A practical framework for choosing an AI model for Android: task fit, privacy, latency, cost, quality and device reach, with a decision diagram, Kotlin routing code and evaluation tips.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to Choose the Right AI Model for an Android App", "description": "A practical framework for choosing an AI model for Android: task fit, privacy, latency, cost, quality and device reach, with a decision diagram, Kotlin routing code and evaluation tips.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "ai model selection android, on-device vs cloud model, gemini nano vs gemini flash, llm for mobile app, ai cost estimation mobile, evaluate llm android, hybrid ai android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/choose-ai-model-android-app/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "How to Choose the Right AI Model for an Android App", "item": "https://yunoktech.com/android/choose-ai-model-android-app/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">How to Choose the Right AI Model for an Android App</h1>
+    <p class="ad-lede">Picking an AI model by leaderboard rank is how mobile teams end up with slow, expensive features that work on half their users' phones. Use this framework to choose by task, privacy, latency, cost, quality and device reach, then verify with your own evaluation set.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>7 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#principle">The principle: choose for the task, not the leaderboard</a></li><li><a href="#six-questions">Six questions that decide the model</a></li><li><a href="#decision-diagram">Decision diagram</a></li><li><a href="#options">The options available to Android developers</a></li><li><a href="#cost">Estimate cost before you build</a></li><li><a href="#routing">Implementing model choice in code</a></li><li><a href="#evaluate">Evaluate quality with your own test set</a></li><li><a href="#use-cases">Worked examples</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Your team has decided to add an AI feature. Someone suggests "the best model", meaning the one at the top of a benchmark. Three months later the feature costs more than expected, feels slow on mobile networks, can't be used offline, and legal is asking where user data goes. None of that was the model's fault. It was a selection problem.</p>
+<p>This guide is for intermediate Android developers and tech leads who need to choose a model, or a combination of models, for a real feature. You'll get a six-question framework, a decision diagram, a comparison of the main options available to Android developers, Kotlin code for routing between models at runtime, and a lightweight way to evaluate quality before you commit.</p>
+
+<h2 id="principle">The principle: choose for the task, not the leaderboard</h2>
+<p>Benchmarks measure general capability on standard datasets. Your users care about <em>one specific task</em> on <em>their</em> devices and networks. For many mobile features, a smaller, faster or on-device model is the better product choice, even if it scores lower on a leaderboard.</p>
+<div class="key"><b>Rule of thumb</b>
+<p>Start with the <strong>smallest, cheapest, most private option that meets your quality bar</strong> on a realistic test set. Move up in size or to the cloud only when evidence shows you need to.</p></div>
+
+<h2 id="six-questions">Six questions that decide the model</h2>
+<h3 id="q1-task">1. What kind of task is it?</h3>
+<ul>
+  <li><strong>Fixed perception task</strong> (read text, scan barcodes, detect objects or faces, identify language): use <strong>task-specific ML</strong> such as ML Kit or a LiteRT model. An LLM is the wrong tool.</li>
+  <li><strong>Short text transformation</strong> (summarise, proofread, rewrite, describe an image): a <strong>small generative model</strong>, possibly Gemini Nano on-device.</li>
+  <li><strong>Open-ended reasoning, long context, multi-turn chat, tool use</strong>: a <strong>cloud LLM</strong>.</li>
+</ul>
+<h3 id="q2-privacy">2. How sensitive is the data?</h3>
+<p>Private messages, health notes and financial documents argue strongly for on-device processing, or at least explicit consent before sending data to a cloud provider. Remember that your Play Store Data safety declaration must match what you actually do.</p>
+<h3 id="q3-latency">3. How fast must it feel?</h3>
+<p>Inline features such as autocomplete or smart replies need near-instant responses. Network round-trips plus model time may be too slow, especially on mobile networks. Features where the user explicitly waits, such as "summarise this document", tolerate a few seconds, especially with streamed output.</p>
+<h3 id="q4-offline">4. Must it work offline?</h3>
+<p>If yes, only on-device options qualify: ML Kit, LiteRT, or Gemini Nano on supported devices.</p>
+<h3 id="q5-reach">5. Which devices must it support?</h3>
+<p>Gemini Nano runs only on specific supported devices. If the feature must work for <em>all</em> your users, including budget phones common in markets like India, you need a cloud path or a smaller model you ship yourself.</p>
+<h3 id="q6-cost">6. What can you afford per user, per month?</h3>
+<p>Cloud models are billed per token. On-device has no per-request fee but costs engineering effort and is limited by device and quota. Estimate cost before building, as shown below.</p>
+
+<h2 id="decision-diagram">Decision diagram</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-dec-cap">
+  <svg viewBox="0 0 720 400" role="img" aria-labelledby="fig-dec-title fig-dec-desc">
+    <title id="fig-dec-title">Decision tree for choosing an AI model for an Android feature</title>
+    <desc id="fig-dec-desc">First question: is it a fixed perception task? If yes, use ML Kit or LiteRT. If no, must it work offline or keep data on device? If yes, check whether Gemini Nano supports the task and device: if yes use Gemini Nano via ML Kit GenAI, if no reconsider scope or ship a small LiteRT model. If no, does it need long context, chat or tools? If yes use a cloud model through Firebase AI Logic or your backend; if no use a hybrid of on-device first with cloud fallback.</desc>
+    <defs><marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="230" y="12" width="260" height="46" rx="12"/><text class="d-t" x="360" y="40" text-anchor="middle">Fixed perception task?</text></g>
+    <path class="d-line" d="M490 35 H560 V80" marker-end="url(#d1)"/><text class="d-s" x="520" y="28">yes</text>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="480" y="84" width="220" height="46" rx="12"/><text class="d-t" x="590" y="105" text-anchor="middle">ML Kit / LiteRT</text><text class="d-s" x="590" y="122" text-anchor="middle">fast, free, offline</text></g>
+    <path class="d-line" d="M360 58 V96" marker-end="url(#d1)"/><text class="d-s" x="368" y="82">no</text>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="200" y="100" width="260" height="46" rx="12"/><text class="d-t" x="330" y="121" text-anchor="middle">Offline, or data must</text><text class="d-t" x="330" y="138" text-anchor="middle">stay on device?</text></g>
+    <path class="d-line" d="M200 123 H110 V180" marker-end="url(#d1)"/><text class="d-s" x="140" y="116">yes</text>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="16" y="184" width="200" height="46" rx="12"/><text class="d-t" x="116" y="205" text-anchor="middle">Nano supports task</text><text class="d-t" x="116" y="222" text-anchor="middle">+ target devices?</text></g>
+    <path class="d-line" d="M80 230 V286" marker-end="url(#d1)"/><text class="d-s" x="58" y="262">yes</text>
+    <path class="d-line" d="M170 230 V340" marker-end="url(#d1)"/><text class="d-s" x="178" y="262">no</text>
+    <g class="d-step" style="--i:4"><rect class="d-blue" x="12" y="290" width="140" height="46" rx="12"/><text class="d-t" x="82" y="311" text-anchor="middle">Gemini Nano</text><text class="d-s" x="82" y="328" text-anchor="middle">ML Kit GenAI</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-red" x="100" y="344" width="200" height="46" rx="12"/><text class="d-t" x="200" y="365" text-anchor="middle">Reduce scope or ship</text><text class="d-t" x="200" y="382" text-anchor="middle">small LiteRT model</text></g>
+    <path class="d-line" d="M400 146 V180" marker-end="url(#d1)"/><text class="d-s" x="408" y="166">no</text>
+    <g class="d-step" style="--i:5"><rect class="d-amber" x="290" y="184" width="240" height="46" rx="12"/><text class="d-t" x="410" y="205" text-anchor="middle">Long context, chat,</text><text class="d-t" x="410" y="222" text-anchor="middle">tools or deep reasoning?</text></g>
+    <path class="d-line" d="M530 207 H600 V280" marker-end="url(#d1)"/><text class="d-s" x="550" y="200">yes</text>
+    <g class="d-step" style="--i:6"><rect class="d-violet" x="490" y="284" width="220" height="56" rx="12"/><text class="d-t" x="600" y="306" text-anchor="middle">Cloud model</text><text class="d-s" x="600" y="326" text-anchor="middle">Firebase AI Logic / backend</text></g>
+    <path class="d-line" d="M410 230 V280" marker-end="url(#d1)"/><text class="d-s" x="418" y="260">no</text>
+    <g class="d-step" style="--i:6"><rect class="d-green" x="318" y="284" width="160" height="56" rx="12"/><text class="d-t" x="398" y="306" text-anchor="middle">Hybrid</text><text class="d-s" x="398" y="326" text-anchor="middle">on-device → cloud</text></g>
+  </svg>
+  <figcaption id="fig-dec-cap">A starting point, not a rulebook. Cost and quality evaluation (below) can still change the answer.</figcaption>
+</figure>
+
+<h2 id="options">The options available to Android developers</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Option</th><th>Privacy</th><th>Latency</th><th>Cost</th><th>Quality ceiling</th><th>Device reach</th></tr></thead>
+  <tbody>
+    <tr><td>ML Kit task APIs</td><td>On device</td><td>Very low</td><td>No per-call fee</td><td>High for its fixed task</td><td>Broad</td></tr>
+    <tr><td>Custom LiteRT model</td><td>On device</td><td>Low</td><td>Engineering + training</td><td>Depends on your model</td><td>Broad (size-dependent)</td></tr>
+    <tr><td>Gemini Nano (ML Kit GenAI)</td><td>On device</td><td>Low, no network</td><td>No per-call fee; per-app quota</td><td>Good for short, focused tasks</td><td>Supported devices only</td></tr>
+    <tr><td>Cloud "Flash-Lite"-class model</td><td>Leaves device</td><td>Network + fast model</td><td>Lowest cloud price tier</td><td>Good for simple tasks</td><td>All devices online</td></tr>
+    <tr><td>Cloud "Flash"-class model</td><td>Leaves device</td><td>Network + fast model</td><td>Moderate</td><td>Strong general capability</td><td>All devices online</td></tr>
+    <tr><td>Cloud flagship reasoning model</td><td>Leaves device</td><td>Higher</td><td>Highest</td><td>Best for complex reasoning</td><td>All devices online</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">Model families and names change frequently. At the time of writing, Google's documentation recommends its latest Flash and Flash-Lite models for new projects. Check the current <a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">models</a> and <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">pricing</a> pages before you decide.</p>
+<p>The same thinking applies if you compare providers, for example Gemini, OpenAI or open-weight models hosted on your own servers. Compare them on <em>your</em> task with <em>your</em> evaluation set, consider data-handling terms, and keep the provider behind an interface so you can switch. See <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI</a> for the deployment side of this choice.</p>
+
+<h2 id="cost">Estimate cost before you build</h2>
+<p>Cloud LLM pricing is usually per million input tokens and per million output tokens, and output tokens often cost more. A token is roughly a few characters of English text. Estimate with your own numbers:</p>
+<figure class="code"><figcaption><span class="file">CostEstimate.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">/**
+ * Rough monthly cost estimate for a cloud AI feature.
+ * Fill the prices from the provider's CURRENT pricing page; never hard-code guesses in production.
+ */</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">CostInputs</span>(
+    <span class="tk-k">val</span> monthlyActiveUsers: <span class="tk-t">Int</span>,
+    <span class="tk-k">val</span> requestsPerUserPerMonth: <span class="tk-t">Double</span>,
+    <span class="tk-k">val</span> avgInputTokens: <span class="tk-t">Int</span>,          <span class="tk-c">// prompt + context + chat history</span>
+    <span class="tk-k">val</span> avgOutputTokens: <span class="tk-t">Int</span>,
+    <span class="tk-k">val</span> pricePerMillionInput: <span class="tk-t">Double</span>, <span class="tk-c">// in your billing currency</span>
+    <span class="tk-k">val</span> pricePerMillionOutput: <span class="tk-t">Double</span>,
+)
+
+<span class="tk-k">fun</span> estimateMonthlyCost(c: <span class="tk-t">CostInputs</span>): <span class="tk-t">Double</span> {
+    <span class="tk-k">val</span> requests = c.monthlyActiveUsers * c.requestsPerUserPerMonth
+    <span class="tk-k">val</span> inputCost = requests * c.avgInputTokens / <span class="tk-n">1_000_000.0</span> * c.pricePerMillionInput
+    <span class="tk-k">val</span> outputCost = requests * c.avgOutputTokens / <span class="tk-n">1_000_000.0</span> * c.pricePerMillionOutput
+    <span class="tk-k">return</span> inputCost + outputCost
+}</code></pre></figure>
+<p>Two lessons usually come out of this exercise. First, <strong>input tokens dominate in chat</strong>, because the whole history is resent on every turn, so trimming or summarising history matters. Second, a small share of heavy users can dominate cost, so <strong>per-user limits</strong> are a product requirement, not an afterthought.</p>
+
+<h2 id="routing">Implementing model choice in code</h2>
+<p>Treat the model as a replaceable dependency. Route each request based on capability, availability and user consent:</p>
+<figure class="code"><figcaption><span class="file">ModelRouter.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">AiTask</span> { <span class="tk-t">SUMMARIZE_SHORT</span>, <span class="tk-t">REWRITE</span>, <span class="tk-t">CHAT</span>, <span class="tk-t">LONG_DOCUMENT_QA</span> }
+
+<span class="tk-k">interface</span> <span class="tk-t">AiEngine</span> {
+    <span class="tk-k">val</span> name: <span class="tk-t">String</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> isAvailable(): <span class="tk-t">Boolean</span>
+    <span class="tk-k">fun</span> supports(task: <span class="tk-t">AiTask</span>): <span class="tk-t">Boolean</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> run(task: <span class="tk-t">AiTask</span>, input: <span class="tk-t">String</span>): <span class="tk-t">String</span>
+}
+
+<span class="tk-k">class</span> <span class="tk-t">ModelRouter</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> onDevice: <span class="tk-t">AiEngine</span>,                   <span class="tk-c">// e.g. Gemini Nano via ML Kit GenAI</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cloud: <span class="tk-t">AiEngine</span>,                      <span class="tk-c">// e.g. Gemini via Firebase AI Logic</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cloudConsentGiven: () -&gt; <span class="tk-t">Boolean</span>,     <span class="tk-c">// user opted in to cloud processing</span>
+) {
+    <span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">Route</span> {
+        <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Use</span>(<span class="tk-k">val</span> engine: <span class="tk-t">AiEngine</span>) : <span class="tk-t">Route</span>
+        <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Unavailable</span>(<span class="tk-k">val</span> reason: <span class="tk-t">String</span>) : <span class="tk-t">Route</span>
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> route(task: <span class="tk-t">AiTask</span>): <span class="tk-t">Route</span> {
+        <span class="tk-k">if</span> (onDevice.supports(task) &amp;&amp; onDevice.isAvailable()) <span class="tk-k">return</span> <span class="tk-t">Route</span>.<span class="tk-t">Use</span>(onDevice)
+        <span class="tk-k">if</span> (!cloud.supports(task)) <span class="tk-k">return</span> <span class="tk-t">Route</span>.<span class="tk-t">Unavailable</span>(<span class="tk-s">"Not supported on this device"</span>)
+        <span class="tk-k">if</span> (!cloudConsentGiven()) <span class="tk-k">return</span> <span class="tk-t">Route</span>.<span class="tk-t">Unavailable</span>(<span class="tk-s">"Cloud processing is turned off"</span>)
+        <span class="tk-k">return</span> <span class="tk-k">if</span> (cloud.isAvailable()) <span class="tk-t">Route</span>.<span class="tk-t">Use</span>(cloud) <span class="tk-k">else</span> <span class="tk-t">Route</span>.<span class="tk-t">Unavailable</span>(<span class="tk-s">"You're offline"</span>)
+    }
+}</code></pre></figure>
+<p>The ViewModel calls <code>route()</code>, shows the reason when the result is <code>Unavailable</code>, and records which engine answered. That metric is invaluable when you investigate quality complaints later.</p>
+
+<h2 id="evaluate">Evaluate quality with your own test set</h2>
+<p>Before committing to a model, build a small evaluation set: 30 to 100 realistic inputs, with notes on what a good output must contain. Run every candidate model over it and review the results, both manually and with simple automated checks.</p>
+<figure class="code"><figcaption><span class="file">EvalRunner.kt (JVM test or small script)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">EvalCase</span>(<span class="tk-k">val</span> input: <span class="tk-t">String</span>, <span class="tk-k">val</span> mustMention: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;, <span class="tk-k">val</span> maxWords: <span class="tk-t">Int</span>)
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">EvalResult</span>(<span class="tk-k">val</span> engine: <span class="tk-t">String</span>, <span class="tk-k">val</span> passed: <span class="tk-t">Int</span>, <span class="tk-k">val</span> total: <span class="tk-t">Int</span>, <span class="tk-k">val</span> avgMillis: <span class="tk-t">Long</span>)
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> evaluate(engine: <span class="tk-t">AiEngine</span>, task: <span class="tk-t">AiTask</span>, cases: <span class="tk-t">List</span>&lt;<span class="tk-t">EvalCase</span>&gt;): <span class="tk-t">EvalResult</span> {
+    <span class="tk-k">var</span> passed = <span class="tk-n">0</span>
+    <span class="tk-k">var</span> totalMillis = <span class="tk-n">0L</span>
+    <span class="tk-k">for</span> (case <span class="tk-k">in</span> cases) {
+        <span class="tk-k">val</span> start = <span class="tk-t">System</span>.nanoTime()
+        <span class="tk-k">val</span> output = runCatching { engine.run(task, case.input) }.getOrDefault(<span class="tk-s">""</span>)
+        totalMillis += (<span class="tk-t">System</span>.nanoTime() - start) / <span class="tk-n">1_000_000</span>
+        <span class="tk-k">val</span> words = output.split(<span class="tk-t">Regex</span>(<span class="tk-s">"\\s+"</span>)).count { it.isNotBlank() }
+        <span class="tk-k">val</span> mentionsAll = case.mustMention.all { output.contains(it, ignoreCase = <span class="tk-k">true</span>) }
+        <span class="tk-k">if</span> (output.isNotBlank() &amp;&amp; mentionsAll &amp;&amp; words &lt;= case.maxWords) passed++
+    }
+    <span class="tk-k">return</span> <span class="tk-t">EvalResult</span>(engine.name, passed, cases.size, totalMillis / cases.size.coerceAtLeast(<span class="tk-n">1</span>))
+}</code></pre></figure>
+<p>Simple checks like these won't capture everything. Tone and factual accuracy still need human review, but they catch regressions fast, especially when a provider updates a model version.</p>
+
+<h2 id="use-cases">Worked examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Note-taking app: "Summarise this note"</h3><dl><dt>Requirements</dt><dd>Private notes; short inputs; should work on the train with no signal.</dd><dt>Choice</dt><dd>Gemini Nano Summarization on supported devices; cloud fallback only with explicit opt-in.</dd><dt>Trade-off</dt><dd>Users on unsupported phones without opt-in don't get the feature.</dd></dl></div>
+  <div class="card usecase"><h3>E-commerce: product Q&amp;A chat</h3><dl><dt>Requirements</dt><dd>Answers grounded in the catalogue; multi-turn; all users.</dd><dt>Choice</dt><dd>Cloud Flash-class model behind your backend, with retrieval from the product database.</dd><dt>Trade-off</dt><dd>Per-token cost and backend work; needs rate limits.</dd></dl></div>
+  <div class="card usecase"><h3>Field inspection app: identify defects in photos</h3><dl><dt>Requirements</dt><dd>Offline at remote sites; a specific set of defect types.</dd><dt>Choice</dt><dd>A custom image classifier trained on your images, deployed with LiteRT.</dd><dt>Trade-off</dt><dd>You must collect labelled data and maintain the model.</dd></dl></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><strong>Choosing by benchmark</strong> instead of by your own evaluation set.</li>
+  <li><strong>Ignoring device reach.</strong> An on-device-only feature that most of your users can't access.</li>
+  <li><strong>Hard-coding the model name</strong> in many places. Model names change, and older models get retired. Centralise it, ideally in remote config.</li>
+  <li><strong>Not budgeting output tokens.</strong> Set a maximum output length, and ask for concise answers.</li>
+  <li><strong>Forgetting the non-AI path.</strong> When no model is available, the app must still work.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is a bigger model always more accurate for my feature?</summary><div><p>Not necessarily. For narrow tasks such as short summaries or rewriting, smaller models often perform well enough and respond faster at lower cost. Measure on your own test inputs.</p></div></details>
+  <details><summary>Can I switch models later?</summary><div><p>Yes, if the provider sits behind an interface and prompts are versioned. Re-run your evaluation set whenever you switch, because outputs will change.</p></div></details>
+  <details><summary>How do I keep the model name updatable without an app release?</summary><div><p>Store it in a remote configuration service such as Firebase Remote Config and validate it against an allow-list in the app or on your backend.</p></div></details>
+  <details><summary>Should I fine-tune a model?</summary><div><p>Usually not at first. Better prompts, examples in the prompt and retrieval of your own data (RAG) solve most problems more cheaply. Consider fine-tuning only when evaluation shows a consistent gap that prompting can't close.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Choosing an AI model for Android is a product and engineering decision: <strong>task fit, privacy, latency, offline needs, device reach and cost</strong>, verified with a realistic evaluation set. Start small and private, put the model behind an interface, route at runtime, and move up only when the data says you should.</p>
+<p>Next step: write your feature's answers to the six questions and estimate its monthly cost with the formula above. Then dig into the deployment trade-offs in <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI for Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Gemini models and their capabilities</a></li><li><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Gemini API pricing</a></li><li><a href="https://developer.android.com/ai/gemini-nano" target="_blank" rel="noopener">Gemini Nano on Android</a></li><li><a href="https://developers.google.com/ml-kit/genai" target="_blank" rel="noopener">ML Kit GenAI APIs and device support</a></li><li><a href="https://firebase.google.com/docs/ai-logic" target="_blank" rel="noopener">Firebase AI Logic</a></li><li><a href="https://ai.google.dev/edge/litert" target="_blank" rel="noopener">LiteRT on-device runtime</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dchoose-ai-model-android-app-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dchoose-ai-model-android-app-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-in-android-development/index.html"><small>Android AI and Generative AI</small>What Is AI in Android Development? A Complete Developer&#x27;s Guide</a></li><li><a href="../../android/cloud-ai-vs-on-device-ai-android/index.html"><small>Android AI and Generative AI</small>Cloud AI vs On-Device AI for Android</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/gemini-nano-ml-kit-genai-android/index.html"><small>Android AI and Generative AI</small>Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/choose-ai-model-android-app/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/choose-ai-model-android-app/&amp;text=How to Choose the Right AI Model for an Android App" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/choose-ai-model-android-app/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#principle">The principle: choose for the task, not the leaderboard</a></li><li><a href="#six-questions">Six questions that decide the model</a></li><li><a href="#decision-diagram">Decision diagram</a></li><li><a href="#options">The options available to Android developers</a></li><li><a href="#cost">Estimate cost before you build</a></li><li><a href="#routing">Implementing model choice in code</a></li><li><a href="#evaluate">Evaluate quality with your own test set</a></li><li><a href="#use-cases">Worked examples</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dchoose-ai-model-android-app-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dchoose-ai-model-android-app-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

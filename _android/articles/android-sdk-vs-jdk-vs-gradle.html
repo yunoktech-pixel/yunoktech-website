@@ -1,0 +1,166 @@
+<!--meta
+{
+  "seo_title": "Android SDK vs JDK vs Gradle: What's the Difference?",
+  "description": "Understand the Android SDK, JDK, Gradle and the Android Gradle Plugin: what each does, how they work together in a build, version files to check and fixes for common errors.",
+  "primary_keyword": "android sdk vs jdk vs gradle",
+  "keywords": ["what is android sdk", "jdk for android studio", "gradle android explained", "android gradle plugin", "compileSdk targetSdk minSdk", "gradle wrapper", "version catalog"],
+  "lede": "SDK, JDK, Gradle, AGP, compileSdk, the Gradle JVM... Android build errors are full of acronyms. This guide explains what each piece is, how they cooperate when you press Run, and how to read and fix the version errors that confuse beginners.",
+  "date": "2026-10-15",
+  "cta": "beginner",
+  "related": ["setup-android-studio", "how-android-app-works-internally", "gradle-multi-module-build-optimization", "build-first-android-app"],
+  "refs": [
+    ["Configure your build", "https://developer.android.com/build"],
+    ["Android Gradle Plugin release notes and compatibility", "https://developer.android.com/build/releases/gradle-plugin"],
+    ["Java versions in Android builds", "https://developer.android.com/build/jdks"],
+    ["Migrate your build to version catalogs", "https://developer.android.com/build/migrate-to-catalogs"],
+    ["SDK Manager", "https://developer.android.com/studio/intro/update"]
+  ]
+}
+-->
+<p class="ad-lead">You press Run and see: <em>"Android Gradle plugin requires Java 17 to run"</em>, or <em>"compileSdk 34 is lower than the version required by dependency X"</em>. To fix errors like these with confidence, you need a clear mental model of the build tools.</p>
+<p>This article explains the <strong>Android SDK</strong>, the <strong>JDK</strong>, <strong>Gradle</strong> and the <strong>Android Gradle Plugin (AGP)</strong>, plus the three SDK version settings in every Android project, using a real build file as the reference.</p>
+
+<h2 id="one-line">The one-line definitions</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tool</th><th>What it is</th><th>Analogy</th></tr></thead>
+  <tbody>
+    <tr><td><strong>JDK</strong></td><td>Java Development Kit: the Java runtime and compiler tools that Gradle and the Kotlin compiler run on</td><td>The engine the workshop machines run on</td></tr>
+    <tr><td><strong>Gradle</strong></td><td>A general-purpose build automation tool: runs tasks, resolves dependencies, caches results</td><td>The workshop manager scheduling jobs</td></tr>
+    <tr><td><strong>AGP</strong></td><td>Android Gradle Plugin: teaches Gradle how to build Android apps (resources, DEX, signing, APK/AAB)</td><td>The Android-specific machinery</td></tr>
+    <tr><td><strong>Android SDK</strong></td><td>Android platform APIs (android.jar per API level), build tools, platform-tools (adb), emulator</td><td>The parts catalogue and test bench</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-b-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-b-t fig-b-d">
+    <title id="fig-b-t">How the JDK, Gradle, AGP and the Android SDK cooperate in a build</title>
+    <desc id="fig-b-d">The JDK runs Gradle. Gradle loads the Android Gradle Plugin, which uses the Android SDK to compile against android.jar, process resources, convert bytecode to DEX with D8 or R8, and package and sign an APK or AAB.</desc>
+    <defs><marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="14" y="80" width="110" height="60" rx="12"/><text class="d-w" x="69" y="115" text-anchor="middle">JDK</text></g>
+    <path class="d-flow" d="M124 110 H156" marker-end="url(#b1)"/><text class="d-s" x="140" y="100" text-anchor="middle">runs</text>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="160" y="80" width="110" height="60" rx="12"/><text class="d-t" x="215" y="115" text-anchor="middle">Gradle</text></g>
+    <path class="d-flow" d="M270 110 H302" marker-end="url(#b1)"/><text class="d-s" x="286" y="100" text-anchor="middle">loads</text>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="306" y="80" width="110" height="60" rx="12"/><text class="d-t" x="361" y="108" text-anchor="middle">AGP</text><text class="d-s" x="361" y="126" text-anchor="middle">Android plugin</text></g>
+    <path class="d-flow" d="M416 110 H448" marker-end="url(#b1)"/><text class="d-s" x="432" y="100" text-anchor="middle">uses</text>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="452" y="20" width="250" height="190" rx="14"/><text class="d-t" x="577" y="44" text-anchor="middle">Android SDK + build steps</text>
+      <text class="d-s" x="577" y="74" text-anchor="middle">1. compile Kotlin vs android.jar</text>
+      <text class="d-s" x="577" y="100" text-anchor="middle">2. process resources (AAPT2)</text>
+      <text class="d-s" x="577" y="126" text-anchor="middle">3. D8/R8 → DEX bytecode</text>
+      <text class="d-s" x="577" y="152" text-anchor="middle">4. package + sign → APK / AAB</text>
+      <text class="d-s" x="577" y="178" text-anchor="middle">5. adb installs on device</text></g>
+  </svg>
+  <figcaption id="fig-b-cap">Each layer has its own version, and most build errors are a version mismatch between two adjacent boxes.</figcaption>
+</figure>
+
+<h2 id="jdk">The JDK: what Gradle runs on</h2>
+<p>Android apps don't run on a desktop JVM, but the <em>build</em> does. Gradle, the Kotlin compiler and AGP are JVM programs, so they need a JDK. Recent AGP versions require a minimum JDK version to run. Android Studio bundles a suitable JDK (the JetBrains Runtime) and uses it by default.</p>
+<p>Two different "Java versions" appear in a project, and mixing them up causes most confusion:</p>
+<ul>
+  <li><strong>The Gradle JDK</strong>, which runs the build. It's set in Android Studio under <em>Settings → Build Tools → Gradle → Gradle JDK</em>, or with a toolchain.</li>
+  <li><strong>The Java/Kotlin target</strong> (<code>jvmTarget</code>, <code>sourceCompatibility</code>), which is the bytecode level your code is compiled to. Android's toolchain supports it through desugaring.</li>
+</ul>
+
+<h2 id="gradle">Gradle and the wrapper</h2>
+<p>Each project pins its Gradle version in <code>gradle/wrapper/gradle-wrapper.properties</code>. The <strong>Gradle wrapper</strong> (<code>gradlew</code>) downloads exactly that version, so every developer and CI machine builds with the same Gradle.</p>
+<code-block lang="properties" file="gradle/wrapper/gradle-wrapper.properties">
+distributionUrl=https\://services.gradle.org/distributions/gradle-<version>-bin.zip
+</code-block>
+<code-block lang="bash" file="Terminal: build without the IDE">
+./gradlew assembleDebug        # build a debug APK
+./gradlew testDebugUnitTest    # run local unit tests
+./gradlew --version            # shows Gradle, Kotlin and JVM versions in use
+</code-block>
+
+<h2 id="agp">The Android Gradle Plugin (AGP)</h2>
+<p>AGP adds the <code>android { }</code> block and Android-specific tasks. AGP versions are tied to <strong>minimum Gradle versions</strong>, <strong>minimum JDK versions</strong> and supported Android Studio versions. Google publishes a compatibility table in the AGP release notes. Use the <em>AGP Upgrade Assistant</em> in Android Studio to move between versions safely.</p>
+
+<h2 id="sdk-versions">compileSdk, minSdk and targetSdk</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+android {
+    namespace = "com.example.notes"
+    compileSdk = 36                 // APIs you can CALL in code (compile against this android.jar)
+
+    defaultConfig {
+        applicationId = "com.example.notes"
+        minSdk = 24                 // oldest Android version that can INSTALL the app
+        targetSdk = 36              // Android version whose BEHAVIOUR changes you've tested
+        versionCode = 1
+        versionName = "1.0"
+    }
+}
+</code-block>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Setting</th><th>Controls</th><th>Practical rule</th></tr></thead>
+  <tbody>
+    <tr><td><code>compileSdk</code></td><td>Which APIs exist at compile time</td><td>Use the latest stable SDK. Newer libraries often require it.</td></tr>
+    <tr><td><code>minSdk</code></td><td>Who can install the app</td><td>A product decision: balance reach against development cost. Guard newer APIs with version checks.</td></tr>
+    <tr><td><code>targetSdk</code></td><td>Which behaviour changes apply to your app</td><td>Keep it recent. Google Play requires new apps and updates to target a recent API level.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>The values above are examples. Check the current Google Play target API requirement before each release.</p>
+<code-block lang="kotlin" file="Calling a newer API safely when minSdk is lower">
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    // POST_NOTIFICATIONS runtime permission exists only on Android 13 (API 33)+
+    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+}
+</code-block>
+
+<h2 id="catalog">Version catalogs: one place for dependency versions</h2>
+<code-block lang="toml" file="gradle/libs.versions.toml">
+[versions]
+agp = "<agp-version>"
+kotlin = "<kotlin-version>"
+composeBom = "<bom-version>"
+
+[libraries]
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+</code-block>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))   // BOM aligns all Compose library versions
+    implementation(libs.androidx.material3)
+}
+</code-block>
+
+<h2 id="troubleshooting">Reading and fixing common build errors</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Error message (paraphrased)</th><th>Which layer</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>"Android Gradle plugin requires Java N to run"</td><td>JDK ↔ AGP</td><td>Set Gradle JDK to the bundled JDK or JDK N+</td></tr>
+    <tr><td>"Minimum supported Gradle version is X"</td><td>Gradle ↔ AGP</td><td>Update <code>distributionUrl</code>, or use the Upgrade Assistant</td></tr>
+    <tr><td>"Dependency requires compileSdk X or later"</td><td>Library ↔ SDK</td><td>Raise <code>compileSdk</code> and install that SDK platform</td></tr>
+    <tr><td>"Failed to find target with hash string 'android-X'"</td><td>SDK</td><td>Install the platform in the SDK Manager</td></tr>
+    <tr><td>"Inconsistent JVM-target compatibility"</td><td>Kotlin ↔ Java target</td><td>Align <code>jvmTarget</code> and <code>compileOptions</code>, or use a toolchain</td></tr>
+    <tr><td>"Unresolved reference" after adding a library</td><td>Dependencies</td><td>Sync Gradle; check the artifact name, version and repository</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">Real situations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Cloning an old GitHub project</h3><p>It pins an old AGP that doesn't support your JDK. Either use a matching older JDK for that project, or upgrade AGP and Gradle with the Upgrade Assistant and fix deprecations.</p></div>
+  <div class="card usecase"><h3>CI build fails, local build works</h3><p>CI uses a different JDK. Pin the JDK in the CI workflow (for example the setup-java action) and rely on the Gradle wrapper.</p></div>
+  <div class="card usecase"><h3>Play Console rejects an update</h3><p>The target API is too old for current Play requirements. Raise <code>targetSdk</code> and test the behaviour changes for that Android version.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is the Android SDK the same as the JDK?</summary><div><p>No. The JDK provides Java tooling that runs the build. The Android SDK provides the Android APIs, build tools and device tools. You need both.</p></div></details>
+  <details><summary>Should compileSdk and targetSdk always match?</summary><div><p>Often they do, but they mean different things. You can compile against a newer SDK before you've finished testing its behaviour changes, then raise <code>targetSdk</code>.</p></div></details>
+  <details><summary>Do I need to install Gradle globally?</summary><div><p>No. Use the project's Gradle wrapper (<code>./gradlew</code>), which downloads the correct version automatically.</p></div></details>
+  <details><summary>What's the difference between Groovy and Kotlin DSL build files?</summary><div><p>Both configure the same build. Kotlin DSL (<code>.kts</code>) is the default for new projects and offers better IDE completion and type safety.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>The <strong>JDK runs Gradle</strong>, <strong>Gradle runs AGP</strong>, and <strong>AGP uses the Android SDK</strong> to compile, dex, package and sign your app. Each has its own version, and most build errors are a mismatch between two of them. Read the error, identify the layer, and fix the version at that boundary.</p>
+<p>Next step: open your project's <code>libs.versions.toml</code> and <code>gradle-wrapper.properties</code> and identify each version. Then learn what happens after the build in <a href="../how-android-app-works-internally/index.html">How an Android App Works Internally</a>.</p>

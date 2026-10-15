@@ -1,0 +1,131 @@
+<!--meta
+{
+  "seo_title": "Foreground Services in Android: Types, Rules and Examples",
+  "description": "Foreground services on modern Android: required service types and permissions, startForeground with notifications, background start restrictions, timeouts for some types, alternatives like WorkManager, and Play policy.",
+  "primary_keyword": "foreground service android",
+  "keywords": ["foreground service type android 14", "startforeground kotlin", "foregroundservicestartnotallowedexception", "android background start restrictions", "dataSync foreground service timeout", "foreground service play policy"],
+  "lede": "Foreground services let your app keep doing user-visible work, like playing music, tracking a run or an active call, while the user does something else. Modern Android tightly restricts them: you must declare a type, hold permissions, show a notification, and justify use on Google Play.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["workmanager-background-work", "firebase-cloud-messaging-push-notifications", "android-permissions-privacy", "android-app-components"],
+  "refs": [
+    ["Foreground services overview", "https://developer.android.com/develop/background-work/services/fgs"],
+    ["Foreground service types", "https://developer.android.com/develop/background-work/services/fgs/service-types"],
+    ["Restrictions on starting from background", "https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start"],
+    ["Foreground service timeouts", "https://developer.android.com/develop/background-work/services/fgs/timeout"],
+    ["Play Console: foreground service requirements", "https://support.google.com/googleplay/android-developer/answer/13392821"]
+  ]
+}
+-->
+<p class="ad-lead">A foreground service tells the system "the user knows this is running and cares about it". In return, Android keeps it alive. Because that power was abused, recent Android versions require explicit service types, matching permissions, and restrict when you can start one.</p>
+
+<h2 id="rules">The modern rules at a glance</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fgs-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-fgs-t fig-fgs-d">
+    <title id="fig-fgs-t">Requirements for a foreground service</title>
+    <desc id="fig-fgs-d">Declare the service with a foregroundServiceType in the manifest, request FOREGROUND_SERVICE and the type-specific permission, start it while the app is allowed (usually visible), call startForeground with a notification and type promptly, and stop it when the work ends.</desc>
+    <defs><marker id="fgsm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M140 80 H158 M280 80 H298 M420 80 H438 M560 80 H578" marker-end="url(#fgsm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="50" width="130" height="60" rx="12"/><text class="d-t" x="75" y="76" text-anchor="middle">Declare type</text><text class="d-s" x="75" y="94" text-anchor="middle">manifest</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="160" y="50" width="120" height="60" rx="12"/><text class="d-t" x="220" y="76" text-anchor="middle">Permissions</text><text class="d-s" x="220" y="94" text-anchor="middle">FGS + type</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="300" y="50" width="120" height="60" rx="12"/><text class="d-t" x="360" y="76" text-anchor="middle">Start when</text><text class="d-s" x="360" y="94" text-anchor="middle">allowed</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="440" y="50" width="120" height="60" rx="12"/><text class="d-t" x="500" y="76" text-anchor="middle">startForeground</text><text class="d-s" x="500" y="94" text-anchor="middle">+ notification</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="580" y="50" width="130" height="60" rx="12"/><text class="d-w" x="645" y="76" text-anchor="middle">Stop</text><text class="d-w" x="645" y="94" text-anchor="middle">when done</text></g>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Plus: justify the type in Play Console when your app targets Android 14+.</text>
+  </svg>
+  <figcaption id="fig-fgs-cap">Missing any step results in exceptions at runtime or Play review issues.</figcaption>
+</figure>
+
+<h2 id="types">Service types</h2>
+<p>Since Android 14 (API 34), apps targeting it must declare at least one type per foreground service. Common types:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Type</th><th>For</th><th>Extra permission</th></tr></thead>
+  <tbody>
+    <tr><td><code>mediaPlayback</code></td><td>Audio/video playback</td><td><code>FOREGROUND_SERVICE_MEDIA_PLAYBACK</code></td></tr>
+    <tr><td><code>location</code></td><td>Navigation, run tracking</td><td><code>FOREGROUND_SERVICE_LOCATION</code> + location permission</td></tr>
+    <tr><td><code>phoneCall</code></td><td>Ongoing calls</td><td><code>FOREGROUND_SERVICE_PHONE_CALL</code> + role/permission</td></tr>
+    <tr><td><code>dataSync</code></td><td>Upload/download/sync</td><td><code>FOREGROUND_SERVICE_DATA_SYNC</code> (time-limited)</td></tr>
+    <tr><td><code>shortService</code></td><td>Quick critical tasks</td><td>None (about 3 minutes, strict)</td></tr>
+    <tr><td><code>specialUse</code></td><td>Valid cases not covered by other types</td><td><code>FOREGROUND_SERVICE_SPECIAL_USE</code> + justification</td></tr>
+  </tbody>
+</table>
+</div>
+<p>See the official types list for camera, microphone, health, connectedDevice, remoteMessaging and others, with their exact requirements. Some types, such as <code>dataSync</code> and <code>mediaProcessing</code>, have runtime limits on newer Android versions. Check the timeouts page.</p>
+
+<h2 id="manifest">Manifest</h2>
+<code-block lang="xml" file="AndroidManifest.xml">
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+<application>
+    <service
+        android:name=".PlaybackService"
+        android:exported="false"
+        android:foregroundServiceType="mediaPlayback" />
+</application>
+</code-block>
+
+<h2 id="service">The service</h2>
+<code-block lang="kotlin" file="PlaybackService.kt">
+class PlaybackService : Service() {
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val notification = NotificationCompat.Builder(this, CHANNEL_PLAYBACK)
+            .setSmallIcon(R.drawable.ic_play)
+            .setContentTitle("Playing")
+            .setOngoing(true)
+            .build()
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            notification,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0,
+        )
+        // start the actual work (e.g. player) here
+        return START_NOT_STICKY
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    companion object {
+        const val NOTIFICATION_ID = 42
+        const val CHANNEL_PLAYBACK = "playback"
+    }
+}
+
+// Starting it (while the app is in the foreground):
+ContextCompat.startForegroundService(context, Intent(context, PlaybackService::class.java))
+</code-block>
+<div class="callout tip"><b>For media, prefer Media3</b><p>For playback, Media3's <code>MediaSessionService</code> handles the service, notification and media session for you.</p></div>
+
+<h2 id="restrictions">Background start restrictions</h2>
+<p>Since Android 12, apps targeting it generally can't start foreground services while in the background. Doing so throws <code>ForegroundServiceStartNotAllowedException</code>. There are exemptions (for example, starting from a high-priority FCM message or after certain user interactions). Check the restrictions page. When in doubt, use WorkManager, which can promote long-running work with <code>setForeground</code>.</p>
+
+<h2 id="alternatives">Prefer alternatives when possible</h2>
+<ul>
+  <li><strong>Deferrable work:</strong> <a href="../workmanager-background-work/index.html">WorkManager</a>.</li>
+  <li><strong>User-initiated data transfers</strong> (Android 14+): user-initiated data transfer jobs via JobScheduler for large uploads/downloads.</li>
+  <li><strong>Exact alarms:</strong> AlarmManager for alarm clocks and reminders.</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong><code>MissingForegroundServiceTypeException</code>:</strong> type missing in the manifest or <code>startForeground</code> call.</li>
+  <li><strong><code>SecurityException</code> on start:</strong> type-specific permission or prerequisites (such as location permission) missing.</li>
+  <li><strong>Notification not shown:</strong> on Android 13+ POST_NOTIFICATIONS may be denied. The service still runs, but appears in the Task Manager instead of the shade.</li>
+  <li><strong>Service killed after a while:</strong> check type timeouts and call <code>stopSelf()</code> in <code>onTimeout</code> where required.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need a foreground service for a file upload?</summary><div><p>Usually not. WorkManager (with constraints and retries) or a user-initiated data transfer job is preferred.</p></div></details>
+  <details><summary>Will Play reject my app for foreground services?</summary><div><p>Apps targeting Android 14+ must declare each type's use in Play Console. Use that doesn't match the type's purpose can be rejected.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Foreground services are for <strong>ongoing, user-visible work</strong>. Declare the right <strong>type and permissions</strong>, start while allowed, call <code>startForeground</code> promptly with a notification, respect <strong>timeouts</strong>, and prefer WorkManager or specialised APIs when they fit.</p>
+<p>Next step: open specific screens from links with <a href="../deep-links-app-links-android/index.html">Deep Links and Android App Links</a>.</p>

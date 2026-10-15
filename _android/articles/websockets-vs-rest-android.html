@@ -1,0 +1,133 @@
+<!--meta
+{
+  "seo_title": "WebSockets vs REST APIs in Android: When to Use Each",
+  "description": "WebSockets vs REST for Android apps: request-response vs persistent connections, battery and lifecycle impact, reconnection, OkHttp WebSocket as a Flow, and alternatives like FCM and SSE.",
+  "primary_keyword": "websockets vs rest android",
+  "keywords": ["okhttp websocket kotlin", "real time android app", "websocket reconnect backoff", "server sent events android", "polling vs websocket mobile", "websocket flow kotlin"],
+  "lede": "REST is request and response: the app asks, the server answers. WebSockets keep a connection open so the server can push data instantly. Real-time sounds great until you consider battery, lifecycle and flaky mobile networks. Here's how to choose, and how to implement WebSockets robustly.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["rest-api-kotlin-coroutines", "firebase-cloud-messaging-push-notifications", "android-battery-optimization", "flow-vs-stateflow-vs-sharedflow"],
+  "refs": [
+    ["OkHttp (WebSocket support): official repository", "https://github.com/square/okhttp"],
+    ["Optimize network access (battery)", "https://developer.android.com/develop/connectivity/network-ops/network-access-optimization"],
+    ["Firebase Cloud Messaging", "https://firebase.google.com/docs/cloud-messaging"],
+    ["The WebSocket Protocol (RFC 6455)", "https://datatracker.ietf.org/doc/html/rfc6455"]
+  ]
+}
+-->
+<p class="ad-lead">A chat app, a live delivery tracker, a trading dashboard and a news app all show "fresh" data, but each needs a different freshness, and freshness has a price on mobile. Choosing between REST, WebSockets and push is about how fast updates must arrive and what you're willing to spend in battery and complexity.</p>
+
+<h2 id="models">The communication models</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ws2-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-ws2-t fig-ws2-d">
+    <title id="fig-ws2-t">REST polling compared with a WebSocket connection</title>
+    <desc id="fig-ws2-d">Top: with REST, the client sends a request and gets a response; to get updates it polls repeatedly, many requests return nothing new. Bottom: with a WebSocket, after one handshake the connection stays open and either side can send messages at any time.</desc>
+    <text class="d-t" x="20" y="22">REST (request → response, polling for updates)</text>
+    <rect class="d-blue" x="20" y="34" width="90" height="70" rx="10"/><text class="d-t" x="65" y="74" text-anchor="middle">App</text>
+    <rect class="d-amber" x="610" y="34" width="90" height="70" rx="10"/><text class="d-t" x="655" y="74" text-anchor="middle">Server</text>
+    <path class="d-line" d="M110 46 H606 M606 58 H114 M110 80 H606 M606 92 H114"/>
+    <text class="d-s" x="360" y="42" text-anchor="middle">GET /messages?since=…  (nothing new)</text>
+    <text class="d-s" x="360" y="76" text-anchor="middle">GET again after 10 s</text>
+    <text class="d-t" x="20" y="140">WebSocket (one connection, both directions)</text>
+    <rect class="d-blue" x="20" y="152" width="90" height="70" rx="10"/><text class="d-t" x="65" y="192" text-anchor="middle">App</text>
+    <rect class="d-amber" x="610" y="152" width="90" height="70" rx="10"/><text class="d-t" x="655" y="192" text-anchor="middle">Server</text>
+    <rect class="d-green" x="114" y="178" width="492" height="18" rx="9"/><text class="d-s" x="360" y="191" text-anchor="middle">persistent connection: messages pushed instantly, either way</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M600 187 H120');--dur:1.4s"/>
+  </svg>
+  <figcaption id="fig-ws2-cap">Polling wastes requests when nothing changes. A WebSocket is efficient while open, but keeping it open has costs on mobile.</figcaption>
+</figure>
+
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Best fit</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Load data when a screen opens</td><td>REST</td><td>Simple, cacheable, stateless</td></tr>
+    <tr><td>Instant two-way updates while a screen is open (chat, live collaboration)</td><td>WebSocket</td><td>Low latency in both directions</td></tr>
+    <tr><td>One-way live updates while open (scores, prices)</td><td>WebSocket or Server-Sent Events</td><td>Server push without polling</td></tr>
+    <tr><td>Alert users when the app is closed</td><td>FCM push</td><td>System-managed, battery-friendly delivery</td></tr>
+    <tr><td>Data that changes every few minutes</td><td>REST with refresh on screen open or periodic sync</td><td>A persistent connection isn't worth the cost</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mobile-realities">Mobile realities</h2>
+<ul>
+  <li><strong>Battery:</strong> keeping a radio active drains battery. Keep WebSockets open only while the relevant UI is visible.</li>
+  <li><strong>Background limits:</strong> Android restricts background network and execution, so you can't rely on a background WebSocket. Use FCM to wake the app.</li>
+  <li><strong>Network changes:</strong> moving between Wi-Fi and mobile data drops connections. Reconnection with backoff is mandatory.</li>
+  <li><strong>Missed messages:</strong> after reconnecting, fetch what you missed via REST (for example with <code>since=lastEventId</code>).</li>
+</ul>
+
+<h2 id="implementation">OkHttp WebSocket as a Flow</h2>
+<code-block lang="kotlin" file="LiveUpdates.kt">
+sealed interface SocketEvent {
+    data object Connected : SocketEvent
+    data class Message(val text: String) : SocketEvent
+    data class Closed(val reason: String) : SocketEvent
+}
+
+fun OkHttpClient.webSocketFlow(url: String): Flow<SocketEvent> = callbackFlow {
+    val socket = newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) { trySend(SocketEvent.Connected) }
+        override fun onMessage(webSocket: WebSocket, text: String) { trySend(SocketEvent.Message(text)) }
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            trySend(SocketEvent.Closed(reason)); close()
+        }
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) { close(t) }
+    })
+    awaitClose { socket.close(1000, "Collector cancelled") }   // closes when the screen stops collecting
+}
+
+/** Reconnect with capped exponential backoff while collected. */
+fun OkHttpClient.resilientSocket(url: String): Flow<SocketEvent> =
+    webSocketFlow(url).retryWhen { cause, attempt ->
+        if (cause is IOException) { delay(minOf(30_000L, 1_000L shl attempt.toInt().coerceAtMost(5))); true }
+        else false
+    }
+</code-block>
+<p>Set a ping interval on the OkHttp client (<code>pingInterval(20, TimeUnit.SECONDS)</code>) so dead connections are detected.</p>
+
+<h2 id="viewmodel">Lifecycle-aware usage</h2>
+<code-block lang="kotlin" file="ChatViewModel.kt">
+class ChatViewModel(client: OkHttpClient, private val repo: ChatRepository) : ViewModel() {
+    val messages: StateFlow<List<ChatMessage>> = client.resilientSocket("wss://chat.example.com/rooms/42")
+        .onEach { event ->
+            when (event) {
+                SocketEvent.Connected -> repo.syncMissed()                 // REST catch-up after (re)connect
+                is SocketEvent.Message -> repo.saveIncoming(event.text)    // persist; UI observes Room
+                is SocketEvent.Closed -> Unit
+            }
+        }
+        .flatMapLatest { repo.observeMessages() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+}
+</code-block>
+<p>With <code>WhileSubscribed</code>, the socket closes a few seconds after the screen stops collecting, which saves battery when the user leaves.</p>
+
+<h2 id="use-cases">Real-world combinations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Chat app</h3><p>WebSocket while the conversation is open, FCM for new messages when closed, and REST for history and catch-up.</p></div>
+  <div class="card usecase"><h3>Delivery tracking</h3><p>WebSocket or SSE for the live map while visible, and FCM for "driver arriving" when backgrounded.</p></div>
+  <div class="card usecase"><h3>News feed</h3><p>REST with pull-to-refresh and periodic WorkManager sync. Real-time sockets would add cost without benefit.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Keeping a WebSocket open in a background service "for real-time", which drains battery and fights OS limits.</li>
+  <li>No reconnection or catch-up logic, so messages are silently lost.</li>
+  <li>Unbounded reconnect loops without backoff during outages.</li>
+  <li>Sending auth tokens in query strings, which may end up in logs. Prefer headers or an initial auth message, as your server supports.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are WebSockets supported by Retrofit?</summary><div><p>No. Use OkHttp's WebSocket API directly, or Ktor's WebSocket client.</p></div></details>
+  <details><summary>What about gRPC streaming or MQTT?</summary><div><p>Both are valid for specific needs: gRPC for typed bidirectional streams with gRPC backends, and MQTT for IoT-style pub/sub. The same lifecycle and reconnection concerns apply.</p></div></details>
+  <details><summary>Is polling ever okay?</summary><div><p>Yes, for infrequent updates while a screen is open, with sensible intervals and stopping when the screen isn't visible.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>REST</strong> for most data, <strong>WebSockets</strong> for truly real-time, two-way features <em>while the UI is visible</em>, and <strong>FCM</strong> for anything that must reach users when the app is closed. Wrap sockets in lifecycle-aware Flows with backoff, and always catch up via REST after reconnecting.</p>
+<p>Next step: reduce network use further with <a href="../android-caching-strategies/index.html">Caching Strategies for Android Apps</a>.</p>

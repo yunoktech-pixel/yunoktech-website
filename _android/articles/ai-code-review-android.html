@@ -1,0 +1,93 @@
+<!--meta
+{
+  "seo_title": "AI Code Review: Benefits, Risks and Limitations",
+  "description": "Use AI code review in Android projects effectively: what it catches, what it misses, false positives, privacy, integrating with pull requests, review prompts and keeping human ownership.",
+  "primary_keyword": "ai code review",
+  "keywords": ["ai pull request review", "automated code review android", "llm code review limitations", "code review checklist android", "ai review false positives", "human in the loop code review"],
+  "lede": "AI reviewers can scan every pull request in seconds and spot missing null checks, leaked contexts or forgotten tests. They also miss business logic errors and sometimes flag non-issues with total confidence. Here's how to get the benefits while keeping review quality high.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["verify-ai-generated-android-code", "ai-write-kotlin-responsibly", "android-ci-cd-github-actions", "scaling-android-codebase-teams"],
+  "refs": [
+    ["Android lint", "https://developer.android.com/studio/write/lint"],
+    ["Google engineering practices: code review", "https://google.github.io/eng-practices/review/"],
+    ["Gemini in Android Studio", "https://developer.android.com/studio/gemini/overview"]
+  ]
+}
+-->
+<p class="ad-lead">Code review exists to catch defects, share knowledge and keep the codebase coherent. AI review helps with the first goal, partly, and does little for the other two. Treat it as an extra reviewer with specific strengths, not a replacement for people.</p>
+
+<h2 id="strengths">What AI review is good and bad at</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Usually good at</th><th>Usually weak at</th></tr></thead>
+  <tbody>
+    <tr><td>Common bug patterns: nullability, resource leaks, swallowed exceptions</td><td>Business rules and product intent</td></tr>
+    <tr><td>Android pitfalls: Context leaks, main-thread I/O, lifecycle misuse</td><td>Cross-module architecture decisions and history</td></tr>
+    <tr><td>Missing tests or obvious untested branches</td><td>Whether tests assert the <em>right</em> behaviour</td></tr>
+    <tr><td>Readability suggestions, naming</td><td>Knowing which conventions your team actually follows (without rules)</td></tr>
+    <tr><td>Security smells: hard-coded secrets, logging tokens</td><td>Threat modelling of a new feature</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-cr-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-cr-t fig-cr-d">
+    <title id="fig-cr-t">Layered code review pipeline</title>
+    <desc id="fig-cr-d">A pull request first passes deterministic checks such as build, tests, lint and static analysis, then an AI review that comments on likely issues, and finally human review focusing on design, intent and knowledge sharing before merge.</desc>
+    <defs><marker id="crm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 80 H156 M326 80 H352 M512 80 H538" marker-end="url(#crm)"/>
+    <rect class="d-blue" x="10" y="50" width="120" height="60" rx="12"/><text class="d-t" x="70" y="85" text-anchor="middle">Pull request</text>
+    <rect class="d-green" x="160" y="50" width="166" height="60" rx="12"/><text class="d-t" x="243" y="76" text-anchor="middle">Deterministic</text><text class="d-s" x="243" y="94" text-anchor="middle">build, tests, lint</text>
+    <rect class="d-violet" x="356" y="50" width="156" height="60" rx="12"/><text class="d-t" x="434" y="76" text-anchor="middle">AI review</text><text class="d-s" x="434" y="94" text-anchor="middle">suggestions</text>
+    <rect class="d-amber" x="542" y="50" width="168" height="60" rx="12"/><text class="d-t" x="626" y="76" text-anchor="middle">Human review</text><text class="d-s" x="626" y="94" text-anchor="middle">design, intent</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Cheap, certain checks first; probabilistic AI next; human judgement last.</text>
+  </svg>
+  <figcaption id="fig-cr-cap">Use deterministic tools for what they can prove, so AI and humans spend attention on the rest.</figcaption>
+</figure>
+
+<h2 id="prompt">A focused review prompt</h2>
+<code-block lang="text" file="Review prompt for an Android diff">
+Review this diff for an Android app (Kotlin, Compose, Hilt, coroutines). Focus only on:
+1) correctness bugs, 2) lifecycle/threading issues (main-thread I/O, leaked scopes/contexts),
+3) security/privacy (secrets, logging personal data, exported components),
+4) missing or weak tests for changed logic.
+For each finding: file:line, severity (high/medium/low), why it's a problem, minimal fix.
+Do not comment on formatting or style covered by ktlint. If unsure, say so.
+</code-block>
+
+<h2 id="false-positives">Handling false positives</h2>
+<ul>
+  <li>Require <strong>evidence</strong> (file and line, reasoning). Dismiss findings that can't point to a concrete problem.</li>
+  <li>Tune with <strong>rules</strong>: tell the reviewer about intentional patterns ("we use <code>!!</code> only after <code>checkNotNull</code> in tests").</li>
+  <li>Don't let AI comments block merges automatically. Humans decide.</li>
+</ul>
+
+<h2 id="privacy">Privacy and policy</h2>
+<p>Sending diffs to an AI service shares source code. Use tools and tiers approved by your organisation, exclude sensitive paths, and check data retention terms, especially for client projects under NDA.</p>
+
+<h2 id="human">What humans should still focus on</h2>
+<ul>
+  <li>Does this change solve the right problem, as the product needs it?</li>
+  <li>Does it fit the architecture and future direction?</li>
+  <li>Is it understandable to the next person, and did the author learn something?</li>
+  <li>Are tests protecting meaningful behaviour?</li>
+</ul>
+
+<h2 id="use-cases">Good uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Self-review before opening a PR</h3><p>The author runs AI review locally and fixes obvious issues before teammates spend time.</p></div>
+  <div class="card usecase"><h3>Large mechanical PRs</h3><p>AI scans for inconsistencies in big migrations, and humans sample-review deeply.</p></div>
+  <div class="card usecase"><h3>Junior mentoring</h3><p>AI explains "why" for common issues, and seniors focus on design feedback.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can AI replace a second human reviewer?</summary><div><p>For low-risk changes some teams accept AI plus one human, but for most production code keep human review. AI misses intent and context.</p></div></details>
+  <details><summary>Does AI review conflict with lint?</summary><div><p>It shouldn't duplicate lint. Configure it to skip what lint and formatters already enforce.</p></div></details>
+  <details><summary>How do I measure value?</summary><div><p>Track accepted versus dismissed findings and bugs caught before merge, and adjust prompts or turn the reviewer off for low-value categories.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI code review is a useful <strong>additional layer</strong>: good at common bugs, Android pitfalls and missing tests, weak at intent and architecture. Run deterministic checks first, prompt AI for evidence-backed findings, treat its output as suggestions, and keep humans responsible for design and knowledge sharing.</p>
+<p>Next step: a reality check in <a href="../can-ai-build-android-app/index.html">Can AI Build a Complete Android App?</a></p>

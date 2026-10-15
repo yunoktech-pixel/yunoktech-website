@@ -1,0 +1,139 @@
+<!--meta
+{
+  "seo_title": "ML Kit GenAI APIs Explained (Gemini Nano on Android)",
+  "description": "A tour of ML Kit GenAI APIs on Android: Summarization, Proofreading, Rewriting, Image Description, Speech Recognition and Prompt API, with shared lifecycle, limits and Kotlin examples.",
+  "primary_keyword": "ml kit genai apis",
+  "keywords": ["ml kit rewriting api", "ml kit proofreading api", "ml kit image description", "gemini nano api android", "on-device generative ai android", "ml kit prompt api"],
+  "lede": "ML Kit GenAI gives Android apps ready-made, on-device generative features powered by Gemini Nano: summarise, proofread, rewrite, describe images, transcribe speech and run custom prompts. This guide compares the APIs, explains their shared lifecycle, and shows Kotlin examples.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["gemini-nano-ml-kit-genai-android", "ai-writing-assistant-android", "ai-image-description-android", "cloud-ai-vs-on-device-ai-android"],
+  "refs": [
+    ["ML Kit GenAI APIs overview", "https://developers.google.com/ml-kit/genai"],
+    ["Summarization API", "https://developers.google.com/ml-kit/genai/summarization/android"],
+    ["Proofreading API", "https://developers.google.com/ml-kit/genai/proofreading/android"],
+    ["Rewriting API", "https://developers.google.com/ml-kit/genai/rewriting/android"],
+    ["Image Description API", "https://developers.google.com/ml-kit/genai/image-description/android"],
+    ["Gemini Nano on Android", "https://developer.android.com/ai/gemini-nano"]
+  ]
+}
+-->
+<p class="ad-lead">Building on-device generative features used to mean bundling a model, managing GPU delegates and tuning prompts yourself. ML Kit GenAI packages common tasks as high-level APIs on top of Gemini Nano, which Android's AICore service manages. You call a client, check availability, and get results without network or per-request fees.</p>
+
+<div class="note"><b>Status</b><p>At the time of writing, Google lists Summarization, Proofreading, Rewriting, Image Description and Prompt as <strong>beta</strong>, and Speech Recognition as <strong>alpha</strong>. Beta APIs can change and have no SLA, and device support is limited to specific models. Always check the official pages for current details.</p></div>
+
+<h2 id="apis">The APIs</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>API</th><th>Input → output</th><th>Typical feature</th></tr></thead>
+  <tbody>
+    <tr><td>Summarization</td><td>Article or conversation → 1–3 bullet points</td><td>"Summarise this note/chat"</td></tr>
+    <tr><td>Proofreading</td><td>Short text → corrected text</td><td>Fix typos before sending</td></tr>
+    <tr><td>Rewriting</td><td>Short text → restyled versions (e.g. shorter, friendlier, more professional)</td><td>Tone adjustment in a composer</td></tr>
+    <tr><td>Image Description</td><td>Bitmap → short description</td><td>Alt text, accessibility</td></tr>
+    <tr><td>Speech Recognition</td><td>Audio → text</td><td>Dictation, voice notes</td></tr>
+    <tr><td>Prompt</td><td>Custom text or image prompt → generated text</td><td>Classification, extraction, custom short tasks</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="lifecycle">The shared lifecycle</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gl-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-gl-t fig-gl-d">
+    <title id="fig-gl-t">Common lifecycle of ML Kit GenAI clients</title>
+    <desc id="fig-gl-d">Create a client with options, check feature status, download the feature if needed, run inference with optional streaming, and close the client when done.</desc>
+    <defs><marker id="glm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#glm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="64" text-anchor="middle">getClient</text><text class="d-s" x="70" y="82" text-anchor="middle">options</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="64" text-anchor="middle">checkStatus</text><text class="d-s" x="212" y="82" text-anchor="middle">4 states</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="64" text-anchor="middle">download</text><text class="d-s" x="352" y="82" text-anchor="middle">if needed</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="64" text-anchor="middle">runInference</text><text class="d-s" x="497" y="82" text-anchor="middle">stream or await</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="584" y="40" width="126" height="60" rx="12"/><text class="d-t" x="647" y="64" text-anchor="middle">close()</text><text class="d-s" x="647" y="82" text-anchor="middle">release</text></g>
+  </svg>
+  <figcaption id="fig-gl-cap">Learn the lifecycle once and every GenAI API feels the same. Details are in <a href="../gemini-nano-ml-kit-genai-android/index.html">the Gemini Nano guide</a>.</figcaption>
+</figure>
+
+<h2 id="rewriting">Example: Rewriting</h2>
+<code-block lang="kotlin" file="ToneRewriter.kt (beta API, names may change)">
+// implementation("com.google.mlkit:genai-rewriting:<version>")
+class ToneRewriter(context: Context) : AutoCloseable {
+    private val shorten = Rewriting.getClient(
+        RewriterOptions.builder(context)
+            .setOutputType(RewriterOptions.OutputType.SHORTEN)
+            .setLanguage(RewriterOptions.Language.ENGLISH)
+            .build()
+    )
+
+    suspend fun isReady(): Boolean = shorten.checkFeatureStatus().await() == FeatureStatus.AVAILABLE
+
+    /** Returns up to a few suggestions; the user picks one. */
+    suspend fun shorter(text: String): List<String> =
+        shorten.runInference(RewritingRequest.builder(text).build()).await()
+            .results.map { it.text }
+
+    override fun close() = shorten.close()
+}
+</code-block>
+
+<h2 id="proofreading">Example: Proofreading</h2>
+<code-block lang="kotlin" file="Proofreader.kt (beta API, names may change)">
+// implementation("com.google.mlkit:genai-proofreading:<version>")
+val proofreader = Proofreading.getClient(
+    ProofreaderOptions.builder(context)
+        .setInputType(ProofreaderOptions.InputType.KEYBOARD)     // typed text (vs. VOICE)
+        .setLanguage(ProofreaderOptions.Language.ENGLISH)
+        .build()
+)
+suspend fun fix(text: String): String? =
+    proofreader.runInference(ProofreadingRequest.builder(text).build()).await()
+        .results.firstOrNull()?.text
+</code-block>
+
+<h2 id="image">Example: Image Description</h2>
+<code-block lang="kotlin" file="AltTextGenerator.kt (beta API, names may change)">
+// implementation("com.google.mlkit:genai-image-description:<version>")
+val describer = ImageDescription.getClient(ImageDescriberOptions.builder(context).build())
+
+suspend fun altText(bitmap: Bitmap): String =
+    describer.runInference(ImageDescriptionRequest.builder(bitmap).build()).await().description
+</code-block>
+
+<h2 id="choose">Task API or Prompt API?</h2>
+<ul>
+  <li><strong>Task APIs</strong> (summarise, proofread, rewrite, describe) come with tuned prompts and quality evaluation by Google. Prefer them whenever your feature matches.</li>
+  <li><strong>Prompt API</strong> gives flexibility for custom tasks such as classifying a message, extracting fields or generating short labels. You own prompt quality and evaluation, and outputs can vary by Gemini Nano version.</li>
+</ul>
+
+<h2 id="constraints">Constraints to design around</h2>
+<ul>
+  <li><strong>Device support</strong> is limited. Check status before showing UI, and provide a fallback or hide the feature.</li>
+  <li><strong>Foreground only</strong>: background inference is blocked.</li>
+  <li><strong>Quotas</strong>: per-app inference quota (<code>BUSY</code>) and battery-use quotas.</li>
+  <li><strong>Input limits and languages</strong> vary per API. Summarisation, for example, documents roughly 4,000 input tokens and a small set of languages.</li>
+</ul>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Messaging</h3><p>Proofread and rewrite in the composer. Private messages never leave the phone.</p></div>
+  <div class="card usecase"><h3>Notes and email</h3><p>Summaries of long notes or threads, offered only on supported devices.</p></div>
+  <div class="card usecase"><h3>Accessibility</h3><p>Auto-generated alt text drafts for user-uploaded images, editable before saving.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Showing AI buttons without checking feature status.</li>
+  <li>Running inference automatically on every keystroke and hitting quotas.</li>
+  <li>Applying suggestions automatically without letting the user review them.</li>
+  <li>Forgetting <code>close()</code>, which leaks resources.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do ML Kit GenAI APIs cost money?</summary><div><p>There's no per-request fee, because inference runs on the device. Your costs are engineering effort and the user's device resources.</p></div></details>
+  <details><summary>Can I use them on the emulator?</summary><div><p>Generally not, since Gemini Nano requires supported physical devices. Test on the devices listed in the documentation.</p></div></details>
+  <details><summary>What about unsupported devices?</summary><div><p>Hide the feature, or offer a cloud alternative with user consent. See <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>ML Kit GenAI offers <strong>private, on-device generative features</strong> with a consistent lifecycle: get a client, check status, download, run inference, close. Prefer the task APIs where they fit, use the Prompt API for custom tasks, and design for limited device support, foreground-only use and quotas.</p>
+<p>Next step: build a complete feature with these APIs in <a href="../ai-writing-assistant-android/index.html">How to Build an AI Writing Assistant for Android</a>.</p>

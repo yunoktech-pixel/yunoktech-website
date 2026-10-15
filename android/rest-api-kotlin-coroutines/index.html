@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Integration with Kotlin and Coroutines | Yunok Tech</title>
+  <meta name="description" content="End-to-end REST API integration in Android with Kotlin coroutines: API contract, DTO mapping, repository, ViewModel state, parallel requests, retries, timeouts and testing.">
+  <meta name="keywords" content="rest api kotlin coroutines android, android api integration, kotlin coroutines retrofit example, parallel api calls kotlin, retry with backoff kotlin, api repository viewmodel, android networking architecture">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/rest-api-kotlin-coroutines/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/rest-api-kotlin-coroutines/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="REST API Integration with Kotlin and Coroutines">
+  <meta property="og:description" content="End-to-end REST API integration in Android with Kotlin coroutines: API contract, DTO mapping, repository, ViewModel state, parallel requests, retries, timeouts and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="REST API Integration with Kotlin and Coroutines">
+  <meta name="twitter:description" content="End-to-end REST API integration in Android with Kotlin coroutines: API contract, DTO mapping, repository, ViewModel state, parallel requests, retries, timeouts and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "REST API Integration with Kotlin and Coroutines", "description": "End-to-end REST API integration in Android with Kotlin coroutines: API contract, DTO mapping, repository, ViewModel state, parallel requests, retries, timeouts and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "android api integration, kotlin coroutines retrofit example, parallel api calls kotlin, retry with backoff kotlin, api repository viewmodel, android networking architecture", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/rest-api-kotlin-coroutines/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "REST API Integration with Kotlin and Coroutines", "item": "https://yunoktech.com/android/rest-api-kotlin-coroutines/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">REST API Integration with Kotlin and Coroutines</h1>
+    <p class="ad-lede">Calling an endpoint is easy. Integrating an API well means clean models, predictable loading and error states, parallel calls where useful, sensible retries and timeouts, and tests. This walkthrough builds a complete feature end to end.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#flow">The end-to-end flow</a></li><li><a href="#contract">1. The API contract and DTOs</a></li><li><a href="#domain">2. Domain models and mapping</a></li><li><a href="#repository">3. Repository: parallel, with partial failure</a></li><li><a href="#viewmodel">4. ViewModel state</a></li><li><a href="#testing">5. Testing the repository</a></li><li><a href="#use-cases">Variations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">The feature: an order-tracking screen that loads the order, its shipment status and recommended products, three endpoints with different reliability. The goal: fast loading, graceful partial failure, and code that's easy to test.</p>
+
+<h2 id="flow">The end-to-end flow</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ra-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ra-t fig-ra-d">
+    <title id="fig-ra-t">Parallel API calls with partial failure</title>
+    <desc id="fig-ra-d">The ViewModel asks the repository for order details. The repository calls order and shipment endpoints in parallel with async and the recommendations endpoint in a supervised way. Order and shipment are required; recommendations failure is tolerated. Results map to domain models and then to UI state.</desc>
+    <defs><marker id="ram" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="80" width="130" height="56" rx="12"/><text class="d-t" x="75" y="112" text-anchor="middle">ViewModel</text></g>
+    <path class="d-flow" d="M140 108 H186" marker-end="url(#ram)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="190" y="80" width="150" height="56" rx="12"/><text class="d-t" x="265" y="104" text-anchor="middle">OrderRepository</text><text class="d-s" x="265" y="122" text-anchor="middle">coroutineScope</text></g>
+    <path class="d-flow" d="M340 96 L436 36 M340 108 H436 M340 120 L436 180" marker-end="url(#ram)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="440" y="14" width="270" height="44" rx="10"/><text class="d-s" x="575" y="40" text-anchor="middle">GET /orders/{id}: required</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="440" y="86" width="270" height="44" rx="10"/><text class="d-s" x="575" y="112" text-anchor="middle">GET /shipments/{id}: required</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="440" y="158" width="270" height="44" rx="10"/><text class="d-s" x="575" y="184" text-anchor="middle">GET /recommendations: optional</text></g>
+  </svg>
+  <figcaption id="fig-ra-cap">Required calls fail together. Optional calls fail alone, and the screen still works without them.</figcaption>
+</figure>
+
+<h2 id="contract">1. The API contract and DTOs</h2>
+<figure class="code"><figcaption><span class="file">OrderApi.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">OrderApi</span> {
+    <span class="tk-a">@GET</span>(<span class="tk-s">"orders/{id}"</span>) <span class="tk-k">suspend</span> <span class="tk-k">fun</span> order(<span class="tk-a">@Path</span>(<span class="tk-s">"id"</span>) id: <span class="tk-t">String</span>): <span class="tk-t">OrderDto</span>
+    <span class="tk-a">@GET</span>(<span class="tk-s">"shipments/{orderId}"</span>) <span class="tk-k">suspend</span> <span class="tk-k">fun</span> shipment(<span class="tk-a">@Path</span>(<span class="tk-s">"orderId"</span>) id: <span class="tk-t">String</span>): <span class="tk-t">ShipmentDto</span>
+    <span class="tk-a">@GET</span>(<span class="tk-s">"recommendations"</span>) <span class="tk-k">suspend</span> <span class="tk-k">fun</span> recommendations(<span class="tk-a">@Query</span>(<span class="tk-s">"orderId"</span>) id: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">ProductDto</span>&gt;
+}
+
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">OrderDto</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> total_paise: <span class="tk-t">Long</span>, <span class="tk-k">val</span> placed_at: <span class="tk-t">String</span>)
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ShipmentDto</span>(<span class="tk-k">val</span> status: <span class="tk-t">String</span>, <span class="tk-k">val</span> eta: <span class="tk-t">String</span>? = <span class="tk-k">null</span>)
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ProductDto</span>(<span class="tk-k">val</span> id: <span class="tk-t">String</span>, <span class="tk-k">val</span> name: <span class="tk-t">String</span>)</code></pre></figure>
+
+<h2 id="domain">2. Domain models and mapping</h2>
+<figure class="code"><figcaption><span class="file">Models.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">ShipmentStatus</span> { <span class="tk-t">PACKED</span>, <span class="tk-t">SHIPPED</span>, <span class="tk-t">OUT_FOR_DELIVERY</span>, <span class="tk-t">DELIVERED</span>, <span class="tk-t">UNKNOWN</span> }
+
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">OrderDetails</span>(
+    <span class="tk-k">val</span> orderId: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> totalPaise: <span class="tk-t">Long</span>,
+    <span class="tk-k">val</span> placedAt: <span class="tk-t">Instant</span>,
+    <span class="tk-k">val</span> status: <span class="tk-t">ShipmentStatus</span>,
+    <span class="tk-k">val</span> eta: <span class="tk-t">LocalDate</span>?,
+    <span class="tk-k">val</span> recommendations: <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt;,
+)
+
+<span class="tk-k">fun</span> <span class="tk-t">ShipmentDto</span>.statusEnum() = runCatching { <span class="tk-t">ShipmentStatus</span>.valueOf(status) }.getOrDefault(<span class="tk-t">ShipmentStatus</span>.<span class="tk-t">UNKNOWN</span>)</code></pre></figure>
+<p>Unknown server values map to <code>UNKNOWN</code> instead of crashing, so a new server status doesn't break old app versions.</p>
+
+<h2 id="repository">3. Repository: parallel, with partial failure</h2>
+<figure class="code"><figcaption><span class="file">OrderRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">OrderRepository</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">OrderApi</span>) {
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> details(orderId: <span class="tk-t">String</span>): <span class="tk-t">OrderDetails</span> = coroutineScope {
+        <span class="tk-k">val</span> order = async { retryIo { api.order(orderId) } }
+        <span class="tk-k">val</span> shipment = async { retryIo { api.shipment(orderId) } }
+        <span class="tk-c">// Optional: failure shouldn't cancel siblings or fail the whole call</span>
+        <span class="tk-k">val</span> recs = async {
+            runCatching { withTimeout(<span class="tk-n">3_000</span>) { api.recommendations(orderId) } }
+                .getOrDefault(emptyList())
+        }
+
+        <span class="tk-k">val</span> o = order.await()
+        <span class="tk-k">val</span> s = shipment.await()
+        <span class="tk-t">OrderDetails</span>(
+            orderId = o.id,
+            totalPaise = o.total_paise,
+            placedAt = <span class="tk-t">Instant</span>.parse(o.placed_at),
+            status = s.statusEnum(),
+            eta = s.eta?.let(<span class="tk-t">LocalDate</span>::parse),
+            recommendations = recs.await().map { <span class="tk-t">Product</span>(it.id, it.name) },
+        )
+    }
+}
+
+<span class="tk-c">/** Retries transient I/O failures with exponential backoff; rethrows the last error. */</span>
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; retryIo(times: <span class="tk-t">Int</span> = <span class="tk-n">3</span>, initialDelay: <span class="tk-t">Long</span> = <span class="tk-n">400</span>, block: <span class="tk-k">suspend</span> () -&gt; <span class="tk-t">T</span>): <span class="tk-t">T</span> {
+    <span class="tk-k">var</span> delayMs = initialDelay
+    repeat(times - <span class="tk-n">1</span>) {
+        <span class="tk-k">try</span> { <span class="tk-k">return</span> block() } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) { delay(delayMs); delayMs *= <span class="tk-n">2</span> }
+    }
+    <span class="tk-k">return</span> block()
+}</code></pre></figure>
+<div class="note"><b>Why runCatching is safe here</b><p><code>runCatching</code> also catches <code>CancellationException</code>. Here it wraps a block with its own timeout, and if the parent is cancelled, the following <code>await()</code> calls still observe cancellation. In general, prefer catching specific exceptions.</p></div>
+
+<h2 id="viewmodel">4. ViewModel state</h2>
+<figure class="code"><figcaption><span class="file">OrderViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">OrderUiState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Loading</span> : <span class="tk-t">OrderUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Content</span>(<span class="tk-k">val</span> details: <span class="tk-t">OrderDetails</span>) : <span class="tk-t">OrderUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Error</span>(<span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">OrderUiState</span>
+}
+
+<span class="tk-k">class</span> <span class="tk-t">OrderViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repo: <span class="tk-t">OrderRepository</span>, savedState: <span class="tk-t">SavedStateHandle</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> orderId: <span class="tk-t">String</span> = checkNotNull(savedState[<span class="tk-s">"orderId"</span>])
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _state = <span class="tk-t">MutableStateFlow</span>&lt;<span class="tk-t">OrderUiState</span>&gt;(<span class="tk-t">OrderUiState</span>.<span class="tk-t">Loading</span>)
+    <span class="tk-k">val</span> state = _state.asStateFlow()
+
+    <span class="tk-k">init</span> { load() }
+
+    <span class="tk-k">fun</span> load() = viewModelScope.launch {
+        _state.<span class="tk-k">value</span> = <span class="tk-t">OrderUiState</span>.<span class="tk-t">Loading</span>
+        _state.<span class="tk-k">value</span> = <span class="tk-k">try</span> {
+            <span class="tk-t">OrderUiState</span>.<span class="tk-t">Content</span>(repo.details(orderId))
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-t">OrderUiState</span>.<span class="tk-t">Error</span>(<span class="tk-s">"You're offline. Pull to retry."</span>)
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">HttpException</span>) {
+            <span class="tk-t">OrderUiState</span>.<span class="tk-t">Error</span>(<span class="tk-k">if</span> (e.code() == <span class="tk-n">404</span>) <span class="tk-s">"Order not found."</span> <span class="tk-k">else</span> <span class="tk-s">"Something went wrong (${e.code()})."</span>)
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="testing">5. Testing the repository</h2>
+<figure class="code"><figcaption><span class="file">OrderRepositoryTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `recommendations failure does not fail details`() = runTest {
+    <span class="tk-k">val</span> api = <span class="tk-k">object</span> : <span class="tk-t">OrderApi</span> {
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> order(id: <span class="tk-t">String</span>) = <span class="tk-t">OrderDto</span>(id, <span class="tk-n">129_900</span>, <span class="tk-s">"2026-10-01T10:00:00Z"</span>)
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> shipment(id: <span class="tk-t">String</span>) = <span class="tk-t">ShipmentDto</span>(<span class="tk-s">"SHIPPED"</span>, <span class="tk-s">"2026-10-03"</span>)
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> recommendations(id: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">ProductDto</span>&gt; = <span class="tk-k">throw</span> <span class="tk-t">IOException</span>(<span class="tk-s">"down"</span>)
+    }
+    <span class="tk-k">val</span> details = <span class="tk-t">OrderRepository</span>(api).details(<span class="tk-s">"A1"</span>)
+    assertEquals(<span class="tk-t">ShipmentStatus</span>.<span class="tk-t">SHIPPED</span>, details.status)
+    assertTrue(details.recommendations.isEmpty())
+}</code></pre></figure>
+
+<h2 id="use-cases">Variations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Dependent calls</h3><p>Sequential: get the user, then fetch orders by the user's account ID. No <code>async</code> needed.</p></div>
+  <div class="card usecase"><h3>Polling a status</h3><p>A <code>flow { while (true) { emit(api.status()); delay(10_000) } }</code> collected only while the screen is visible.</p></div>
+  <div class="card usecase"><h3>Offline support</h3><p>Write results to Room and observe from there. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Sequential calls for independent data, which doubles or triples loading time.</li>
+  <li>Retrying non-idempotent requests, such as creating a payment, without idempotency keys.</li>
+  <li>Retrying 4xx errors. Only transient failures (I/O, 5xx, 429 with backoff) deserve retries.</li>
+  <li>Parsing dates and enums without fallbacks.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>coroutineScope or supervisorScope?</summary><div><p><code>coroutineScope</code> fails fast when any child fails, which is right for required data. <code>supervisorScope</code> lets children fail independently. Above, the optional call handles its own failure instead.</p></div></details>
+  <details><summary>Where do timeouts belong?</summary><div><p>Set global timeouts on OkHttp, and use <code>withTimeout</code> for specific, latency-sensitive optional calls.</p></div></details>
+  <details><summary>Should I return Result from repositories?</summary><div><p>Either convention works. Pick one per codebase. This example throws and maps in the ViewModel.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Good API integration combines <strong>clean DTO-to-domain mapping</strong>, <strong>parallel calls for independent data</strong>, <strong>isolated optional failures</strong>, <strong>retries only for transient errors</strong>, and <strong>explicit UI states</strong>, all testable with fakes.</p>
+<p>Next step: compare HTTP clients in <a href="../retrofit-vs-ktor-client/index.html">Retrofit vs Ktor Client</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/kotlin/coroutines" target="_blank" rel="noopener">Coroutines on Android</a></li><li><a href="https://developer.android.com/topic/architecture/data-layer" target="_blank" rel="noopener">Data layer</a></li><li><a href="https://github.com/square/retrofit" target="_blank" rel="noopener">Retrofit (official repository)</a></li><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing coroutines</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Drest-api-kotlin-coroutines-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Drest-api-kotlin-coroutines-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/retrofit-android-guide/index.html"><small>APIs, Databases, and Backend Integration</small>Retrofit in Android: Complete Guide</a></li><li><a href="../../android/android-api-error-handling/index.html"><small>APIs, Databases, and Backend Integration</small>Handling API Errors and Network Failures</a></li><li><a href="../../android/kotlin-suspend-functions/index.html"><small>Kotlin Programming</small>Suspend Functions Explained with Real Examples</a></li><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/rest-api-kotlin-coroutines/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/rest-api-kotlin-coroutines/&amp;text=REST API Integration with Kotlin and Coroutines" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/rest-api-kotlin-coroutines/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#flow">The end-to-end flow</a></li><li><a href="#contract">1. The API contract and DTOs</a></li><li><a href="#domain">2. Domain models and mapping</a></li><li><a href="#repository">3. Repository: parallel, with partial failure</a></li><li><a href="#viewmodel">4. ViewModel state</a></li><li><a href="#testing">5. Testing the repository</a></li><li><a href="#use-cases">Variations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Drest-api-kotlin-coroutines-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Drest-api-kotlin-coroutines-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!--meta
+{
+  "seo_title": "LLMs vs Traditional Machine Learning for Android Apps",
+  "description": "When to use large language models vs traditional ML models in Android apps: how they differ, costs, latency, accuracy, on-device options like ML Kit and LiteRT, and practical examples for each.",
+  "primary_keyword": "llm vs traditional machine learning",
+  "keywords": ["llm vs ml model android", "when to use llm", "ml kit vs gemini", "classification vs generative ai", "on device ml android", "choose ai approach mobile"],
+  "lede": "Not every AI feature needs a large language model. Barcode scanning, face detection, spam classification and many other tasks are solved faster, cheaper and more reliably by traditional, task-specific models. Here's how to tell which approach fits.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["choose-ai-model-android-app", "ai-in-android-development", "litert-litert-lm-android", "cloud-ai-vs-on-device-ai-android"],
+  "refs": [
+    ["ML Kit", "https://developers.google.com/ml-kit"],
+    ["LiteRT overview", "https://ai.google.dev/edge/litert"],
+    ["AI on Android", "https://developer.android.com/ai"],
+    ["Google Machine Learning Crash Course", "https://developers.google.com/machine-learning/crash-course"]
+  ]
+}
+-->
+<p class="ad-lead">A traditional ML model is a specialist: trained for one task, it outputs a label, number or box. An LLM is a generalist: it takes text (and sometimes images or audio) and generates new content. Specialists are usually smaller, faster and more predictable. Generalists handle open-ended language tasks no specialist can.</p>
+
+<h2 id="difference">The core difference</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-llm-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-llm-t fig-llm-d">
+    <title id="fig-llm-t">Traditional ML versus LLM</title>
+    <desc id="fig-llm-d">Traditional ML: input such as an image goes into a task-specific model and produces a structured output such as a label with confidence, quickly and cheaply. LLM: a prompt plus input goes into a general model and produces generated text, which is flexible but slower, costlier and can be wrong in fluent ways.</desc>
+    <defs><marker id="llmm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 60 H226 M420 60 H476 M170 160 H226 M420 160 H476" marker-end="url(#llmm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="30" width="150" height="60" rx="12"/><text class="d-s" x="95" y="65" text-anchor="middle">Image</text>
+    <rect class="d-green" x="230" y="30" width="190" height="60" rx="12"/><text class="d-t" x="325" y="56" text-anchor="middle">Task model</text><text class="d-s" x="325" y="74" text-anchor="middle">e.g. classifier, 4 MB</text>
+    <rect class="d-green" x="480" y="30" width="220" height="60" rx="12"/><text class="d-t" x="590" y="56" text-anchor="middle">"cat" 0.94</text><text class="d-s" x="590" y="74" text-anchor="middle">structured, fast</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="20" y="130" width="150" height="60" rx="12"/><text class="d-s" x="95" y="158" text-anchor="middle">Prompt</text><text class="d-s" x="95" y="176" text-anchor="middle">+ input</text>
+    <rect class="d-violet" x="230" y="130" width="190" height="60" rx="12"/><text class="d-t" x="325" y="156" text-anchor="middle">LLM</text><text class="d-s" x="325" y="174" text-anchor="middle">general, large</text>
+    <rect class="d-violet" x="480" y="130" width="220" height="60" rx="12"/><text class="d-t" x="590" y="156" text-anchor="middle">Generated text</text><text class="d-s" x="590" y="174" text-anchor="middle">flexible, can be wrong</text></g>
+  </svg>
+  <figcaption id="fig-llm-cap">Use the specialist when the task is well-defined; use the generalist when the task is open-ended language.</figcaption>
+</figure>
+
+<h2 id="compare">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>Traditional ML</th><th>LLM</th></tr></thead>
+  <tbody>
+    <tr><td>Output</td><td>Labels, scores, boxes, embeddings</td><td>Free-form text (or structured JSON)</td></tr>
+    <tr><td>Size</td><td>Often KB–tens of MB</td><td>Billions of parameters (GBs on device), or cloud</td></tr>
+    <tr><td>Latency</td><td>Milliseconds on device</td><td>Hundreds of ms to seconds</td></tr>
+    <tr><td>Cost</td><td>Free on device after shipping</td><td>Per token in the cloud; device support needed on-device</td></tr>
+    <tr><td>Predictability</td><td>Consistent outputs, measurable accuracy</td><td>Variable outputs, can hallucinate</td></tr>
+    <tr><td>Flexibility</td><td>One task</td><td>Many tasks via prompting</td></tr>
+    <tr><td>Data needed</td><td>Labelled training data (or use pre-trained)</td><td>Prompts and examples; fine-tuning optional</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="examples">Which to use: examples</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Task</th><th>Better fit</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Barcode/QR scanning</td><td>ML Kit barcode</td><td>Solved, fast, offline</td></tr>
+    <tr><td>Text recognition (OCR)</td><td>ML Kit text recognition</td><td>Accurate, on-device</td></tr>
+    <tr><td>Face detection, pose</td><td>ML Kit / MediaPipe</td><td>Real-time video</td></tr>
+    <tr><td>Spam or category label for short text</td><td>Small classifier (or embeddings)</td><td>Cheap, consistent</td></tr>
+    <tr><td>Summarise a long note</td><td>LLM</td><td>Open-ended generation</td></tr>
+    <tr><td>Answer questions about documents</td><td>LLM + retrieval (RAG)</td><td>Language understanding</td></tr>
+    <tr><td>Extract fields from messy receipts</td><td>OCR + LLM</td><td>Combine both: specialist reads, generalist structures</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="combine">Combining both</h2>
+<p>Many good features chain a specialist and a generalist:</p>
+<code-block lang="kotlin" file="OCR (ML Kit) then structure with an LLM">
+class ReceiptParser(
+    private val recognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS),
+    private val llm: ReceiptLlm,                       // your Gemini-backed extractor
+) {
+    suspend fun parse(image: InputImage): Receipt? {
+        val text = recognizer.process(image).await().text      // fast, on-device OCR
+        if (text.isBlank()) return null
+        return llm.extractReceipt(text)                        // JSON with total, date, merchant
+            ?.takeIf { it.total >= 0 }                          // validate model output
+    }
+}
+</code-block>
+
+<h2 id="decide">Decision checklist</h2>
+<ol class="steps">
+  <li>Is there a ready-made ML Kit or MediaPipe solution? Start there.</li>
+  <li>Is the output a fixed set of labels or numbers? Prefer a task model.</li>
+  <li>Does the task need open-ended language understanding or generation? Consider an LLM.</li>
+  <li>Are latency, offline use or cost critical? Favour on-device and smaller models.</li>
+  <li>Can you tolerate occasional wrong outputs? If not, add validation or avoid LLMs. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses</a>.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can an LLM replace all my ML models?</summary><div><p>Technically it can attempt many tasks, but usually at higher latency and cost with less consistency. Specialists remain the better choice for well-defined perception and classification tasks.</p></div></details>
+  <details><summary>Do I need to train models myself?</summary><div><p>Often not. ML Kit, MediaPipe and pre-trained models cover common tasks. Custom training makes sense for domain-specific labels.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>traditional ML</strong> for well-defined tasks with structured outputs (fast, cheap, predictable) and <strong>LLMs</strong> for open-ended language tasks. Combine them, so specialists perceive and generalists reason, and validate LLM outputs.</p>
+<p>Next step: compare Google's LLM options in <a href="../gemini-nano-vs-cloud-gemini/index.html">Gemini Nano vs Cloud-Based Gemini Models</a>.</p>

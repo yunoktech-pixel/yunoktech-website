@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caching Strategies for Android Apps (Complete Guide) | Yunok Tech</title>
+  <meta name="description" content="Caching strategies for Android apps: HTTP cache with OkHttp, in-memory caches, Room as a persistent cache, stale-while-revalidate, invalidation, image caching and offline behaviour.">
+  <meta name="keywords" content="android caching strategies, okhttp cache android, stale while revalidate android, lrucache android, cache invalidation mobile, room cache network, image caching android coil">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-caching-strategies/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-caching-strategies/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Caching Strategies for Android Apps (Complete Guide)">
+  <meta property="og:description" content="Caching strategies for Android apps: HTTP cache with OkHttp, in-memory caches, Room as a persistent cache, stale-while-revalidate, invalidation, image caching and offline behaviour.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Caching Strategies for Android Apps (Complete Guide)">
+  <meta name="twitter:description" content="Caching strategies for Android apps: HTTP cache with OkHttp, in-memory caches, Room as a persistent cache, stale-while-revalidate, invalidation, image caching and offline behaviour.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Caching Strategies for Android Apps", "description": "Caching strategies for Android apps: HTTP cache with OkHttp, in-memory caches, Room as a persistent cache, stale-while-revalidate, invalidation, image caching and offline behaviour.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "okhttp cache android, stale while revalidate android, lrucache android, cache invalidation mobile, room cache network, image caching android coil", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-caching-strategies/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Caching Strategies for Android Apps", "item": "https://yunoktech.com/android/android-caching-strategies/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Caching Strategies for Android Apps</h1>
+    <p class="ad-lede">Caching makes apps faster, cheaper and usable offline, and it's also where stale-data bugs come from. This guide covers the cache layers available on Android, the main strategies, and how to decide freshness and invalidation for each kind of data.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#layers">Cache layers on Android</a></li><li><a href="#strategies">Core strategies</a></li><li><a href="#swr">Stale-while-revalidate with Room</a></li><li><a href="#http">HTTP caching with OkHttp</a></li><li><a href="#memory">In-memory caches</a></li><li><a href="#images">Images</a></li><li><a href="#invalidation">Invalidation rules</a></li><li><a href="#use-cases">Policy per data type: an example</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"There are only two hard things in computer science: cache invalidation and naming things." On Android, caching is also essential: users on slow networks, data caps and flaky connections notice every unnecessary request. The goal is a deliberate policy per data type, not caching everything.</p>
+
+<h2 id="layers">Cache layers on Android</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cl-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-cl-t fig-cl-d">
+    <title id="fig-cl-t">Layered caching from memory to network</title>
+    <desc id="fig-cl-d">A request first checks the in-memory cache, fastest but lost when the process dies; then the persistent cache in Room or files, which survives restarts; then the OkHttp HTTP disk cache, which respects server headers; and finally the network. Responses populate the layers on the way back.</desc>
+    <defs><marker id="clm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 60 H176 M326 60 H352 M502 60 H528" marker-end="url(#clm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="10" y="30" width="140" height="60" rx="12"/><text class="d-t" x="80" y="54" text-anchor="middle">Memory</text><text class="d-s" x="80" y="72" text-anchor="middle">nanoseconds</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="180" y="30" width="146" height="60" rx="12"/><text class="d-t" x="253" y="54" text-anchor="middle">Room / files</text><text class="d-s" x="253" y="72" text-anchor="middle">survives restarts</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="356" y="30" width="146" height="60" rx="12"/><text class="d-t" x="429" y="54" text-anchor="middle">HTTP cache</text><text class="d-s" x="429" y="72" text-anchor="middle">OkHttp, headers</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="532" y="30" width="178" height="60" rx="12"/><text class="d-t" x="621" y="54" text-anchor="middle">Network</text><text class="d-s" x="621" y="72" text-anchor="middle">slowest, costs data</text></g>
+    <text class="d-s" x="360" y="130" text-anchor="middle">Faster ← → fresher</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Each layer trades freshness for speed and availability.</text>
+  </svg>
+  <figcaption id="fig-cl-cap">You rarely need all four for the same data. Choose per data type.</figcaption>
+</figure>
+
+<h2 id="strategies">Core strategies</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Strategy</th><th>Behaviour</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td>Cache-first</td><td>Use cache if present; network only when missing</td><td>Static or rarely changing data (country lists, config)</td></tr>
+    <tr><td>Network-first</td><td>Try network; fall back to cache on failure</td><td>Data that must be fresh but should degrade offline (account balance with "last updated")</td></tr>
+    <tr><td>Stale-while-revalidate</td><td>Show cache immediately, refresh in background, update UI</td><td>Feeds, lists, profiles: most content</td></tr>
+    <tr><td>Network-only</td><td>Never cache</td><td>Payments, OTPs, highly sensitive or one-time data</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="swr">Stale-while-revalidate with Room</h2>
+<figure class="code"><figcaption><span class="file">ProfileRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ProfileRepository</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">ProfileApi</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> dao: <span class="tk-t">ProfileDao</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> clock: <span class="tk-t">Clock</span>,
+) {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> maxAge = <span class="tk-t">Duration</span>.ofMinutes(<span class="tk-n">10</span>)
+
+    <span class="tk-c">/** Emits cached profile immediately; refreshes in the background if stale. */</span>
+    <span class="tk-k">fun</span> observeProfile(userId: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">Profile</span>?&gt; = dao.observe(userId)
+        .onStart { refreshIfStale(userId) }
+        .map { it?.toDomain() }
+
+    <span class="tk-k">private</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refreshIfStale(userId: <span class="tk-t">String</span>) {
+        <span class="tk-k">val</span> cached = dao.<span class="tk-k">get</span>(userId)
+        <span class="tk-k">val</span> stale = cached == <span class="tk-k">null</span> ||
+            <span class="tk-t">Duration</span>.between(<span class="tk-t">Instant</span>.ofEpochMilli(cached.fetchedAt), clock.instant()) &gt; maxAge
+        <span class="tk-k">if</span> (stale) {
+            runCatching { api.profile(userId) }
+                .onSuccess { dao.upsert(it.toEntity(fetchedAt = clock.millis())) }
+            <span class="tk-c">// On failure, keep serving the cached copy; the UI can show "last updated".</span>
+        }
+    }
+}</code></pre></figure>
+<p>Running the refresh in <code>onStart</code> delays the first emission until the refresh attempt finishes. To show the cache instantly, launch the refresh in a separate coroutine from the ViewModel instead.</p>
+
+<h2 id="http">HTTP caching with OkHttp</h2>
+<p>If your server sends proper <code>Cache-Control</code> and <code>ETag</code> headers, OkHttp's disk cache handles freshness and conditional requests (<code>304 Not Modified</code>) automatically:</p>
+<figure class="code"><figcaption><span class="file">OkHttp cache</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> client = <span class="tk-t">OkHttpClient</span>.<span class="tk-t">Builder</span>()
+    .cache(<span class="tk-t">Cache</span>(directory = <span class="tk-t">File</span>(context.cacheDir, <span class="tk-s">"http_cache"</span>), maxSize = <span class="tk-n">50L</span> * <span class="tk-n">1024</span> * <span class="tk-n">1024</span>))
+    .build()
+
+<span class="tk-c">// Offline fallback: accept stale cached responses when there is no connectivity</span>
+<span class="tk-k">class</span> <span class="tk-t">OfflineCacheInterceptor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> isOnline: () -&gt; <span class="tk-t">Boolean</span>) : <span class="tk-t">Interceptor</span> {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> intercept(chain: <span class="tk-t">Interceptor</span>.<span class="tk-t">Chain</span>): <span class="tk-t">Response</span> {
+        <span class="tk-k">var</span> request = chain.request()
+        <span class="tk-k">if</span> (!isOnline()) {
+            request = request.newBuilder()
+                .cacheControl(<span class="tk-t">CacheControl</span>.<span class="tk-t">Builder</span>().onlyIfCached().maxStale(<span class="tk-n">7</span>, <span class="tk-t">TimeUnit</span>.<span class="tk-t">DAYS</span>).build())
+                .build()
+        }
+        <span class="tk-k">return</span> chain.proceed(request)
+    }
+}</code></pre></figure>
+<p>HTTP caching is great for GET responses you display as-is. When you need to query, combine or modify data locally, Room is the better cache.</p>
+
+<h2 id="memory">In-memory caches</h2>
+<figure class="code"><figcaption><span class="file">Small LRU cache</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ExchangeRateCache</span>(maxEntries: <span class="tk-t">Int</span> = <span class="tk-n">50</span>) {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> cache = <span class="tk-t">LruCache</span>&lt;<span class="tk-t">String</span>, <span class="tk-t">Pair</span>&lt;<span class="tk-t">Double</span>, <span class="tk-t">Long</span>&gt;&gt;(maxEntries)
+
+    <span class="tk-k">fun</span> <span class="tk-k">get</span>(pair: <span class="tk-t">String</span>, maxAgeMs: <span class="tk-t">Long</span>, now: <span class="tk-t">Long</span>): <span class="tk-t">Double</span>? =
+        cache.<span class="tk-k">get</span>(pair)?.takeIf { now - it.second &lt; maxAgeMs }?.first
+
+    <span class="tk-k">fun</span> put(pair: <span class="tk-t">String</span>, rate: <span class="tk-t">Double</span>, now: <span class="tk-t">Long</span>) { cache.put(pair, rate to now) }
+}</code></pre></figure>
+<p>Memory caches are fast but vanish with the process, so use them for hot, recomputable data. Respond to <code>onTrimMemory</code> by clearing large ones.</p>
+
+<h2 id="images">Images</h2>
+<p>Image libraries such as Coil and Glide provide memory and disk caching, downsampling and request deduplication. Don't build your own. Make sure image URLs change when content changes (versioned URLs), or use cache headers correctly.</p>
+
+<h2 id="invalidation">Invalidation rules</h2>
+<ul>
+  <li><strong>Time-based (TTL):</strong> simple and predictable. Choose per data type.</li>
+  <li><strong>Event-based:</strong> after a user edits their profile, update or invalidate the cache immediately.</li>
+  <li><strong>Server-driven:</strong> ETags and versions, or push messages that trigger a refresh.</li>
+  <li><strong>On logout:</strong> clear all user-specific caches, including the HTTP cache if it contains personal data.</li>
+</ul>
+
+<h2 id="use-cases">Policy per data type: an example</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Strategy</th><th>TTL / trigger</th></tr></thead>
+  <tbody>
+    <tr><td>Product catalogue</td><td>Stale-while-revalidate (Room)</td><td>1 hour; pull-to-refresh</td></tr>
+    <tr><td>Prices and stock</td><td>Network-first</td><td>Always refresh on product open</td></tr>
+    <tr><td>User profile</td><td>Stale-while-revalidate</td><td>10 minutes; invalidate on edit</td></tr>
+    <tr><td>App config</td><td>Cache-first</td><td>Refresh on app start in background</td></tr>
+    <tr><td>Payment status</td><td>Network-only</td><td>-</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Caching without any invalidation, so users see outdated data indefinitely.</li>
+  <li>Different screens caching the same data separately, so they disagree.</li>
+  <li>Personal data left in caches after logout.</li>
+  <li>Unbounded caches that grow until storage or memory runs out.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Room cache or HTTP cache?</summary><div><p>HTTP cache for responses you show directly and that the server controls with headers. Room when you need queries, joins, offline edits or a single source of truth across screens.</p></div></details>
+  <details><summary>Where should cache logic live?</summary><div><p>In repositories or data sources, so every caller gets consistent freshness.</p></div></details>
+  <details><summary>How do I show staleness to users?</summary><div><p>Store <code>fetchedAt</code> with cached data, and display "Updated 5 min ago" when it matters, for example for balances and prices.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Effective caching is <strong>per data type</strong>: choose cache-first, network-first, stale-while-revalidate or network-only; pick the right layer (memory, Room, HTTP); and define <strong>clear invalidation</strong>, including on logout.</p>
+<p>Next step: secure the credentials behind those requests with <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>, or move on to quality with <a href="../android-unit-testing-junit/index.html">Unit Testing in Android with JUnit</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp (HTTP caching): official repository and docs</a></li><li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching" target="_blank" rel="noopener">HTTP caching (MDN)</a></li><li><a href="https://developer.android.com/topic/architecture/data-layer/offline-first" target="_blank" rel="noopener">Offline-first data layer</a></li><li><a href="https://coil-kt.github.io/coil/" target="_blank" rel="noopener">Coil image loading</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-caching-strategies-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-caching-strategies-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/offline-first-android-architecture/index.html"><small>APIs, Databases, and Backend Integration</small>Offline-First Android App Architecture</a></li><li><a href="../../android/okhttp-interceptors/index.html"><small>APIs, Databases, and Backend Integration</small>OkHttp Interceptors Explained</a></li><li><a href="../../android/repository-pattern-android/index.html"><small>Android Architecture and Clean Code</small>Repository Pattern in Android</a></li><li><a href="../../android/reduce-android-app-size/index.html"><small>Testing, Debugging, and Performance</small>How to Reduce Android App Size</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-caching-strategies/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-caching-strategies/&amp;text=Caching Strategies for Android Apps" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-caching-strategies/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#layers">Cache layers on Android</a></li><li><a href="#strategies">Core strategies</a></li><li><a href="#swr">Stale-while-revalidate with Room</a></li><li><a href="#http">HTTP caching with OkHttp</a></li><li><a href="#memory">In-memory caches</a></li><li><a href="#images">Images</a></li><li><a href="#invalidation">Invalidation rules</a></li><li><a href="#use-cases">Policy per data type: an example</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-caching-strategies-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-caching-strategies-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

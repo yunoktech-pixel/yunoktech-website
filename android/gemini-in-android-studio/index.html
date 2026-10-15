@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Use Gemini in Android Studio: Practical Guide | Yunok Tech</title>
+  <meta name="description" content="Use Gemini in Android Studio effectively: chat, code completion, Agent Mode, AGENTS.md, unit tests, Compose previews, crash analysis, privacy controls and prompts that work.">
+  <meta name="keywords" content="gemini in android studio, android studio ai assistant, gemini agent mode android studio, agents.md android studio, aiexclude, ai code completion android, generate unit tests android studio, app quality insights gemini">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/gemini-in-android-studio/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/gemini-in-android-studio/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="How to Use Gemini in Android Studio: Practical Guide">
+  <meta property="og:description" content="Use Gemini in Android Studio effectively: chat, code completion, Agent Mode, AGENTS.md, unit tests, Compose previews, crash analysis, privacy controls and prompts that work.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="AI Tools for Android Developers">
+  <meta name="twitter:title" content="How to Use Gemini in Android Studio: Practical Guide">
+  <meta name="twitter:description" content="Use Gemini in Android Studio effectively: chat, code completion, Agent Mode, AGENTS.md, unit tests, Compose previews, crash analysis, privacy controls and prompts that work.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How to Use Gemini in Android Studio", "description": "Use Gemini in Android Studio effectively: chat, code completion, Agent Mode, AGENTS.md, unit tests, Compose previews, crash analysis, privacy controls and prompts that work.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "AI Tools for Android Developers", "keywords": "android studio ai assistant, gemini agent mode android studio, agents.md android studio, aiexclude, ai code completion android, generate unit tests android studio, app quality insights gemini", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/gemini-in-android-studio/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "How to Use Gemini in Android Studio", "item": "https://yunoktech.com/android/gemini-in-android-studio/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-tools">AI Tools for Android Developers</a></nav>
+    <span class="ad-chip">🛠️ AI Tools for Android Developers</span>
+    <h1 id="article-title">How to Use Gemini in Android Studio</h1>
+    <p class="ad-lede">Gemini in Android Studio can explain a stack trace, draft a Compose preview, write a unit test or run a multi-step change in Agent Mode. It can also confidently produce wrong code. This guide shows the features that save real time, how to prompt them, and how to keep your code and data under control.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>7 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#setup">Getting started</a></li><li><a href="#features">The features that save the most time</a></li><li><a href="#prompting">Prompting habits that improve results</a></li><li><a href="#privacy">Privacy and data control</a></li><li><a href="#verify">A verification habit for AI-written code</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Android Studio now ships with an AI assistant built specifically for Android development. It understands Gradle errors, Compose and Logcat, and it can act across your project in Agent Mode. Used well, it removes a lot of friction. Used carelessly, it adds subtle bugs faster than you can review them.</p>
+<p>This guide is for Android developers at any level who want to get practical value from <strong>Gemini in Android Studio</strong>. It covers the main features, where each one helps most, prompts that produce better results, project rules with <code>AGENTS.md</code>, privacy controls with <code>.aiexclude</code>, and a verification habit that keeps AI-written code safe to ship.</p>
+
+<div class="note"><b>Feature availability changes quickly</b>
+<p>Google states that Gemini in Android Studio is available in the latest stable version of Android Studio and in major versions released in the previous 10 months. Feature names and menus below follow the official documentation at the time of writing. Check the overview page for what your version includes.</p></div>
+
+<h2 id="setup">Getting started</h2>
+<ol class="steps">
+  <li><strong>Update Android Studio</strong> to the latest stable release.</li>
+  <li><strong>Open the Gemini tool window</strong> (View → Tool Windows → Gemini) and sign in with your Google account.</li>
+  <li><strong>Review the data-sharing settings</strong> when prompted. Choose whether Gemini can use your project's code as context, and read the data and privacy page for your tier.</li>
+  <li><strong>Add an <code>.aiexclude</code> file</strong> for anything that must never be shared, such as credentials, keystores and proprietary algorithms. See <a href="#privacy">Privacy and data control</a> below.</li>
+</ol>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tier</th><th>What you get (per Google's overview)</th></tr></thead>
+  <tbody>
+    <tr><td>Individual (no cost)</td><td>A lightweight Gemini model with a smaller context window, suitable for most tasks. Optionally add your own Gemini API key to use other models and pay per token.</td></tr>
+    <tr><td>Individual with Google One</td><td>Google One subscribers get added capabilities and higher limits at no extra cost.</td></tr>
+    <tr><td>Business</td><td>Via Gemini Enterprise or the Google Developer Program: higher quota, central admin controls, data residency and security options such as VPC Service Controls, and code customisation.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="features">The features that save the most time</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ide-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ide-title fig-ide-desc">
+    <title id="fig-ide-title">Where Gemini helps across the Android development loop</title>
+    <desc id="fig-ide-desc">A loop of five stages: Understand (chat, explain code), Write (code completion, transformations, Compose previews), Test (generate unit tests, Journeys), Debug (Logcat and App Quality Insights crash analysis), and Ship (commit messages, dependency updates). Agent Mode can span several stages.</desc>
+    <defs><marker id="i1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M136 70 H158 M276 70 H298 M416 70 H438 M556 70 H578" marker-end="url(#i1)"/>
+    <path class="d-dash" d="M640 100 V140 H76 V104" marker-end="url(#i1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="16" y="40" width="120" height="60" rx="12"/><text class="d-t" x="76" y="64" text-anchor="middle">Understand</text><text class="d-s" x="76" y="84" text-anchor="middle">chat, explain</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="162" y="40" width="114" height="60" rx="12"/><text class="d-t" x="219" y="64" text-anchor="middle">Write</text><text class="d-s" x="219" y="84" text-anchor="middle">complete, transform</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="302" y="40" width="114" height="60" rx="12"/><text class="d-t" x="359" y="64" text-anchor="middle">Test</text><text class="d-s" x="359" y="84" text-anchor="middle">unit tests, Journeys</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="442" y="40" width="114" height="60" rx="12"/><text class="d-t" x="499" y="64" text-anchor="middle">Debug</text><text class="d-s" x="499" y="84" text-anchor="middle">Logcat, crashes</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="582" y="40" width="120" height="60" rx="12"/><text class="d-t" x="642" y="64" text-anchor="middle">Ship</text><text class="d-s" x="642" y="84" text-anchor="middle">commits, deps</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="200" y="160" width="320" height="40" rx="12"/><text class="d-w" x="360" y="185" text-anchor="middle">Agent Mode: multi-step tasks across stages</text></g>
+  </svg>
+  <figcaption id="fig-ide-cap">Gemini is most useful when it is woven into each stage of the loop, with you reviewing every output, rather than used as a one-shot code generator.</figcaption>
+</figure>
+
+<h3 id="chat">1. Chat: explain, plan and ask</h3>
+<p>The chat panel is best for <em>understanding</em>: explaining unfamiliar code, comparing approaches, or planning a change before you write it. You can attach files and images for context. Select code in the editor and ask about it directly.</p>
+<figure class="code"><figcaption><span class="file">Prompts that work well in chat</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Explain what this ViewModel does, step by step, and point out any coroutine
+cancellation or lifecycle problems. Don't rewrite it yet.
+
+I get "Unresolved reference: collectAsStateWithLifecycle". Which dependency
+provides it, and where does it go in libs.versions.toml and build.gradle.kts?
+
+Compare Room and DataStore for storing a list of 50 favourite article IDs.
+Recommend one and explain the trade-off in 5 bullet points.</code></pre></figure>
+
+<h3 id="completion">2. Code completion and transformations</h3>
+<p>Inline completion suggests the next lines as you type. It's most accurate for repetitive or pattern-following code such as mappers, DAO methods and test cases that resemble the ones above them. <strong>Code transformations</strong> let you select code and describe a change ("convert to a sealed interface", "add KDoc", "make this function main-safe with withContext"), then review a diff before accepting.</p>
+
+<h3 id="agent">3. Agent Mode: multi-step changes</h3>
+<p>Agent Mode takes a goal, plans steps, reads and edits multiple files, and can run tools such as builds. It asks for your approval according to the permissions you configure. It suits well-scoped tasks with a clear definition of done:</p>
+<figure class="code"><figcaption><span class="file">Good Agent Mode tasks</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">Add a "Sort by price" option to ProductListScreen. Store the choice in the
+existing SettingsRepository (DataStore). Update ProductListViewModel and its
+unit tests. Follow the patterns already used for "Sort by name".
+Build the app and run the unit tests for the product module when done.
+
+Update all Compose-related dependencies to their latest stable versions using
+the version catalog, build the project, and fix compilation errors you
+introduce. List every version change in your final summary.</code></pre></figure>
+<div class="warn"><b>Scope agent tasks tightly</b>
+<p>"Refactor the app to Clean Architecture" is a bad agent task: too big to review, with an unclear finish line. Break large changes into small, reviewable steps, commit before each one, and read every diff.</p></div>
+
+<h3 id="rules">4. Project rules with AGENTS.md</h3>
+<p>Android Studio supports an <code>AGENTS.md</code> file and rules that give Gemini persistent instructions about your project, so you don't repeat conventions in every prompt. Keep it short, specific and checked into Git:</p>
+<figure class="code"><figcaption><span class="file">AGENTS.md (project root)</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text"># Project conventions for AI agents
+
+## Stack
+- Kotlin only, Jetpack Compose UI, Material 3. No new XML layouts.
+- Architecture: ViewModel exposes a single StateFlow&lt;UiState&gt;; UI is stateless where possible.
+- DI: Hilt. Networking: Retrofit + kotlinx.serialization. Local data: Room, DataStore.
+
+## Rules
+- Add dependencies only through gradle/libs.versions.toml.
+- Never put API keys or secrets in source code or BuildConfig.
+- Use viewModelScope; never GlobalScope. Inject dispatchers.
+- Every new ViewModel needs unit tests in src/test using MainDispatcherRule and fakes (no mocks for repositories).
+- User-facing strings go in res/values/strings.xml.
+
+## Verification
+- Run ./gradlew :app:testDebugUnitTest before finishing a task.
+- Summarise every file changed and why.</code></pre></figure>
+
+<h3 id="tests">5. Generate unit tests</h3>
+<p>Gemini can generate unit-test scaffolding for a class. Treat the output as a <em>first draft</em>. Check that the tests assert meaningful behaviour, not just that code runs, and that they use your project's fakes and coroutine test rules. A useful prompt is to ask for the edge cases first, then the tests:</p>
+<figure class="code"><figcaption><span class="file">Test prompt</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">List the edge cases for CartViewModel.applyCoupon(): expired coupon, network
+failure, empty cart, coupon already applied, double tap. Then write JUnit tests
+for each using FakeCouponRepository and MainDispatcherRule from our test utils.</code></pre></figure>
+
+<h3 id="compose">6. Compose previews and UI from images</h3>
+<p>Gemini can <strong>generate Compose previews</strong> for a composable with realistic sample data, and <strong>generate UI from an attached image</strong> such as a design mockup. The result is a starting point: check spacing against your design system, replace hard-coded strings with resources, and verify accessibility (content descriptions, touch target sizes, contrast).</p>
+
+<h3 id="debugging">7. Debugging: Logcat and App Quality Insights</h3>
+<p>From Logcat you can ask Gemini to explain a crash or error. In <strong>App Quality Insights</strong>, which shows Firebase Crashlytics and Android vitals data in the IDE, Gemini can analyse a crash cluster together with your source code and suggest causes. This is often the highest-value feature for maintaining real apps, because it shortens the path from "top crash on the dashboard" to "likely line of code".</p>
+
+<h3 id="commits">8. Commit messages and housekeeping</h3>
+<p>Gemini can draft commit messages from your staged diff, and Agent Mode can automate dependency updates. Edit generated commit messages so they explain the <em>why</em>, which a diff alone can't tell the model.</p>
+
+<h2 id="prompting">Prompting habits that improve results</h2>
+<div class="cards">
+  <div class="card pros"><h4>Do</h4><ul><li>Give context: files, error text, versions</li><li>State constraints ("no new dependencies", "keep the public API")</li><li>Ask for a plan or explanation before code</li><li>Ask for tests together with the change</li><li>Iterate in small steps</li></ul></div>
+  <div class="card cons"><h4>Avoid</h4><ul><li>Vague asks ("make it better")</li><li>Huge multi-feature requests</li><li>Accepting code you can't explain</li><li>Pasting secrets or customer data into prompts</li><li>Trusting version numbers without checking release pages</li></ul></div>
+</div>
+
+<h2 id="privacy">Privacy and data control</h2>
+<p>Before using AI tools on company code, check your organisation's policy and the tier's data terms. Android Studio gives you two important controls:</p>
+<ul>
+  <li><strong>Project-level context sharing settings</strong> decide whether Gemini can use your codebase as context at all.</li>
+  <li><strong><code>.aiexclude</code> files</strong> exclude specific files or directories from being sent as context, using patterns similar to <code>.gitignore</code>.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">.aiexclude (project root)</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text"># Never share secrets or signing material
+*.jks
+*.keystore
+local.properties
+secrets.properties
+google-services.json
+
+# Proprietary or regulated code
+app/src/main/java/com/example/pricing/engine/
+docs/customer-data/</code></pre></figure>
+<div class="warn"><b>Exclusion is not a security boundary for secrets</b>
+<p><code>.aiexclude</code> controls what is sent as context. Secrets should still never be committed to source control in the first place. Use environment variables, a secrets manager, or Gradle properties outside the repository.</p></div>
+
+<h2 id="verify">A verification habit for AI-written code</h2>
+<ol class="steps">
+  <li><strong>Read the diff line by line.</strong> If you can't explain a line, don't merge it.</li>
+  <li><strong>Check APIs and versions</strong> against official docs and release pages. Models sometimes suggest deprecated or non-existent APIs.</li>
+  <li><strong>Build and run the tests.</strong> Add a test for the behaviour you asked for, if the AI didn't.</li>
+  <li><strong>Check Android specifics</strong> that models often miss: lifecycle and configuration changes, main-thread safety, permissions, accessibility, and process death.</li>
+  <li><strong>Look for security issues</strong>: hard-coded keys, logging personal data, disabled TLS checks, exported components.</li>
+</ol>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Joining a legacy codebase</h3><p>Use chat to explain unfamiliar modules and Java classes before changing them. Ask for a sequence of how data flows from API to screen. Verify the explanation by stepping through with the debugger.</p></div>
+  <div class="card usecase"><h3>Fixing a top crash</h3><p>Open the crash in App Quality Insights, ask Gemini for likely causes using the stack trace and source, write a failing test that reproduces it, then fix it and confirm the test passes.</p></div>
+  <div class="card usecase"><h3>Routine dependency upgrades</h3><p>Let Agent Mode bump versions in the catalog and fix compile errors, then review the summary and diff and run the full test suite before merging.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Gemini in Android Studio free?</summary><div><p>There is a no-cost individual tier with a lightweight model. You can add a Gemini API key to pay per token for more capable models, and Google offers a business tier with additional controls. Check the overview page for current details.</p></div></details>
+  <details><summary>Does Gemini see my whole project?</summary><div><p>Only if you allow code context sharing, and never the files excluded by <code>.aiexclude</code>. Review the data and privacy documentation for your tier.</p></div></details>
+  <details><summary>Should beginners use AI coding tools?</summary><div><p>Yes, mainly to <em>explain</em> concepts, errors and code. Writing code yourself first builds the judgement you need to review AI output later.</p></div></details>
+  <details><summary>Can I use other AI assistants in Android Studio?</summary><div><p>Android Studio supports other plugins and tools, and Gemini in Android Studio can use MCP servers to extend Agent Mode. The verification habit in this article applies to every tool.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Gemini in Android Studio is most valuable as a <strong>context-aware collaborator</strong>: explaining code and errors, drafting tests and previews, analysing crashes, and handling well-scoped multi-step changes in Agent Mode. Set it up with <strong><code>AGENTS.md</code> for your conventions and <code>.aiexclude</code> for sensitive files</strong>, keep tasks small, and verify everything before it ships.</p>
+<p>Next step: add an <code>AGENTS.md</code> to your current project and ask Agent Mode to write unit tests for one ViewModel. Review them critically. If you want to build AI features <em>into</em> your app rather than use AI to write it, start with <a href="../ai-in-android-development/index.html">What Is AI in Android Development?</a></p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/gemini/overview" target="_blank" rel="noopener">Gemini in Android Studio overview</a></li><li><a href="https://developer.android.com/studio/gemini/agent-mode" target="_blank" rel="noopener">Agent Mode</a></li><li><a href="https://developer.android.com/studio/gemini/aiexclude" target="_blank" rel="noopener">Configure context sharing with .aiexclude</a></li><li><a href="https://developer.android.com/studio/gemini/data-and-privacy" target="_blank" rel="noopener">Data and privacy for Gemini in Android Studio</a></li><li><a href="https://developer.android.com/studio/gemini/generate-unit-tests" target="_blank" rel="noopener">Generate unit tests</a></li><li><a href="https://developer.android.com/studio/debug/app-quality-insights" target="_blank" rel="noopener">App Quality Insights</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-in-android-studio-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-in-android-studio-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>AI coding tools multiply what you already know. The stronger your Kotlin, Compose and architecture foundation, the better you can judge, fix and ship what these tools suggest.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-in-android-development/index.html"><small>Android AI and Generative AI</small>What Is AI in Android Development? A Complete Developer&#x27;s Guide</a></li><li><a href="../../android/android-developer-roadmap-beginners/index.html"><small>Android Development for Beginners</small>Android Development Roadmap for Beginners in 2026</a></li><li><a href="../../android/ai-chatbot-jetpack-compose/index.html"><small>Android AI and Generative AI</small>Build an AI Chatbot Using Kotlin and Jetpack Compose</a></li><li><a href="../../android/kotlin-coroutines-flow-android/index.html"><small>Kotlin Programming</small>Kotlin Coroutines and Flow Explained for Android Developers</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/gemini-in-android-studio/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/gemini-in-android-studio/&amp;text=How to Use Gemini in Android Studio" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/gemini-in-android-studio/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#setup">Getting started</a></li><li><a href="#features">The features that save the most time</a></li><li><a href="#prompting">Prompting habits that improve results</a></li><li><a href="#privacy">Privacy and data control</a></li><li><a href="#verify">A verification habit for AI-written code</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-in-android-studio-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-in-android-studio-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

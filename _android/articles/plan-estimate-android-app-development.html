@@ -1,0 +1,118 @@
+<!--meta
+{
+  "seo_title": "How to Plan and Estimate Android App Development",
+  "description": "Plan and estimate Android app projects realistically: discovery, scope breakdown, hidden work (backend, QA, release, policy), ranges and confidence, risk buffers, milestones and client communication.",
+  "primary_keyword": "estimate android app development",
+  "keywords": ["android app development timeline", "app project estimation", "mobile app cost estimate", "work breakdown structure app", "mvp planning android", "freelance android estimate"],
+  "lede": "Most app estimates are wrong in the same direction: too optimistic, because they count screens and forget everything else. Whether you're quoting a client or planning your own app, a structured process produces estimates that hold up and conversations that stay honest.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["solo-android-developer-launch", "prepare-android-app-production", "android-engineering-tradeoffs", "maintaining-android-apps-lessons"],
+  "refs": [
+    ["Core app quality guidelines", "https://developer.android.com/docs/quality-guidelines/core-app-quality"],
+    ["Google Play policy center", "https://play.google/developer-content-policy/"],
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"]
+  ]
+}
+-->
+<p class="ad-lead">"How long will the app take?" is impossible to answer well from a one-paragraph idea, and dangerous to answer quickly. Good estimates come from breaking the work down, including the invisible parts, and communicating ranges with stated assumptions.</p>
+
+<h2 id="process">The estimation process</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-est-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-est-t fig-est-d">
+    <title id="fig-est-t">Estimation process for an Android app</title>
+    <desc id="fig-est-d">Discovery clarifies users, flows and constraints; breakdown lists features and hidden work; sizing estimates each item as a range; risk adjustment adds buffers for unknowns and integrations; the plan is then communicated as milestones with assumptions and re-estimated as learning happens.</desc>
+    <defs><marker id="esm2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#esm2)"/>
+    <path class="d-dash" d="M645 100 V150 H70 V104" marker-end="url(#esm2)"/><text class="d-s" x="358" y="168" text-anchor="middle">re-estimate at each milestone</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Discovery</text><text class="d-s" x="70" y="84" text-anchor="middle">flows, constraints</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">Breakdown</text><text class="d-s" x="212" y="84" text-anchor="middle">incl. hidden work</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Size</text><text class="d-s" x="352" y="84" text-anchor="middle">ranges</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Risk</text><text class="d-s" x="497" y="84" text-anchor="middle">buffers</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="584" y="40" width="126" height="60" rx="12"/><text class="d-t" x="647" y="66" text-anchor="middle">Milestones</text><text class="d-s" x="647" y="84" text-anchor="middle">+ assumptions</text></g>
+  </svg>
+  <figcaption id="fig-est-cap">Estimates are hypotheses. Milestones are where you test them.</figcaption>
+</figure>
+
+<h2 id="discovery">1. Discovery questions</h2>
+<ul>
+  <li>Who are the users, and what are the 3–5 core flows?</li>
+  <li>Does a backend exist? Who builds it? What APIs are ready?</li>
+  <li>Offline requirements? Accounts? Payments? Notifications? AI features?</li>
+  <li>Design status: wireframes, final designs, a design system?</li>
+  <li>Supported devices: phones only, or tablets and foldables? Minimum Android version?</li>
+  <li>Languages, accessibility and compliance requirements?</li>
+</ul>
+
+<h2 id="breakdown">2. Break down, including hidden work</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>Often forgotten items</th></tr></thead>
+  <tbody>
+    <tr><td>Project setup</td><td>Architecture, modules, CI, environments, DI, theming</td></tr>
+    <tr><td>Features</td><td>Empty, error and loading states; edge cases; validation</td></tr>
+    <tr><td>Data</td><td>Caching, offline, sync, migrations</td></tr>
+    <tr><td>Integrations</td><td>Auth providers, payments, maps, analytics, push, third-party SDK quirks</td></tr>
+    <tr><td>Quality</td><td>Unit and UI tests, accessibility, performance, device testing</td></tr>
+    <tr><td>Release</td><td>Signing, store listing, policy forms, closed testing period, review time</td></tr>
+    <tr><td>Communication</td><td>Meetings, demos, feedback rounds, documentation</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="sizing">3. Size items as ranges</h2>
+<code-block lang="kotlin" file="Three-point estimate helper">
+data class Estimate(val optimisticDays: Double, val likelyDays: Double, val pessimisticDays: Double) {
+    /** PERT-style weighted mean: biases toward the likely case while accounting for risk. */
+    val expected: Double get() = (optimisticDays + 4 * likelyDays + pessimisticDays) / 6
+}
+
+val items = mapOf(
+    "Login + Credential Manager" to Estimate(2.0, 3.0, 6.0),
+    "Product list with paging + cache" to Estimate(3.0, 5.0, 9.0),
+    "Checkout with Play Billing" to Estimate(4.0, 7.0, 14.0),
+)
+val total = items.values.sumOf { it.expected }   // communicate as a range, not a single number
+</code-block>
+<p>Wide ranges signal uncertainty. Narrow them by spiking risky items (a quick prototype of the payment integration, for example) before committing.</p>
+
+<h2 id="risk">4. Adjust for risk</h2>
+<ul>
+  <li>Add explicit buffers for unknown APIs, new technologies, and dependencies on other teams.</li>
+  <li>Account for calendar time you don't control: Play review, closed-testing periods, client feedback cycles.</li>
+  <li>List assumptions ("backend APIs ready by week 3", "designs final before development") so that changes are visible.</li>
+</ul>
+
+<h2 id="milestones">5. Plan in milestones</h2>
+<ol class="steps">
+  <li><strong>Foundation:</strong> architecture, CI, auth, design system.</li>
+  <li><strong>Core flows:</strong> the 2–3 flows that define the product, end to end.</li>
+  <li><strong>Completion:</strong> secondary features, edge cases, offline.</li>
+  <li><strong>Hardening:</strong> testing, performance, accessibility, policy forms.</li>
+  <li><strong>Release:</strong> closed testing, fixes, staged rollout.</li>
+</ol>
+
+<h2 id="communicate">Communicating estimates</h2>
+<ul>
+  <li>Give ranges with confidence levels, not single dates.</li>
+  <li>Separate "MVP" from "nice to have", and let stakeholders choose trade-offs.</li>
+  <li>Re-estimate at each milestone, and report changes early.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Freelance quote</h3><p>A paid discovery phase first, then a fixed price per milestone with clear assumptions and a change process.</p></div>
+  <div class="card usecase"><h3>Startup MVP</h3><p>Timebox: decide the scope that fits 8–10 weeks, rather than estimating everything.</p></div>
+  <div class="card usecase"><h3>Feature in an existing app</h3><p>Include refactoring and regression testing for the touched areas.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How long does a typical Android app take?</summary><div><p>There's no meaningful typical number. Small MVPs can take weeks, and complex apps with backends and integrations take many months. Estimate from your breakdown.</p></div></details>
+  <details><summary>Do AI tools shorten estimates?</summary><div><p>They can speed up boilerplate and tests, but integration, product decisions, QA and release work remain. Adjust carefully, based on your team's measured experience.</p></div></details>
+  <details><summary>Fixed price or time and materials?</summary><div><p>Fixed price suits well-defined scope after discovery. Time and materials suits evolving products. Hybrids (fixed per milestone) are common.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Reliable estimates come from <strong>discovery, a breakdown that includes hidden work, ranged sizing, explicit risk buffers and assumptions, and milestone-based re-estimation</strong>, communicated as ranges stakeholders can make trade-offs with.</p>
+<p>Next step: prepare for the job market with <a href="../android-interview-questions/index.html">Top 50 Android Interview Questions and Answers</a>.</p>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>On-Device Image and Text Processing on Android | Yunok Tech</title>
+  <meta name="description" content="Process images and text on device with ML Kit: text recognition, image labeling, object detection, language identification, translation, entity extraction, smart reply and GenAI image description, with CameraX.">
+  <meta name="keywords" content="on device image text processing android, ml kit text recognition kotlin, ml kit image labeling, ml kit translation offline, entity extraction ml kit, camerax ml kit analyzer, ocr android offline">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/on-device-image-text-processing/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/on-device-image-text-processing/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="On-Device Image and Text Processing on Android">
+  <meta property="og:description" content="Process images and text on device with ML Kit: text recognition, image labeling, object detection, language identification, translation, entity extraction, smart reply and GenAI image description, with CameraX.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="On-Device Image and Text Processing on Android">
+  <meta name="twitter:description" content="Process images and text on device with ML Kit: text recognition, image labeling, object detection, language identification, translation, entity extraction, smart reply and GenAI image description, with CameraX.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "On-Device Image and Text Processing on Android", "description": "Process images and text on device with ML Kit: text recognition, image labeling, object detection, language identification, translation, entity extraction, smart reply and GenAI image description, with CameraX.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "ml kit text recognition kotlin, ml kit image labeling, ml kit translation offline, entity extraction ml kit, camerax ml kit analyzer, ocr android offline", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/on-device-image-text-processing/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "On-Device Image and Text Processing on Android", "item": "https://yunoktech.com/android/on-device-image-text-processing/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">On-Device Image and Text Processing on Android</h1>
+    <p class="ad-lede">Many useful AI features need no cloud calls at all. ML Kit runs text recognition, image labeling, translation and more directly on the device: fast, private and free. Here's a practical tour with Kotlin and CameraX.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#catalog">What&#x27;s available</a></li><li><a href="#pipeline">A camera pipeline</a></li><li><a href="#ocr">Text recognition from a photo</a></li><li><a href="#live">Live analysis with CameraX</a></li><li><a href="#language">Language: ID, translation, entities</a></li><li><a href="#best-practices">Best practices</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">ML Kit's vision and language APIs use compact, task-specific models. They run in milliseconds, work offline, and keep data on the phone, often making them a better first choice than an LLM. See <a href="../llms-vs-traditional-machine-learning/index.html">LLMs vs Traditional ML</a>.</p>
+
+<h2 id="catalog">What's available</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>API</th><th>Does</th><th>Example feature</th></tr></thead>
+  <tbody>
+    <tr><td>Text recognition</td><td>OCR for Latin, Devanagari, Chinese, Japanese, Korean scripts</td><td>Scan receipts, notes</td></tr>
+    <tr><td>Image labeling</td><td>General labels (food, plant, dog…)</td><td>Auto-tag photos</td></tr>
+    <tr><td>Object detection</td><td>Locate and track objects</td><td>Visual product search</td></tr>
+    <tr><td>Barcode scanning</td><td>1D/2D codes</td><td>QR payments, inventory</td></tr>
+    <tr><td>Face detection, pose, segmentation</td><td>Landmarks, body pose, background</td><td>Filters, fitness</td></tr>
+    <tr><td>Language ID</td><td>Detect text language</td><td>Route to translation</td></tr>
+    <tr><td>Translation</td><td>Offline translation between many languages</td><td>Translate chat messages</td></tr>
+    <tr><td>Entity extraction</td><td>Addresses, dates, phone numbers, money</td><td>Smart actions in messages</td></tr>
+    <tr><td>GenAI Image Description (beta)</td><td>Short descriptions via Gemini Nano</td><td>Alt text. See <a href="../ai-image-description-android/index.html">Image Description</a>.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Some models are bundled with the app (bigger APK, available immediately); others are downloaded via Google Play services (smaller APK, needs a download first). Each API page lists the options.</p>
+
+<h2 id="pipeline">A camera pipeline</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-odp-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-odp-t fig-odp-d">
+    <title id="fig-odp-t">CameraX to ML Kit pipeline</title>
+    <desc id="fig-odp-d">CameraX ImageAnalysis provides frames; the MlKitAnalyzer runs a detector such as text recognition on each frame; results map to UI state in a ViewModel; the Compose UI draws overlays or shows extracted text.</desc>
+    <defs><marker id="odpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 80 H206 M370 80 H406 M550 80 H586" marker-end="url(#odpm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="50" width="150" height="60" rx="12"/><text class="d-t" x="95" y="76" text-anchor="middle">CameraX</text><text class="d-s" x="95" y="94" text-anchor="middle">frames</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="210" y="50" width="160" height="60" rx="12"/><text class="d-t" x="290" y="76" text-anchor="middle">MlKitAnalyzer</text><text class="d-s" x="290" y="94" text-anchor="middle">detector</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="410" y="50" width="140" height="60" rx="12"/><text class="d-t" x="480" y="76" text-anchor="middle">ViewModel</text><text class="d-s" x="480" y="94" text-anchor="middle">UI state</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="590" y="50" width="110" height="60" rx="12"/><text class="d-w" x="645" y="84" text-anchor="middle">Compose UI</text></g>
+  </svg>
+  <figcaption id="fig-odp-cap">Process frames continuously, but throttle state updates for a smooth UI.</figcaption>
+</figure>
+
+<h2 id="ocr">Text recognition from a photo</h2>
+<figure class="code"><figcaption><span class="file">TextScanner.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">TextScanner</span> : <span class="tk-t">AutoCloseable</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> recognizer = <span class="tk-t">TextRecognition</span>.getClient(<span class="tk-t">TextRecognizerOptions</span>.<span class="tk-t">DEFAULT_OPTIONS</span>)
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> scan(context: <span class="tk-t">Context</span>, uri: <span class="tk-t">Uri</span>): <span class="tk-t">String</span> {
+        <span class="tk-k">val</span> image = <span class="tk-t">InputImage</span>.fromFilePath(context, uri)
+        <span class="tk-k">return</span> recognizer.process(image).await().text     <span class="tk-c">// kotlinx-coroutines-play-services await()</span>
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> close() = recognizer.close()
+}</code></pre></figure>
+
+<h2 id="live">Live analysis with CameraX</h2>
+<figure class="code"><figcaption><span class="file">Live text recognition</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> recognizer = <span class="tk-t">TextRecognition</span>.getClient(<span class="tk-t">TextRecognizerOptions</span>.<span class="tk-t">DEFAULT_OPTIONS</span>)
+
+cameraController.setImageAnalysisAnalyzer(
+    <span class="tk-t">ContextCompat</span>.getMainExecutor(context),
+    <span class="tk-t">MlKitAnalyzer</span>(
+        listOf(recognizer),
+        <span class="tk-t">ImageAnalysis</span>.<span class="tk-t">COORDINATE_SYSTEM_VIEW_REFERENCED</span>,
+        <span class="tk-t">ContextCompat</span>.getMainExecutor(context),
+    ) { result -&gt;
+        result.getValue(recognizer)?.let { text -&gt; viewModel.onTextDetected(text.text) }
+    },
+)</code></pre></figure>
+
+<h2 id="language">Language: ID, translation, entities</h2>
+<figure class="code"><figcaption><span class="file">Translate and extract entities</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> translateToEnglish(text: <span class="tk-t">String</span>): <span class="tk-t">String</span> {
+    <span class="tk-k">val</span> lang = <span class="tk-t">LanguageIdentification</span>.getClient().identifyLanguage(text).await()
+    <span class="tk-k">if</span> (lang == <span class="tk-s">"und"</span> || lang == <span class="tk-s">"en"</span>) <span class="tk-k">return</span> text
+    <span class="tk-k">val</span> sourceLang = <span class="tk-t">TranslateLanguage</span>.fromLanguageTag(lang) ?: <span class="tk-k">return</span> text
+    <span class="tk-k">val</span> translator = <span class="tk-t">Translation</span>.getClient(
+        <span class="tk-t">TranslatorOptions</span>.<span class="tk-t">Builder</span>()
+            .setSourceLanguage(sourceLang)
+            .setTargetLanguage(<span class="tk-t">TranslateLanguage</span>.<span class="tk-t">ENGLISH</span>)
+            .build()
+    )
+    <span class="tk-k">return</span> translator.use {
+        it.downloadModelIfNeeded(<span class="tk-t">DownloadConditions</span>.<span class="tk-t">Builder</span>().requireWifi().build()).await()
+        it.translate(text).await()
+    }
+}
+
+<span class="tk-k">suspend</span> <span class="tk-k">fun</span> findEntities(text: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; {
+    <span class="tk-k">val</span> extractor = <span class="tk-t">EntityExtraction</span>.getClient(
+        <span class="tk-t">EntityExtractorOptions</span>.<span class="tk-t">Builder</span>(<span class="tk-t">EntityExtractorOptions</span>.<span class="tk-t">ENGLISH</span>).build()
+    )
+    <span class="tk-k">return</span> extractor.use {
+        it.downloadModelIfNeeded().await()
+        it.annotate(text).await().flatMap { a -&gt; a.entities.map { e -&gt; <span class="tk-s">"${e.type}: ${text.substring(a.start, a.end)}"</span> } }
+    }
+}</code></pre></figure>
+
+<h2 id="best-practices">Best practices</h2>
+<ul>
+  <li>Close detectors when done, and reuse clients during a session.</li>
+  <li>Downscale large images before processing to save time and memory.</li>
+  <li>Use confidence thresholds, and let users correct results.</li>
+  <li>Download language models over Wi-Fi with user-visible progress.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does ML Kit send images to Google?</summary><div><p>The on-device APIs process data locally. Review each API's documentation and your Play Data safety disclosures.</p></div></details>
+  <details><summary>How accurate is on-device translation?</summary><div><p>It's good for getting the gist, but less fluent than cloud translation. Label it as automatic translation.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>ML Kit gives you <strong>OCR, labeling, detection, translation and entity extraction on device</strong>: fast, private and free. Combine it with <strong>CameraX</strong> for live features, and add an LLM only when you need open-ended generation.</p>
+<p>Next step: make AI features work across devices and offline with <a href="../offline-ai-device-compatibility/index.html">Offline AI Features and Device Compatibility</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developers.google.com/ml-kit" target="_blank" rel="noopener">ML Kit</a></li><li><a href="https://developers.google.com/ml-kit/vision/text-recognition/v2/android" target="_blank" rel="noopener">Text recognition v2</a></li><li><a href="https://developers.google.com/ml-kit/vision/image-labeling/android" target="_blank" rel="noopener">Image labeling</a></li><li><a href="https://developers.google.com/ml-kit/language/translation/android" target="_blank" rel="noopener">On-device translation</a></li><li><a href="https://developer.android.com/media/camera/camerax/mlkitanalyzer" target="_blank" rel="noopener">CameraX ML Kit Analyzer</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Don-device-image-text-processing-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Don-device-image-text-processing-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/llms-vs-traditional-machine-learning/index.html"><small>Android AI Projects and Production</small>LLMs vs Traditional Machine Learning</a></li><li><a href="../../android/ai-image-description-android/index.html"><small>Android AI and Generative AI</small>Image Understanding and Description in Android Apps</a></li><li><a href="../../android/litert-litert-lm-android/index.html"><small>Android AI Projects and Production</small>LiteRT and LiteRT-LM on Android</a></li><li><a href="../../android/ai-photo-caption-generator-android/index.html"><small>Android AI Projects and Production</small>Build an AI Photo Caption Generator for Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/on-device-image-text-processing/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/on-device-image-text-processing/&amp;text=On-Device Image and Text Processing on Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/on-device-image-text-processing/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#catalog">What&#x27;s available</a></li><li><a href="#pipeline">A camera pipeline</a></li><li><a href="#ocr">Text recognition from a photo</a></li><li><a href="#live">Live analysis with CameraX</a></li><li><a href="#language">Language: ID, translation, entities</a></li><li><a href="#best-practices">Best practices</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Don-device-image-text-processing-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Don-device-image-text-processing-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!--meta
+{
+  "seo_title": "Kotlin Interview Questions for Experienced Developers",
+  "description": "Advanced Kotlin interview questions with answers: variance, inline and reified, delegation, sealed hierarchies, coroutines internals, Flow operators, value classes, DSLs and performance.",
+  "primary_keyword": "kotlin interview questions experienced",
+  "keywords": ["advanced kotlin interview", "kotlin variance in out", "kotlin coroutines internals interview", "value class kotlin", "kotlin dsl interview", "senior kotlin questions"],
+  "lede": "Senior Kotlin interviews go beyond syntax: why does MutableList<Dog> not substitute for MutableList<Animal>? What does the compiler generate for a suspend function? When would you use a value class? Here are the questions that separate experienced developers, with concise answers and code.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["android-interview-questions", "coroutines-flow-interview-questions", "kotlin-generics-reified", "kotlin-delegation"],
+  "refs": [
+    ["Kotlin language reference", "https://kotlinlang.org/docs/home.html"],
+    ["Generics: in, out, where", "https://kotlinlang.org/docs/generics.html"],
+    ["Inline value classes", "https://kotlinlang.org/docs/inline-classes.html"],
+    ["Coroutines guide", "https://kotlinlang.org/docs/coroutines-guide.html"]
+  ]
+}
+-->
+<p class="ad-lead">For experienced roles, interviewers probe whether you understand Kotlin's design: what the compiler does, why rules exist, and when features are the wrong tool. Answer with the principle, a short example and a trade-off.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-kq-cap">
+  <svg viewBox="0 0 720 140" role="img" aria-labelledby="fig-kq-t fig-kq-d">
+    <title id="fig-kq-t">How to structure a senior-level answer</title>
+    <desc id="fig-kq-d">Principle: what it is and why it exists. Example: a short code snippet or real use. Trade-off: when not to use it or what it costs.</desc>
+    <defs><marker id="kqm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M230 70 H256 M466 70 H492" marker-end="url(#kqm)"/>
+    <rect class="d-violet" x="20" y="40" width="210" height="60" rx="12"/><text class="d-t" x="125" y="66" text-anchor="middle">Principle</text><text class="d-s" x="125" y="84" text-anchor="middle">what + why</text>
+    <rect class="d-blue" x="260" y="40" width="206" height="60" rx="12"/><text class="d-t" x="363" y="66" text-anchor="middle">Example</text><text class="d-s" x="363" y="84" text-anchor="middle">code or real case</text>
+    <rect class="d-amber" x="496" y="40" width="204" height="60" rx="12"/><text class="d-t" x="598" y="66" text-anchor="middle">Trade-off</text><text class="d-s" x="598" y="84" text-anchor="middle">when not to</text>
+  </svg>
+  <figcaption id="fig-kq-cap">Use this three-part shape for every answer below.</figcaption>
+</figure>
+
+<h2 id="types">Type system</h2>
+<h3>Why is <code>MutableList&lt;Dog&gt;</code> not a <code>MutableList&lt;Animal&gt;</code>?</h3>
+<p>Because a mutable list both produces and consumes elements, so it's invariant. If it were covariant, you could add a <code>Cat</code> through the <code>Animal</code> reference. <code>List&lt;out E&gt;</code> is read-only and covariant, so <code>List&lt;Dog&gt;</code> <em>is</em> a <code>List&lt;Animal&gt;</code>.</p>
+<h3>What is <code>Nothing</code> and where is it useful?</h3>
+<p>The bottom type, with no values. It's the subtype of everything. Functions that never return (<code>throw</code>, <code>TODO()</code>) return <code>Nothing</code>, and it lets <code>Result.Failure : Result&lt;Nothing&gt;</code> fit any <code>Result&lt;out T&gt;</code>.</p>
+<h3>What are value classes?</h3>
+<code-block lang="kotlin" file="Type-safe IDs without allocation (in most cases)">
+@JvmInline value class UserId(val raw: String)
+@JvmInline value class OrderId(val raw: String)
+
+fun loadOrder(user: UserId, order: OrderId) { /* can't accidentally swap them */ }
+</code-block>
+<p>A value class wraps a single value for type safety, and is usually represented as the underlying type at runtime. It's boxed when used as a generic or nullable type.</p>
+
+<h2 id="functions">Functions and compilation</h2>
+<h3>What does <code>inline</code> change, and what are <code>noinline</code> and <code>crossinline</code>?</h3>
+<p>Inlining copies the body and lambdas into call sites, which avoids lambda objects and enables non-local returns and <code>reified</code>. <code>noinline</code> keeps a lambda as an object (to store or pass it). <code>crossinline</code> forbids non-local return when the lambda runs in another context. The cost is larger bytecode.</p>
+<h3>How are extension functions compiled?</h3>
+<p>As static methods taking the receiver as the first parameter. They're resolved statically and can't access private members.</p>
+<h3>What does the compiler generate for a <code>suspend</code> function?</h3>
+<p>A state machine with a hidden <code>Continuation</code> parameter. Local variables are stored in the continuation across suspension points, and the function returns <code>COROUTINE_SUSPENDED</code> when it suspends.</p>
+
+<h2 id="classes">Classes and delegation</h2>
+<h3>Sealed class vs sealed interface vs enum?</h3>
+<p>Enums have fixed instances with the same shape. Sealed hierarchies allow subtypes with different data. Sealed interfaces allow multiple inheritance and lighter declarations. All give exhaustive <code>when</code>.</p>
+<h3>How does <code>by</code> delegation work for classes and properties?</h3>
+<p>Class delegation generates forwarding methods to a delegate instance (decorator pattern). Property delegation routes get and set to <code>getValue</code>/<code>setValue</code> (for example <code>lazy</code>, <code>viewModels()</code>, Compose state). See <a href="../kotlin-delegation/index.html">Delegation</a>.</p>
+<h3>What's tricky about data class <code>equals</code>?</h3>
+<p>Only primary-constructor properties take part. Mutable properties in data classes used as map keys or in sets cause bugs when they change. Arrays compare by reference unless you override equality.</p>
+
+<h2 id="coroutines">Coroutines and Flow (advanced)</h2>
+<h3>coroutineScope vs supervisorScope?</h3>
+<p>In <code>coroutineScope</code>, a failing child cancels siblings and the parent. In <code>supervisorScope</code>, child failures are isolated, so each child must handle its own errors.</p>
+<h3>Why must you rethrow <code>CancellationException</code>?</h3>
+<p>Cancellation is implemented with this exception. Swallowing it keeps cancelled work running and breaks structured concurrency.</p>
+<h3>flatMapLatest vs flatMapConcat vs flatMapMerge?</h3>
+<p>Latest cancels the previous inner flow (search-as-you-type). Concat processes sequentially. Merge runs concurrently, with a concurrency limit.</p>
+<h3>How does <code>stateIn(WhileSubscribed(5000))</code> behave?</h3>
+<p>It starts the upstream when the first collector appears and stops it five seconds after the last disappears, which survives configuration changes without leaking work.</p>
+
+<h2 id="dsl">DSLs and idioms</h2>
+<h3>How do type-safe builders work?</h3>
+<p>They use lambdas with receivers (<code>T.() -&gt; Unit</code>), often with <code>@DslMarker</code> to prevent accidental access to outer receivers. Compose's layout scopes and the Gradle Kotlin DSL use this.</p>
+<code-block lang="kotlin" file="Minimal DSL with @DslMarker">
+@DslMarker annotation class MenuDsl
+
+@MenuDsl class Menu { val items = mutableListOf<String>(); fun item(title: String) { items += title } }
+fun menu(build: Menu.() -> Unit): Menu = Menu().apply(build)
+
+val m = menu { item("Home"); item("Settings") }
+</code-block>
+
+<h2 id="performance">Performance awareness</h2>
+<ul>
+  <li>Sequences vs lists: lazy, which helps large chains and short-circuiting.</li>
+  <li>Boxing with generics and nullable primitives.</li>
+  <li>Lambdas capturing variables allocate objects unless inlined.</li>
+  <li><code>lazy</code> synchronisation modes.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Will I be asked about Kotlin Multiplatform?</summary><div><p>Increasingly, yes: expect/actual, what can be shared, and trade-offs. See <a href="../kotlin-multiplatform-vs-native-android/index.html">KMP vs Native</a>.</p></div></details>
+  <details><summary>How deep should I know compiler internals?</summary><div><p>Enough to explain behaviour (suspend state machines, inline, extensions), not to recite bytecode.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Senior Kotlin interviews test <strong>understanding of the type system, compilation, delegation and coroutine semantics</strong>. Answer with principle, example and trade-off, and connect each answer to real Android code you've written.</p>
+<p>Next step: prepare UI questions with <a href="../jetpack-compose-interview-questions/index.html">Jetpack Compose Interview Questions</a>.</p>

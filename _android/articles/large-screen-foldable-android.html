@@ -1,0 +1,116 @@
+<!--meta
+{
+  "seo_title": "Large Screens, Tablets and Foldables in Android",
+  "description": "Make Android apps great on tablets, foldables, ChromeOS and desktop windows: window size classes, canonical layouts, posture with WindowManager, continuity, input support, multi-window and orientation changes.",
+  "primary_keyword": "android large screen foldable",
+  "keywords": ["android tablet app design", "foldable posture windowmanager", "window size classes android", "android multi window", "keyboard mouse support android", "android 16 orientation resizability"],
+  "lede": "Tablets, foldables, Chromebooks and desktop-style windowing mean your app can run at almost any size. Recent Android versions ignore orientation and resizability restrictions on large screens for apps targeting them, so adapting isn't optional anymore. Here's how to do it well.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-adaptive-ui-tablets-foldables", "material3-theming-dynamic-color", "compose-navigation", "android-privacy-accessibility-reliability"],
+  "refs": [
+    ["Large screens and foldables", "https://developer.android.com/guide/topics/large-screens/get-started-with-large-screens"],
+    ["Window size classes", "https://developer.android.com/develop/ui/compose/layouts/adaptive/use-window-size-classes"],
+    ["Make your app fold aware", "https://developer.android.com/develop/ui/compose/layouts/adaptive/foldables/make-your-app-fold-aware"],
+    ["Large screen app quality", "https://developer.android.com/docs/quality-guidelines/large-screen-app-quality"],
+    ["Android 16 behavior changes: orientation and resizability", "https://developer.android.com/about/versions/16/behavior-changes-16"]
+  ]
+}
+-->
+<p class="ad-lead">Our <a href="../compose-adaptive-ui-tablets-foldables/index.html">Adaptive UI in Compose</a> guide covers the layout basics. This article goes further: foldable postures, continuity across configuration changes, input devices, multi-window, and the platform changes that make large-screen support mandatory.</p>
+
+<h2 id="landscape">The device landscape</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ls-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ls-t fig-ls-d">
+    <title id="fig-ls-t">Window sizes your app should handle</title>
+    <desc id="fig-ls-d">Compact width phones in portrait, medium width foldables unfolded and small tablets, expanded width large tablets and desktop windows, plus foldable postures like tabletop and book, and free-form resizable windows.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="30" y="40" width="70" height="120" rx="10"/><text class="d-s" x="65" y="185" text-anchor="middle">Compact</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="150" y="50" width="140" height="110" rx="10"/><line class="d-dash" x1="220" y1="50" x2="220" y2="160"/><text class="d-s" x="220" y="185" text-anchor="middle">Medium / foldable</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="340" y="50" width="190" height="110" rx="10"/><text class="d-s" x="435" y="185" text-anchor="middle">Expanded tablet</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="570" y="40" width="130" height="90" rx="8"/><rect class="d-box" x="590" y="70" width="90" height="70" rx="6"/><text class="d-s" x="635" y="185" text-anchor="middle">Desktop windows</text></g>
+  </svg>
+  <figcaption id="fig-ls-cap">Design by available window size, not device type: the same device can produce several sizes.</figcaption>
+</figure>
+
+<h2 id="mandatory">Why it's no longer optional</h2>
+<p>From Android 16 (API 36), for apps targeting it, the system ignores manifest restrictions on orientation, resizability and aspect ratio on large screens (smallest width at least 600dp), with a temporary opt-out that is removed in the following version. Combined with Play's target API requirements (new apps and updates must target API 36 from August 31, 2026), most apps must now handle being resized and rotated on tablets and foldables.</p>
+
+<h2 id="layouts">Canonical layouts</h2>
+<ul>
+  <li><strong>List-detail:</strong> side-by-side panes on wide windows (<code>ListDetailPaneScaffold</code>).</li>
+  <li><strong>Supporting pane:</strong> main content plus contextual content.</li>
+  <li><strong>Feed:</strong> adaptive grids.</li>
+  <li><strong>Navigation:</strong> <code>NavigationSuiteScaffold</code> switches between bottom bar, rail and drawer.</li>
+</ul>
+
+<h2 id="posture">Foldable postures</h2>
+<code-block lang="kotlin" file="Detect tabletop posture">
+@Composable
+fun rememberIsTabletop(): Boolean {
+    val context = LocalContext.current
+    val layoutInfo by remember(context) {
+        WindowInfoTracker.getOrCreate(context).windowLayoutInfo(context as Activity)
+    }.collectAsStateWithLifecycle(initialValue = null)
+
+    val fold = layoutInfo?.displayFeatures?.filterIsInstance<FoldingFeature>()?.firstOrNull()
+    return fold?.state == FoldingFeature.State.HALF_OPENED &&
+           fold.orientation == FoldingFeature.Orientation.HORIZONTAL
+}
+// Tabletop: e.g. video on the top half, controls on the bottom half.
+</code-block>
+<p>The Material 3 adaptive library also exposes posture information through <code>currentWindowAdaptiveInfo()</code>, avoiding manual WindowManager plumbing in many cases.</p>
+
+<h2 id="continuity">Continuity across changes</h2>
+<p>Folding, unfolding, resizing and rotating trigger configuration changes. Users expect to keep their place:</p>
+<ul>
+  <li>Keep state in ViewModels and <code>rememberSaveable</code>, not in composables tied to a layout.</li>
+  <li>Preserve scroll position and selection when switching between one and two panes.</li>
+  <li>Don't restart video or lose form input on fold or unfold.</li>
+</ul>
+
+<h2 id="input">Input: keyboard, mouse, stylus</h2>
+<code-block lang="kotlin" file="Keyboard shortcut and hover">
+Modifier
+    .onPreviewKeyEvent { event ->
+        if (event.type == KeyEventType.KeyDown && event.isCtrlPressed && event.key == Key.N) {
+            onNewItem(); true
+        } else false
+    }
+    .pointerHoverIcon(PointerIcon.Hand)   // mouse cursor feedback
+</code-block>
+<ul>
+  <li>Support Tab navigation and visible focus indicators.</li>
+  <li>Support right-click context menus and drag and drop where it makes sense.</li>
+  <li>Support stylus input for drawing and handwriting apps.</li>
+</ul>
+
+<h2 id="multiwindow">Multi-window and desktop windowing</h2>
+<ul>
+  <li>Your app can be split-screen, free-form or in a desktop window. Handle any size.</li>
+  <li>Don't pause playback in <code>onPause</code> when visible in multi-window. Use <code>onStop</code>.</li>
+  <li>Multi-instance and opening content in a new window can suit document-style apps.</li>
+</ul>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Use resizable and foldable emulators, and the desktop emulator.</li>
+  <li>Use Compose previews with multiple device specs.</li>
+  <li>Check the large screen app quality checklist.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Email or chat</h3><p>List-detail on tablets, with keyboard shortcuts for power users.</p></div>
+  <div class="card usecase"><h3>Video</h3><p>Tabletop mode with controls below the fold.</p></div>
+  <div class="card usecase"><h3>Notes</h3><p>Stylus input, drag and drop, multi-window.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I lock my app to portrait?</summary><div><p>On phones, yes. On large screens, apps targeting Android 16+ have orientation locks ignored (except for some categories like games). Design to adapt.</p></div></details>
+  <details><summary>Do I need separate tablet layouts?</summary><div><p>Not separate apps. Use adaptive layouts that respond to window size classes.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Large-screen support means <strong>adaptive layouts by window size</strong>, <strong>posture awareness</strong> on foldables, <strong>continuity</strong> across changes, full <strong>keyboard, mouse and stylus</strong> support, and correct <strong>multi-window</strong> behaviour, which is now required in practice by platform changes.</p>
+<p>Next step: explore AI-ready app capabilities with <a href="../android-appfunctions-ai-ecosystem/index.html">AppFunctions and the Android AI Ecosystem</a>.</p>

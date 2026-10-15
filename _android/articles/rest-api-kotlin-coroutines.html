@@ -1,0 +1,172 @@
+<!--meta
+{
+  "seo_title": "REST API Integration with Kotlin and Coroutines",
+  "description": "End-to-end REST API integration in Android with Kotlin coroutines: API contract, DTO mapping, repository, ViewModel state, parallel requests, retries, timeouts and testing.",
+  "primary_keyword": "rest api kotlin coroutines android",
+  "keywords": ["android api integration", "kotlin coroutines retrofit example", "parallel api calls kotlin", "retry with backoff kotlin", "api repository viewmodel", "android networking architecture"],
+  "lede": "Calling an endpoint is easy. Integrating an API well means clean models, predictable loading and error states, parallel calls where useful, sensible retries and timeouts, and tests. This walkthrough builds a complete feature end to end.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["retrofit-android-guide", "android-api-error-handling", "kotlin-suspend-functions", "repository-pattern-android"],
+  "refs": [
+    ["Coroutines on Android", "https://developer.android.com/kotlin/coroutines"],
+    ["Data layer", "https://developer.android.com/topic/architecture/data-layer"],
+    ["Retrofit (official repository)", "https://github.com/square/retrofit"],
+    ["Testing coroutines", "https://developer.android.com/kotlin/coroutines/test"]
+  ]
+}
+-->
+<p class="ad-lead">The feature: an order-tracking screen that loads the order, its shipment status and recommended products, three endpoints with different reliability. The goal: fast loading, graceful partial failure, and code that's easy to test.</p>
+
+<h2 id="flow">The end-to-end flow</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ra-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ra-t fig-ra-d">
+    <title id="fig-ra-t">Parallel API calls with partial failure</title>
+    <desc id="fig-ra-d">The ViewModel asks the repository for order details. The repository calls order and shipment endpoints in parallel with async and the recommendations endpoint in a supervised way. Order and shipment are required; recommendations failure is tolerated. Results map to domain models and then to UI state.</desc>
+    <defs><marker id="ram" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="80" width="130" height="56" rx="12"/><text class="d-t" x="75" y="112" text-anchor="middle">ViewModel</text></g>
+    <path class="d-flow" d="M140 108 H186" marker-end="url(#ram)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="190" y="80" width="150" height="56" rx="12"/><text class="d-t" x="265" y="104" text-anchor="middle">OrderRepository</text><text class="d-s" x="265" y="122" text-anchor="middle">coroutineScope</text></g>
+    <path class="d-flow" d="M340 96 L436 36 M340 108 H436 M340 120 L436 180" marker-end="url(#ram)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="440" y="14" width="270" height="44" rx="10"/><text class="d-s" x="575" y="40" text-anchor="middle">GET /orders/{id}: required</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="440" y="86" width="270" height="44" rx="10"/><text class="d-s" x="575" y="112" text-anchor="middle">GET /shipments/{id}: required</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="440" y="158" width="270" height="44" rx="10"/><text class="d-s" x="575" y="184" text-anchor="middle">GET /recommendations: optional</text></g>
+  </svg>
+  <figcaption id="fig-ra-cap">Required calls fail together. Optional calls fail alone, and the screen still works without them.</figcaption>
+</figure>
+
+<h2 id="contract">1. The API contract and DTOs</h2>
+<code-block lang="kotlin" file="OrderApi.kt">
+interface OrderApi {
+    @GET("orders/{id}") suspend fun order(@Path("id") id: String): OrderDto
+    @GET("shipments/{orderId}") suspend fun shipment(@Path("orderId") id: String): ShipmentDto
+    @GET("recommendations") suspend fun recommendations(@Query("orderId") id: String): List<ProductDto>
+}
+
+@Serializable data class OrderDto(val id: String, val total_paise: Long, val placed_at: String)
+@Serializable data class ShipmentDto(val status: String, val eta: String? = null)
+@Serializable data class ProductDto(val id: String, val name: String)
+</code-block>
+
+<h2 id="domain">2. Domain models and mapping</h2>
+<code-block lang="kotlin" file="Models.kt">
+enum class ShipmentStatus { PACKED, SHIPPED, OUT_FOR_DELIVERY, DELIVERED, UNKNOWN }
+
+data class OrderDetails(
+    val orderId: String,
+    val totalPaise: Long,
+    val placedAt: Instant,
+    val status: ShipmentStatus,
+    val eta: LocalDate?,
+    val recommendations: List<Product>,
+)
+
+fun ShipmentDto.statusEnum() = runCatching { ShipmentStatus.valueOf(status) }.getOrDefault(ShipmentStatus.UNKNOWN)
+</code-block>
+<p>Unknown server values map to <code>UNKNOWN</code> instead of crashing, so a new server status doesn't break old app versions.</p>
+
+<h2 id="repository">3. Repository: parallel, with partial failure</h2>
+<code-block lang="kotlin" file="OrderRepository.kt">
+class OrderRepository(private val api: OrderApi) {
+
+    suspend fun details(orderId: String): OrderDetails = coroutineScope {
+        val order = async { retryIo { api.order(orderId) } }
+        val shipment = async { retryIo { api.shipment(orderId) } }
+        // Optional: failure shouldn't cancel siblings or fail the whole call
+        val recs = async {
+            runCatching { withTimeout(3_000) { api.recommendations(orderId) } }
+                .getOrDefault(emptyList())
+        }
+
+        val o = order.await()
+        val s = shipment.await()
+        OrderDetails(
+            orderId = o.id,
+            totalPaise = o.total_paise,
+            placedAt = Instant.parse(o.placed_at),
+            status = s.statusEnum(),
+            eta = s.eta?.let(LocalDate::parse),
+            recommendations = recs.await().map { Product(it.id, it.name) },
+        )
+    }
+}
+
+/** Retries transient I/O failures with exponential backoff; rethrows the last error. */
+suspend fun <T> retryIo(times: Int = 3, initialDelay: Long = 400, block: suspend () -> T): T {
+    var delayMs = initialDelay
+    repeat(times - 1) {
+        try { return block() } catch (e: IOException) { delay(delayMs); delayMs *= 2 }
+    }
+    return block()
+}
+</code-block>
+<div class="note"><b>Why runCatching is safe here</b><p><code>runCatching</code> also catches <code>CancellationException</code>. Here it wraps a block with its own timeout, and if the parent is cancelled, the following <code>await()</code> calls still observe cancellation. In general, prefer catching specific exceptions.</p></div>
+
+<h2 id="viewmodel">4. ViewModel state</h2>
+<code-block lang="kotlin" file="OrderViewModel.kt">
+sealed interface OrderUiState {
+    data object Loading : OrderUiState
+    data class Content(val details: OrderDetails) : OrderUiState
+    data class Error(val message: String) : OrderUiState
+}
+
+class OrderViewModel(private val repo: OrderRepository, savedState: SavedStateHandle) : ViewModel() {
+    private val orderId: String = checkNotNull(savedState["orderId"])
+    private val _state = MutableStateFlow<OrderUiState>(OrderUiState.Loading)
+    val state = _state.asStateFlow()
+
+    init { load() }
+
+    fun load() = viewModelScope.launch {
+        _state.value = OrderUiState.Loading
+        _state.value = try {
+            OrderUiState.Content(repo.details(orderId))
+        } catch (e: IOException) {
+            OrderUiState.Error("You're offline. Pull to retry.")
+        } catch (e: HttpException) {
+            OrderUiState.Error(if (e.code() == 404) "Order not found." else "Something went wrong (${e.code()}).")
+        }
+    }
+}
+</code-block>
+
+<h2 id="testing">5. Testing the repository</h2>
+<code-block lang="kotlin" file="OrderRepositoryTest.kt">
+@Test
+fun `recommendations failure does not fail details`() = runTest {
+    val api = object : OrderApi {
+        override suspend fun order(id: String) = OrderDto(id, 129_900, "2026-10-01T10:00:00Z")
+        override suspend fun shipment(id: String) = ShipmentDto("SHIPPED", "2026-10-03")
+        override suspend fun recommendations(id: String): List<ProductDto> = throw IOException("down")
+    }
+    val details = OrderRepository(api).details("A1")
+    assertEquals(ShipmentStatus.SHIPPED, details.status)
+    assertTrue(details.recommendations.isEmpty())
+}
+</code-block>
+
+<h2 id="use-cases">Variations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Dependent calls</h3><p>Sequential: get the user, then fetch orders by the user's account ID. No <code>async</code> needed.</p></div>
+  <div class="card usecase"><h3>Polling a status</h3><p>A <code>flow { while (true) { emit(api.status()); delay(10_000) } }</code> collected only while the screen is visible.</p></div>
+  <div class="card usecase"><h3>Offline support</h3><p>Write results to Room and observe from there. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Sequential calls for independent data, which doubles or triples loading time.</li>
+  <li>Retrying non-idempotent requests, such as creating a payment, without idempotency keys.</li>
+  <li>Retrying 4xx errors. Only transient failures (I/O, 5xx, 429 with backoff) deserve retries.</li>
+  <li>Parsing dates and enums without fallbacks.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>coroutineScope or supervisorScope?</summary><div><p><code>coroutineScope</code> fails fast when any child fails, which is right for required data. <code>supervisorScope</code> lets children fail independently. Above, the optional call handles its own failure instead.</p></div></details>
+  <details><summary>Where do timeouts belong?</summary><div><p>Set global timeouts on OkHttp, and use <code>withTimeout</code> for specific, latency-sensitive optional calls.</p></div></details>
+  <details><summary>Should I return Result from repositories?</summary><div><p>Either convention works. Pick one per codebase. This example throws and maps in the ViewModel.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Good API integration combines <strong>clean DTO-to-domain mapping</strong>, <strong>parallel calls for independent data</strong>, <strong>isolated optional failures</strong>, <strong>retries only for transient errors</strong>, and <strong>explicit UI states</strong>, all testable with fakes.</p>
+<p>Next step: compare HTTP clients in <a href="../retrofit-vs-ktor-client/index.html">Retrofit vs Ktor Client</a>.</p>

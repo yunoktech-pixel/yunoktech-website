@@ -1,0 +1,97 @@
+<!--meta
+{
+  "seo_title": "Google Play Console: A Developer's Guide (2026)",
+  "description": "Navigate Google Play Console as a developer: releases and testing tracks, Android vitals, pre-launch reports, statistics, ratings and reviews, store listing experiments, policy status and users.",
+  "primary_keyword": "google play console guide",
+  "keywords": ["play console android vitals", "play console testing tracks", "pre-launch report", "store listing experiments", "play console statistics", "play console user permissions"],
+  "lede": "After launch, the Play Console becomes your app's control centre: releases, quality metrics, user feedback, growth experiments and policy status. This guide maps the sections developers use most and what to watch in each.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["publish-android-app-google-play", "improve-android-app-ratings", "android-store-listing-optimization", "android-analytics-crash-reporting"],
+  "refs": [
+    ["Play Console Help", "https://support.google.com/googleplay/android-developer/"],
+    ["Android vitals", "https://developer.android.com/topic/performance/vitals"],
+    ["Set up open, closed or internal tests", "https://support.google.com/googleplay/android-developer/answer/9845334"],
+    ["Store listing experiments", "https://support.google.com/googleplay/android-developer/answer/6227309"]
+  ]
+}
+-->
+<p class="ad-lead">The Play Console has dozens of sections, and it's easy to miss the ones that matter: a policy warning with a deadline, an ANR spike after a release, or reviews mentioning the same bug. Here's how to organise your attention.</p>
+
+<h2 id="map">The sections that matter most</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-pc-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-pc-t fig-pc-d">
+    <title id="fig-pc-t">Key areas of the Play Console</title>
+    <desc id="fig-pc-d">Release: testing tracks, production, staged rollout, app bundle explorer. Quality: Android vitals, pre-launch report. Grow: store listing, experiments, statistics. Users: ratings and reviews. Policy: policy status, app content declarations. Setup: users and permissions, app integrity and signing.</desc>
+    <rect class="d-blue" x="10" y="20" width="225" height="70" rx="12"/><text class="d-t" x="122" y="46" text-anchor="middle">Release</text><text class="d-s" x="122" y="68" text-anchor="middle">tracks · rollouts · bundles</text>
+    <rect class="d-red" x="247" y="20" width="225" height="70" rx="12"/><text class="d-t" x="359" y="46" text-anchor="middle">Quality</text><text class="d-s" x="359" y="68" text-anchor="middle">Android vitals · pre-launch</text>
+    <rect class="d-green" x="484" y="20" width="225" height="70" rx="12"/><text class="d-t" x="596" y="46" text-anchor="middle">Grow</text><text class="d-s" x="596" y="68" text-anchor="middle">listing · experiments · stats</text>
+    <rect class="d-amber" x="10" y="110" width="225" height="70" rx="12"/><text class="d-t" x="122" y="136" text-anchor="middle">Users</text><text class="d-s" x="122" y="158" text-anchor="middle">ratings · reviews · replies</text>
+    <rect class="d-violet" x="247" y="110" width="225" height="70" rx="12"/><text class="d-t" x="359" y="136" text-anchor="middle">Policy</text><text class="d-s" x="359" y="158" text-anchor="middle">status · app content forms</text>
+    <rect class="d-box" x="484" y="110" width="225" height="70" rx="12"/><text class="d-t" x="596" y="136" text-anchor="middle">Setup</text><text class="d-s" x="596" y="158" text-anchor="middle">users · app integrity</text>
+  </svg>
+  <figcaption id="fig-pc-cap">Check Quality and Policy after every release, and Users and Grow weekly.</figcaption>
+</figure>
+
+<h2 id="release">Release management</h2>
+<ul>
+  <li><strong>Testing tracks</strong>: internal (fast, small), closed (invited), open (public beta).</li>
+  <li><strong>Production with staged rollout</strong>: increase gradually, and <em>halt</em> if vitals worsen.</li>
+  <li><strong>App bundle explorer</strong>: see generated APKs, download sizes per device configuration, and the app signing certificate fingerprints.</li>
+  <li><strong>Release notes</strong> per language: tell users what changed.</li>
+</ul>
+
+<h2 id="vitals">Android vitals</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Metric</th><th>Why it matters</th><th>Action</th></tr></thead>
+  <tbody>
+    <tr><td>User-perceived crash rate</td><td>Core vital; affects visibility above bad-behaviour thresholds</td><td>Fix top clusters first; see <a href="../debugging-crashes-logcat/index.html">Debugging Crashes</a></td></tr>
+    <tr><td>User-perceived ANR rate</td><td>Core vital</td><td>Fix main-thread blocking; see <a href="../android-anr-errors/index.html">ANRs</a></td></tr>
+    <tr><td>Startup time, rendering</td><td>User experience</td><td>Baseline Profiles, profiling</td></tr>
+    <tr><td>Excessive wake locks / background work</td><td>Battery complaints</td><td>WorkManager, constraints</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Use the breakdowns (device, Android version, app version) to find patterns, such as one manufacturer or one release.</p>
+
+<h2 id="prelaunch">Pre-launch report</h2>
+<p>When you upload to a testing track, Google runs your app on real devices and reports crashes, accessibility issues, security warnings and screenshots. Provide test credentials for login-gated apps, and review the report before promoting a release.</p>
+
+<h2 id="users">Ratings and reviews</h2>
+<ul>
+  <li>Filter reviews by version, device and keyword to find recurring bugs.</li>
+  <li>Reply helpfully. Updated reviews often improve after a fix. See <a href="../improve-android-app-ratings/index.html">Improving Ratings</a>.</li>
+</ul>
+
+<h2 id="grow">Growth tools</h2>
+<ul>
+  <li><strong>Store listing</strong> and <strong>custom store listings</strong> for specific countries or audiences.</li>
+  <li><strong>Store listing experiments</strong> to A/B test icons, screenshots and descriptions.</li>
+  <li><strong>Statistics</strong>: installs, uninstalls, acquisition sources, conversion rate from listing visitors.</li>
+</ul>
+
+<h2 id="policy">Policy status and app content</h2>
+<p>Check <strong>Policy status</strong> regularly. Warnings often come with deadlines (target API, Data safety updates, new declarations). Keep <strong>App content</strong> forms (privacy policy, ads, content rating, target audience, Data safety, permissions declarations) up to date whenever features or SDKs change.</p>
+
+<h2 id="access">Team access</h2>
+<p>Invite team members with least-privilege permissions (release manager, support replying to reviews, finance). Avoid sharing the owner account.</p>
+
+<h2 id="use-cases">A weekly routine</h2>
+<ol class="steps">
+  <li><strong>Monday:</strong> Policy status and inbox messages.</li>
+  <li><strong>After each release:</strong> vitals by app version, crash clusters and rollout decisions.</li>
+  <li><strong>Weekly:</strong> reviews by keyword, with replies and bug tickets.</li>
+  <li><strong>Monthly:</strong> statistics and listing experiment results.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Where do I find the SHA fingerprint for Google sign-in?</summary><div><p>Under App integrity (app signing), which shows the app signing key and upload key certificates.</p></div></details>
+  <details><summary>Can I roll back a release?</summary><div><p>You can halt a staged rollout. To fix a released bug, ship a new version with a higher <code>versionCode</code>. Downgrading in place isn't supported for users who already updated.</p></div></details>
+  <details><summary>Is there an API for the Play Console?</summary><div><p>The Google Play Developer API supports publishing, reviews and more, and is commonly used from CI.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use the Play Console deliberately: <strong>releases with staged rollouts</strong>, <strong>Android vitals and pre-launch reports</strong> after every release, <strong>reviews and policy status</strong> weekly, and <strong>experiments and statistics</strong> to grow.</p>
+<p>Next step: decide how your app will earn with <a href="../android-monetization-ads-vs-iap/index.html">Android App Monetization: Ads vs In-App Purchases</a>.</p>

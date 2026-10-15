@@ -1,0 +1,145 @@
+<!--meta
+{
+  "seo_title": "Jetpack Compose Performance Optimization Guide",
+  "description": "Optimise Jetpack Compose performance: measure first, avoid unnecessary recomposition, stability and strong skipping, deferred state reads, lazy list tuning, Baseline Profiles and tools.",
+  "primary_keyword": "compose performance optimization",
+  "keywords": ["compose recomposition performance", "compose stability strong skipping", "derivedStateOf performance", "compose layout inspector recomposition count", "compose baseline profile", "compose jank"],
+  "lede": "Compose is fast when you work with its model and slow when you fight it. This guide shows how to measure, find unnecessary recomposition, fix stability issues, defer state reads to cheaper phases, and tune lazy lists, in order of impact.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["android-app-performance-optimization", "lazycolumn-vs-column", "baseline-profiles-android", "composable-functions-explained"],
+  "refs": [
+    ["Compose performance", "https://developer.android.com/develop/ui/compose/performance"],
+    ["Follow best practices", "https://developer.android.com/develop/ui/compose/performance/bestpractices"],
+    ["Stability in Compose", "https://developer.android.com/develop/ui/compose/performance/stability"],
+    ["Strong skipping mode", "https://developer.android.com/develop/ui/compose/performance/stability/strongskipping"],
+    ["Compose phases", "https://developer.android.com/develop/ui/compose/phases"]
+  ]
+}
+-->
+<p class="ad-lead">"Compose is slow" usually means one of a few specific problems: testing a debug build, recomposing a large tree on every scroll frame, or doing expensive work inside composables. All of them are measurable and fixable.</p>
+
+<h2 id="measure">Step 0: Measure correctly</h2>
+<ul>
+  <li><strong>Use a release-like build</strong> (minified, non-debuggable). Debug Compose is significantly slower.</li>
+  <li><strong>Add a Baseline Profile.</strong> Compose ships its own profile rules, and your app's critical journeys benefit from one too. See <a href="../baseline-profiles-android/index.html">Baseline Profiles</a>.</li>
+  <li><strong>Use Macrobenchmark</strong> with <code>FrameTimingMetric</code> for scrolling and animation jank.</li>
+  <li><strong>Use Layout Inspector's recomposition counts</strong> to see which composables recompose and how often.</li>
+</ul>
+
+<h2 id="phases">Understand the three phases</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ph-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ph-t fig-ph-d">
+    <title id="fig-ph-t">Reading state in later phases avoids recomposition</title>
+    <desc id="fig-ph-d">State read during composition triggers composition, layout and drawing. State read in a layout lambda, such as Modifier.offset with a lambda, triggers only layout and drawing. State read in a draw lambda, such as drawBehind or graphicsLayer, triggers only drawing, the cheapest.</desc>
+    <defs><marker id="phm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M220 50 H260 M460 50 H500" marker-end="url(#phm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="20" y="20" width="200" height="60" rx="12"/><text class="d-t" x="120" y="46" text-anchor="middle">Composition</text><text class="d-s" x="120" y="64" text-anchor="middle">most expensive</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="264" y="20" width="196" height="60" rx="12"/><text class="d-t" x="362" y="46" text-anchor="middle">Layout</text><text class="d-s" x="362" y="64" text-anchor="middle">measure + place</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="504" y="20" width="196" height="60" rx="12"/><text class="d-t" x="602" y="46" text-anchor="middle">Drawing</text><text class="d-s" x="602" y="64" text-anchor="middle">cheapest</text></g>
+    <text class="d-s" x="120" y="110" text-anchor="middle">Text("$offset")</text><text class="d-s" x="120" y="128" text-anchor="middle">reads → all 3 phases</text>
+    <text class="d-s" x="362" y="110" text-anchor="middle">Modifier.offset { … }</text><text class="d-s" x="362" y="128" text-anchor="middle">reads → layout + draw</text>
+    <text class="d-s" x="602" y="110" text-anchor="middle">graphicsLayer { alpha = … }</text><text class="d-s" x="602" y="128" text-anchor="middle">reads → draw only</text>
+    <text class="d-t" x="360" y="176" text-anchor="middle">Read fast-changing state as late as possible.</text>
+  </svg>
+  <figcaption id="fig-ph-cap">Where you read state determines which phases re-run. For animations and scroll effects, prefer lambda-based modifiers.</figcaption>
+</figure>
+
+<h2 id="fixes">The fixes, in order of impact</h2>
+<h3 id="deferred">1. Defer reads of fast-changing state</h3>
+<code-block lang="kotlin" file="Collapsing header">
+// ❌ Recomposes Header on every scroll pixel
+Header(Modifier.offset(y = (-scrollState.value / 2).dp))
+
+// ✅ Reads scroll only in the layout phase
+Header(Modifier.offset { IntOffset(0, -scrollState.value / 2) })
+
+// ✅ Alpha in the draw phase
+Header(Modifier.graphicsLayer { alpha = 1f - (scrollState.value / 600f).coerceIn(0f, 1f) })
+</code-block>
+
+<h3 id="derived">2. Use derivedStateOf when outputs change less than inputs</h3>
+<code-block lang="kotlin" file="derivedStateOf">
+val showFab by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+</code-block>
+
+<h3 id="remember">3. Don't do expensive work in composition</h3>
+<code-block lang="kotlin" file="remember with keys, or move to the ViewModel">
+// ❌ Sorting and formatting 1,000 items on every recomposition
+val rows = transactions.sortedByDescending { it.date }.map { it.toUi() }
+
+// ✅ Recompute only when the input changes (better still: do it in the ViewModel)
+val rows = remember(transactions) { transactions.sortedByDescending { it.date }.map { it.toUi() } }
+</code-block>
+
+<h3 id="lazy">4. Tune lazy lists</h3>
+<ul>
+  <li>Provide <code>key</code> and <code>contentType</code> for every <code>items</code> call.</li>
+  <li>Keep item composables small and parameters simple (IDs, strings, immutable UI models).</li>
+  <li>Size images to their display size, and avoid decoding full-resolution bitmaps.</li>
+</ul>
+
+<h3 id="stability">5. Stability and strong skipping</h3>
+<p>Compose skips a composable when its parameters are equal to last time and considered <strong>stable</strong>. With <strong>strong skipping mode</strong>, the default in recent Compose compiler versions, composables with unstable parameters can still be skipped, using instance equality for those parameters, and lambdas are remembered automatically. This removed many earlier stability headaches, but a few things still matter:</p>
+<code-block lang="kotlin" file="Stable UI models">
+// Prefer immutable data classes for UI state
+@Immutable
+data class ProductUi(val id: String, val title: String, val priceText: String)
+
+// A List parameter is an interface Compose can't prove immutable.
+// With strong skipping, a NEW list instance on each emission means "changed".
+// Avoid recreating identical lists; consider kotlinx.collections.immutable for clarity.
+</code-block>
+<p>Use the Compose compiler's <strong>stability reports</strong> to see which classes are unstable. Fix the ones that appear on hot paths, not all of them.</p>
+
+<h3 id="scope">6. Narrow recomposition scope</h3>
+<code-block lang="kotlin" file="Extract the frequently-changing part">
+@Composable
+fun PlayerScreen(state: PlayerState) {
+    Column {
+        AlbumArt(state.art)                       // rarely changes
+        TrackInfo(state.title, state.artist)      // rarely changes
+        ProgressBar(progressProvider = { state.progress })   // lambda: read deferred into ProgressBar
+    }
+}
+</code-block>
+<p>Passing a <code>() -&gt; Float</code> provider instead of the value lets only <code>ProgressBar</code> react to every progress tick.</p>
+
+<h2 id="tools">Tools checklist</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Question</th><th>Tool</th></tr></thead>
+  <tbody>
+    <tr><td>Is scrolling janky?</td><td>Macrobenchmark <code>FrameTimingMetric</code>, Perfetto trace</td></tr>
+    <tr><td>What recomposes too often?</td><td>Layout Inspector recomposition counts and highlighting</td></tr>
+    <tr><td>Which classes are unstable?</td><td>Compose compiler stability reports</td></tr>
+    <tr><td>Is startup slow?</td><td>Macrobenchmark <code>StartupTimingMetric</code>, Baseline Profile comparison</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">Typical fixes in the wild</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Feed jank</h3><p>Missing keys, large images and formatting in item bodies. Fixed with keys, sized images and preformatted UI models.</p></div>
+  <div class="card usecase"><h3>Collapsing toolbar stutter</h3><p>Scroll offset read in composition. Fixed with lambda <code>offset</code> and <code>graphicsLayer</code>.</p></div>
+  <div class="card usecase"><h3>Whole screen recomposes per keystroke</h3><p>Text state hoisted too high and read at the root. Fixed by narrowing reads to the field and the components that need them.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Optimising stability everywhere before measuring.</li>
+  <li>Backwards writes: writing state that was already read in the same composition, which triggers recomposition loops.</li>
+  <li>Using <code>derivedStateOf</code> for cheap derivations that change as often as their inputs.</li>
+  <li>Testing on a debug build and concluding Compose is slow.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is recomposition itself bad?</summary><div><p>No. It's how Compose works. Excessive recomposition of large subtrees on every frame is the problem.</p></div></details>
+  <details><summary>Do I need @Stable and @Immutable everywhere?</summary><div><p>No. With strong skipping and immutable data classes, most code needs no annotations. Use them deliberately where reports show a hot-path problem.</p></div></details>
+  <details><summary>How much do Baseline Profiles help Compose?</summary><div><p>They often noticeably improve startup and first-scroll smoothness because Compose code is large. Measure the gain with Macrobenchmark in your own app.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Fast Compose comes from <strong>measuring release builds</strong>, <strong>reading fast-changing state late</strong>, <strong>keeping composition cheap</strong>, <strong>tuning lazy lists</strong> and fixing stability <strong>where it matters</strong>. Baseline Profiles and Macrobenchmark prove the improvement.</p>
+<p>Next step: build components Compose doesn't ship with in <a href="../compose-custom-layouts-drawing/index.html">Custom Layouts and Drawing in Compose</a>.</p>

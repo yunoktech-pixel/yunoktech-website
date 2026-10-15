@@ -1,0 +1,240 @@
+<!--meta
+{
+  "seo_title": "Android App Performance Optimization Guide (2026)",
+  "description": "Make Android apps faster with a measure-first workflow: startup, Baseline Profiles, Compose jank, memory leaks, ANRs, battery and app size, with Macrobenchmark code.",
+  "primary_keyword": "android app performance optimization",
+  "keywords": ["android startup time", "baseline profiles", "macrobenchmark android", "jetpack compose performance", "android jank", "android memory leaks", "android vitals anr", "r8 app size"],
+  "intent": "Informational / problem solving",
+  "lede": "Performance work fails when it starts with guesses. This guide gives you a measure-first workflow and the highest-impact fixes for startup time, scrolling jank, memory, ANRs, battery and app size, with the Jetpack tools that prove the improvement.",
+  "date": "2026-10-14",
+  "cta": "performance",
+  "related": ["clean-architecture-android", "jetpack-compose-vs-xml", "kotlin-coroutines-flow-android", "mvi-vs-mvvm-android"],
+  "refs": [
+    ["App performance guide", "https://developer.android.com/topic/performance/overview"],
+    ["App startup time", "https://developer.android.com/topic/performance/vitals/launch-time"],
+    ["Baseline Profiles overview", "https://developer.android.com/topic/performance/baselineprofiles/overview"],
+    ["Macrobenchmark", "https://developer.android.com/topic/performance/benchmarking/macrobenchmark-overview"],
+    ["Compose performance", "https://developer.android.com/develop/ui/compose/performance"],
+    ["Android vitals", "https://developer.android.com/topic/performance/vitals"],
+    ["Shrink, obfuscate and optimize your app (R8)", "https://developer.android.com/build/shrink-code"]
+  ]
+}
+-->
+<p class="ad-lead">Users rarely say "this app has a 1.8-second cold start and drops frames in the feed". They say "it feels slow", and some of them uninstall. Performance is a feature, and for Android apps that run on everything from flagship phones to budget devices it's one of the hardest to get right.</p>
+<p>This guide is for Android developers who want a systematic approach rather than a list of random tips. It covers the measure-first workflow, the tools for each problem, and the fixes with the biggest real-world impact across startup, rendering, memory, responsiveness, battery and size.</p>
+
+<h2 id="workflow">The workflow: measure, fix, verify</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-perf-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-perf-title fig-perf-desc">
+    <title id="fig-perf-title">Performance optimisation loop</title>
+    <desc id="fig-perf-desc">A loop of four steps: observe real-world data in Android vitals and Crashlytics; reproduce and measure with Macrobenchmark on a release build; profile with Perfetto or Android Studio Profiler to find the cause; fix and verify with the same benchmark, then guard against regressions in CI.</desc>
+    <defs><marker id="o1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M166 70 H194 M346 70 H374 M526 70 H554" marker-end="url(#o1)"/>
+    <path class="d-dash" d="M630 100 V160 H90 V104" marker-end="url(#o1)"/><text class="d-s" x="360" y="180" text-anchor="middle">repeat · add the benchmark to CI to catch regressions</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="16" y="40" width="150" height="60" rx="12"/><text class="d-t" x="91" y="64" text-anchor="middle">1. Observe</text><text class="d-s" x="91" y="84" text-anchor="middle">Android vitals</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="198" y="40" width="148" height="60" rx="12"/><text class="d-t" x="272" y="64" text-anchor="middle">2. Measure</text><text class="d-s" x="272" y="84" text-anchor="middle">Macrobenchmark</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="378" y="40" width="148" height="60" rx="12"/><text class="d-t" x="452" y="64" text-anchor="middle">3. Profile</text><text class="d-s" x="452" y="84" text-anchor="middle">Perfetto / Profiler</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="558" y="40" width="148" height="60" rx="12"/><text class="d-t" x="632" y="64" text-anchor="middle">4. Fix + verify</text><text class="d-s" x="632" y="84" text-anchor="middle">same benchmark</text></g>
+  </svg>
+  <figcaption id="fig-perf-cap">Never optimise without a number before and after. Measure release-like builds on a real, ideally mid-range, device.</figcaption>
+</figure>
+<div class="warn"><b>Don't measure debug builds</b>
+<p>Debug builds disable R8 optimisations and add debugging overhead. Jetpack Compose in particular runs noticeably slower in debug. Benchmark a release-like (minified, non-debuggable) build type.</p></div>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Problem</th><th>Field signal</th><th>Lab tool</th></tr></thead>
+  <tbody>
+    <tr><td>Slow startup</td><td>Android vitals startup metrics</td><td>Macrobenchmark <code>StartupTimingMetric</code>, Perfetto</td></tr>
+    <tr><td>Janky scrolling and animation</td><td>Vitals rendering metrics, JankStats</td><td>Macrobenchmark <code>FrameTimingMetric</code>, Profiler</td></tr>
+    <tr><td>ANRs</td><td>Vitals ANR rate (a core vital)</td><td>StrictMode, Perfetto main-thread traces</td></tr>
+    <tr><td>Memory leaks and OOM</td><td>Crash reports (OutOfMemoryError)</td><td>LeakCanary, Memory Profiler, heap dumps</td></tr>
+    <tr><td>Battery drain</td><td>Vitals (excessive wake locks, background work)</td><td>Power Profiler, Background Task Inspector</td></tr>
+    <tr><td>Large download size</td><td>Play Console size reports</td><td>APK Analyzer, R8 configuration</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="startup">1. Startup time</h2>
+<p>Startup is the first impression, and it compounds because users open apps many times a day. Android distinguishes <strong>cold</strong> starts (process created from scratch), <strong>warm</strong> starts and <strong>hot</strong> starts. Cold start matters most, and it is where most improvements come from.</p>
+<h3 id="measure-startup">Measure it with Macrobenchmark</h3>
+<code-block lang="kotlin" file="benchmark/src/main/java/.../StartupBenchmark.kt">
+@RunWith(AndroidJUnit4::class)
+class StartupBenchmark {
+    @get:Rule val benchmarkRule = MacrobenchmarkRule()
+
+    @Test fun coldStartNoCompilation() = startup(CompilationMode.None())
+    @Test fun coldStartWithBaselineProfile() = startup(CompilationMode.Partial())
+
+    private fun startup(mode: CompilationMode) = benchmarkRule.measureRepeated(
+        packageName = "com.example.app",
+        metrics = listOf(StartupTimingMetric()),
+        compilationMode = mode,
+        startupMode = StartupMode.COLD,
+        iterations = 10,
+    ) {
+        pressHome()
+        startActivityAndWait()
+    }
+}
+</code-block>
+<h3 id="fix-startup">The highest-impact startup fixes</h3>
+<ol class="steps">
+  <li><strong>Do less in <code>Application.onCreate()</code>.</strong> Initialise SDKs lazily or after the first frame. Analytics, remote config and image loaders rarely need to block startup.</li>
+  <li><strong>Add Baseline Profiles</strong> (next section). They help the runtime pre-compile critical code paths and are one of the most effective startup and jank improvements.</li>
+  <li><strong>Avoid disk and network on the main thread</strong> during startup: no synchronous SharedPreferences reads of large files, no database queries before the first frame.</li>
+  <li><strong>Keep the first screen light.</strong> Show cached content or a skeleton quickly, then load the rest.</li>
+  <li><strong>Use the SplashScreen API properly</strong>, and don't extend the splash artificially to hide slow initialisation.</li>
+</ol>
+<code-block lang="kotlin" file="Lazy SDK initialisation with Hilt">
+class App : Application() {
+    @Inject lateinit var analytics: dagger.Lazy<Analytics>   // created on first use, not at startup
+
+    override fun onCreate() {
+        super.onCreate()
+        // Defer non-critical work until after the first frame is drawn.
+        Handler(Looper.getMainLooper()).post {
+            ProcessLifecycleOwner.get().lifecycleScope.launch(Dispatchers.Default) {
+                analytics.get().initialize()
+            }
+        }
+    }
+}
+</code-block>
+
+<h2 id="baseline-profiles">2. Baseline Profiles</h2>
+<p>Android Runtime (ART) uses just-in-time compilation and profile-guided ahead-of-time compilation. A <strong>Baseline Profile</strong> ships a list of the classes and methods your critical user journeys need, so they're compiled ahead of time from the first launch instead of being interpreted. Android's documentation reports meaningful improvements in startup and rendering. Measure the gain in your own app with the benchmark above (<code>None</code> vs <code>Partial</code>).</p>
+<code-block lang="kotlin" file="baselineprofile/src/main/java/.../BaselineProfileGenerator.kt">
+@RunWith(AndroidJUnit4::class)
+class BaselineProfileGenerator {
+    @get:Rule val rule = BaselineProfileRule()
+
+    @Test
+    fun generate() = rule.collect(packageName = "com.example.app") {
+        // Critical user journey: launch, then scroll the main feed.
+        pressHome()
+        startActivityAndWait()
+        device.findObject(By.res("feed_list"))?.fling(Direction.DOWN)
+        device.waitForIdle()
+    }
+}
+</code-block>
+<p>Android Studio includes a <em>Baseline Profile Generator</em> module template that sets up the module and the Baseline Profile Gradle plugin for you. Generate the profile on a device or emulator, then commit the generated file.</p>
+<div class="tip"><b>Compose testTag to resource ID</b>
+<p>For UI Automator to find composables with <code>By.res(...)</code>, set <code>Modifier.semantics { testTagsAsResourceId = true }</code> near the root and add <code>Modifier.testTag("feed_list")</code> to the list.</p></div>
+
+<h2 id="rendering">3. Rendering and jank</h2>
+<p>To render smoothly at 60 Hz, each frame must be produced in about 16 ms, and less on 90 or 120 Hz displays. Dropped frames show up as jank during scrolling and animation.</p>
+<h3 id="compose-jank">Compose-specific fixes</h3>
+<code-block lang="kotlin" file="Compose performance patterns">
+// 1. Stable keys and content types in lazy lists
+LazyColumn {
+    items(items = posts, key = { it.id }, contentType = { it.type }) { post -> PostRow(post) }
+}
+
+// 2. Defer reads of fast-changing state to the layout/draw phase with lambda modifiers
+Box(Modifier.offset { IntOffset(0, scrollState.value / 2) })      // ✅ no recomposition per pixel
+// Box(Modifier.offset(y = (scrollState.value / 2).dp))             // ❌ recomposes every scroll frame
+
+// 3. derivedStateOf when a calculation changes less often than its inputs
+val showScrollToTop by remember { derivedStateOf { listState.firstVisibleItemIndex > 5 } }
+
+// 4. Remember expensive calculations
+val sorted = remember(posts) { posts.sortedByDescending { it.score } }
+</code-block>
+<ul>
+  <li><strong>Prefer immutable, stable parameters</strong> (data classes with <code>val</code>s, immutable collections) so Compose can skip recomposing unchanged items. Use the Compose compiler reports to find unstable classes.</li>
+  <li><strong>Use Layout Inspector's recomposition counts</strong> to find composables that recompose more than expected.</li>
+  <li><strong>Load images at display size</strong> with an image library such as Coil or Glide, never full-resolution bitmaps into thumbnails.</li>
+</ul>
+<h3 id="view-jank">View-system fixes</h3>
+<ul>
+  <li>Flatten deep layouts (for example with ConstraintLayout) and avoid nested weights.</li>
+  <li>Use <code>DiffUtil</code> / <code>ListAdapter</code> and avoid <code>notifyDataSetChanged()</code>.</li>
+  <li>Never bind expensive work in <code>onBindViewHolder</code>.</li>
+</ul>
+
+<h2 id="anr">4. Responsiveness and ANRs</h2>
+<p>An ANR happens when the main thread is blocked for too long, for example for about five seconds while handling input. ANR rate is one of Google Play's <strong>core vitals</strong>, and exceeding Play's bad-behaviour thresholds can affect your app's visibility. The usual causes are I/O, locks or heavy computation on the main thread.</p>
+<code-block lang="kotlin" file="Catch main-thread I/O early with StrictMode (debug only)">
+class App : Application() {
+    override fun onCreate() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .build()
+            )
+        }
+        super.onCreate()
+    }
+}
+</code-block>
+<p>The fix is almost always to move the work off the main thread with coroutines (<code>withContext(Dispatchers.IO)</code> or <code>Dispatchers.Default</code>), and to avoid <code>runBlocking</code> in app code. See <a href="../kotlin-coroutines-flow-android/index.html">Kotlin Coroutines and Flow Explained</a>.</p>
+
+<h2 id="memory">5. Memory</h2>
+<ul>
+  <li><strong>Find leaks with LeakCanary</strong> in debug builds. Common culprits are Activities captured by long-lived objects, unregistered listeners, and Views held by Fragments after <code>onDestroyView</code>.</li>
+  <li><strong>Never hold a <code>Context</code>, View or Activity in a ViewModel or singleton.</strong> Use the application context when you truly need one.</li>
+  <li><strong>Bitmaps are the biggest memory consumer</strong> in most apps. Downsample to display size, and let image libraries manage caching.</li>
+  <li><strong>Respond to <code>onTrimMemory</code></strong> by clearing caches when the system is under pressure.</li>
+</ul>
+
+<h2 id="battery-network">6. Battery and network</h2>
+<ul>
+  <li>Use <strong>WorkManager</strong> with constraints (unmetered network, charging) for deferrable background work, instead of custom wake locks and alarms.</li>
+  <li><strong>Batch and cache network requests.</strong> Every radio wake-up costs battery. Use HTTP caching and avoid polling. Prefer push (FCM) for updates.</li>
+  <li><strong>Stop location and sensor updates</strong> when the screen isn't visible, using lifecycle-aware collection.</li>
+</ul>
+
+<h2 id="size">7. App size</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+android {
+    buildTypes {
+        release {
+            isMinifyEnabled = true          // R8: shrink, optimise, obfuscate code
+            isShrinkResources = true        // remove unused resources
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+}
+</code-block>
+<ul>
+  <li>Publish an <strong>Android App Bundle</strong> so Google Play delivers only the code and resources each device needs.</li>
+  <li>Inspect the output with the <strong>APK Analyzer</strong>. Large native libraries, unused fonts and uncompressed images are common surprises.</li>
+  <li>Prefer vector drawables and WebP or AVIF images where appropriate. Remove unused dependencies.</li>
+</ul>
+
+<h2 id="use-cases">Real-world scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Slow cold start after adding SDKs</h3><dl><dt>Diagnosis</dt><dd>A Perfetto trace shows several SDK initialisers in <code>Application.onCreate()</code>.</dd><dt>Fix</dt><dd>Lazy and deferred initialisation, plus a Baseline Profile for the launch journey.</dd><dt>Verify</dt><dd>The StartupBenchmark median improves and stays stable in CI.</dd></dl></div>
+  <div class="card usecase"><h3>Janky feed in Compose</h3><dl><dt>Diagnosis</dt><dd>Recomposition counts show every row recomposing on scroll; an unstable <code>List</code> parameter.</dd><dt>Fix</dt><dd>Stable keys, an immutable UI model, deferred state reads, and properly sized images.</dd><dt>Verify</dt><dd><code>FrameTimingMetric</code> shows fewer slow frames.</dd></dl></div>
+  <div class="card usecase"><h3>ANR spike after a release</h3><dl><dt>Diagnosis</dt><dd>Vitals ANR clusters point to a synchronous database read in a click handler.</dd><dt>Fix</dt><dd>Move the read to a suspend function and show a loading state.</dd><dt>Verify</dt><dd>StrictMode stays clean; the ANR rate falls in the next release.</dd></dl></div>
+</div>
+
+<h2 id="checklist">Performance checklist</h2>
+<ul>
+  <li>☐ Startup and scroll Macrobenchmarks exist and run on release-like builds</li>
+  <li>☐ Baseline Profile generated for critical journeys and committed</li>
+  <li>☐ No SDK initialisation that isn't needed for the first frame</li>
+  <li>☐ StrictMode enabled in debug; no main-thread disk or network</li>
+  <li>☐ LeakCanary in debug builds; no known leaks</li>
+  <li>☐ Lazy lists use stable keys; images loaded at display size</li>
+  <li>☐ R8 and resource shrinking enabled; App Bundle published</li>
+  <li>☐ Android vitals reviewed after every release</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What is a good cold start time?</summary><div><p>Faster is better, and Android vitals flags startups it considers excessive. Rather than chase a universal number, measure your current median on a mid-range device, set a target, and prevent regressions in CI.</p></div></details>
+  <details><summary>Do Baseline Profiles work for all users?</summary><div><p>They're delivered with your app through Google Play and applied by the Android Runtime on supported Android versions. Android's documentation lists the details. Measure the impact with Macrobenchmark using different compilation modes.</p></div></details>
+  <details><summary>Is Jetpack Compose slower than Views?</summary><div><p>Not inherently. Both can be fast or slow. Compose performance depends heavily on state handling and stability, and must be judged on release builds, ideally with Baseline Profiles.</p></div></details>
+  <details><summary>Should I add a performance-monitoring SDK?</summary><div><p>Android vitals and Crashlytics cover the essentials for many apps. Additional monitoring can help, but every SDK has its own startup and size cost, so measure it.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android performance work is a loop: <strong>observe field data, measure with Macrobenchmark, profile to find the cause, fix, and verify with the same benchmark</strong>. The highest-impact fixes are usually the same few: less work at startup, Baseline Profiles, nothing blocking the main thread, stable Compose state, sensibly sized images, and R8 for size.</p>
+<p>Next step: add the <code>StartupBenchmark</code> above to your project today and record your baseline number. Every optimisation after that becomes measurable. For the architecture that makes these fixes easier, read <a href="../clean-architecture-android/index.html">Clean Architecture in Android</a>.</p>

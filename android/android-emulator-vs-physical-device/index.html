@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Emulator vs Physical Device for Development | Yunok Tech</title>
+  <meta name="description" content="Emulator or real phone for Android development? Compare speed, accuracy, hardware, performance testing and cost, with setup tips, adb commands and a practical testing strategy.">
+  <meta name="keywords" content="android emulator vs physical device, android emulator vs real device, test android app on phone, wireless debugging android, android virtual device, firebase test lab, device testing strategy android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-emulator-vs-physical-device/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-emulator-vs-physical-device/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Android Emulator vs Physical Device for Development">
+  <meta property="og:description" content="Emulator or real phone for Android development? Compare speed, accuracy, hardware, performance testing and cost, with setup tips, adb commands and a practical testing strategy.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Development for Beginners">
+  <meta name="twitter:title" content="Android Emulator vs Physical Device for Development">
+  <meta name="twitter:description" content="Emulator or real phone for Android development? Compare speed, accuracy, hardware, performance testing and cost, with setup tips, adb commands and a practical testing strategy.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Android Emulator vs Physical Device for Development", "description": "Emulator or real phone for Android development? Compare speed, accuracy, hardware, performance testing and cost, with setup tips, adb commands and a practical testing strategy.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android Development for Beginners", "keywords": "android emulator vs real device, test android app on phone, wireless debugging android, android virtual device, firebase test lab, device testing strategy android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-emulator-vs-physical-device/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Android Emulator vs Physical Device for Development", "item": "https://yunoktech.com/android/android-emulator-vs-physical-device/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#beginners">Android Development for Beginners</a></nav>
+    <span class="ad-chip">🌱 Android Development for Beginners</span>
+    <h1 id="article-title">Android Emulator vs Physical Device for Development</h1>
+    <p class="ad-lede">The emulator is convenient and free; a real phone is honest. Each catches bugs the other misses. Here's what each is good for, where each misleads you, and a practical strategy that uses both.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>4 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#comparison">Side-by-side comparison</a></li><li><a href="#emulator-strengths">Where the emulator shines</a></li><li><a href="#device-strengths">Where a real device is essential</a></li><li><a href="#wireless">Debugging a phone without a cable</a></li><li><a href="#use-cases">Real scenarios</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Your app runs perfectly on the emulator. Then a user on a mid-range phone reports that the camera screen crashes, scrolling stutters, and a notification never arrived. The emulator didn't lie, exactly. It just isn't a phone.</p>
+<p>This guide compares the Android Emulator and physical devices honestly, explains what each is best at, and gives you a testing strategy that fits a student budget as well as a professional team.</p>
+
+<h2 id="comparison">Side-by-side comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Emulator</th><th>Physical device</th></tr></thead>
+  <tbody>
+    <tr><td>Cost</td><td>Free; unlimited configurations</td><td>You need to own or borrow devices</td></tr>
+    <tr><td>Setup</td><td>Create an AVD in Device Manager</td><td>Enable Developer options and USB or wireless debugging</td></tr>
+    <tr><td>Screen sizes and API levels</td><td>Any size, foldables, tablets, old and new Android versions</td><td>Only what you have</td></tr>
+    <tr><td>Performance realism</td><td>Not representative; runs on your PC's CPU and GPU</td><td>Realistic for that device class</td></tr>
+    <tr><td>Hardware</td><td>Simulated sensors, location, camera and network</td><td>Real camera, GPS, Bluetooth, NFC, biometrics, thermals</td></tr>
+    <tr><td>Manufacturer behaviour</td><td>Mostly stock Android</td><td>Real OEM skins, battery optimisations, permission quirks</td></tr>
+    <tr><td>Resource usage on your PC</td><td>High (RAM, CPU)</td><td>Low</td></tr>
+    <tr><td>Automation and CI</td><td>Excellent (Gradle Managed Devices, headless)</td><td>Requires device labs or cloud services</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="emulator-strengths">Where the emulator shines</h2>
+<ul>
+  <li><strong>Configuration coverage:</strong> test your <code>minSdk</code>, the latest Android version, small phones, tablets and foldables without buying anything.</li>
+  <li><strong>Controlled conditions:</strong> set GPS routes, network speed and latency, battery level, dark mode and font scale from Extended Controls.</li>
+  <li><strong>Snapshots:</strong> resume in seconds from a saved state.</li>
+  <li><strong>Automation:</strong> run instrumented tests on Gradle Managed Devices in CI.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">Useful adb commands against the emulator</span><span class="lang">Shell</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-bash">adb emu geo fix <span class="tk-n">76.7794</span> <span class="tk-n">30.7333</span>          <span class="tk-c"># set GPS location (longitude latitude)</span>
+adb shell cmd uimode night yes           <span class="tk-c"># switch to dark mode</span>
+adb shell settings put system font_scale <span class="tk-n">1.3</span>   <span class="tk-c"># test large text</span>
+adb shell am kill com.example.app        <span class="tk-c"># simulate process death (app in background)</span></code></pre></figure>
+
+<h2 id="device-strengths">Where a real device is essential</h2>
+<ul>
+  <li><strong>Performance and jank:</strong> judge scrolling, startup and animation only on real hardware, ideally mid-range.</li>
+  <li><strong>Camera, Bluetooth, NFC, biometrics and sensors:</strong> emulated versions are approximations.</li>
+  <li><strong>Battery and background behaviour:</strong> manufacturer battery optimisations can delay or block background work and notifications.</li>
+  <li><strong>Touch and ergonomics:</strong> tap target sizes and gesture navigation feel different under a real thumb.</li>
+  <li><strong>On-device AI features:</strong> Gemini Nano runs only on supported physical devices. See <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI</a>.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-test-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-test-t fig-test-d">
+    <title id="fig-test-t">A layered device testing strategy</title>
+    <desc id="fig-test-d">Daily development on one fast emulator or your own phone. Before merging, run tests on emulators for minSdk, latest Android and a tablet. Before release, run on two or three real devices including a mid-range phone, plus optional cloud device testing.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="20" width="210" height="150" rx="14"/><text class="d-t" x="125" y="48" text-anchor="middle">Daily coding</text><text class="d-s" x="125" y="78" text-anchor="middle">1 emulator or your phone</text><text class="d-s" x="125" y="98" text-anchor="middle">fast run/debug loop</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="255" y="20" width="210" height="150" rx="14"/><text class="d-t" x="360" y="48" text-anchor="middle">Before merging</text><text class="d-s" x="360" y="78" text-anchor="middle">emulators: minSdk, latest,</text><text class="d-s" x="360" y="98" text-anchor="middle">tablet/foldable, dark mode,</text><text class="d-s" x="360" y="118" text-anchor="middle">large font · CI tests</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="490" y="20" width="210" height="150" rx="14"/><text class="d-t" x="595" y="48" text-anchor="middle">Before release</text><text class="d-s" x="595" y="78" text-anchor="middle">2–3 real devices incl.</text><text class="d-s" x="595" y="98" text-anchor="middle">a mid-range phone ·</text><text class="d-s" x="595" y="118" text-anchor="middle">optional cloud device lab</text></g>
+  </svg>
+  <figcaption id="fig-test-cap">Use the cheap, fast option often and the realistic option at checkpoints.</figcaption>
+</figure>
+
+<h2 id="wireless">Debugging a phone without a cable</h2>
+<p>On Android 11 and later, <strong>Wireless debugging</strong> pairs your phone with Android Studio over Wi-Fi. Use <em>Pair Devices Using Wi-Fi</em> in the Device Manager and scan the QR code from Developer options on the phone. Both devices must be on the same network.</p>
+
+<h2 id="use-cases">Real scenarios</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Student with a modest laptop</h3><p>Use your own phone for daily runs to save RAM. Use one emulator occasionally to check a different screen size or Android version.</p></div>
+  <div class="card usecase"><h3>App with camera and maps</h3><p>Build the UI on the emulator, but validate camera capture, permissions and location accuracy on real devices before every release.</p></div>
+  <div class="card usecase"><h3>Team shipping weekly</h3><p>Instrumented tests on Gradle Managed Devices in CI, plus a small shelf of real devices (popular brands among your users), and cloud testing for wider coverage.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Emulator extremely slow:</strong> hardware acceleration is off. Follow Google's emulator acceleration guide.</li>
+  <li><strong>Phone shows "unauthorized" in <code>adb devices</code>:</strong> unlock it and accept the debugging prompt. Revoke and re-accept if needed.</li>
+  <li><strong>Notifications or background work behave differently on a real phone:</strong> check the manufacturer's battery optimisation settings and test with the app excluded and included.</li>
+  <li><strong>App behaves differently on the emulator's x86/ARM image:</strong> native libraries may lack an ABI. Check the <code>lib/</code> folders in the APK Analyzer.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I publish an app tested only on the emulator?</summary><div><p>You can, but it's risky. At minimum, test on one real device before release, especially for performance, permissions and hardware features.</p></div></details>
+  <details><summary>Which real device should I buy for testing?</summary><div><p>A popular mid-range phone from a manufacturer common among your users. It reveals performance and OEM issues that a flagship hides.</p></div></details>
+  <details><summary>Is the emulator good enough for Compose previews?</summary><div><p>You don't need either for previews, which render in Android Studio. Use the emulator or a device for interaction, animation and real data.</p></div></details>
+  <details><summary>What are Gradle Managed Devices?</summary><div><p>Emulator definitions in your Gradle build that Gradle can create, run tests on and tear down automatically, which makes them ideal for CI.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use the <strong>emulator for coverage and speed</strong> (many Android versions, screen sizes and conditions, plus automation) and <strong>real devices for truth</strong> (performance, hardware, battery and manufacturer behaviour). A layered strategy gives you both without a big budget.</p>
+<p>Next step: create two AVDs, one at your <code>minSdk</code> and one at the latest Android version, then <a href="../build-first-android-app/index.html">build your first app</a> and run it on both plus your own phone.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/studio/run/emulator" target="_blank" rel="noopener">Run apps on the Android Emulator</a></li><li><a href="https://developer.android.com/studio/run/device" target="_blank" rel="noopener">Run apps on a hardware device</a></li><li><a href="https://developer.android.com/tools/adb" target="_blank" rel="noopener">Android Debug Bridge (adb)</a></li><li><a href="https://firebase.google.com/docs/test-lab" target="_blank" rel="noopener">Firebase Test Lab</a></li><li><a href="https://developer.android.com/studio/test/gradle-managed-devices" target="_blank" rel="noopener">Gradle Managed Devices</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-emulator-vs-physical-device-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-emulator-vs-physical-device-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/setup-android-studio/index.html"><small>Android Development for Beginners</small>How to Set Up Android Studio Step by Step</a></li><li><a href="../../android/build-first-android-app/index.html"><small>Android Development for Beginners</small>How to Build Your First Android App</a></li><li><a href="../../android/android-app-performance-optimization/index.html"><small>Testing, Debugging, and Performance</small>Android App Performance Optimization Guide</a></li><li><a href="../../android/compose-adaptive-ui-tablets-foldables/index.html"><small>Jetpack Compose</small>Adaptive UI for Tablets and Foldable Devices</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-emulator-vs-physical-device/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-emulator-vs-physical-device/&amp;text=Android Emulator vs Physical Device for Development" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-emulator-vs-physical-device/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#comparison">Side-by-side comparison</a></li><li><a href="#emulator-strengths">Where the emulator shines</a></li><li><a href="#device-strengths">Where a real device is essential</a></li><li><a href="#wireless">Debugging a phone without a cable</a></li><li><a href="#use-cases">Real scenarios</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-emulator-vs-physical-device-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-emulator-vs-physical-device-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

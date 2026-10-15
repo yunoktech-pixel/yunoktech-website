@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSockets vs REST APIs in Android: When to Use Each | Yunok Tech</title>
+  <meta name="description" content="WebSockets vs REST for Android apps: request-response vs persistent connections, battery and lifecycle impact, reconnection, OkHttp WebSocket as a Flow, and alternatives like FCM and SSE.">
+  <meta name="keywords" content="websockets vs rest android, okhttp websocket kotlin, real time android app, websocket reconnect backoff, server sent events android, polling vs websocket mobile, websocket flow kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/websockets-vs-rest-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/websockets-vs-rest-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="WebSockets vs REST APIs in Android: When to Use Each">
+  <meta property="og:description" content="WebSockets vs REST for Android apps: request-response vs persistent connections, battery and lifecycle impact, reconnection, OkHttp WebSocket as a Flow, and alternatives like FCM and SSE.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="WebSockets vs REST APIs in Android: When to Use Each">
+  <meta name="twitter:description" content="WebSockets vs REST for Android apps: request-response vs persistent connections, battery and lifecycle impact, reconnection, OkHttp WebSocket as a Flow, and alternatives like FCM and SSE.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "WebSockets vs REST APIs in Android", "description": "WebSockets vs REST for Android apps: request-response vs persistent connections, battery and lifecycle impact, reconnection, OkHttp WebSocket as a Flow, and alternatives like FCM and SSE.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "okhttp websocket kotlin, real time android app, websocket reconnect backoff, server sent events android, polling vs websocket mobile, websocket flow kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/websockets-vs-rest-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "WebSockets vs REST APIs in Android", "item": "https://yunoktech.com/android/websockets-vs-rest-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">WebSockets vs REST APIs in Android</h1>
+    <p class="ad-lede">REST is request and response: the app asks, the server answers. WebSockets keep a connection open so the server can push data instantly. Real-time sounds great until you consider battery, lifecycle and flaky mobile networks. Here's how to choose, and how to implement WebSockets robustly.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#models">The communication models</a></li><li><a href="#comparison">Comparison</a></li><li><a href="#mobile-realities">Mobile realities</a></li><li><a href="#implementation">OkHttp WebSocket as a Flow</a></li><li><a href="#viewmodel">Lifecycle-aware usage</a></li><li><a href="#use-cases">Real-world combinations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A chat app, a live delivery tracker, a trading dashboard and a news app all show "fresh" data, but each needs a different freshness, and freshness has a price on mobile. Choosing between REST, WebSockets and push is about how fast updates must arrive and what you're willing to spend in battery and complexity.</p>
+
+<h2 id="models">The communication models</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ws2-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-ws2-t fig-ws2-d">
+    <title id="fig-ws2-t">REST polling compared with a WebSocket connection</title>
+    <desc id="fig-ws2-d">Top: with REST, the client sends a request and gets a response; to get updates it polls repeatedly, many requests return nothing new. Bottom: with a WebSocket, after one handshake the connection stays open and either side can send messages at any time.</desc>
+    <text class="d-t" x="20" y="22">REST (request → response, polling for updates)</text>
+    <rect class="d-blue" x="20" y="34" width="90" height="70" rx="10"/><text class="d-t" x="65" y="74" text-anchor="middle">App</text>
+    <rect class="d-amber" x="610" y="34" width="90" height="70" rx="10"/><text class="d-t" x="655" y="74" text-anchor="middle">Server</text>
+    <path class="d-line" d="M110 46 H606 M606 58 H114 M110 80 H606 M606 92 H114"/>
+    <text class="d-s" x="360" y="42" text-anchor="middle">GET /messages?since=…  (nothing new)</text>
+    <text class="d-s" x="360" y="76" text-anchor="middle">GET again after 10 s</text>
+    <text class="d-t" x="20" y="140">WebSocket (one connection, both directions)</text>
+    <rect class="d-blue" x="20" y="152" width="90" height="70" rx="10"/><text class="d-t" x="65" y="192" text-anchor="middle">App</text>
+    <rect class="d-amber" x="610" y="152" width="90" height="70" rx="10"/><text class="d-t" x="655" y="192" text-anchor="middle">Server</text>
+    <rect class="d-green" x="114" y="178" width="492" height="18" rx="9"/><text class="d-s" x="360" y="191" text-anchor="middle">persistent connection: messages pushed instantly, either way</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M600 187 H120');--dur:1.4s"/>
+  </svg>
+  <figcaption id="fig-ws2-cap">Polling wastes requests when nothing changes. A WebSocket is efficient while open, but keeping it open has costs on mobile.</figcaption>
+</figure>
+
+<h2 id="comparison">Comparison</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Best fit</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Load data when a screen opens</td><td>REST</td><td>Simple, cacheable, stateless</td></tr>
+    <tr><td>Instant two-way updates while a screen is open (chat, live collaboration)</td><td>WebSocket</td><td>Low latency in both directions</td></tr>
+    <tr><td>One-way live updates while open (scores, prices)</td><td>WebSocket or Server-Sent Events</td><td>Server push without polling</td></tr>
+    <tr><td>Alert users when the app is closed</td><td>FCM push</td><td>System-managed, battery-friendly delivery</td></tr>
+    <tr><td>Data that changes every few minutes</td><td>REST with refresh on screen open or periodic sync</td><td>A persistent connection isn't worth the cost</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mobile-realities">Mobile realities</h2>
+<ul>
+  <li><strong>Battery:</strong> keeping a radio active drains battery. Keep WebSockets open only while the relevant UI is visible.</li>
+  <li><strong>Background limits:</strong> Android restricts background network and execution, so you can't rely on a background WebSocket. Use FCM to wake the app.</li>
+  <li><strong>Network changes:</strong> moving between Wi-Fi and mobile data drops connections. Reconnection with backoff is mandatory.</li>
+  <li><strong>Missed messages:</strong> after reconnecting, fetch what you missed via REST (for example with <code>since=lastEventId</code>).</li>
+</ul>
+
+<h2 id="implementation">OkHttp WebSocket as a Flow</h2>
+<figure class="code"><figcaption><span class="file">LiveUpdates.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SocketEvent</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Connected</span> : <span class="tk-t">SocketEvent</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Message</span>(<span class="tk-k">val</span> text: <span class="tk-t">String</span>) : <span class="tk-t">SocketEvent</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Closed</span>(<span class="tk-k">val</span> reason: <span class="tk-t">String</span>) : <span class="tk-t">SocketEvent</span>
+}
+
+<span class="tk-k">fun</span> <span class="tk-t">OkHttpClient</span>.webSocketFlow(url: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">SocketEvent</span>&gt; = callbackFlow {
+    <span class="tk-k">val</span> socket = newWebSocket(<span class="tk-t">Request</span>.<span class="tk-t">Builder</span>().url(url).build(), <span class="tk-k">object</span> : <span class="tk-t">WebSocketListener</span>() {
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> onOpen(webSocket: <span class="tk-t">WebSocket</span>, response: <span class="tk-t">Response</span>) { trySend(<span class="tk-t">SocketEvent</span>.<span class="tk-t">Connected</span>) }
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> onMessage(webSocket: <span class="tk-t">WebSocket</span>, text: <span class="tk-t">String</span>) { trySend(<span class="tk-t">SocketEvent</span>.<span class="tk-t">Message</span>(text)) }
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> onClosed(webSocket: <span class="tk-t">WebSocket</span>, code: <span class="tk-t">Int</span>, reason: <span class="tk-t">String</span>) {
+            trySend(<span class="tk-t">SocketEvent</span>.<span class="tk-t">Closed</span>(reason)); close()
+        }
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> onFailure(webSocket: <span class="tk-t">WebSocket</span>, t: <span class="tk-t">Throwable</span>, response: <span class="tk-t">Response</span>?) { close(t) }
+    })
+    awaitClose { socket.close(<span class="tk-n">1000</span>, <span class="tk-s">"Collector cancelled"</span>) }   <span class="tk-c">// closes when the screen stops collecting</span>
+}
+
+<span class="tk-c">/** Reconnect with capped exponential backoff while collected. */</span>
+<span class="tk-k">fun</span> <span class="tk-t">OkHttpClient</span>.resilientSocket(url: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">SocketEvent</span>&gt; =
+    webSocketFlow(url).retryWhen { cause, attempt -&gt;
+        <span class="tk-k">if</span> (cause <span class="tk-k">is</span> <span class="tk-t">IOException</span>) { delay(minOf(<span class="tk-n">30_000L</span>, <span class="tk-n">1_000L</span> shl attempt.toInt().coerceAtMost(<span class="tk-n">5</span>))); <span class="tk-k">true</span> }
+        <span class="tk-k">else</span> <span class="tk-k">false</span>
+    }</code></pre></figure>
+<p>Set a ping interval on the OkHttp client (<code>pingInterval(20, TimeUnit.SECONDS)</code>) so dead connections are detected.</p>
+
+<h2 id="viewmodel">Lifecycle-aware usage</h2>
+<figure class="code"><figcaption><span class="file">ChatViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ChatViewModel</span>(client: <span class="tk-t">OkHttpClient</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> repo: <span class="tk-t">ChatRepository</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">val</span> messages: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">ChatMessage</span>&gt;&gt; = client.resilientSocket(<span class="tk-s">"wss://chat.example.com/rooms/42"</span>)
+        .onEach { event -&gt;
+            <span class="tk-k">when</span> (event) {
+                <span class="tk-t">SocketEvent</span>.<span class="tk-t">Connected</span> -&gt; repo.syncMissed()                 <span class="tk-c">// REST catch-up after (re)connect</span>
+                <span class="tk-k">is</span> <span class="tk-t">SocketEvent</span>.<span class="tk-t">Message</span> -&gt; repo.saveIncoming(event.text)    <span class="tk-c">// persist; UI observes Room</span>
+                <span class="tk-k">is</span> <span class="tk-t">SocketEvent</span>.<span class="tk-t">Closed</span> -&gt; <span class="tk-t">Unit</span>
+            }
+        }
+        .flatMapLatest { repo.observeMessages() }
+        .stateIn(viewModelScope, <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>), emptyList())
+}</code></pre></figure>
+<p>With <code>WhileSubscribed</code>, the socket closes a few seconds after the screen stops collecting, which saves battery when the user leaves.</p>
+
+<h2 id="use-cases">Real-world combinations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Chat app</h3><p>WebSocket while the conversation is open, FCM for new messages when closed, and REST for history and catch-up.</p></div>
+  <div class="card usecase"><h3>Delivery tracking</h3><p>WebSocket or SSE for the live map while visible, and FCM for "driver arriving" when backgrounded.</p></div>
+  <div class="card usecase"><h3>News feed</h3><p>REST with pull-to-refresh and periodic WorkManager sync. Real-time sockets would add cost without benefit.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Keeping a WebSocket open in a background service "for real-time", which drains battery and fights OS limits.</li>
+  <li>No reconnection or catch-up logic, so messages are silently lost.</li>
+  <li>Unbounded reconnect loops without backoff during outages.</li>
+  <li>Sending auth tokens in query strings, which may end up in logs. Prefer headers or an initial auth message, as your server supports.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are WebSockets supported by Retrofit?</summary><div><p>No. Use OkHttp's WebSocket API directly, or Ktor's WebSocket client.</p></div></details>
+  <details><summary>What about gRPC streaming or MQTT?</summary><div><p>Both are valid for specific needs: gRPC for typed bidirectional streams with gRPC backends, and MQTT for IoT-style pub/sub. The same lifecycle and reconnection concerns apply.</p></div></details>
+  <details><summary>Is polling ever okay?</summary><div><p>Yes, for infrequent updates while a screen is open, with sensible intervals and stopping when the screen isn't visible.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>REST</strong> for most data, <strong>WebSockets</strong> for truly real-time, two-way features <em>while the UI is visible</em>, and <strong>FCM</strong> for anything that must reach users when the app is closed. Wrap sockets in lifecycle-aware Flows with backoff, and always catch up via REST after reconnecting.</p>
+<p>Next step: reduce network use further with <a href="../android-caching-strategies/index.html">Caching Strategies for Android Apps</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://github.com/square/okhttp" target="_blank" rel="noopener">OkHttp (WebSocket support): official repository</a></li><li><a href="https://developer.android.com/develop/connectivity/network-ops/network-access-optimization" target="_blank" rel="noopener">Optimize network access (battery)</a></li><li><a href="https://firebase.google.com/docs/cloud-messaging" target="_blank" rel="noopener">Firebase Cloud Messaging</a></li><li><a href="https://datatracker.ietf.org/doc/html/rfc6455" target="_blank" rel="noopener">The WebSocket Protocol (RFC 6455)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwebsockets-vs-rest-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwebsockets-vs-rest-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/rest-api-kotlin-coroutines/index.html"><small>APIs, Databases, and Backend Integration</small>REST API Integration with Kotlin and Coroutines</a></li><li><a href="../../android/firebase-cloud-messaging-push-notifications/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Cloud Messaging and Push Notifications</a></li><li><a href="../../android/android-battery-optimization/index.html"><small>Testing, Debugging, and Performance</small>Battery Optimization for Android Apps</a></li><li><a href="../../android/flow-vs-stateflow-vs-sharedflow/index.html"><small>Kotlin Programming</small>Flow vs StateFlow vs SharedFlow</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/websockets-vs-rest-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/websockets-vs-rest-android/&amp;text=WebSockets vs REST APIs in Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/websockets-vs-rest-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#models">The communication models</a></li><li><a href="#comparison">Comparison</a></li><li><a href="#mobile-realities">Mobile realities</a></li><li><a href="#implementation">OkHttp WebSocket as a Flow</a></li><li><a href="#viewmodel">Lifecycle-aware usage</a></li><li><a href="#use-cases">Real-world combinations</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwebsockets-vs-rest-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dwebsockets-vs-rest-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

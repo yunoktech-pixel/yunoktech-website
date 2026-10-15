@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrating Cloud AI APIs Securely in Android | Yunok Tech</title>
+  <meta name="description" content="Secure cloud AI in Android apps: never ship provider keys, Firebase AI Logic with App Check, backend proxy architecture, auth, per-user quotas, prompt hardening, logging and abuse protection.">
+  <meta name="keywords" content="secure ai api android, protect openai api key android, gemini api key security, ai backend proxy mobile, app check ai logic, rate limiting ai api, llm api abuse prevention">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/secure-cloud-ai-api-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/secure-cloud-ai-api-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Integrating Cloud AI APIs Securely in Android">
+  <meta property="og:description" content="Secure cloud AI in Android apps: never ship provider keys, Firebase AI Logic with App Check, backend proxy architecture, auth, per-user quotas, prompt hardening, logging and abuse protection.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Integrating Cloud AI APIs Securely in Android">
+  <meta name="twitter:description" content="Secure cloud AI in Android apps: never ship provider keys, Firebase AI Logic with App Check, backend proxy architecture, auth, per-user quotas, prompt hardening, logging and abuse protection.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Integrating Cloud AI APIs Securely in Android", "description": "Secure cloud AI in Android apps: never ship provider keys, Firebase AI Logic with App Check, backend proxy architecture, auth, per-user quotas, prompt hardening, logging and abuse protection.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android AI and Generative AI", "keywords": "protect openai api key android, gemini api key security, ai backend proxy mobile, app check ai logic, rate limiting ai api, llm api abuse prevention", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/secure-cloud-ai-api-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Integrating Cloud AI APIs Securely in Android", "item": "https://yunoktech.com/android/secure-cloud-ai-api-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Integrating Cloud AI APIs Securely in Android</h1>
+    <p class="ad-lede">A leaked AI API key can generate a large bill overnight, and an unprotected AI endpoint becomes free compute for abusers. This guide covers the secure architectures for calling cloud AI from Android: managed SDKs with App Check, or your own backend proxy, plus the controls both need.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architectures">Two secure architectures</a></li><li><a href="#option-a">Option A: Firebase AI Logic + App Check</a></li><li><a href="#option-b">Option B: your own backend proxy</a></li><li><a href="#controls">Controls checklist</a></li><li><a href="#client-side">Client-side hygiene</a></li><li><a href="#use-cases">Which option when</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Everything inside an APK can be extracted: strings, BuildConfig fields, native libraries, "obfuscated" constants. If your app holds a provider API key, assume someone will find it. Secure AI integration starts from that assumption.</p>
+
+<h2 id="architectures">Two secure architectures</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sa-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-sa-t fig-sa-d">
+    <title id="fig-sa-t">Secure ways to call cloud AI from Android</title>
+    <desc id="fig-sa-d">Option A: the app uses the Firebase AI Logic SDK, which attaches an App Check token; Firebase's proxy verifies it and calls Gemini with keys held server-side. Option B: the app calls your own backend with a user auth token and App Check or Play Integrity token; the backend authenticates, applies quotas and prompt rules, then calls any AI provider with keys stored in a secret manager. The insecure option of embedding a provider key in the APK is crossed out.</desc>
+    <defs><marker id="sam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">A. Managed SDK</text>
+    <rect class="d-blue" x="20" y="34" width="120" height="50" rx="10"/><text class="d-s" x="80" y="64" text-anchor="middle">App</text>
+    <path class="d-flow" d="M140 59 H196" marker-end="url(#sam)"/><text class="d-s" x="168" y="52" text-anchor="middle">App Check</text>
+    <rect class="d-amber" x="200" y="34" width="180" height="50" rx="10"/><text class="d-s" x="290" y="64" text-anchor="middle">Firebase AI Logic proxy</text>
+    <path class="d-flow" d="M380 59 H436" marker-end="url(#sam)"/>
+    <rect class="d-green" x="440" y="34" width="120" height="50" rx="10"/><text class="d-s" x="500" y="64" text-anchor="middle">Gemini</text>
+    <text class="d-t" x="20" y="122">B. Your backend</text>
+    <rect class="d-blue" x="20" y="134" width="120" height="50" rx="10"/><text class="d-s" x="80" y="164" text-anchor="middle">App</text>
+    <path class="d-flow" d="M140 159 H196" marker-end="url(#sam)"/><text class="d-s" x="168" y="150" text-anchor="middle">user token</text>
+    <rect class="d-violet" x="200" y="134" width="180" height="50" rx="10"/><text class="d-s" x="290" y="156" text-anchor="middle">Backend: auth, quotas,</text><text class="d-s" x="290" y="172" text-anchor="middle">prompts, logging</text>
+    <path class="d-flow" d="M380 159 H436" marker-end="url(#sam)"/><text class="d-s" x="408" y="150" text-anchor="middle">secret key</text>
+    <rect class="d-green" x="440" y="134" width="120" height="50" rx="10"/><text class="d-s" x="500" y="164" text-anchor="middle">Any provider</text>
+    <rect class="d-red" x="590" y="80" width="120" height="70" rx="10"/><text class="d-t" x="650" y="108" text-anchor="middle">✗ Key in APK</text><text class="d-s" x="650" y="128" text-anchor="middle">never</text>
+    <text class="d-s" x="300" y="226" text-anchor="middle">Both keep provider secrets off the device. B adds full control.</text>
+  </svg>
+  <figcaption id="fig-sa-cap">Choose A for speed with Gemini. Choose B when you need multiple providers, private data, tools or strict per-user policy.</figcaption>
+</figure>
+
+<h2 id="option-a">Option A: Firebase AI Logic + App Check</h2>
+<p>The SDK calls Gemini through Firebase's proxy. <strong>App Check</strong>, using Play Integrity on Android, attests that requests come from your genuine app on a genuine device, and Firebase documents enforcement for AI Logic from July 2026. Setup is in <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration</a>. Additional considerations:</p>
+<ul>
+  <li>App Check reduces abuse but isn't user authentication. A genuine app can still be scripted, so add per-user limits where it matters.</li>
+  <li>Consider limited-use App Check tokens for extra replay protection, if supported by your SDK version.</li>
+  <li>Monitor usage and set budget alerts in Google Cloud.</li>
+</ul>
+
+<h2 id="option-b">Option B: your own backend proxy</h2>
+<figure class="code"><figcaption><span class="file">Android: call your backend, not the provider</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">AssistantApi</span> {
+    <span class="tk-a">@POST</span>(<span class="tk-s">"v1/assistant/reply"</span>)
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> reply(<span class="tk-a">@Body</span> body: <span class="tk-t">AssistantRequest</span>): <span class="tk-t">AssistantResponse</span>
+}
+
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">AssistantRequest</span>(<span class="tk-k">val</span> conversationId: <span class="tk-t">String</span>, <span class="tk-k">val</span> message: <span class="tk-t">String</span>)
+<span class="tk-a">@Serializable</span> <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">AssistantResponse</span>(<span class="tk-k">val</span> reply: <span class="tk-t">String</span>, <span class="tk-k">val</span> remainingToday: <span class="tk-t">Int</span>)
+<span class="tk-c">// Auth header (user ID token) and App Check / Integrity token are added by OkHttp interceptors.</span></code></pre></figure>
+<p>The backend's responsibilities:</p>
+<ol class="steps">
+  <li><strong>Authenticate</strong> the user (verify the ID token) and, ideally, the app (App Check or Play Integrity verdict).</li>
+  <li><strong>Enforce quotas</strong>: requests and tokens per user per day, plus global budgets.</li>
+  <li><strong>Own the prompt</strong>: system instructions, templates and tool definitions live server-side, not in the APK.</li>
+  <li><strong>Validate input</strong>: size limits, file types, and content checks.</li>
+  <li><strong>Call the provider</strong> with keys from a secret manager, with timeouts and retries.</li>
+  <li><strong>Filter output</strong>: moderation, schema validation, removal of sensitive data.</li>
+  <li><strong>Log safely</strong>: metadata (tokens, latency, model, user ID hash), not raw personal content by default.</li>
+</ol>
+
+<h2 id="controls">Controls checklist</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Risk</th><th>Control</th></tr></thead>
+  <tbody>
+    <tr><td>Key theft</td><td>No provider keys in the app; secret manager on the server; key rotation</td></tr>
+    <tr><td>Bill shock / abuse</td><td>Per-user quotas, rate limits, max tokens, budget alerts</td></tr>
+    <tr><td>Fake clients</td><td>App Check / Play Integrity; user authentication</td></tr>
+    <tr><td>Prompt injection</td><td>Server-owned prompts, delimited user input, tool allow-lists, output validation</td></tr>
+    <tr><td>Data leakage</td><td>Minimise data sent; redact; retention settings; disclosure and consent</td></tr>
+    <tr><td>Harmful output</td><td>Safety settings, moderation, reporting UI</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="client-side">Client-side hygiene</h2>
+<ul>
+  <li>Never log prompts, responses or auth headers in release builds.</li>
+  <li>Cap input size in the UI and in the request.</li>
+  <li>Don't let model output trigger sensitive actions (payments, deletions, messages) without explicit user confirmation.</li>
+  <li>Treat model output as untrusted when rendering (Markdown links, HTML).</li>
+</ul>
+
+<h2 id="use-cases">Which option when</h2>
+<div class="cards">
+  <div class="card usecase"><h3>MVP chat feature with Gemini</h3><p>Option A: fastest secure path, plus App Check and usage monitoring.</p></div>
+  <div class="card usecase"><h3>Assistant over private company data</h3><p>Option B: retrieval and authorisation must happen server-side.</p></div>
+  <div class="card usecase"><h3>Multi-provider or model routing</h3><p>Option B: switch providers without app releases.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Isn't obfuscating the key enough?</summary><div><p>No. Obfuscation slows attackers slightly, but keys can be recovered from the APK or intercepted at runtime. Keep keys on servers.</p></div></details>
+  <details><summary>Can I restrict a Google API key to my Android app?</summary><div><p>Some Google APIs support Android app restrictions (package name and certificate), but these are checks on request headers, not cryptographic attestation. Don't rely on them for costly AI APIs.</p></div></details>
+  <details><summary>Does App Check stop all abuse?</summary><div><p>It significantly raises the bar but isn't perfect. Combine it with authentication, quotas and monitoring.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Secure cloud AI on Android means <strong>no provider keys in the app</strong>, either through <strong>Firebase AI Logic with App Check</strong> or <strong>your own authenticated backend</strong>, plus <strong>quotas, server-owned prompts, input and output validation, and safe logging</strong>.</p>
+<p>Next step: choose providers and models with <a href="../gemini-vs-openai-vs-open-source-models/index.html">Gemini vs OpenAI vs Open-Source Models</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/app-check" target="_blank" rel="noopener">Firebase AI Logic: App Check</a></li><li><a href="https://firebase.google.com/docs/app-check" target="_blank" rel="noopener">Firebase App Check</a></li><li><a href="https://developer.android.com/google/play/integrity" target="_blank" rel="noopener">Play Integrity API</a></li><li><a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications</a></li><li><a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noopener">Gemini API: API key best practices</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsecure-cloud-ai-api-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsecure-cloud-ai-api-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/secure-api-keys-android/index.html"><small>Android Security and Privacy</small>Secure API Keys and Secrets in Android Apps</a></li><li><a href="../../android/prompt-injection-android-ai/index.html"><small>Android AI Projects and Production</small>Prompt Injection and Untrusted Input in Android AI Apps</a></li><li><a href="../../android/monitor-ai-latency-errors-costs/index.html"><small>Android AI Projects and Production</small>Monitoring AI Latency, Errors, and Inference Costs</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/secure-cloud-ai-api-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/secure-cloud-ai-api-android/&amp;text=Integrating Cloud AI APIs Securely in Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/secure-cloud-ai-api-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architectures">Two secure architectures</a></li><li><a href="#option-a">Option A: Firebase AI Logic + App Check</a></li><li><a href="#option-b">Option B: your own backend proxy</a></li><li><a href="#controls">Controls checklist</a></li><li><a href="#client-side">Client-side hygiene</a></li><li><a href="#use-cases">Which option when</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsecure-cloud-ai-api-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dsecure-cloud-ai-api-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

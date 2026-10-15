@@ -1,0 +1,83 @@
+<!--meta
+{
+  "seo_title": "App Store Listing Optimization for Android (Play ASO)",
+  "description": "Optimise your Google Play store listing: title and descriptions, keywords without stuffing, icon, screenshots and video, localisation, custom store listings and A/B testing with experiments.",
+  "primary_keyword": "google play store listing optimization",
+  "keywords": ["play store aso", "app title keywords android", "play store screenshots best practices", "store listing experiments", "localize play store listing", "custom store listings"],
+  "lede": "Your store listing is the page where a visitor decides in seconds whether to install. App store optimisation (ASO) on Google Play means being findable for the right searches and convincing once found, without misleading metadata that violates policy.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["publish-android-app-google-play", "improve-android-app-ratings", "google-play-console-guide", "solo-android-developer-launch"],
+  "refs": [
+    ["Create and set up your store listing", "https://support.google.com/googleplay/android-developer/answer/9859152"],
+    ["Store listing best practices", "https://support.google.com/googleplay/android-developer/answer/13393723"],
+    ["Store listing experiments", "https://support.google.com/googleplay/android-developer/answer/6227309"],
+    ["Play metadata policy", "https://support.google.com/googleplay/android-developer/answer/9898842"]
+  ]
+}
+-->
+<p class="ad-lead">Two apps with similar quality can see very different installs, because one listing clearly communicates value and matches what people search for, while the other shows a generic icon and a wall of text. ASO is product communication, measured.</p>
+
+<h2 id="funnel">The listing funnel</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-aso-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-aso-t fig-aso-d">
+    <title id="fig-aso-t">Store listing funnel</title>
+    <desc id="fig-aso-d">Discovery through search and browse depends on title, description relevance and quality signals. In search results, the icon, title and rating drive taps. On the listing page, screenshots, video and the short description drive installs. After install, retention and ratings feed back into visibility.</desc>
+    <defs><marker id="asom" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 70 H196 M370 70 H396 M570 70 H596" marker-end="url(#asom)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="160" height="60" rx="12"/><text class="d-t" x="90" y="66" text-anchor="middle">Discovered</text><text class="d-s" x="90" y="84" text-anchor="middle">relevance, quality</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="200" y="40" width="170" height="60" rx="12"/><text class="d-t" x="285" y="66" text-anchor="middle">Tapped</text><text class="d-s" x="285" y="84" text-anchor="middle">icon · title · rating</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="400" y="40" width="170" height="60" rx="12"/><text class="d-t" x="485" y="66" text-anchor="middle">Installed</text><text class="d-s" x="485" y="84" text-anchor="middle">screenshots · text</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="600" y="40" width="110" height="60" rx="12"/><text class="d-t" x="655" y="66" text-anchor="middle">Kept</text><text class="d-s" x="655" y="84" text-anchor="middle">retention</text></g>
+    <path class="d-dash" d="M655 100 V140 H90 V104" marker-end="url(#asom)"/><text class="d-s" x="372" y="160" text-anchor="middle">quality and engagement feed back into visibility</text>
+  </svg>
+  <figcaption id="fig-aso-cap">Each stage has its own levers. Optimise the weakest stage first, using Play Console statistics.</figcaption>
+</figure>
+
+<h2 id="text">Title and descriptions</h2>
+<ul>
+  <li><strong>App name</strong> (limited length): brand plus a clear descriptor, for example "NotiVault: Notification History".</li>
+  <li><strong>Short description</strong>: one clear benefit sentence, which users see before expanding.</li>
+  <li><strong>Full description</strong>: lead with the problem you solve, then key features as short paragraphs or bullets, then trust signals (privacy, offline, no account needed).</li>
+  <li>Use the words your users would search for, naturally. Keyword stuffing, competitor names, misleading claims and ranking or price promotions in metadata violate Play policy.</li>
+</ul>
+
+<h2 id="visuals">Icon, screenshots and video</h2>
+<ul>
+  <li><strong>Icon</strong>: simple, recognisable at small sizes, distinct from competitors, and following Play's icon specifications.</li>
+  <li><strong>Screenshots</strong>: show real app screens with short benefit captions. Put the most compelling value first, since many users only see the first two or three.</li>
+  <li><strong>Feature graphic and video</strong>: optional but useful. Keep videos short and show the app in use.</li>
+  <li>Include tablet and other form-factor screenshots if you support them.</li>
+</ul>
+
+<h2 id="localise">Localisation</h2>
+<p>Translate the listing for your main markets, and localise screenshots (UI language, culturally relevant examples). In India, consider Hindi and other regional languages if your app supports them. Users convert better in their language.</p>
+
+<h2 id="experiments">Store listing experiments</h2>
+<ol class="steps">
+  <li>Pick one element to test: icon, first screenshot or short description.</li>
+  <li>Create variants in Play Console → Store listing experiments.</li>
+  <li>Run until results are statistically meaningful, then apply the winner.</li>
+  <li>Test again. Small improvements compound.</li>
+</ol>
+
+<h2 id="custom">Custom store listings</h2>
+<p>Create listings for specific countries, or for traffic from specific campaigns (pre-registration, ads), with tailored messaging and screenshots.</p>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Utility app</h3><p>First screenshot: the core result ("All your notifications, even deleted ones"), not the settings screen.</p></div>
+  <div class="card usecase"><h3>Devotional app</h3><p>Listing in Hindi and English, with screenshots of offline audio and lyrics in Devanagari.</p></div>
+  <div class="card usecase"><h3>Productivity app</h3><p>An experiment showing "no account needed" in the short description against a feature list.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does the description affect search on Google Play?</summary><div><p>Play uses listing text, among many signals, to understand your app. Write clearly for users, and include relevant terms naturally.</p></div></details>
+  <details><summary>How often should I update screenshots?</summary><div><p>Whenever the UI changes noticeably or a new key feature ships. Outdated screenshots erode trust.</p></div></details>
+  <details><summary>Can I mention "#1" or "best"?</summary><div><p>Play's metadata policy restricts unverifiable ranking claims and promotional terms in titles and icons. Check the current policy.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Good ASO combines <strong>clear, policy-compliant text</strong>, <strong>benefit-first visuals</strong>, <strong>localisation</strong> and <strong>continuous experiments</strong>, backed by an app that retains users. Measure each funnel stage, and improve the weakest one first.</p>
+<p>Next step: measure what happens after install with <a href="../android-analytics-crash-reporting/index.html">Analytics and Crash Reporting for Android Apps</a>.</p>

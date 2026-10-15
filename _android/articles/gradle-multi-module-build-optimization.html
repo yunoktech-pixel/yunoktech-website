@@ -1,0 +1,109 @@
+<!--meta
+{
+  "seo_title": "Multi-Module Gradle Builds and Build Optimization",
+  "description": "Speed up Android Gradle builds: measuring with build scans, configuration cache, build cache, parallel execution, KSP over kapt, non-transitive R classes, module structure and CI caching.",
+  "primary_keyword": "gradle build optimization android",
+  "keywords": ["android build speed", "gradle configuration cache", "gradle build cache android", "ksp vs kapt build time", "non transitive r class", "gradle build scan"],
+  "lede": "Slow builds tax every developer, every day. In multi-module Android projects, a handful of Gradle settings and structural choices often cut build times dramatically. Here's how to measure, what to enable, and which module design choices matter.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["multi-module-architecture-android", "android-modularization-strategies", "android-ci-cd-github-actions", "android-sdk-vs-jdk-vs-gradle"],
+  "refs": [
+    ["Optimize your build speed", "https://developer.android.com/build/optimize-your-build"],
+    ["Gradle configuration cache", "https://docs.gradle.org/current/userguide/configuration_cache.html"],
+    ["Gradle build cache", "https://docs.gradle.org/current/userguide/build_cache.html"],
+    ["Migrate from kapt to KSP", "https://developer.android.com/build/migrate-to-ksp"],
+    ["Build Analyzer", "https://developer.android.com/build/build-analyzer"]
+  ]
+}
+-->
+<p class="ad-lead">A 3-minute incremental build, run 40 times a day by 20 developers, is 40 developer-hours lost daily. Build speed is productivity. Most wins come from measuring, enabling caches, and avoiding module structures that force unnecessary recompilation.</p>
+
+<h2 id="phases">Where build time goes</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gb-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-gb-t fig-gb-d">
+    <title id="fig-gb-t">Gradle build phases and caches</title>
+    <desc id="fig-gb-d">Initialization determines projects; configuration evaluates build scripts, accelerated by the configuration cache; execution runs tasks, accelerated by up-to-date checks, the local and remote build cache and parallel execution.</desc>
+    <defs><marker id="gbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M190 70 H226 M440 70 H476" marker-end="url(#gbm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="40" width="170" height="60" rx="12"/><text class="d-t" x="105" y="66" text-anchor="middle">Initialization</text><text class="d-s" x="105" y="84" text-anchor="middle">which projects</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="230" y="40" width="210" height="60" rx="12"/><text class="d-t" x="335" y="66" text-anchor="middle">Configuration</text><text class="d-s" x="335" y="84" text-anchor="middle">→ configuration cache</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="480" y="40" width="220" height="60" rx="12"/><text class="d-t" x="590" y="66" text-anchor="middle">Execution</text><text class="d-s" x="590" y="84" text-anchor="middle">→ build cache, parallel</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Measure each phase before changing anything (build scans, Build Analyzer).</text>
+  </svg>
+  <figcaption id="fig-gb-cap">Configuration time grows with module count. Execution time grows with what needs recompiling.</figcaption>
+</figure>
+
+<h2 id="measure">Measure first</h2>
+<ul>
+  <li><strong>Build Analyzer</strong> in Android Studio identifies slow tasks and plugins.</li>
+  <li><strong>Gradle build scans</strong> (<code>--scan</code>) show timelines, cache hits and configuration time.</li>
+  <li>Benchmark typical scenarios: clean build, an ABI change in a core module, a non-ABI change in a feature module.</li>
+</ul>
+
+<h2 id="settings">High-impact settings</h2>
+<code-block lang="properties" file="gradle.properties">
+# Reuse configuration results between builds
+org.gradle.configuration-cache=true
+# Reuse task outputs from previous builds (local, optionally remote)
+org.gradle.caching=true
+# Run independent module tasks in parallel
+org.gradle.parallel=true
+# Give the daemon enough memory (tune for your machine)
+org.gradle.jvmargs=-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8
+# Smaller, non-transitive R classes: changes in one module's resources recompile less
+android.nonTransitiveRClass=true
+</code-block>
+<p>Recent AGP versions enable some of these by default (non-transitive R classes, for example). Check what your versions default to, and verify that plugins are configuration-cache compatible.</p>
+
+<h2 id="ksp">Prefer KSP over kapt</h2>
+<p>kapt generates Java stubs and is significantly slower. Hilt, Room and Moshi support KSP. Migrating annotation processors to KSP often gives large wins in modules that use them.</p>
+
+<h2 id="structure">Module structure choices</h2>
+<ul>
+  <li><strong><code>implementation</code> over <code>api</code></strong>: limits recompilation of consumers when internals change.</li>
+  <li><strong>API/impl splits</strong> for frequently changed features used by others.</li>
+  <li><strong>Avoid a giant "common" module</strong> that everything depends on: one change rebuilds the world.</li>
+  <li><strong>Pure Kotlin/JVM modules</strong> for domain logic. They build and test faster than Android library modules.</li>
+  <li><strong>Convention plugins</strong> instead of <code>subprojects { }</code> or <code>allprojects { }</code>, which slow configuration and break isolation.</li>
+</ul>
+
+<h2 id="hygiene">Build script hygiene</h2>
+<code-block lang="kts" file="Avoid eager, configuration-time work">
+// ❌ Runs at configuration time on EVERY build (even unrelated tasks)
+val gitSha = Runtime.getRuntime().exec("git rev-parse --short HEAD").inputStream.reader().readText().trim()
+
+// ✅ Lazy provider evaluated only when needed (configuration-cache friendly)
+val gitSha = providers.exec { commandLine("git", "rev-parse", "--short", "HEAD") }
+    .standardOutput.asText.map { it.trim() }
+</code-block>
+<ul>
+  <li>Use lazy APIs (<code>register</code>, providers), not <code>create</code>, and don't read files at configuration time.</li>
+  <li>Disable unused build features per module (<code>buildConfig</code>, <code>aidl</code>, <code>renderscript</code>).</li>
+  <li>Keep dependencies and plugins up to date. Gradle and AGP improve performance regularly.</li>
+</ul>
+
+<h2 id="ci">CI builds</h2>
+<ul>
+  <li>Cache Gradle home and the build cache between runs (for example with <code>gradle/actions/setup-gradle</code>).</li>
+  <li>Consider a remote build cache shared by CI and developers, populated by trusted CI builds.</li>
+  <li>Run only affected modules' tests on PRs in large projects.</li>
+</ul>
+
+<h2 id="use-cases">Typical wins</h2>
+<div class="cards">
+  <div class="card usecase"><h3>kapt → KSP</h3><p>Large reductions in annotation-processing time for Room and Hilt modules.</p></div>
+  <div class="card usecase"><h3>Configuration cache</h3><p>Repeat builds skip configuration, especially noticeable with many modules.</p></div>
+  <div class="card usecase"><h3>Breaking up "core:common"</h3><p>Fewer modules recompiled per change, and better parallelism.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do more modules always mean faster builds?</summary><div><p>Not always. Incremental builds and parallelism improve, but configuration time and sync time grow. Measure to find the sweet spot.</p></div></details>
+  <details><summary>Why is my configuration cache failing?</summary><div><p>A plugin or script does configuration-time work that isn't cacheable. Build output reports the problem, so update or replace the plugin, or rewrite the logic lazily.</p></div></details>
+  <details><summary>Does more RAM help?</summary><div><p>Up to a point. Too little memory causes GC thrashing. Tune <code>org.gradle.jvmargs</code> and the Kotlin daemon settings, and monitor them.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Fast Android builds come from <strong>measuring</strong>, enabling <strong>configuration and build caches</strong>, <strong>parallel execution</strong>, <strong>KSP</strong>, <strong>non-transitive R classes</strong>, sensible <strong>module boundaries</strong> with <code>implementation</code> dependencies, and <strong>lazy build scripts</strong>, plus caching in CI.</p>
+<p>Next step: decide how far to share code across platforms with <a href="../compose-multiplatform-vs-kotlin-multiplatform/index.html">Compose Multiplatform vs Kotlin Multiplatform</a>.</p>

@@ -1,0 +1,152 @@
+<!--meta
+{
+  "seo_title": "Android App Components: Activities, Services, Receivers",
+  "description": "The four Android app components explained with Kotlin: Activities, Services, Broadcast Receivers and Content Providers, plus intents, the manifest, and when to use WorkManager instead.",
+  "primary_keyword": "android app components",
+  "keywords": ["activity service broadcast receiver content provider", "android intents explained", "android manifest components", "exported components", "foreground service android", "single activity architecture"],
+  "lede": "Android apps don't have a single main() function. The system starts your app through four kinds of components declared in the manifest. Knowing what each one is for, and what replaced the old patterns, prevents crashes, battery drain and security holes.",
+  "date": "2026-10-15",
+  "cta": "beginner",
+  "related": ["how-android-app-works-internally", "android-foreground-services", "workmanager-background-work", "deep-links-app-links-android"],
+  "refs": [
+    ["Application fundamentals: app components", "https://developer.android.com/guide/components/fundamentals"],
+    ["Intents and intent filters", "https://developer.android.com/guide/components/intents-filters"],
+    ["Services overview", "https://developer.android.com/develop/background-work/services"],
+    ["Broadcasts overview", "https://developer.android.com/develop/background-work/background-tasks/broadcasts"],
+    ["Content providers", "https://developer.android.com/guide/topics/providers/content-providers"]
+  ]
+}
+-->
+<p class="ad-lead">A console program starts at <code>main()</code> and runs until it ends. An Android app is different. The system can enter it from many doors: the launcher icon, a notification, a shared photo, a scheduled job, another app asking for data. Those doors are <strong>app components</strong>.</p>
+<p>This guide explains the four component types, how <strong>intents</strong> connect them, how the <strong>manifest</strong> declares them, and which modern APIs you should use instead of patterns that are now discouraged.</p>
+
+<h2 id="overview">The four components at a glance</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-c-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-c-t fig-c-d">
+    <title id="fig-c-t">The four Android app components and their entry points</title>
+    <desc id="fig-c-d">The Android system can enter an app through an Activity for a screen the user sees, a Service for long-running work, a Broadcast Receiver for system-wide events, and a Content Provider for sharing structured data. All are declared in AndroidManifest.xml.</desc>
+    <defs><marker id="c2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-dark" x="290" y="10" width="140" height="44" rx="12"/><text class="d-w" x="360" y="37" text-anchor="middle">Android system</text>
+    <path class="d-flow" d="M330 54 L95 112 M350 54 L275 112 M370 54 L445 112 M390 54 L625 112" marker-end="url(#c2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="116" width="150" height="80" rx="12"/><text class="d-t" x="95" y="142" text-anchor="middle">Activity</text><text class="d-s" x="95" y="162" text-anchor="middle">a screen / UI entry</text><text class="d-s" x="95" y="180" text-anchor="middle">launcher, deep link</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="200" y="116" width="150" height="80" rx="12"/><text class="d-t" x="275" y="142" text-anchor="middle">Service</text><text class="d-s" x="275" y="162" text-anchor="middle">work without UI</text><text class="d-s" x="275" y="180" text-anchor="middle">e.g. music playback</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="370" y="116" width="150" height="80" rx="12"/><text class="d-t" x="445" y="142" text-anchor="middle">Broadcast Receiver</text><text class="d-s" x="445" y="162" text-anchor="middle">reacts to events</text><text class="d-s" x="445" y="180" text-anchor="middle">e.g. boot, locale</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="550" y="116" width="150" height="80" rx="12"/><text class="d-t" x="625" y="142" text-anchor="middle">Content Provider</text><text class="d-s" x="625" y="162" text-anchor="middle">shares data</text><text class="d-s" x="625" y="180" text-anchor="middle">e.g. FileProvider</text></g>
+    <text class="d-s" x="360" y="220" text-anchor="middle">All four are declared in AndroidManifest.xml</text>
+  </svg>
+  <figcaption id="fig-c-cap">Each component is an independent entry point the system can start, possibly in a fresh process.</figcaption>
+</figure>
+
+<h2 id="activities">Activities: screens the user interacts with</h2>
+<p>An <strong>Activity</strong> provides a window for UI. Modern apps commonly use a <strong>single-Activity architecture</strong>: one Activity hosts Jetpack Compose, and navigation between screens happens inside Compose rather than by launching new Activities.</p>
+<code-block lang="kotlin" file="MainActivity.kt">
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent { AppTheme { AppNavHost() } }   // all screens are composables
+    }
+}
+</code-block>
+<code-block lang="xml" file="AndroidManifest.xml (excerpt)">
+<activity
+    android:name=".MainActivity"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+</code-block>
+<p><code>android:exported="true"</code> lets other apps, including the launcher, start this Activity. Since Android 12, any component with an intent filter must declare <code>exported</code> explicitly.</p>
+
+<h2 id="intents">Intents: messages between components</h2>
+<code-block lang="kotlin" file="Explicit and implicit intents">
+// Explicit: start a specific component in your app
+startActivity(Intent(context, SettingsActivity::class.java))
+
+// Implicit: ask the system for any app that can handle an action
+val share = Intent(Intent.ACTION_SEND).apply {
+    type = "text/plain"
+    putExtra(Intent.EXTRA_TEXT, "Check out this article: https://yunoktech.com/android/")
+}
+startActivity(Intent.createChooser(share, "Share via"))
+</code-block>
+
+<h2 id="services">Services: work without a UI</h2>
+<p>A <strong>Service</strong> runs work that isn't tied to a screen. Modern Android restricts background execution heavily to protect battery, so plain background services are rarely appropriate. Today's guidance:</p>
+<ul>
+  <li><strong>User-visible ongoing work</strong> (music playback, navigation, an active call, a workout): a <strong>foreground service</strong> with a notification and a declared foreground service type. See <a href="../android-foreground-services/index.html">Foreground Services</a>.</li>
+  <li><strong>Deferrable, guaranteed work</strong> (sync, uploads, cleanup): <strong>WorkManager</strong>. See <a href="../workmanager-background-work/index.html">Background Work with WorkManager</a>.</li>
+  <li><strong>Work that only matters while the user is on screen</strong>: coroutines in <code>viewModelScope</code>, with no Service needed.</li>
+</ul>
+
+<h2 id="receivers">Broadcast Receivers: reacting to events</h2>
+<p>A <strong>BroadcastReceiver</strong> responds to system or app events, such as the device finishing boot, a locale change or a download completing. Since Android 8, most implicit broadcasts can't be received by manifest-declared receivers. Register them at runtime while your app is active instead:</p>
+<code-block lang="kotlin" file="Runtime-registered receiver">
+class BatteryMonitor(private val context: Context) {
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            Log.d("Battery", "Level: $level")
+        }
+    }
+
+    fun start() = ContextCompat.registerReceiver(
+        context, receiver,
+        IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+        ContextCompat.RECEIVER_NOT_EXPORTED,     // don't accept broadcasts from other apps
+    )
+
+    fun stop() = context.unregisterReceiver(receiver)
+}
+</code-block>
+<div class="warn"><b>Keep onReceive short</b>
+<p><code>onReceive()</code> runs on the main thread and must finish quickly. For longer work, enqueue a WorkManager job.</p></div>
+
+<h2 id="providers">Content Providers: sharing data</h2>
+<p>A <strong>ContentProvider</strong> exposes data to other apps through <code>content://</code> URIs with fine-grained permissions. Most apps never write one, but nearly all use <strong>FileProvider</strong> to share files securely, for example sending a photo to a camera app or a PDF to an email app:</p>
+<code-block lang="kotlin" file="Share a file securely">
+val file = File(context.cacheDir, "invoice.pdf")
+val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+val intent = Intent(Intent.ACTION_SEND).apply {
+    type = "application/pdf"
+    putExtra(Intent.EXTRA_STREAM, uri)
+    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)   // temporary access just for this file
+}
+context.startActivity(Intent.createChooser(intent, "Send invoice"))
+</code-block>
+
+<h2 id="comparison">Which component should I use?</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Need</th><th>Use</th><th>Avoid</th></tr></thead>
+  <tbody>
+    <tr><td>A screen</td><td>A composable inside your single Activity</td><td>An Activity per screen in new apps</td></tr>
+    <tr><td>Sync data every few hours</td><td>WorkManager periodic work</td><td>A background Service with alarms</td></tr>
+    <tr><td>Play audio with the screen off</td><td>Foreground service (media playback type), Media3</td><td>An unrestricted background service</td></tr>
+    <tr><td>React to network changes in the UI</td><td>ConnectivityManager callbacks as a Flow</td><td>A manifest CONNECTIVITY_CHANGE receiver</td></tr>
+    <tr><td>Share a file with another app</td><td>FileProvider</td><td><code>file://</code> URIs (blocked on modern Android)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li><strong>Exporting components unnecessarily.</strong> Every exported component is an attack surface. Set <code>exported="false"</code> unless other apps must reach it.</li>
+  <li><strong>Long work in <code>onReceive()</code></strong>, causing ANRs.</li>
+  <li><strong>Using Services for periodic background work</strong> instead of WorkManager.</li>
+  <li><strong>Passing large objects in intent extras</strong>, which can crash with <code>TransactionTooLargeException</code>. Pass IDs instead.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is a Fragment an app component?</summary><div><p>No. Fragments are UI building blocks hosted inside an Activity, and the system can't start them directly. In Compose apps, composables usually replace Fragments.</p></div></details>
+  <details><summary>Is the Application class a component?</summary><div><p>Not one of the four, but it's created before any component in your process and is often used for app-wide setup.</p></div></details>
+  <details><summary>Do I still need multiple Activities?</summary><div><p>Sometimes: for distinct entry points such as a share target or a settings screen launched from system settings. Most navigation can live in one Activity.</p></div></details>
+  <details><summary>What replaced IntentService and JobIntentService?</summary><div><p>WorkManager for deferrable work, and coroutines for work tied to the UI. Both older classes are deprecated.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android enters your app through four doors: <strong>Activities</strong> (UI), <strong>Services</strong> (ongoing work), <strong>Broadcast Receivers</strong> (events) and <strong>Content Providers</strong> (data sharing), connected by <strong>intents</strong> and declared in the <strong>manifest</strong>. Modern apps use one Activity with Compose, WorkManager for background work, and FileProvider for sharing, and they export as little as possible.</p>
+<p>Next step: open your app's manifest and check every <code>exported</code> attribute. Then read <a href="../workmanager-background-work/index.html">Background Work with WorkManager</a>.</p>

@@ -1,0 +1,112 @@
+<!--meta
+{
+  "seo_title": "AI Privacy and Data Retention in Android Apps",
+  "description": "Handle user data responsibly in Android AI features: data flow mapping, minimisation, provider terms and retention, logging without content, user controls, deletion, Play Data safety disclosures and regulations.",
+  "primary_keyword": "ai privacy data retention android",
+  "keywords": ["ai data privacy mobile app", "llm data retention policy", "play data safety ai", "gdpr ai app", "dpdp act app privacy", "ai logging without pii"],
+  "lede": "Every prompt you send to a cloud model may contain personal data, and it can end up in provider logs, your backend logs, analytics and crash reports. Responsible AI apps map these flows, minimise them, set retention limits, and give users real control.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["protect-user-data-ai-android-apps", "secure-cloud-ai-api-android", "android-permissions-privacy", "monitor-ai-latency-errors-costs"],
+  "refs": [
+    ["Google Play: Data safety section", "https://support.google.com/googleplay/android-developer/answer/10787469"],
+    ["Gemini API additional terms", "https://ai.google.dev/gemini-api/terms"],
+    ["Firebase AI Logic: data governance", "https://firebase.google.com/docs/ai-logic/data-governance"],
+    ["OpenAI: data controls (API platform)", "https://platform.openai.com/docs/guides/your-data"],
+    ["Privacy on Android", "https://developer.android.com/privacy"]
+  ]
+}
+-->
+<p class="ad-lead"><a href="../protect-user-data-ai-android-apps/index.html">Protecting User Data in AI Apps</a> covers safeguards in the app itself. This article focuses on the lifecycle of data: where it goes, how long it stays, who can access it, and what you must disclose.</p>
+
+<div class="callout note"><b>Not legal advice</b><p>Privacy laws (GDPR, India's DPDP Act, CCPA and others) and provider terms differ and change. Consult qualified counsel for your app, and read your providers' current terms.</p></div>
+
+<h2 id="map">Map your AI data flows</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pr-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-pr-t fig-pr-d">
+    <title id="fig-pr-t">Where AI data can travel</title>
+    <desc id="fig-pr-d">User input in the app can travel to the AI provider, which may retain data per its terms; to your backend and its logs; to analytics and crash reporting if not filtered; and to local storage and backups. Each destination needs a retention rule and a deletion path.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="260" y="10" width="200" height="50" rx="12"/><text class="d-w" x="360" y="40" text-anchor="middle">User input + context</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="20" y="100" width="160" height="70" rx="12"/><text class="d-t" x="100" y="128" text-anchor="middle">AI provider</text><text class="d-s" x="100" y="148" text-anchor="middle">retention per terms</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="195" y="100" width="160" height="70" rx="12"/><text class="d-t" x="275" y="128" text-anchor="middle">Your backend</text><text class="d-s" x="275" y="148" text-anchor="middle">DB + logs</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-red" x="370" y="100" width="160" height="70" rx="12"/><text class="d-t" x="450" y="128" text-anchor="middle">Analytics/crash</text><text class="d-s" x="450" y="148" text-anchor="middle">accidental leaks</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="545" y="100" width="160" height="70" rx="12"/><text class="d-t" x="625" y="128" text-anchor="middle">Device</text><text class="d-s" x="625" y="148" text-anchor="middle">Room, files, backup</text></g>
+    <path class="d-line" d="M360 60 L100 100 M360 60 L275 100 M360 60 L450 100 M360 60 L625 100"/>
+    <text class="d-s" x="360" y="208" text-anchor="middle">For each destination: what data, why, how long, who can access, how to delete.</text>
+  </svg>
+  <figcaption id="fig-pr-cap">Accidental flows (logs, crash reports) are the most common privacy failures.</figcaption>
+</figure>
+
+<h2 id="minimise">Minimise what you send</h2>
+<ul>
+  <li>Send only the text needed for the task (retrieved chunks, not entire documents).</li>
+  <li>Strip or mask identifiers (emails, phone numbers) when they're not needed.</li>
+  <li>Prefer on-device processing for sensitive content. See <a href="../gemini-nano-vs-cloud-gemini/index.html">Nano vs Cloud</a>.</li>
+  <li>Don't attach user profiles to prompts by default.</li>
+</ul>
+<code-block lang="kotlin" file="Simple redaction before sending (defence in depth, not a guarantee)">
+private val EMAIL = Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
+private val PHONE = Regex("(?:\\+?\\d[\\s-]?){10,13}")
+
+fun redact(text: String): String =
+    text.replace(EMAIL, "[email]").replace(PHONE, "[phone]")
+</code-block>
+
+<h2 id="provider">Know your provider's terms</h2>
+<p>Providers differ on whether they retain prompts, for how long, whether they use data to improve models, and how this differs between free and paid tiers. Check your provider's current data governance terms (for example Firebase AI Logic and the Gemini API terms, or OpenAI's API data controls), choose settings and tiers that match your promises to users, and document the decision.</p>
+
+<h2 id="logging">Log without content</h2>
+<code-block lang="kotlin" file="Telemetry without user content">
+data class AiCallEvent(
+    val feature: String,            // "summarize"
+    val model: String,              // "gemini-3.8-flash"
+    val source: String,             // "cloud" | "on-device"
+    val inputTokens: Int?,
+    val outputTokens: Int?,
+    val latencyMs: Long,
+    val outcome: String,            // "ok" | "blocked" | "error:429"
+)
+// Never log prompts, responses or file names by default.
+// If you need samples for quality review, make it opt-in, anonymised and time-limited.
+</code-block>
+<p>Also check that crash reports don't capture prompt strings in exception messages or breadcrumbs.</p>
+
+<h2 id="retention">Retention rules</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Example rule</th></tr></thead>
+  <tbody>
+    <tr><td>Chat history (device)</td><td>Kept until the user deletes; "clear all" available</td></tr>
+    <tr><td>Chat history (server sync)</td><td>Only if the user enables sync; deleted with the account</td></tr>
+    <tr><td>Backend request logs</td><td>Metadata only, 30 days</td></tr>
+    <tr><td>Quality review samples</td><td>Opt-in, anonymised, 90 days</td></tr>
+    <tr><td>Uploaded files</td><td>Deleted after processing</td></tr>
+  </tbody>
+</table>
+</div>
+<p>These are examples. Set rules that fit your app and obligations, and implement them with automated deletion jobs.</p>
+
+<h2 id="controls">User controls</h2>
+<ul>
+  <li>Clear disclosure before first use: what's processed, where, and why.</li>
+  <li>A setting to disable cloud AI or AI features entirely.</li>
+  <li>Delete history, and account deletion that covers AI data (Play requires an account deletion path for apps with accounts).</li>
+  <li>Exclude sensitive local data from backups where appropriate.</li>
+</ul>
+
+<h2 id="disclosure">Disclosures</h2>
+<ul>
+  <li><strong>Play Data safety:</strong> declare data collected and shared, including data sent to AI providers and processed by SDKs.</li>
+  <li><strong>Privacy policy:</strong> describe AI processing, providers, retention and user rights.</li>
+  <li>Keep disclosures in sync with code changes, and review on every AI feature launch.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is on-device AI automatically private?</summary><div><p>Processing stays on device, but you may still store results, sync them or log them. Apply the same retention thinking.</p></div></details>
+  <details><summary>Can I use user prompts to improve my product?</summary><div><p>Only in line with your disclosures, user consent where required, and applicable law. Opt-in with anonymisation is the safer approach.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI privacy is about the <strong>whole data lifecycle</strong>: map flows, <strong>minimise</strong> what's sent, understand <strong>provider retention</strong>, log <strong>metadata not content</strong>, set and automate <strong>retention rules</strong>, give users <strong>controls</strong>, and keep <strong>disclosures</strong> accurate.</p>
+<p>Next step: defend against malicious inputs in <a href="../prompt-injection-android-ai/index.html">Prompt Injection and Untrusted Input</a>.</p>

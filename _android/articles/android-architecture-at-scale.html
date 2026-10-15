@@ -1,0 +1,103 @@
+<!--meta
+{
+  "seo_title": "Android App Architecture at Scale (Large Apps)",
+  "description": "How Android architecture changes at scale: modular boundaries, platform layers, shared state, navigation across features, data consistency, performance budgets, experimentation and governance.",
+  "primary_keyword": "android architecture at scale",
+  "keywords": ["large android app architecture", "android platform team architecture", "feature modules navigation", "android performance budget", "feature flags architecture", "scalable android codebase"],
+  "lede": "Architecture that works for 10 screens and 3 developers breaks at 300 screens and 50 developers, not because patterns are wrong, but because new problems appear: build times, ownership, cross-feature consistency, experiments and governance. Here's how large Android apps evolve their architecture.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["scaling-android-codebase-teams", "android-modularization-strategies", "gradle-multi-module-build-optimization", "android-engineering-tradeoffs"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Guide to modularization", "https://developer.android.com/topic/modularization"],
+    ["Now in Android architecture", "https://github.com/android/nowinandroid/blob/main/docs/ArchitectureLearningJourney.md"],
+    ["App performance guide", "https://developer.android.com/topic/performance/overview"]
+  ]
+}
+-->
+<p class="ad-lead">At scale, the hardest architecture problems are organisational and systemic: how 10 teams ship independently without breaking each other, how features share user state consistently, how the app stays fast as everyone adds code, and how decisions stay coherent across years.</p>
+
+<h2 id="shape">The shape of a large Android app</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sc2-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-sc2-t fig-sc2-d">
+    <title id="fig-sc2-t">Layered architecture of a large Android app</title>
+    <desc id="fig-sc2-d">At the top, the app shell handles navigation, DI assembly and startup. Feature modules owned by teams sit below, each with UI, ViewModels and feature data. Shared domain and data services provide cross-feature state such as session, user and cart. A platform layer provides networking, storage, design system, analytics, feature flags and performance tooling.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="20" y="10" width="680" height="40" rx="10"/><text class="d-w" x="360" y="35" text-anchor="middle">App shell: navigation host, DI assembly, startup orchestration</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="20" y="62" width="160" height="60" rx="10"/><text class="d-s" x="100" y="96" text-anchor="middle">Feature: Catalog</text>
+    <rect class="d-blue" x="192" y="62" width="160" height="60" rx="10"/><text class="d-s" x="272" y="96" text-anchor="middle">Feature: Cart</text>
+    <rect class="d-blue" x="364" y="62" width="160" height="60" rx="10"/><text class="d-s" x="444" y="96" text-anchor="middle">Feature: Payments</text>
+    <rect class="d-blue" x="536" y="62" width="164" height="60" rx="10"/><text class="d-s" x="618" y="96" text-anchor="middle">Feature: Account</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="20" y="134" width="680" height="44" rx="10"/><text class="d-t" x="360" y="161" text-anchor="middle">Shared domain services: session, user, cart state, entitlements</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="20" y="190" width="680" height="50" rx="10"/><text class="d-t" x="360" y="213" text-anchor="middle">Platform: network · storage · design system · analytics · flags · perf</text><text class="d-s" x="360" y="231" text-anchor="middle">owned by a platform team</text></g>
+  </svg>
+  <figcaption id="fig-sc2-cap">Features depend downward only. Cross-feature state lives in shared services, not in other features.</figcaption>
+</figure>
+
+<h2 id="boundaries">1. Strong boundaries</h2>
+<ul>
+  <li>Feature modules with public API modules for cross-feature contracts. See <a href="../android-modularization-strategies/index.html">Modularization Strategies</a>.</li>
+  <li>Enforced dependency rules in CI, not just conventions.</li>
+  <li>Teams own modules (CODEOWNERS), with clear on-call and quality responsibility.</li>
+</ul>
+
+<h2 id="shared-state">2. Shared state, done deliberately</h2>
+<p>User session, cart contents and entitlements are needed by many features. Put them in shared services with observable APIs, and a single source of truth for each:</p>
+<code-block lang="kotlin" file="Shared session service contract">
+interface SessionService {
+    val session: StateFlow<Session>               // SignedOut | SignedIn(user, entitlements)
+    suspend fun signOut()
+}
+
+sealed interface Session {
+    data object SignedOut : Session
+    data class SignedIn(val userId: String, val entitlements: Set<String>) : Session
+}
+// Features observe; only the auth feature mutates via its own API.
+</code-block>
+
+<h2 id="navigation">3. Navigation across features</h2>
+<p>Features expose route keys or entry points through API modules. The app shell assembles the navigation graph, so features never reference each other's screens directly. Deep links resolve to keys centrally. See <a href="../compose-navigation/index.html">Navigation in Compose</a>.</p>
+
+<h2 id="performance">4. Performance budgets</h2>
+<ul>
+  <li>Set budgets: cold start, frame metrics on key screens, APK size, memory.</li>
+  <li>Run Macrobenchmarks in CI, and alert on regressions per PR or nightly.</li>
+  <li>Control startup centrally: features register initialisers with priorities, so nobody adds work to <code>Application.onCreate</code> unreviewed.</li>
+</ul>
+
+<h2 id="experimentation">5. Experimentation and flags</h2>
+<p>Large apps run many experiments at once. Centralise flag evaluation and exposure logging, keep flag reads out of deep business logic (inject decisions), and clean up flags after launch. See <a href="../scaling-android-codebase-teams/index.html">Scaling Across Teams</a>.</p>
+
+<h2 id="consistency">6. Consistency and governance</h2>
+<ul>
+  <li>A design system module with screenshot tests.</li>
+  <li>Architecture decision records and lightweight design reviews for cross-cutting changes.</li>
+  <li>Templates and convention plugins for new features.</li>
+  <li>Lint rules encoding team conventions.</li>
+</ul>
+
+<h2 id="data">7. Data consistency at scale</h2>
+<p>Multiple features caching the same entities leads to inconsistency. Prefer shared repositories over a common database for core entities, and event-driven invalidation (for example push-triggered refresh) for data that changes server-side.</p>
+
+<h2 id="use-cases">Evolution stages</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Stage</th><th>Typical architecture work</th></tr></thead>
+  <tbody>
+    <tr><td>Growing (5–15 devs)</td><td>Feature modules, design system, Hilt, CI tests, flags</td></tr>
+    <tr><td>Large (15–50 devs)</td><td>Platform team, API modules, performance CI, startup orchestration</td></tr>
+    <tr><td>Very large (50+)</td><td>Governance, ADRs, dependency rules, build optimisation, internal tooling</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does scale require Clean Architecture everywhere?</summary><div><p>No. Consistent boundaries matter more than uniform layering. Some features need a domain layer and others don't.</p></div></details>
+  <details><summary>Should large apps use multiple Activities?</summary><div><p>Single-Activity with Compose navigation is common, but some entry points (share targets, widgets) need their own Activities. Choose per use case.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Architecture at scale means <strong>enforced boundaries, deliberate shared state, centrally assembled navigation, performance budgets in CI, managed experimentation and lightweight governance</strong>, so many teams can ship independently while the app stays coherent and fast.</p>
+<p>Next step: keep builds fast as the codebase grows with <a href="../gradle-multi-module-build-optimization/index.html">Multi-Module Gradle Builds and Build Optimization</a>.</p>

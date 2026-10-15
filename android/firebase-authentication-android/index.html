@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Authentication in Android (Kotlin Guide) | Yunok Tech</title>
+  <meta name="description" content="Add Firebase Authentication to Android with Kotlin: email/password, Google sign-in via Credential Manager, auth state as Flow, ID tokens for your backend, security rules and errors.">
+  <meta name="keywords" content="firebase authentication android, firebase auth kotlin, google sign in credential manager, firebase email password android, firebase id token backend, authstate flow kotlin, firebase auth compose">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/firebase-authentication-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/firebase-authentication-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Firebase Authentication in Android (Kotlin Guide)">
+  <meta property="og:description" content="Add Firebase Authentication to Android with Kotlin: email/password, Google sign-in via Credential Manager, auth state as Flow, ID tokens for your backend, security rules and errors.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Firebase Authentication in Android (Kotlin Guide)">
+  <meta name="twitter:description" content="Add Firebase Authentication to Android with Kotlin: email/password, Google sign-in via Credential Manager, auth state as Flow, ID tokens for your backend, security rules and errors.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Firebase Authentication in Android", "description": "Add Firebase Authentication to Android with Kotlin: email/password, Google sign-in via Credential Manager, auth state as Flow, ID tokens for your backend, security rules and errors.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "firebase auth kotlin, google sign in credential manager, firebase email password android, firebase id token backend, authstate flow kotlin, firebase auth compose", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/firebase-authentication-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Firebase Authentication in Android", "item": "https://yunoktech.com/android/firebase-authentication-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Firebase Authentication in Android</h1>
+    <p class="ad-lede">Firebase Authentication gives Android apps secure sign-in without building an auth backend: email and password, Google, phone and more. This guide implements email and Google sign-in with modern APIs, exposes auth state as a Flow, and connects it securely to your own server.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#flow">How it fits together</a></li><li><a href="#setup">Setup</a></li><li><a href="#repository">An AuthRepository</a></li><li><a href="#google">Google sign-in with Credential Manager</a></li><li><a href="#ui">Routing by auth state</a></li><li><a href="#backend">Calling your own backend securely</a></li><li><a href="#errors">Errors and UX</a></li><li><a href="#use-cases">Common setups</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Rolling your own authentication means hashing passwords, securing reset flows, rate-limiting attacks and managing sessions, all of which are easy to get dangerously wrong. Firebase Authentication handles these as a managed service, while your app focuses on the sign-in experience.</p>
+
+<h2 id="flow">How it fits together</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fa-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-fa-t fig-fa-d">
+    <title id="fig-fa-t">Firebase Authentication sign-in and backend verification</title>
+    <desc id="fig-fa-d">The app gets credentials from the user, via email and password or Google through Credential Manager, and signs in with Firebase Auth. Firebase returns a user and an ID token. The app sends the ID token to your backend, which verifies it with the Firebase Admin SDK before serving data.</desc>
+    <defs><marker id="fam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H186 M346 70 H382 M532 70 H568" marker-end="url(#fam)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="140" height="60" rx="12"/><text class="d-t" x="80" y="64" text-anchor="middle">Credentials</text><text class="d-s" x="80" y="82" text-anchor="middle">email · Google</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="190" y="40" width="156" height="60" rx="12"/><text class="d-t" x="268" y="64" text-anchor="middle">Firebase Auth</text><text class="d-s" x="268" y="82" text-anchor="middle">user + ID token</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="386" y="40" width="146" height="60" rx="12"/><text class="d-t" x="459" y="64" text-anchor="middle">Your app</text><text class="d-s" x="459" y="82" text-anchor="middle">Bearer ID token</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="572" y="40" width="138" height="60" rx="12"/><text class="d-t" x="641" y="64" text-anchor="middle">Your backend</text><text class="d-s" x="641" y="82" text-anchor="middle">verifies token</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Never trust a user ID sent by the client. Verify the signed ID token on the server.</text>
+  </svg>
+  <figcaption id="fig-fa-cap">Firebase proves who the user is. Your backend checks that proof on every request.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<ol class="steps">
+  <li>Create a Firebase project, register your Android app, and add <code>google-services.json</code>.</li>
+  <li>Enable the providers you need (Email/Password, Google) in <strong>Authentication → Sign-in method</strong>.</li>
+  <li>For Google sign-in, add your app's <strong>SHA-1 and SHA-256</strong> fingerprints (debug and release, plus Play App Signing) in project settings.</li>
+</ol>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    implementation(platform(<span class="tk-s">"com.google.firebase:firebase-bom:&lt;latest&gt;"</span>))
+    implementation(<span class="tk-s">"com.google.firebase:firebase-auth"</span>)
+    <span class="tk-c">// Google sign-in through Credential Manager</span>
+    implementation(<span class="tk-s">"androidx.credentials:credentials:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"androidx.credentials:credentials-play-services-auth:&lt;version&gt;"</span>)
+    implementation(<span class="tk-s">"com.google.android.libraries.identity.googleid:googleid:&lt;version&gt;"</span>)
+}</code></pre></figure>
+
+<h2 id="repository">An AuthRepository</h2>
+<figure class="code"><figcaption><span class="file">AuthRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">AuthRepository</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> auth: <span class="tk-t">FirebaseAuth</span> = <span class="tk-t">Firebase</span>.auth) {
+
+    <span class="tk-c">/** Emits the current user (or null) and every change. */</span>
+    <span class="tk-k">val</span> currentUser: <span class="tk-t">Flow</span>&lt;<span class="tk-t">FirebaseUser</span>?&gt; = callbackFlow {
+        <span class="tk-k">val</span> listener = <span class="tk-t">FirebaseAuth</span>.<span class="tk-t">AuthStateListener</span> { trySend(it.currentUser) }
+        auth.addAuthStateListener(listener)
+        awaitClose { auth.removeAuthStateListener(listener) }
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> signIn(email: <span class="tk-t">String</span>, password: <span class="tk-t">String</span>): <span class="tk-t">FirebaseUser</span> =
+        auth.signInWithEmailAndPassword(email.trim(), password).await().user!!
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> register(email: <span class="tk-t">String</span>, password: <span class="tk-t">String</span>): <span class="tk-t">FirebaseUser</span> {
+        <span class="tk-k">val</span> user = auth.createUserWithEmailAndPassword(email.trim(), password).await().user!!
+        user.sendEmailVerification().await()
+        <span class="tk-k">return</span> user
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> sendPasswordReset(email: <span class="tk-t">String</span>) { auth.sendPasswordResetEmail(email.trim()).await() }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> signInWithGoogleIdToken(idToken: <span class="tk-t">String</span>): <span class="tk-t">FirebaseUser</span> =
+        auth.signInWithCredential(<span class="tk-t">GoogleAuthProvider</span>.getCredential(idToken, <span class="tk-k">null</span>)).await().user!!
+
+    <span class="tk-c">/** Fresh ID token for calls to your own backend. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> idToken(forceRefresh: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>): <span class="tk-t">String</span>? =
+        auth.currentUser?.getIdToken(forceRefresh)?.await()?.token
+
+    <span class="tk-k">fun</span> signOut() = auth.signOut()
+}</code></pre></figure>
+<p><code>await()</code> comes from <code>kotlinx-coroutines-play-services</code>. On success, Firebase returns a non-null user, which is why <code>!!</code> is acceptable here.</p>
+
+<h2 id="google">Google sign-in with Credential Manager</h2>
+<figure class="code"><figcaption><span class="file">GoogleSignIn.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> requestGoogleIdToken(activity: <span class="tk-t">Activity</span>, webClientId: <span class="tk-t">String</span>): <span class="tk-t">String</span>? {
+    <span class="tk-k">val</span> credentialManager = <span class="tk-t">CredentialManager</span>.create(activity)
+    <span class="tk-k">val</span> option = <span class="tk-t">GetGoogleIdOption</span>.<span class="tk-t">Builder</span>()
+        .setServerClientId(webClientId)              <span class="tk-c">// "Web client" ID from your Firebase/Google Cloud project</span>
+        .setFilterByAuthorizedAccounts(<span class="tk-k">false</span>)        <span class="tk-c">// show all Google accounts on the device</span>
+        .build()
+    <span class="tk-k">val</span> request = <span class="tk-t">GetCredentialRequest</span>.<span class="tk-t">Builder</span>().addCredentialOption(option).build()
+
+    <span class="tk-k">return</span> <span class="tk-k">try</span> {
+        <span class="tk-k">val</span> credential = credentialManager.getCredential(activity, request).credential
+        <span class="tk-k">if</span> (credential <span class="tk-k">is</span> <span class="tk-t">CustomCredential</span> &amp;&amp; credential.type == <span class="tk-t">GoogleIdTokenCredential</span>.<span class="tk-t">TYPE_GOOGLE_ID_TOKEN_CREDENTIAL</span>) {
+            <span class="tk-t">GoogleIdTokenCredential</span>.createFrom(credential.<span class="tk-k">data</span>).idToken
+        } <span class="tk-k">else</span> <span class="tk-k">null</span>
+    } <span class="tk-k">catch</span> (e: <span class="tk-t">GetCredentialCancellationException</span>) {
+        <span class="tk-k">null</span>                                          <span class="tk-c">// user dismissed the sheet</span>
+    } <span class="tk-k">catch</span> (e: <span class="tk-t">GetCredentialException</span>) {
+        <span class="tk-k">null</span>                                          <span class="tk-c">// no accounts, misconfiguration, etc.</span>
+    }
+}
+<span class="tk-c">// val token = requestGoogleIdToken(activity, getString(R.string.default_web_client_id))</span>
+<span class="tk-c">// token?.let { authRepository.signInWithGoogleIdToken(it) }</span></code></pre></figure>
+
+<h2 id="ui">Routing by auth state</h2>
+<figure class="code"><figcaption><span class="file">AppRoot.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">AppRoot</span>(authRepository: <span class="tk-t">AuthRepository</span>) {
+    <span class="tk-k">val</span> user <span class="tk-k">by</span> authRepository.currentUser.collectAsStateWithLifecycle(initialValue = <span class="tk-k">null</span>)
+    <span class="tk-k">if</span> (user == <span class="tk-k">null</span>) <span class="tk-t">SignInFlow</span>() <span class="tk-k">else</span> <span class="tk-t">MainApp</span>()
+}</code></pre></figure>
+<p>In production, distinguish "unknown, still loading" from "signed out" to avoid a flash of the sign-in screen at startup.</p>
+
+<h2 id="backend">Calling your own backend securely</h2>
+<figure class="code"><figcaption><span class="file">Attach the Firebase ID token</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">FirebaseTokenInterceptor</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> auth: <span class="tk-t">FirebaseAuth</span>) : <span class="tk-t">Interceptor</span> {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> intercept(chain: <span class="tk-t">Interceptor</span>.<span class="tk-t">Chain</span>): <span class="tk-t">Response</span> {
+        <span class="tk-c">// getIdToken may refresh over the network; Tasks.await blocks this OkHttp thread (not main).</span>
+        <span class="tk-k">val</span> token = auth.currentUser?.let { <span class="tk-t">Tasks</span>.await(it.getIdToken(<span class="tk-k">false</span>)).token }
+        <span class="tk-k">val</span> request = chain.request().newBuilder().apply {
+            <span class="tk-k">if</span> (token != <span class="tk-k">null</span>) header(<span class="tk-s">"Authorization"</span>, <span class="tk-s">"Bearer $token"</span>)
+        }.build()
+        <span class="tk-k">return</span> chain.proceed(request)
+    }
+}</code></pre></figure>
+<p>Your server must <strong>verify the ID token</strong> with the Firebase Admin SDK and use the verified UID, never a user ID sent in the request body. If you use Firestore or Realtime Database, protect data with Security Rules based on <code>request.auth</code>.</p>
+
+<h2 id="errors">Errors and UX</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Exception</th><th>Meaning</th><th>Message</th></tr></thead>
+  <tbody>
+    <tr><td><code>FirebaseAuthInvalidCredentialsException</code></td><td>Wrong password or malformed email</td><td>"Email or password is incorrect"</td></tr>
+    <tr><td><code>FirebaseAuthInvalidUserException</code></td><td>User disabled or deleted</td><td>"This account isn't available"</td></tr>
+    <tr><td><code>FirebaseAuthUserCollisionException</code></td><td>Email already registered</td><td>"An account already exists. Try signing in."</td></tr>
+    <tr><td><code>FirebaseAuthWeakPasswordException</code></td><td>Password too weak</td><td>Show the reason from the exception</td></tr>
+    <tr><td><code>FirebaseNetworkException</code></td><td>No connectivity</td><td>"You're offline"</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Depending on your project's settings, Firebase may return a generic invalid-credential error instead of revealing whether an email exists. Design messages that work either way.</p>
+
+<h2 id="use-cases">Common setups</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Consumer app</h3><p>Google sign-in as the primary option, email as a fallback, and optional anonymous auth to let users try first and link later.</p></div>
+  <div class="card usecase"><h3>App with its own API</h3><p>Firebase for identity, your backend verifying ID tokens and storing app data.</p></div>
+  <div class="card usecase"><h3>Sensitive actions</h3><p>Re-authenticate before changing email or deleting an account, and consider biometrics for local unlock.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Missing release or Play App Signing SHA fingerprints, so Google sign-in works in debug but fails in production.</li>
+  <li>Trusting client-provided user IDs on the server.</li>
+  <li>Storing passwords locally.</li>
+  <li>Not offering account deletion. Google Play requires apps that allow account creation to provide account deletion.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does Firebase Auth keep users signed in?</summary><div><p>Yes. Sessions persist across app restarts until the user signs out or the session is revoked. ID tokens refresh automatically.</p></div></details>
+  <details><summary>Should I use the old Google Sign-In SDK?</summary><div><p>Google recommends Credential Manager for new implementations of Sign in with Google on Android.</p></div></details>
+  <details><summary>Is Firebase Auth free?</summary><div><p>Many providers have a generous free tier, but some features (such as phone authentication and enterprise features) have usage-based pricing. Check current Firebase pricing.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Firebase Authentication provides <strong>managed, secure identity</strong>. Expose auth state as a Flow, use <strong>Credential Manager</strong> for Google sign-in, send <strong>ID tokens</strong> to your backend and verify them server-side, and map auth errors to clear messages.</p>
+<p>Next step: reach users with <a href="../firebase-cloud-messaging-push-notifications/index.html">Firebase Cloud Messaging and Push Notifications</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/auth/android/start" target="_blank" rel="noopener">Firebase Authentication on Android</a></li><li><a href="https://firebase.google.com/docs/auth/android/google-signin" target="_blank" rel="noopener">Authenticate with Google on Android (Credential Manager)</a></li><li><a href="https://developer.android.com/identity/sign-in/credential-manager" target="_blank" rel="noopener">Credential Manager</a></li><li><a href="https://firebase.google.com/docs/auth/admin/verify-id-tokens" target="_blank" rel="noopener">Verify ID tokens on your backend</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-authentication-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-authentication-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/secure-token-storage-android/index.html"><small>APIs, Databases, and Backend Integration</small>Secure Token Storage and API Authentication</a></li><li><a href="../../android/firebase-cloud-messaging-push-notifications/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Cloud Messaging and Push Notifications</a></li><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li><li><a href="../../android/biometric-authentication-android/index.html"><small>Android Security and Privacy</small>Biometric Authentication with Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/firebase-authentication-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/firebase-authentication-android/&amp;text=Firebase Authentication in Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/firebase-authentication-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#flow">How it fits together</a></li><li><a href="#setup">Setup</a></li><li><a href="#repository">An AuthRepository</a></li><li><a href="#google">Google sign-in with Credential Manager</a></li><li><a href="#ui">Routing by auth state</a></li><li><a href="#backend">Calling your own backend securely</a></li><li><a href="#errors">Errors and UX</a></li><li><a href="#use-cases">Common setups</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-authentication-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dfirebase-authentication-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

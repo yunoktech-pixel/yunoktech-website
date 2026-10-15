@@ -1,0 +1,395 @@
+<!--meta
+{
+  "seo_title": "Android Development Roadmap for Beginners (2026)",
+  "description": "A step-by-step Android development roadmap for 2026: Kotlin, Android Studio, Jetpack Compose, ViewModel, coroutines, Room, Retrofit, testing and publishing, with projects.",
+  "primary_keyword": "android development roadmap",
+  "keywords": ["android developer roadmap 2026", "learn android development step by step", "android roadmap for beginners", "kotlin android roadmap", "jetpack compose roadmap", "how to start android development", "android projects for beginners"],
+  "intent": "Informational",
+  "lede": "Most beginners don't fail because Android is too hard. They fail because they learn things in the wrong order. This roadmap gives you a sensible sequence, explains why each stage comes where it does, and shows the code you should be able to write at each step.",
+  "date": "2026-10-14",
+  "cta": "beginner",
+  "image_alt": "Eight-stage Android learning path from Kotlin basics to publishing on Google Play",
+  "related": ["become-android-developer-2026", "kotlin-vs-java-android", "jetpack-compose-vs-xml", "kotlin-coroutines-flow-android"],
+  "refs": [
+    ["Android Developers: Get started", "https://developer.android.com/get-started/overview"],
+    ["Kotlin documentation", "https://kotlinlang.org/docs/home.html"],
+    ["Jetpack Compose overview", "https://developer.android.com/compose"],
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Android Basics with Compose (free course by Google)", "https://developer.android.com/courses/android-basics-compose/course"],
+    ["Play Console Help: Create and set up your app", "https://support.google.com/googleplay/android-developer/answer/9859152"]
+  ]
+}
+-->
+<p class="ad-lead">Search "learn Android" and you'll find hundreds of tutorials covering Activities, Fragments, XML layouts, RxJava, Dagger, Java, Kotlin, Compose and Flutter, often in the same playlist. A beginner can easily lose months learning tools the industry has already moved past, or jump into architecture before they can write a loop in Kotlin.</p>
+
+<p>This guide is a <strong>practical Android development roadmap for 2026</strong>. It is written for students, career switchers and web or backend developers who want to build native Android apps. You will learn:</p>
+<ul>
+  <li>the eight stages of learning Android, in the order that actually makes sense,</li>
+  <li>what "done" looks like at each stage, with a small piece of code you should be able to write,</li>
+  <li>which older technologies you can safely postpone,</li>
+  <li>three portfolio projects that prove your skills, and</li>
+  <li>the mistakes that slow most beginners down.</li>
+</ul>
+
+<h2 id="roadmap-at-a-glance">The Android roadmap at a glance</h2>
+<p>Modern Android development, as recommended by Google's own documentation, is built on <strong>Kotlin</strong> for the language, <strong>Jetpack Compose</strong> for the UI, and the <strong>Android Architecture Components</strong> (ViewModel, Room, DataStore, WorkManager and others) for structure and data. The roadmap below follows that stack, starting from the language and ending with a published app.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-roadmap-cap">
+  <svg viewBox="0 0 720 270" role="img" aria-labelledby="fig-roadmap-title fig-roadmap-desc">
+    <title id="fig-roadmap-title">Eight-stage Android learning roadmap</title>
+    <desc id="fig-roadmap-desc">Stages flow left to right on the top row: Kotlin, Android Studio and Gradle, Compose UI, State and ViewModel. Then right to left on the bottom row: Coroutines and Flow, Networking and Room, Testing and Debugging, Publish on Google Play.</desc>
+    <defs><marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M160 62 H190 M340 62 H370 M520 62 H550 M630 96 V164 M550 198 H520 M370 198 H340 M190 198 H160" marker-end="url(#ar1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="20" y="30" width="140" height="66" rx="12"/><text class="d-t" x="90" y="58" text-anchor="middle">1 · Kotlin</text><text class="d-s" x="90" y="78" text-anchor="middle">syntax, null safety</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="200" y="30" width="140" height="66" rx="12"/><text class="d-t" x="270" y="58" text-anchor="middle">2 · Studio + Gradle</text><text class="d-s" x="270" y="78" text-anchor="middle">project structure</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="380" y="30" width="140" height="66" rx="12"/><text class="d-t" x="450" y="58" text-anchor="middle">3 · Compose UI</text><text class="d-s" x="450" y="78" text-anchor="middle">layouts, Material 3</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="560" y="30" width="140" height="66" rx="12"/><text class="d-t" x="630" y="58" text-anchor="middle">4 · State + ViewModel</text><text class="d-s" x="630" y="78" text-anchor="middle">UDF, StateFlow</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-violet" x="560" y="166" width="140" height="66" rx="12"/><text class="d-t" x="630" y="194" text-anchor="middle">5 · Coroutines</text><text class="d-s" x="630" y="214" text-anchor="middle">suspend, Flow</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-amber" x="380" y="166" width="140" height="66" rx="12"/><text class="d-t" x="450" y="194" text-anchor="middle">6 · Data layer</text><text class="d-s" x="450" y="214" text-anchor="middle">Retrofit, Room</text></g>
+    <g class="d-step" style="--i:6"><rect class="d-box" x="200" y="166" width="140" height="66" rx="12"/><text class="d-t" x="270" y="194" text-anchor="middle">7 · Test + Debug</text><text class="d-s" x="270" y="214" text-anchor="middle">JUnit, Logcat</text></g>
+    <g class="d-step" style="--i:7"><rect class="d-green" x="20" y="166" width="140" height="66" rx="12"/><text class="d-t" x="90" y="194" text-anchor="middle">8 · Publish</text><text class="d-s" x="90" y="214" text-anchor="middle">Play Console</text></g>
+  </svg>
+  <figcaption id="fig-roadmap-cap">The eight stages. Each one depends on the one before it. Compose is much easier once Kotlin lambdas feel natural, and ViewModels make sense once you've felt the pain of state living inside the UI.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <caption>A realistic pace for someone studying 10 to 15 hours a week. Adjust it to your schedule. The order matters more than the speed.</caption>
+  <thead><tr><th>Stage</th><th>Focus</th><th>Suggested time</th><th>You're ready to move on when…</th></tr></thead>
+  <tbody>
+    <tr><td>1. Kotlin</td><td>Types, functions, classes, null safety, collections, lambdas</td><td>3–4 weeks</td><td>You can solve small problems in Kotlin without looking up syntax every line</td></tr>
+    <tr><td>2. Tooling</td><td>Android Studio, emulator, Gradle, project structure, Logcat</td><td>1 week</td><td>You can create, run and debug a project on an emulator and a phone</td></tr>
+    <tr><td>3. Compose UI</td><td>Composables, layouts, modifiers, lists, Material 3, navigation</td><td>3–4 weeks</td><td>You can rebuild a simple screen from any app you use daily</td></tr>
+    <tr><td>4. State + ViewModel</td><td>State hoisting, ViewModel, StateFlow, unidirectional data flow</td><td>2–3 weeks</td><td>Your UI survives rotation and the screen logic lives outside composables</td></tr>
+    <tr><td>5. Coroutines</td><td>suspend functions, scopes, dispatchers, Flow</td><td>2 weeks</td><td>You can explain why a network call doesn't freeze the UI</td></tr>
+    <tr><td>6. Data layer</td><td>Retrofit, JSON, Room, DataStore, repository pattern</td><td>3–4 weeks</td><td>Your app loads remote data, caches it and works offline</td></tr>
+    <tr><td>7. Quality</td><td>Unit tests, ViewModel tests, debugging crashes, basic profiling</td><td>2 weeks</td><td>You have tests for your ViewModels and can read a stack trace calmly</td></tr>
+    <tr><td>8. Publish</td><td>Release builds, signing, Play Console, store listing</td><td>1–2 weeks</td><td>An app you built is live, or in closed testing, on Google Play</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stage-1-kotlin">Stage 1: Learn Kotlin properly, before Android</h2>
+<p>Kotlin has been Google's preferred language for Android since 2019, and the official samples, documentation and Jetpack libraries are written with Kotlin in mind. The most common beginner mistake is learning Kotlin <em>through</em> Android. You then fight two unfamiliar things at once: a language and a framework.</p>
+<p>Spend the first few weeks writing plain Kotlin. You can use the <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a> or a simple console project. Focus on:</p>
+<ul>
+  <li><strong>Basics:</strong> <code>val</code> vs <code>var</code>, type inference, functions, string templates, <code>if</code> and <code>when</code> as expressions.</li>
+  <li><strong>Null safety:</strong> nullable types (<code>String?</code>), safe calls (<code>?.</code>), the Elvis operator (<code>?:</code>), and why <code>!!</code> is usually a smell.</li>
+  <li><strong>Classes:</strong> data classes, sealed classes (ideal for UI state), enums, objects.</li>
+  <li><strong>Collections and lambdas:</strong> <code>map</code>, <code>filter</code>, <code>groupBy</code>, <code>sortedBy</code>. Compose leans heavily on lambdas, so this pays off later.</li>
+</ul>
+<p>Here is a small exercise that touches most of these ideas. If you can write something like it without help, you are ready for Stage 2.</p>
+
+<code-block lang="kotlin" file="Main.kt">
+// A tiny expense report: data classes, sealed results, null safety and collection operations.
+data class Expense(val title: String, val amount: Double, val category: String?)
+
+sealed interface Report {
+    data class Ready(val totalsByCategory: Map<String, Double>, val biggest: Expense) : Report
+    data object Empty : Report
+}
+
+fun buildReport(expenses: List<Expense>): Report {
+    if (expenses.isEmpty()) return Report.Empty
+
+    val totals = expenses
+        .groupBy { it.category ?: "Uncategorised" }   // Elvis operator handles null categories
+        .mapValues { (_, items) -> items.sumOf { it.amount } }
+
+    return Report.Ready(totals, expenses.maxBy { it.amount })
+}
+
+fun main() {
+    val expenses = listOf(
+        Expense("Metro card", 500.0, "Travel"),
+        Expense("Lunch", 220.0, "Food"),
+        Expense("Course book", 899.0, null),
+    )
+
+    when (val report = buildReport(expenses)) {
+        is Report.Ready -> {
+            report.totalsByCategory.forEach { (category, total) -> println("$category: ₹$total") }
+            println("Biggest expense: ${report.biggest.title}")
+        }
+        Report.Empty -> println("No expenses yet")
+    }
+}
+</code-block>
+<p>Notice that <code>when</code> must handle every subtype of the sealed interface. That compiler guarantee is exactly why Android developers use sealed types to model screen states such as Loading, Success and Error.</p>
+
+<h2 id="stage-2-tooling">Stage 2: Android Studio, Gradle and project structure</h2>
+<p>Install the current stable release of <a href="https://developer.android.com/studio" target="_blank" rel="noopener">Android Studio</a> and create a project from the <strong>Empty Activity</strong> template. In recent versions this template already uses Jetpack Compose. Don't skip the boring parts here. Understanding the project structure saves hours of confusion later.</p>
+
+<code-block lang="text" file="Project structure (simplified)">
+MyFirstApp/
+├── settings.gradle.kts          ← which modules exist, where to download plugins/libraries
+├── build.gradle.kts             ← top-level plugin declarations
+├── gradle/libs.versions.toml    ← version catalog: one place for dependency versions
+└── app/
+    ├── build.gradle.kts         ← app module: minSdk, targetSdk, dependencies
+    └── src/
+        ├── main/
+        │   ├── AndroidManifest.xml   ← app identity, permissions, entry Activity
+        │   ├── java/com/example/myfirstapp/MainActivity.kt
+        │   └── res/                  ← strings, icons, themes
+        ├── test/                     ← local unit tests (run on your computer's JVM)
+        └── androidTest/              ← instrumented tests (run on a device/emulator)
+</code-block>
+<p>By the end of this stage you should be comfortable with:</p>
+<ul>
+  <li>running the app on an emulator <em>and</em> on a physical phone with USB or wireless debugging,</li>
+  <li>reading Logcat and filtering it by your app's package,</li>
+  <li>setting a breakpoint and stepping through code with the debugger,</li>
+  <li>adding a dependency through the version catalog and syncing Gradle,</li>
+  <li>the difference between <code>minSdk</code> (the oldest Android version you support) and <code>targetSdk</code> (the Android version whose behaviour your app has been tested against).</li>
+</ul>
+
+<h2 id="stage-3-compose">Stage 3: Build UI with Jetpack Compose</h2>
+<p>Jetpack Compose is Android's modern, declarative UI toolkit. You describe <em>what</em> the UI should look like for a given state, and Compose updates the screen when that state changes. This is called <strong>recomposition</strong>. Google recommends Compose for new apps, so learn it first. You will still meet XML layouts in older codebases, but you can learn them later when a job requires it.</p>
+<p>Start with the building blocks: <code>Column</code>, <code>Row</code>, <code>Box</code>, <code>Text</code>, <code>Button</code>, <code>Image</code>, modifiers for padding and size, <code>LazyColumn</code> for lists, and Material 3 components such as <code>Scaffold</code> and <code>TopAppBar</code>. Then learn state, because Compose only redraws when state it reads changes:</p>
+
+<code-block lang="kotlin" file="GreetingCard.kt">
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun LikeCounter(modifier: Modifier = Modifier) {
+    // rememberSaveable keeps the value across recomposition AND configuration changes like rotation.
+    var likes by rememberSaveable { mutableIntStateOf(0) }
+
+    Column(modifier.padding(16.dp)) {
+        Text("This post has $likes likes")
+        Button(onClick = { likes++ }) {
+            Text("Like")
+        }
+    }
+}
+</code-block>
+<p>Tapping the button changes <code>likes</code>. Compose notices that <code>Text</code> reads <code>likes</code> and recomposes it. You never call anything like <code>setText()</code>. If this feels strange at first, that's normal. The <a href="../jetpack-compose-vs-xml/index.html">Jetpack Compose vs XML comparison</a> explains the mental shift in detail.</p>
+
+<h2 id="stage-4-state-viewmodel">Stage 4: State, ViewModel and unidirectional data flow</h2>
+<p>Keeping state inside composables works for a like button. It falls apart for a real screen that loads data, validates input and survives rotation. This is where you learn the pattern Google's <a href="https://developer.android.com/topic/architecture" target="_blank" rel="noopener">architecture guide</a> recommends: the <strong>ViewModel</strong> owns screen state and exposes it as a <code>StateFlow</code>. The UI observes that state and sends events back to the ViewModel. State flows down and events flow up. This is <strong>unidirectional data flow (UDF)</strong>.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-udf-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-udf-title fig-udf-desc">
+    <title id="fig-udf-title">Unidirectional data flow between Compose UI and ViewModel</title>
+    <desc id="fig-udf-desc">The ViewModel exposes UI state to the Compose screen. The screen sends user events, such as a button tap, back to the ViewModel, which updates the state.</desc>
+    <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-blue" x="30" y="50" width="220" height="100" rx="14"/><text class="d-t" x="140" y="92" text-anchor="middle">Compose screen</text><text class="d-s" x="140" y="114" text-anchor="middle">renders state, emits events</text>
+    <rect class="d-violet" x="470" y="50" width="220" height="100" rx="14"/><text class="d-t" x="580" y="92" text-anchor="middle">ViewModel</text><text class="d-s" x="580" y="114" text-anchor="middle">holds StateFlow&lt;UiState&gt;</text>
+    <path class="d-flow" d="M470 78 H254" marker-end="url(#ar2)"/><text class="d-s" x="362" y="68" text-anchor="middle">UiState flows down</text>
+    <path class="d-flow" d="M250 124 H466" marker-end="url(#ar2)"/><text class="d-s" x="362" y="146" text-anchor="middle">events flow up (onAddClick)</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M470 78 H254');--dur:1.8s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M250 124 H466');--dur:1.8s;--delay:.9s"/>
+  </svg>
+  <figcaption id="fig-udf-cap">One source of truth. The screen never changes state directly. It asks the ViewModel, which produces a new immutable state.</figcaption>
+</figure>
+
+<code-block lang="kotlin" file="NotesViewModel.kt">
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+data class NotesUiState(
+    val input: String = "",
+    val notes: List<String> = emptyList(),
+)
+
+class NotesViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(NotesUiState())
+    val uiState: StateFlow<NotesUiState> = _uiState.asStateFlow()
+
+    fun onInputChange(text: String) {
+        _uiState.update { it.copy(input = text) }
+    }
+
+    fun onAddClick() {
+        _uiState.update { state ->
+            if (state.input.isBlank()) state
+            else state.copy(notes = state.notes + state.input.trim(), input = "")
+        }
+    }
+}
+</code-block>
+
+<code-block lang="kotlin" file="NotesScreen.kt">
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+@Composable
+fun NotesScreen(viewModel: NotesViewModel = viewModel()) {
+    // Collects the StateFlow only while the screen is at least STARTED.
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = state.input,
+                onValueChange = viewModel::onInputChange,
+                label = { Text("New note") },
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(Modifier.width(8.dp))
+            Button(onClick = viewModel::onAddClick) { Text("Add") }
+        }
+        LazyColumn(contentPadding = PaddingValues(vertical = 12.dp)) {
+            items(state.notes) { note -> Text(note, Modifier.padding(vertical = 6.dp)) }
+        }
+    }
+}
+</code-block>
+<div class="note"><b>Dependencies for this example</b>
+<p><code>viewModel()</code> comes from <code>androidx.lifecycle:lifecycle-viewmodel-compose</code>, and <code>collectAsStateWithLifecycle()</code> comes from <code>androidx.lifecycle:lifecycle-runtime-compose</code>. Add both through your version catalog using the latest stable Lifecycle version listed on the <a href="https://developer.android.com/jetpack/androidx/releases/lifecycle" target="_blank" rel="noopener">Lifecycle release page</a>.</p></div>
+<p>Rotate the device and the notes survive. The ViewModel outlives the configuration change, which is one of the main reasons it exists. This pattern is the backbone of most production Android apps. For a deeper comparison with MVI, read <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a>.</p>
+
+<h2 id="stage-5-coroutines">Stage 5: Coroutines and Flow</h2>
+<p>Android's main thread draws the UI. If it is blocked for too long, for example by a network call or a database query, the app stutters. If it stays blocked for several seconds, the system shows an "App Not Responding" (ANR) dialog. <strong>Kotlin coroutines</strong> let you write asynchronous code that reads like ordinary sequential code, and move heavy work off the main thread without callbacks.</p>
+<p>Learn these concepts in order: <code>suspend</code> functions, <code>viewModelScope.launch</code>, dispatchers (<code>Dispatchers.IO</code> for blocking I/O), structured concurrency and cancellation, and finally <code>Flow</code> for streams of values. Our full guide, <a href="../kotlin-coroutines-flow-android/index.html">Kotlin Coroutines and Flow Explained</a>, walks through each one with diagrams.</p>
+
+<h2 id="stage-6-data">Stage 6: The data layer: networking and local storage</h2>
+<p>Almost every real app talks to a server and stores something locally. Learn these libraries, which are the standard choices in the Android ecosystem:</p>
+<ul>
+  <li><strong>Retrofit</strong> (with OkHttp and a JSON converter such as kotlinx.serialization) for calling REST APIs.</li>
+  <li><strong>Room</strong> for structured local data, built on SQLite with compile-time-checked queries.</li>
+  <li><strong>DataStore</strong> for small key-value settings, replacing <code>SharedPreferences</code>.</li>
+  <li>The <strong>repository pattern</strong>, which hides where data comes from so ViewModels don't care whether it was cached or fetched.</li>
+</ul>
+
+<code-block lang="kotlin" file="ArticleApi.kt">
+import kotlinx.serialization.Serializable
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+@Serializable
+data class ArticleDto(val id: Long, val title: String, val summary: String)
+
+interface ArticleApi {
+    // Retrofit generates the implementation. suspend makes the call coroutine-friendly.
+    @GET("articles")
+    suspend fun getArticles(@Query("page") page: Int): List<ArticleDto>
+}
+</code-block>
+<p>Your goal here is an app that loads data from an API, saves it in Room, displays it from Room, and still shows the last data when the phone is offline. That single exercise teaches you more architecture than a dozen tutorials.</p>
+
+<h2 id="stage-7-quality">Stage 7: Testing and debugging</h2>
+<p>Beginners often skip testing, then lose confidence every time they change code. You don't need to test everything. Start where the value is highest:</p>
+<ul>
+  <li><strong>Unit-test your ViewModels.</strong> They contain your screen logic and don't need a device. The <code>kotlinx-coroutines-test</code> library gives you <code>runTest</code> for testing coroutine code.</li>
+  <li><strong>Learn to read a crash.</strong> Find the first line of the stack trace that points to <em>your</em> code. That's usually where the fix is.</li>
+  <li><strong>Use the Profiler</strong> in Android Studio once, just to see CPU and memory activity while your app runs.</li>
+</ul>
+
+<code-block lang="kotlin" file="NotesViewModelTest.kt">
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class NotesViewModelTest {
+    @Test
+    fun `blank input is not added`() {
+        val vm = NotesViewModel()
+        vm.onInputChange("   ")
+        vm.onAddClick()
+        assertEquals(emptyList<String>(), vm.uiState.value.notes)
+    }
+
+    @Test
+    fun `adding a note clears the input`() {
+        val vm = NotesViewModel()
+        vm.onInputChange("Buy milk")
+        vm.onAddClick()
+        assertEquals(listOf("Buy milk"), vm.uiState.value.notes)
+        assertEquals("", vm.uiState.value.input)
+    }
+}
+</code-block>
+<p>These tests run on your computer in seconds because <code>NotesViewModel</code> has no Android framework dependencies apart from the <code>ViewModel</code> base class. Keeping logic framework-free is a design choice that pays off here.</p>
+
+<h2 id="stage-8-publish">Stage 8: Publish on Google Play</h2>
+<p>Publishing teaches lessons that tutorials never cover: release builds, code shrinking with R8, app signing, privacy policies, store screenshots, and responding to real users. The steps, briefly:</p>
+<ol class="steps">
+  <li><strong>Create a Google Play developer account</strong> in the Play Console. New personal accounts have identity verification and, at the time of writing, a closed-testing requirement before production access. Check the current rules in Play Console Help.</li>
+  <li><strong>Build a signed Android App Bundle (.aab)</strong> from Android Studio. Use Play App Signing so Google manages the app signing key and you keep an upload key.</li>
+  <li><strong>Complete the store listing and policy forms</strong>: description, screenshots, content rating, data safety section and privacy policy URL.</li>
+  <li><strong>Release to a testing track first</strong> (internal or closed), fix what testers report, then promote to production.</li>
+</ol>
+
+<h2 id="portfolio-projects">Three portfolio projects that prove you're job-ready</h2>
+<p>Recruiters and clients rarely care about certificates. They care whether you can build and reason about a real app. These three projects cover the roadmap end to end. Each one has a clear purpose.</p>
+<div class="cards">
+  <div class="card usecase"><h3>1. Offline-first notes or expense tracker</h3><dl><dt>Problem</dt><dd>Users need to record data quickly, even without internet.</dd><dt>Solution</dt><dd>Compose UI, ViewModel + StateFlow, Room as the single source of truth.</dd><dt>Why it works</dt><dd>It exercises UDF, persistence and lists without networking complexity.</dd><dt>Trade-off</dt><dd>No sync, so data lives on one device.</dd></dl></div>
+  <div class="card usecase"><h3>2. API-driven news or movie app</h3><dl><dt>Problem</dt><dd>Show remote data reliably on slow or flaky networks.</dd><dt>Solution</dt><dd>Retrofit + Room cache + repository, with loading, error and retry states.</dd><dt>Why it works</dt><dd>It shows you can handle real-world failure, not just the happy path.</dd><dt>Trade-off</dt><dd>Cache invalidation adds complexity, so keep the rules simple.</dd></dl></div>
+  <div class="card usecase"><h3>3. A small app published on Play</h3><dl><dt>Problem</dt><dd>Prove you can ship, not just code.</dd><dt>Solution</dt><dd>Polish one project, add tests, write a privacy policy, publish to a testing track or production.</dd><dt>Why it works</dt><dd>A Play Store link is verifiable evidence of end-to-end skills.</dd><dt>Trade-off</dt><dd>Store policy and listing work take real time, so plan for it.</dd></dl></div>
+</div>
+
+<h2 id="what-to-skip">What you can safely postpone</h2>
+<p>The Android ecosystem is over 15 years old, and a lot of content online teaches approaches that are no longer the default for new apps. You will probably meet these in existing codebases, so don't treat them as worthless. They are simply not where a beginner should start:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Older approach</th><th>Modern default</th><th>When you'll still need the old one</th></tr></thead>
+  <tbody>
+    <tr><td>Java as the first language</td><td>Kotlin</td><td>Maintaining older apps. Kotlin and Java interoperate fully.</td></tr>
+    <tr><td>XML layouts + Fragments</td><td>Jetpack Compose</td><td>Many company codebases are mid-migration. Learn XML when a job needs it.</td></tr>
+    <tr><td>AsyncTask, raw threads</td><td>Coroutines</td><td>AsyncTask is deprecated. You'll only see it in very old code.</td></tr>
+    <tr><td>RxJava</td><td>Coroutines + Flow</td><td>Some large apps still use it heavily.</td></tr>
+    <tr><td>SharedPreferences</td><td>DataStore</td><td>Legacy settings code and simple migrations.</td></tr>
+    <tr><td>Manual Dagger setup</td><td>Hilt (built on Dagger)</td><td>Large modular apps sometimes use Dagger directly.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="where-ai-fits">Where AI fits into the roadmap</h2>
+<p>AI matters in two separate ways, and it helps not to mix them up:</p>
+<ul>
+  <li><strong>AI as a coding assistant.</strong> Tools such as Gemini in Android Studio can explain errors, suggest code and generate tests. They are most useful once you can judge whether the output is correct. Use them to <em>explain</em> things during Stages 1–4, not to write code you don't understand. See <a href="../gemini-in-android-studio/index.html">how to use Gemini in Android Studio</a>.</li>
+  <li><strong>AI as an app feature.</strong> Summarisation, chat, image description and smart search are increasingly common features. They sit on top of everything in this roadmap: you still need Compose, ViewModels, coroutines and a data layer. Start with <a href="../ai-in-android-development/index.html">What Is AI in Android Development?</a> after Stage 6.</li>
+</ul>
+
+<h2 id="common-mistakes">Common mistakes that slow beginners down</h2>
+<div class="cards">
+  <div class="card cons"><h4>Tutorial hopping</h4><p>Watching five courses on the same topic feels productive but builds little skill. Finish one resource, then build something without it.</p></div>
+  <div class="card cons"><h4>Architecture too early</h4><p>Clean Architecture with five modules for a two-screen app teaches ceremony, not judgement. Feel the problem first, then adopt the pattern.</p></div>
+  <div class="card cons"><h4>Ignoring error states</h4><p>Real networks fail. Every screen that loads data needs loading, error and empty states, and a retry.</p></div>
+  <div class="card cons"><h4>Copying code you can't explain</h4><p>Whether it comes from Stack Overflow or an AI tool, if you can't explain each line, you can't debug it in production.</p></div>
+  <div class="card cons"><h4>Never testing on a real phone</h4><p>Emulators are excellent, but performance, permissions and OEM behaviour differ on real devices. Test on at least one.</p></div>
+  <div class="card cons"><h4>Skipping Git</h4><p>Commit from day one and push to GitHub. Your commit history is part of your portfolio.</p></div>
+</div>
+
+<h2 id="best-practices">Best practices and trade-offs to keep in mind</h2>
+<ul>
+  <li><strong>Prefer official sources for fundamentals.</strong> The Android Developers documentation and Google's free <em>Android Basics with Compose</em> course stay current with API changes. Many blog tutorials don't.</li>
+  <li><strong>Pin versions through a version catalog</strong> (<code>libs.versions.toml</code>) and update deliberately. Jetpack libraries change quickly, and copying old snippets with old versions causes confusing build errors.</li>
+  <li><strong>Learn breadth before depth, then depth where it pays.</strong> Know a little about everything in the roadmap, then go deep on Compose and coroutines, which you will use every day.</li>
+  <li><strong>Balance speed with understanding.</strong> The time estimates above are guides. If coroutines take you four weeks instead of two, that is time well spent, because everything afterwards depends on them.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I learn Android development without knowing Java?</summary><div><p>Yes. You can start directly with Kotlin. Java knowledge helps when reading older code or libraries, but it is not a prerequisite for modern Android development.</p></div></details>
+  <details><summary>How long does it take to become job-ready?</summary><div><p>It varies a lot with prior programming experience and weekly hours. Following this roadmap at 10–15 hours a week, many learners can build portfolio-quality apps in roughly six months. Job readiness also depends on interview preparation and your local market.</p></div></details>
+  <details><summary>Do I need a powerful computer for Android Studio?</summary><div><p>Android Studio and the emulator are resource-hungry. Google publishes minimum system requirements on the Android Studio download page. In practice, 16 GB of RAM and an SSD make a big difference. With less memory, test on a physical phone instead of the emulator.</p></div></details>
+  <details><summary>Should I learn Flutter or Kotlin Multiplatform instead?</summary><div><p>Both are valid for cross-platform work. If your goal is Android specifically, native Kotlin + Compose gives you the deepest platform knowledge, and that knowledge also transfers to Kotlin Multiplatform and Compose Multiplatform later.</p></div></details>
+  <details><summary>Is XML still worth learning in 2026?</summary><div><p>Learn Compose first. Learn enough XML to read and maintain existing layouts when a project needs it. Many production apps still contain XML screens alongside Compose.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion: your next step</h2>
+<p>The Android roadmap is long, but it isn't confusing once you follow the dependency order: <strong>Kotlin → tooling → Compose → state and ViewModel → coroutines → data → testing → publishing</strong>. Each stage makes the next one easier, and each has a clear "ready to move on" signal.</p>
+<p>Your next step is simple. Open the Kotlin Playground today and write the expense-report exercise from Stage 1 without copying it. When it compiles and you understand every line, move on to Android Studio. If you want to understand why Kotlin is the language to start with, read <a href="../kotlin-vs-java-android/index.html">Kotlin vs Java for Android Development</a> next.</p>

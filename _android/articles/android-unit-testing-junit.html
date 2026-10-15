@@ -1,0 +1,157 @@
+<!--meta
+{
+  "seo_title": "Unit Testing in Android with JUnit (Kotlin Guide)",
+  "description": "Start unit testing Android apps with JUnit and Kotlin: what to test, local vs instrumented tests, test structure, fakes vs mocks, assertions, parameterized tests and running in CI.",
+  "primary_keyword": "android unit testing junit",
+  "keywords": ["junit kotlin android", "local unit tests android", "android testing pyramid", "fakes vs mocks", "given when then test", "gradle test android"],
+  "lede": "Unit tests are the cheapest, fastest safety net an Android app can have. They run on your computer in seconds and catch regressions before users do. This guide covers what to unit test, how to structure tests, and the habits that keep them valuable.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["testing-viewmodels-coroutines-flow", "mockk-vs-mockito", "compose-ui-testing", "android-ci-cd-github-actions"],
+  "refs": [
+    ["Fundamentals of testing Android apps", "https://developer.android.com/training/testing/fundamentals"],
+    ["Build local unit tests", "https://developer.android.com/training/testing/local-tests"],
+    ["Use test doubles", "https://developer.android.com/training/testing/fundamentals/test-doubles"],
+    ["JUnit 4", "https://junit.org/junit4/"]
+  ]
+}
+-->
+<p class="ad-lead">Many Android developers skip tests because UI tests felt slow and flaky. Unit tests are different: they test plain Kotlin logic (ViewModels, mappers, validators, reducers) on the JVM, with no device needed. A few hundred of them run in seconds.</p>
+
+<h2 id="pyramid">Where unit tests fit</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-up-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-up-t fig-up-d">
+    <title id="fig-up-t">Android test types by speed and scope</title>
+    <desc id="fig-up-d">Local unit tests in src/test run on the JVM in milliseconds and are the majority. Instrumented tests in src/androidTest run on a device or emulator and cover integration and UI. End-to-end tests are fewest and slowest.</desc>
+    <polygon points="360,10 690,190 30,190" class="d-box"/>
+    <rect class="d-red" x="300" y="34" width="120" height="30" rx="6"/><text class="d-s" x="360" y="54" text-anchor="middle">E2E (few)</text>
+    <rect class="d-amber" x="215" y="80" width="290" height="36" rx="6"/><text class="d-s" x="360" y="103" text-anchor="middle">Instrumented: src/androidTest (device)</text>
+    <rect class="d-green" x="110" y="134" width="500" height="44" rx="6"/><text class="d-t" x="360" y="161" text-anchor="middle">Local unit tests: src/test (JVM, ms each)</text>
+  </svg>
+  <figcaption id="fig-up-cap">Most of your tests should be fast local unit tests. Keep device tests for what truly needs Android.</figcaption>
+</figure>
+
+<h2 id="what">What to unit test</h2>
+<ul>
+  <li><strong>ViewModels:</strong> state changes in response to events and data.</li>
+  <li><strong>Business logic:</strong> validators, calculators, use cases, reducers.</li>
+  <li><strong>Mappers:</strong> DTO to domain to UI conversions, especially edge cases.</li>
+  <li><strong>Repositories:</strong> caching and merging logic, with fake data sources.</li>
+</ul>
+<p>Don't unit test framework code (Room's SQL is better tested with an in-memory DB in instrumented tests) or trivial getters.</p>
+
+<h2 id="setup">Setup</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:<version>")
+    testImplementation("com.google.truth:truth:<version>")       // optional: readable assertions
+}
+</code-block>
+
+<h2 id="first">A well-structured test</h2>
+<code-block lang="kotlin" file="src/main/.../PasswordValidator.kt">
+object PasswordValidator {
+    sealed interface Result {
+        data object Valid : Result
+        data class Invalid(val reasons: List<String>) : Result
+    }
+
+    fun validate(password: String): Result {
+        val reasons = buildList {
+            if (password.length < 8) add("At least 8 characters")
+            if (password.none(Char::isDigit)) add("At least one number")
+            if (password.none(Char::isUpperCase)) add("At least one uppercase letter")
+        }
+        return if (reasons.isEmpty()) Result.Valid else Result.Invalid(reasons)
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="src/test/.../PasswordValidatorTest.kt">
+class PasswordValidatorTest {
+
+    @Test
+    fun `valid password passes`() {
+        assertEquals(PasswordValidator.Result.Valid, PasswordValidator.validate("Secure123"))
+    }
+
+    @Test
+    fun `short password without digits lists both reasons`() {
+        // Given a short, letters-only password
+        val password = "Abc"
+        // When validated
+        val result = PasswordValidator.validate(password)
+        // Then both problems are reported
+        assertEquals(
+            PasswordValidator.Result.Invalid(listOf("At least 8 characters", "At least one number")),
+            result,
+        )
+    }
+}
+</code-block>
+<p>Backtick names describe behaviour in plain language, and the given/when/then structure keeps tests readable.</p>
+
+<h2 id="doubles">Fakes, stubs and mocks</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Double</th><th>What it is</th><th>When</th></tr></thead>
+  <tbody>
+    <tr><td>Fake</td><td>A working lightweight implementation (in-memory repository)</td><td>Default choice for repositories and data sources</td></tr>
+    <tr><td>Stub</td><td>Returns canned values</td><td>Simple dependencies</td></tr>
+    <tr><td>Mock</td><td>Records and verifies calls (MockK, Mockito)</td><td>Verifying interactions such as "analytics logged once"</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Google's testing guidance favours fakes where practical. They make tests describe behaviour rather than implementation details. See <a href="../mockk-vs-mockito/index.html">MockK vs Mockito</a>.</p>
+
+<h2 id="parameterized">Testing many cases</h2>
+<code-block lang="kotlin" file="Table-driven test">
+@Test
+fun `formats durations`() {
+    val cases = mapOf(0L to "0:00", 59L to "0:59", 61L to "1:01", 3_600L to "60:00")
+    cases.forEach { (seconds, expected) ->
+        assertEquals("for $seconds s", expected, formatDuration(seconds))
+    }
+}
+</code-block>
+
+<h2 id="android-deps">When code touches Android classes</h2>
+<p>Local tests run on the JVM with a stub <code>android.jar</code>, so Android framework calls throw by default. Options:</p>
+<ul>
+  <li><strong>Design it away:</strong> keep logic in classes without Android dependencies (best).</li>
+  <li><strong>Inject abstractions:</strong> for example a <code>StringProvider</code> or <code>Clock</code> instead of <code>Context</code> or <code>System.currentTimeMillis()</code>.</li>
+  <li><strong>Robolectric:</strong> runs Android framework code on the JVM when you really need it.</li>
+</ul>
+
+<h2 id="run">Running tests</h2>
+<code-block lang="bash" file="Terminal">
+./gradlew testDebugUnitTest                 # all local unit tests for the debug variant
+./gradlew :feature:cart:testDebugUnitTest   # one module
+# HTML report: <module>/build/reports/tests/testDebugUnitTest/index.html
+</code-block>
+
+<h2 id="use-cases">High-value tests</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Money and dates</h3><p>Rounding, currency formatting, time zones. Bugs here are costly and easy to test.</p></div>
+  <div class="card usecase"><h3>State transitions</h3><p>Reducers and ViewModels: loading to success, error to retry.</p></div>
+  <div class="card usecase"><h3>Bug regressions</h3><p>Every fixed bug gets a test that would have caught it.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Testing implementation details (private methods, call order) so every refactor breaks tests.</li>
+  <li>Using real time, randomness or the network in unit tests.</li>
+  <li>Huge setup shared by unrelated tests. Prefer small builders and fakes.</li>
+  <li>No assertions, or assertions that can't fail.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>JUnit 4 or JUnit 5?</summary><div><p>Android's tooling and many AndroidX test libraries are built around JUnit 4, which is the simplest default. JUnit 5 can be used for local tests with additional setup.</p></div></details>
+  <details><summary>How much coverage should I aim for?</summary><div><p>Coverage is a weak target. Aim to cover business logic and state transitions thoroughly, and use coverage reports to find untested risky code.</p></div></details>
+  <details><summary>Can AI write my tests?</summary><div><p>AI tools can draft tests, but you must check that they assert meaningful behaviour. See <a href="../ai-unit-test-generation-android/index.html">AI-Assisted Unit Test Generation</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Unit tests are <strong>fast, cheap and high-value</strong> when they target logic: ViewModels, validators, mappers and use cases. Keep logic free of Android classes, prefer fakes, name tests by behaviour, and run them on every commit.</p>
+<p>Next step: test asynchronous code properly in <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels with Coroutines and Flow</a>.</p>

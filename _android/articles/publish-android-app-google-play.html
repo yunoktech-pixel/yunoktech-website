@@ -1,0 +1,115 @@
+<!--meta
+{
+  "seo_title": "How to Publish an Android App on Google Play (2026)",
+  "description": "Step-by-step guide to publishing an Android app on Google Play in 2026: developer account, closed testing, signed App Bundle, store listing, policy forms, target API and staged rollout.",
+  "primary_keyword": "publish android app google play",
+  "keywords": ["upload app to play store", "google play developer account", "closed testing 12 testers", "android app bundle upload", "play console data safety", "target api level 36"],
+  "lede": "Publishing is where many first apps stall: account verification, testing requirements, signing, policy forms and store listing details. This guide walks through the whole process in order, with the requirements current at the time of writing.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["android-app-signing-upload-keys", "prepare-android-app-production", "google-play-console-guide", "android-store-listing-optimization"],
+  "refs": [
+    ["Play Console Help: Create and set up your app", "https://support.google.com/googleplay/android-developer/answer/9859152"],
+    ["App testing requirements for new personal developer accounts", "https://support.google.com/googleplay/android-developer/answer/14151465"],
+    ["Target API level requirements", "https://developer.android.com/google/play/requirements/target-sdk"],
+    ["Prepare your app for release", "https://developer.android.com/studio/publish/preparing"],
+    ["Data safety section", "https://support.google.com/googleplay/android-developer/answer/10787469"]
+  ]
+}
+-->
+<p class="ad-lead">Your app works on your phone. Getting it onto Google Play involves a developer account, a signed release, a testing period, a store listing and several policy declarations. None of it is hard, but each step has details that can delay you by days if you miss them.</p>
+
+<div class="note"><b>Requirements change</b><p>Play policies and requirements are updated regularly. At the time of writing, new apps and updates must target Android 16 (API level 36) from August 31, 2026, and new personal developer accounts must complete a closed test before applying for production access. Always confirm current rules in Play Console Help.</p></div>
+
+<h2 id="overview">The path to production</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pub-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-pub-t fig-pub-d">
+    <title id="fig-pub-t">Steps to publish an Android app on Google Play</title>
+    <desc id="fig-pub-d">Create and verify a developer account; build a signed App Bundle with Play App Signing; set up the store listing and policy forms; run internal and closed testing, which for new personal accounts must meet minimum testers and duration; apply for production access; release to production with a staged rollout.</desc>
+    <defs><marker id="pbm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H124 M224 70 H238 M338 70 H352 M452 70 H466 M566 70 H580" marker-end="url(#pbm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="100" height="60" rx="10"/><text class="d-t" x="60" y="66" text-anchor="middle">Account</text><text class="d-s" x="60" y="84" text-anchor="middle">verify</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="128" y="40" width="96" height="60" rx="10"/><text class="d-t" x="176" y="66" text-anchor="middle">Build</text><text class="d-s" x="176" y="84" text-anchor="middle">signed AAB</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="242" y="40" width="96" height="60" rx="10"/><text class="d-t" x="290" y="66" text-anchor="middle">Listing</text><text class="d-s" x="290" y="84" text-anchor="middle">+ policy</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="356" y="40" width="96" height="60" rx="10"/><text class="d-t" x="404" y="66" text-anchor="middle">Testing</text><text class="d-s" x="404" y="84" text-anchor="middle">closed track</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="470" y="40" width="96" height="60" rx="10"/><text class="d-t" x="518" y="66" text-anchor="middle">Apply</text><text class="d-s" x="518" y="84" text-anchor="middle">production</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="10"/><text class="d-w" x="647" y="66" text-anchor="middle">Release</text><text class="d-w" x="647" y="84" text-anchor="middle">staged rollout</text></g>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Start the account and testing steps early. They involve waiting periods you can't speed up.</text>
+  </svg>
+  <figcaption id="fig-pub-cap">Most delays happen in account verification and testing, not in uploading the app.</figcaption>
+</figure>
+
+<h2 id="account">1. Create a developer account</h2>
+<ul>
+  <li>Register in the Play Console. There's a one-time registration fee.</li>
+  <li>Choose <strong>personal</strong> or <strong>organisation</strong> account. Organisations need verification details such as a D-U-N-S number.</li>
+  <li>Complete identity verification and contact-detail verification.</li>
+</ul>
+
+<h2 id="build">2. Prepare a signed release</h2>
+<ol class="steps">
+  <li>Set a unique <code>applicationId</code>, which is permanent, plus <code>versionCode</code> and <code>versionName</code>.</li>
+  <li>Target the required API level, and test behaviour changes for that Android version.</li>
+  <li>Enable R8 and resource shrinking, and test the minified build. See <a href="../prepare-android-app-production/index.html">Prepare for Production</a>.</li>
+  <li>Generate an <strong>upload key</strong> and enrol in <strong>Play App Signing</strong>. See <a href="../android-app-signing-upload-keys/index.html">App Signing</a>.</li>
+  <li>Build an <strong>Android App Bundle</strong>: <code>./gradlew bundleRelease</code>.</li>
+</ol>
+
+<h2 id="listing">3. Store listing and policy forms</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Item</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>App name, short and full description</td><td>Accurate, no keyword stuffing. See <a href="../android-store-listing-optimization/index.html">Listing Optimization</a></td></tr>
+    <tr><td>Graphics</td><td>App icon, feature graphic, phone screenshots (plus tablet if supported)</td></tr>
+    <tr><td>Privacy policy URL</td><td>Required for most apps; must match actual data practices</td></tr>
+    <tr><td>Data safety form</td><td>Data collected and shared, including by SDKs</td></tr>
+    <tr><td>Content rating questionnaire</td><td>Determines age ratings</td></tr>
+    <tr><td>Target audience and ads declaration</td><td>Extra requirements if children are a target audience</td></tr>
+    <tr><td>App access instructions</td><td>Test credentials if features are behind login</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="testing">4. Testing tracks</h2>
+<ul>
+  <li><strong>Internal testing:</strong> up to a limited number of testers, available within minutes. Use it for quick team checks.</li>
+  <li><strong>Closed testing:</strong> invited testers (email lists or Google Groups). New personal developer accounts must run a closed test that meets Google's minimum tester count and duration before they can apply for production. Commonly cited requirements are 12 opted-in testers for 14 consecutive days. Check the current numbers in Play Console Help.</li>
+  <li><strong>Open testing:</strong> public beta on your store listing.</li>
+</ul>
+<div class="tip"><b>Make the closed test useful</b><p>Recruit real testers (friends, colleagues, a community), ask them to use the app regularly, and collect feedback. Google expects genuine testing, and you'll find real bugs.</p></div>
+
+<h2 id="release">5. Release to production</h2>
+<ol class="steps">
+  <li>Apply for production access (for new personal accounts) after meeting testing requirements, answering questions about your testing.</li>
+  <li>Create a production release, upload the AAB, and write release notes.</li>
+  <li>Use a <strong>staged rollout</strong> (for example 10% → 50% → 100%) and watch crashes and ANRs in Android vitals.</li>
+  <li>Review can take from hours to several days, longer for new accounts or sensitive permissions.</li>
+</ol>
+
+<h2 id="use-cases">Situations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Student's first app</h3><p>Personal account: plan two to three weeks for verification and closed testing before production.</p></div>
+  <div class="card usecase"><h3>Company app</h3><p>Organisation account with team access, and internal testing for QA builds from CI.</p></div>
+  <div class="card usecase"><h3>Client project (agency)</h3><p>Publish under the client's account, with you added as a user with limited permissions.</p></div>
+</div>
+
+<h2 id="rejections">Common reasons for rejection or delays</h2>
+<ul>
+  <li>Data safety form doesn't match the app or SDK behaviour.</li>
+  <li>Missing or inaccessible privacy policy, or no test credentials for login-gated apps.</li>
+  <li>Restricted permissions without justification (SMS, call log, background location).</li>
+  <li>Misleading metadata or impersonation in the listing.</li>
+  <li>Target API level below the requirement.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I change my package name later?</summary><div><p>No. The <code>applicationId</code> identifies the app on Play forever. A new ID means a new app listing.</p></div></details>
+  <details><summary>How long does review take?</summary><div><p>It varies, typically hours to a few days. New accounts and sensitive features can take longer.</p></div></details>
+  <details><summary>Do I need an organisation account to publish?</summary><div><p>No, but organisation accounts suit businesses and avoid the personal-account testing requirement. They require business verification.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Publishing on Google Play means a <strong>verified account</strong>, a <strong>signed App Bundle</strong> targeting the required API level, a complete <strong>listing and policy forms</strong>, a genuine <strong>closed test</strong> (for new personal accounts), and a <strong>staged production rollout</strong>. Start the slow steps early.</p>
+<p>Next step: get signing right once and for all in <a href="../android-app-signing-upload-keys/index.html">Android App Signing and Upload Keys Explained</a>.</p>

@@ -1,0 +1,112 @@
+<!--meta
+{
+  "seo_title": "Android System Design Interview Questions and Approach",
+  "description": "How to answer Android (mobile) system design interviews: a step-by-step framework, client architecture, offline sync, pagination, real-time, images, push, security, and worked example designs.",
+  "primary_keyword": "android system design interview",
+  "keywords": ["mobile system design interview", "design a chat app android", "design news feed mobile", "offline sync system design", "android client architecture interview", "senior android system design"],
+  "lede": "Mobile system design interviews ask you to design an app, such as a chat app, a news feed or a photo gallery, end to end from the client's perspective. The skill being tested is structured thinking about constraints, data flow and trade-offs, not drawing boxes quickly.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["android-architecture-interview-questions", "offline-first-android-architecture", "websockets-vs-rest-android", "senior-android-developer-interview"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Offline-first data layer", "https://developer.android.com/topic/architecture/data-layer/offline-first"],
+    ["Paging library", "https://developer.android.com/topic/libraries/architecture/paging/v3-overview"],
+    ["WorkManager", "https://developer.android.com/develop/background-work/background-tasks/persistent"]
+  ]
+}
+-->
+<p class="ad-lead">"Design Instagram's feed" isn't a request to rebuild Instagram in 45 minutes. It's an invitation to show how you clarify requirements, choose a client architecture, handle network and storage constraints, and reason about trade-offs, while communicating clearly.</p>
+
+<h2 id="framework">A framework for the interview</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sd-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-sd-t fig-sd-d">
+    <title id="fig-sd-t">Mobile system design interview framework</title>
+    <desc id="fig-sd-d">Five steps with approximate time: clarify requirements and constraints, define API and data models, design client architecture and data flow, deep-dive into critical parts such as offline, pagination or real-time, then discuss trade-offs, scaling and quality concerns.</desc>
+    <defs><marker id="sdm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#sdm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Clarify</text><text class="d-s" x="70" y="84" text-anchor="middle">~5 min</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">API + models</text><text class="d-s" x="212" y="84" text-anchor="middle">~5 min</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Architecture</text><text class="d-s" x="352" y="84" text-anchor="middle">~10 min</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Deep dives</text><text class="d-s" x="497" y="84" text-anchor="middle">~15 min</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="12"/><text class="d-w" x="647" y="66" text-anchor="middle">Trade-offs</text><text class="d-w" x="647" y="84" text-anchor="middle">~5–10 min</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Talk through decisions out loud. The interviewer grades reasoning, not completeness.</text>
+  </svg>
+  <figcaption id="fig-sd-cap">Spend most time on deep dives the interviewer cares about. Ask which parts they'd like to explore.</figcaption>
+</figure>
+
+<h2 id="clarify">Step 1: Clarify</h2>
+<ul>
+  <li><strong>Functional:</strong> core features for this interview (for example: view feed, like, comment, post photo).</li>
+  <li><strong>Non-functional:</strong> offline support? Real-time? Scale (users, items per screen)? Low-end devices? Battery and data constraints?</li>
+  <li><strong>Out of scope:</strong> confirm what you'll skip (for example the ranking algorithm and server internals).</li>
+</ul>
+
+<h2 id="api">Step 2: API and data models</h2>
+<code-block lang="text" file="Example: feed API sketch">
+GET  /feed?cursor={cursor}&limit=20      → { items: [Post], nextCursor }
+POST /posts/{id}/like                    → { liked: true, likeCount }   (idempotent)
+POST /posts  (multipart: image + caption) → Post
+Post { id, author{id,name,avatarUrl}, imageUrl, caption, likeCount, likedByMe, createdAt }
+</code-block>
+<p>Mention cursor-based pagination (stable under inserts), idempotency for actions, and image URLs with size variants.</p>
+
+<h2 id="architecture">Step 3: Client architecture</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-sd2-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-sd2-t fig-sd2-d">
+    <title id="fig-sd2-t">Client architecture for a feed app</title>
+    <desc id="fig-sd2-d">Compose UI observes a ViewModel with paged UI state. The repository uses a Paging RemoteMediator to load pages from the API into Room, the source of truth. Likes are written locally first and synced by WorkManager. An image loader with memory and disk cache fetches thumbnails. Push notifications trigger refreshes.</desc>
+    <rect class="d-blue" x="20" y="20" width="160" height="56" rx="10"/><text class="d-t" x="100" y="44" text-anchor="middle">Compose UI</text><text class="d-s" x="100" y="62" text-anchor="middle">LazyColumn + images</text>
+    <rect class="d-violet" x="220" y="20" width="160" height="56" rx="10"/><text class="d-t" x="300" y="44" text-anchor="middle">ViewModel</text><text class="d-s" x="300" y="62" text-anchor="middle">PagingData + actions</text>
+    <rect class="d-box" x="420" y="20" width="160" height="56" rx="10"/><text class="d-t" x="500" y="44" text-anchor="middle">FeedRepository</text><text class="d-s" x="500" y="62" text-anchor="middle">RemoteMediator</text>
+    <rect class="d-green" x="420" y="110" width="160" height="50" rx="10"/><text class="d-t" x="500" y="140" text-anchor="middle">Room (truth)</text>
+    <rect class="d-amber" x="600" y="20" width="110" height="56" rx="10"/><text class="d-t" x="655" y="52" text-anchor="middle">API</text>
+    <rect class="d-amber" x="220" y="110" width="160" height="50" rx="10"/><text class="d-s" x="300" y="140" text-anchor="middle">WorkManager sync</text>
+    <rect class="d-amber" x="20" y="110" width="160" height="50" rx="10"/><text class="d-s" x="100" y="140" text-anchor="middle">Image loader cache</text>
+    <rect class="d-box" x="600" y="110" width="110" height="50" rx="10"/><text class="d-s" x="655" y="140" text-anchor="middle">FCM push</text>
+    <path class="d-line" d="M180 48 H220 M380 48 H420 M580 48 H600 M500 76 V110 M380 135 H420 M100 76 V110 M655 110 V76"/>
+  </svg>
+  <figcaption id="fig-sd2-cap">A defensible baseline: offline-capable, paged, with optimistic actions and background sync.</figcaption>
+</figure>
+
+<h2 id="deep-dives">Step 4: Common deep dives</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Topic</th><th>Key points to discuss</th></tr></thead>
+  <tbody>
+    <tr><td>Pagination</td><td>Cursor vs offset, Paging 3 + RemoteMediator, prefetch distance, invalidation on refresh</td></tr>
+    <tr><td>Offline and sync</td><td>Local source of truth, pending-change outbox, WorkManager constraints, conflict policy</td></tr>
+    <tr><td>Optimistic updates</td><td>Write locally, show immediately, roll back on failure, idempotent APIs</td></tr>
+    <tr><td>Real-time</td><td>WebSocket while visible, FCM when backgrounded, catch-up via REST after reconnect</td></tr>
+    <tr><td>Images</td><td>Size variants, memory and disk cache, downsampling, placeholders, prefetching visible items</td></tr>
+    <tr><td>Uploads</td><td>Compress, resumable or chunked, WorkManager with progress notification, retries</td></tr>
+    <tr><td>Security</td><td>Token storage, TLS, server-side authorisation, Play Integrity for abuse-prone actions</td></tr>
+    <tr><td>Performance</td><td>Startup, list jank, memory on low-end devices, Baseline Profiles</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="examples">Worked example prompts</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Design a chat app</h3><p>Local message store, send queue with states (sending, sent, failed), WebSocket while open, FCM otherwise, ordering with server IDs, attachments uploaded in the background.</p></div>
+  <div class="card usecase"><h3>Design an offline notes app with sync</h3><p>Room, client UUIDs, change log, periodic and on-change sync, last-write-wins or field merge, end-to-end encryption options.</p></div>
+  <div class="card usecase"><h3>Design an image gallery</h3><p>MediaStore or Photo Picker, paging thumbnails, memory budgets, decoding off the main thread, and large-screen layouts.</p></div>
+</div>
+
+<h2 id="tradeoffs">Step 5: Trade-offs to volunteer</h2>
+<ul>
+  <li>Consistency vs responsiveness (optimistic UI).</li>
+  <li>Real-time freshness vs battery and data.</li>
+  <li>Offline capability vs complexity and storage.</li>
+  <li>Modularization vs speed for a small team.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How much backend detail is expected?</summary><div><p>Mostly API contracts and client implications. Mention server concerns briefly (rate limits, idempotency), and stay focused on the client.</p></div></details>
+  <details><summary>Should I write code?</summary><div><p>Usually only small snippets or interfaces. Diagrams and clear explanations matter more.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Ace mobile system design by <strong>clarifying constraints</strong>, defining <strong>APIs and models</strong>, presenting a <strong>clear client architecture</strong>, going deep on <strong>offline, pagination, real-time and media</strong>, and volunteering <strong>trade-offs</strong>, all while thinking out loud.</p>
+<p>Next step: prepare the whole senior loop with <a href="../senior-android-developer-interview/index.html">How to Prepare for a Senior Android Developer Interview</a>.</p>

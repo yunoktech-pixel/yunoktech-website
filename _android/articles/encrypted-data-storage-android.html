@@ -1,0 +1,118 @@
+<!--meta
+{
+  "seo_title": "Encrypted Data Storage in Android (Modern Approach)",
+  "description": "Encrypt data at rest on Android: what to encrypt, file-based encryption, Tink with Keystore master keys, encrypted DataStore and files, SQLCipher for Room, migrating off EncryptedSharedPreferences.",
+  "primary_keyword": "encrypted data storage android",
+  "keywords": ["encrypt files android tink", "room encryption sqlcipher", "encryptedsharedpreferences alternative", "data at rest encryption android", "keystore master key tink", "secure local storage android"],
+  "lede": "Android already encrypts user data at the device level, but app-level encryption adds protection for specific sensitive data against backups, extraction and some compromised-device scenarios. Here's what to encrypt, the modern tools to do it with, and how to migrate off deprecated libraries.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["android-keystore-explained", "secure-token-storage-android", "room-vs-datastore", "protect-user-data-ai-android-apps"],
+  "refs": [
+    ["Data and file storage overview", "https://developer.android.com/training/data-storage"],
+    ["File-based encryption (platform)", "https://source.android.com/docs/security/features/encryption/file-based"],
+    ["Tink", "https://developers.google.com/tink"],
+    ["Android Keystore system", "https://developer.android.com/privacy-and-security/keystore"],
+    ["SQLCipher for Android", "https://www.zetetic.net/sqlcipher/sqlcipher-for-android/"]
+  ]
+}
+-->
+<p class="ad-lead">Modern Android devices use <strong>file-based encryption</strong>: data at rest is encrypted, and apps' private directories are protected by the sandbox. So why encrypt again? Because device encryption protects a powered-off, locked device, not your app's data from backups, debugging tools on compromised devices, or another layer of defence your compliance team requires.</p>
+
+<h2 id="what">What to encrypt at the app level</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Encrypt?</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Auth tokens, session secrets</td><td>Yes</td><td>See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a></td></tr>
+    <tr><td>Health, financial, identity documents</td><td>Yes</td><td>Often required by policy or regulation</td></tr>
+    <tr><td>Private user content (journals, private notes)</td><td>Often</td><td>Consider user expectations</td></tr>
+    <tr><td>Cached public content, preferences like theme</td><td>No</td><td>Encryption adds cost without benefit</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-enc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-enc-t fig-enc-d">
+    <title id="fig-enc-t">Encryption tools for different storage types</title>
+    <desc id="fig-enc-d">A Keystore-wrapped master key protects Tink keysets. Tink AEAD encrypts small values for DataStore; Tink streaming AEAD encrypts files; SQLCipher encrypts entire Room databases with a key protected by the Keystore.</desc>
+    <rect class="d-dark" x="260" y="10" width="200" height="44" rx="10"/><text class="d-w" x="360" y="37" text-anchor="middle">Keystore master key</text>
+    <path class="d-line" d="M300 54 L130 100 M360 54 V100 M420 54 L590 100"/>
+    <rect class="d-green" x="30" y="100" width="200" height="70" rx="12"/><text class="d-t" x="130" y="128" text-anchor="middle">Small values</text><text class="d-s" x="130" y="148" text-anchor="middle">Tink AEAD → DataStore</text>
+    <rect class="d-blue" x="260" y="100" width="200" height="70" rx="12"/><text class="d-t" x="360" y="128" text-anchor="middle">Files</text><text class="d-s" x="360" y="148" text-anchor="middle">Tink streaming AEAD</text>
+    <rect class="d-violet" x="490" y="100" width="200" height="70" rx="12"/><text class="d-t" x="590" y="128" text-anchor="middle">Databases</text><text class="d-s" x="590" y="148" text-anchor="middle">SQLCipher + Room</text>
+  </svg>
+  <figcaption id="fig-enc-cap">One Keystore-protected root, with the right tool for each storage type.</figcaption>
+</figure>
+
+<h2 id="deprecated">About EncryptedSharedPreferences and EncryptedFile</h2>
+<p>Jetpack Security (<code>androidx.security:security-crypto</code>), which provided <code>EncryptedSharedPreferences</code> and <code>EncryptedFile</code>, has been <strong>deprecated</strong>. Existing apps keep working, but new code should use alternatives such as <strong>Tink</strong> directly (which security-crypto used internally), together with DataStore or files. Plan a migration that reads old values once and re-writes them with the new mechanism.</p>
+
+<h2 id="tink-files">Encrypting files with Tink</h2>
+<code-block lang="kotlin" file="EncryptedFiles.kt">
+object EncryptedFiles {
+    private fun streamingAead(context: Context): StreamingAead {
+        StreamingAeadConfig.register()
+        return AndroidKeysetManager.Builder()
+            .withSharedPref(context, "file_keyset", "file_keyset_prefs")
+            .withKeyTemplate(KeyTemplates.get("AES256_GCM_HKDF_4KB"))
+            .withMasterKeyUri("android-keystore://file_master_key")
+            .build()
+            .keysetHandle
+            .getPrimitive(RegistryConfiguration.get(), StreamingAead::class.java)
+    }
+
+    fun write(context: Context, file: File, bytes: ByteArray) {
+        val aad = file.name.toByteArray()               // bind ciphertext to the file name
+        FileOutputStream(file).use { out ->
+            streamingAead(context).newEncryptingStream(out, aad).use { it.write(bytes) }
+        }
+    }
+
+    fun read(context: Context, file: File): ByteArray {
+        val aad = file.name.toByteArray()
+        return FileInputStream(file).use { input ->
+            streamingAead(context).newDecryptingStream(input, aad).use { it.readBytes() }
+        }
+    }
+}
+</code-block>
+<p>In production, create the primitive once and reuse it. For small values, use Tink's <code>Aead</code> with a DataStore serializer, as shown in <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p>
+
+<h2 id="room">Encrypting a Room database</h2>
+<p>Room doesn't encrypt by itself. A common approach is <strong>SQLCipher</strong>, which plugs into Room through an <code>openHelperFactory</code>. Protect the database passphrase by generating random bytes and storing them encrypted with a Keystore-backed key:</p>
+<code-block lang="kotlin" file="Encrypted Room (outline)">
+val passphrase: ByteArray = DbKeyProvider.getOrCreate(context)   // random 32 bytes, stored Tink/Keystore-encrypted
+val factory = SupportOpenHelperFactory(passphrase)                // from the SQLCipher Android library
+val db = Room.databaseBuilder(context, AppDatabase::class.java, "secure.db")
+    .openHelperFactory(factory)
+    .build()
+</code-block>
+<p>Check the SQLCipher library's current artifact and class names, and measure the performance impact on your queries.</p>
+
+<h2 id="practices">Practices</h2>
+<ul>
+  <li>Use authenticated encryption (AES-GCM / AEAD), never ECB or unauthenticated modes.</li>
+  <li>Never hard-code keys, and never derive keys from constants in the APK.</li>
+  <li>Exclude encrypted data and keysets from backups, since Keystore keys don't restore.</li>
+  <li>Handle key loss: treat undecryptable data as missing, and re-sync or sign out.</li>
+  <li>Encrypt only what needs it, because encryption costs CPU and complexity.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Health diary</h3><p>Room with SQLCipher, biometric lock on open, and no cloud backup of the database.</p></div>
+  <div class="card usecase"><h3>Document wallet</h3><p>PDFs encrypted with Tink streaming AEAD, plus FLAG_SECURE on the viewer.</p></div>
+  <div class="card usecase"><h3>Banking session</h3><p>Tokens via Tink AEAD in DataStore, cleared on logout.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is device encryption enough?</summary><div><p>For low-sensitivity data, usually yes. For secrets and regulated data, app-level encryption adds protection for backups and some compromised-device scenarios.</p></div></details>
+  <details><summary>Does encryption slow my app?</summary><div><p>Some, especially for large files or databases. Measure, and encrypt selectively.</p></div></details>
+  <details><summary>Can I use the deprecated library a bit longer?</summary><div><p>Existing code continues to function, but it won't get updates. Plan migration rather than adding new usage.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Encrypt <strong>sensitive</strong> data at the app level with <strong>Keystore-protected keys</strong>: Tink AEAD for small values, streaming AEAD for files, and SQLCipher for databases. Migrate off the deprecated EncryptedSharedPreferences, exclude secrets from backup, and handle key loss gracefully.</p>
+<p>Next step: limit what you collect in the first place with <a href="../android-permissions-privacy/index.html">Android Permissions and Privacy Best Practices</a>.</p>

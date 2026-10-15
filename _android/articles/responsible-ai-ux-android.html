@@ -1,0 +1,117 @@
+<!--meta
+{
+  "seo_title": "Responsible AI User Experience Design on Android",
+  "description": "Design responsible AI UX in Android apps: setting expectations, labelling AI content, user control and editing, feedback, citations, uncertainty, onboarding, accessibility, safety and Google Play AI-generated content policy.",
+  "primary_keyword": "responsible ai ux",
+  "keywords": ["ai ux design mobile", "label ai generated content", "ai feedback thumbs up down", "google play ai generated content policy", "human in the loop ux", "ai transparency app"],
+  "lede": "AI features are probabilistic: sometimes brilliant, sometimes wrong. Good AI UX sets the right expectations, keeps users in control, makes AI content recognisable, and gives people ways to correct and report. These patterns build trust that lasts beyond the novelty.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-fallbacks-android", "ai-generated-app-content-android", "evaluate-ai-responses-hallucinations", "android-privacy-accessibility-reliability"],
+  "refs": [
+    ["Google: People + AI Guidebook", "https://pair.withgoogle.com/guidebook/"],
+    ["Google Play: AI-generated content policy", "https://support.google.com/googleplay/android-developer/answer/13985936"],
+    ["Material Design 3", "https://m3.material.io/"],
+    ["Google AI principles", "https://ai.google/responsibility/principles/"]
+  ]
+}
+-->
+<p class="ad-lead">Users bring very different mental models to AI: some trust it too much, some not at all. Your interface should calibrate that trust, so people rely on AI where it's good, check it where it's weak, and always stay in charge.</p>
+
+<h2 id="principles">Core principles</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rux-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-rux-t fig-rux-d">
+    <title id="fig-rux-t">Principles of responsible AI UX</title>
+    <desc id="fig-rux-d">Set expectations about what AI can and cannot do. Make AI content recognisable. Keep users in control with editing and undo. Show sources and uncertainty. Collect feedback and allow reporting. Fail gracefully.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="20" width="225" height="70" rx="12"/><text class="d-t" x="122" y="50" text-anchor="middle">Set expectations</text><text class="d-s" x="122" y="70" text-anchor="middle">what it can and can't do</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="247" y="20" width="225" height="70" rx="12"/><text class="d-t" x="360" y="50" text-anchor="middle">Make AI visible</text><text class="d-s" x="360" y="70" text-anchor="middle">labels, provenance</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="484" y="20" width="226" height="70" rx="12"/><text class="d-t" x="597" y="50" text-anchor="middle">Keep users in control</text><text class="d-s" x="597" y="70" text-anchor="middle">edit, undo, confirm</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="10" y="110" width="225" height="70" rx="12"/><text class="d-t" x="122" y="140" text-anchor="middle">Show sources</text><text class="d-s" x="122" y="160" text-anchor="middle">citations, uncertainty</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-red" x="247" y="110" width="225" height="70" rx="12"/><text class="d-t" x="360" y="140" text-anchor="middle">Feedback + report</text><text class="d-s" x="360" y="160" text-anchor="middle">rate, flag, correct</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="484" y="110" width="226" height="70" rx="12"/><text class="d-t" x="597" y="140" text-anchor="middle">Fail gracefully</text><text class="d-s" x="597" y="160" text-anchor="middle">helpful, input kept</text></g>
+  </svg>
+  <figcaption id="fig-rux-cap">These principles adapt guidance like Google's People + AI Guidebook to mobile apps.</figcaption>
+</figure>
+
+<h2 id="expectations">Set expectations</h2>
+<ul>
+  <li>Onboard briefly: what the feature does, examples of good uses, and its limits ("may be inaccurate; check important details").</li>
+  <li>Use specific feature names ("Summarise note") rather than vague "AI magic".</li>
+  <li>Disclose where processing happens (on device or cloud).</li>
+</ul>
+
+<h2 id="label">Label AI content</h2>
+<code-block lang="kotlin" file="AiLabel.kt">
+@Composable
+fun AiGeneratedLabel(source: String, modifier: Modifier = Modifier) {
+    AssistChip(
+        onClick = { /* open "About AI summaries" sheet */ },
+        label = { Text("AI-generated · $source") },
+        leadingIcon = { Icon(Icons.Outlined.AutoAwesome, contentDescription = null) },
+        modifier = modifier.semantics { contentDescription = "AI-generated content, from $source. Tap for details." },
+    )
+}
+</code-block>
+<p>Keep the label when content is saved or shared where appropriate, so its origin isn't lost.</p>
+
+<h2 id="control">Keep users in control</h2>
+<ul>
+  <li><strong>Suggest, don't impose:</strong> drafts users edit, not auto-sent messages.</li>
+  <li><strong>Confirm actions</strong> with side effects. See <a href="../prompt-injection-android-ai/index.html">Prompt Injection</a>.</li>
+  <li><strong>Undo</strong> AI edits (keep the original text).</li>
+  <li><strong>Settings</strong> to turn AI features off.</li>
+</ul>
+
+<h2 id="sources">Sources and uncertainty</h2>
+<ul>
+  <li>For answers grounded in documents, show citations users can tap. See <a href="../rag-android-apps/index.html">RAG</a>.</li>
+  <li>Let the model say "I don't know" (instruct it to), and show that state honestly.</li>
+  <li>For high-stakes domains (health, finance, legal), add clear guidance to consult professionals and avoid presenting outputs as authoritative.</li>
+</ul>
+
+<h2 id="feedback">Feedback loops</h2>
+<code-block lang="kotlin" file="Feedback row">
+@Composable
+fun FeedbackRow(onRate: (Boolean) -> Unit, onReport: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { onRate(true) }) { Icon(Icons.Outlined.ThumbUp, "Helpful") }
+        IconButton(onClick = { onRate(false) }) { Icon(Icons.Outlined.ThumbDown, "Not helpful") }
+        TextButton(onClick = onReport) { Text("Report") }
+    }
+}
+// Log ratings without content by default; ask before attaching the response to a report.
+</code-block>
+<p>Google Play's AI-generated content policy expects apps that generate content to let users report or flag offensive content. Check the current policy for your app type.</p>
+
+<h2 id="accessibility">Accessibility</h2>
+<ul>
+  <li>Announce completion of streamed responses once, not on every token.</li>
+  <li>Make Stop and Retry reachable by screen readers.</li>
+  <li>Make AI labels readable as text, not just icons.</li>
+</ul>
+
+<h2 id="safety">Safety by design</h2>
+<ul>
+  <li>Use provider safety settings and your own checks for your audience.</li>
+  <li>Restrict open-ended generation in apps for children or sensitive contexts.</li>
+  <li>Don't make AI impersonate real people or present itself as human.</li>
+</ul>
+
+<h2 id="checklist">Launch checklist</h2>
+<ol class="steps">
+  <li>Feature explains its purpose and limits.</li>
+  <li>AI content is labelled; actions require confirmation.</li>
+  <li>Users can edit, undo, rate and report.</li>
+  <li>Failures and refusals have helpful messages. See <a href="../ai-fallbacks-android/index.html">Fallbacks</a>.</li>
+  <li>Privacy disclosure and settings are in place.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do disclaimers fix inaccurate AI?</summary><div><p>No. They set expectations, but you still need evaluation, grounding and validation to make outputs reliable.</p></div></details>
+  <details><summary>Will labels reduce usage?</summary><div><p>Clear labels typically help users calibrate trust appropriately. Hidden AI that later proves wrong tends to damage trust more.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Responsible AI UX <strong>sets expectations</strong>, <strong>labels AI content</strong>, <strong>keeps users in control</strong>, shows <strong>sources and uncertainty</strong>, collects <strong>feedback and reports</strong>, and <strong>fails gracefully</strong>, building trust that outlasts the novelty.</p>
+<p>Next step: run AI features in production with <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI Latency, Errors and Costs</a>.</p>

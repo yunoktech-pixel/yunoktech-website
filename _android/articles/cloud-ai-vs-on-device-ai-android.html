@@ -1,0 +1,180 @@
+<!--meta
+{
+  "seo_title": "Cloud AI vs On-Device AI for Android: Trade-offs",
+  "description": "Cloud AI vs on-device AI on Android compared: privacy, latency, cost, offline use, device support and quality, plus hybrid inference with Firebase AI Logic and Kotlin code.",
+  "primary_keyword": "cloud ai vs on-device ai android",
+  "keywords": ["on-device ai android", "server-side inference vs on-device", "gemini nano vs gemini cloud", "hybrid inference android", "firebase ai logic hybrid", "offline ai android", "edge ai mobile"],
+  "intent": "Comparison / architecture decision",
+  "lede": "On-device AI promises privacy, zero per-request cost and offline use. Cloud AI promises capability and reach. Neither is free of trade-offs. Here's how they really compare on Android, how hybrid inference works, and how to design a feature that degrades gracefully.",
+  "date": "2026-10-14",
+  "cta": "ai",
+  "related": ["choose-ai-model-android-app", "gemini-nano-ml-kit-genai-android", "gemini-api-android-kotlin", "ai-in-android-development"],
+  "refs": [
+    ["Gemini Nano and AICore", "https://developer.android.com/ai/gemini-nano"],
+    ["Hybrid inference on Android", "https://developer.android.com/ai/hybrid"],
+    ["Firebase AI Logic: hybrid on-device and cloud", "https://firebase.google.com/docs/ai-logic/hybrid"],
+    ["ML Kit GenAI APIs (device support, quotas)", "https://developers.google.com/ml-kit/genai"],
+    ["Firebase App Check for AI Logic", "https://firebase.google.com/docs/ai-logic/app-check"],
+    ["LiteRT", "https://ai.google.dev/edge/litert"]
+  ]
+}
+-->
+<p class="ad-lead">Where the model runs is one of the most consequential decisions in an AI feature. It determines who can use the feature, how fast it feels, what it costs per user, what your privacy policy says, and whether it works in a lift with no signal. Yet teams often treat it as an afterthought once they've picked "a model".</p>
+<p>This article is for Android developers designing AI features. It compares cloud inference and on-device inference across seven dimensions, explains how Android's on-device stack (AICore, Gemini Nano, ML Kit GenAI) differs from the cloud path (Firebase AI Logic or your own backend), introduces Firebase's experimental hybrid inference, and shows Kotlin patterns for graceful fallback.</p>
+
+<h2 id="definitions">Definitions: what "on-device" and "cloud" mean here</h2>
+<ul>
+  <li><strong>On-device inference</strong>: the model runs on the phone's CPU, GPU or NPU. On Android this means Gemini Nano via AICore (through the ML Kit GenAI APIs), task-specific ML Kit models, or your own model running in LiteRT.</li>
+  <li><strong>Cloud (server-side) inference</strong>: the app sends input over the network to a model running in a data centre, such as Gemini through Firebase AI Logic or any model behind your own backend, and receives the output.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-path-cap">
+  <svg viewBox="0 0 720 270" role="img" aria-labelledby="fig-path-title fig-path-desc">
+    <title id="fig-path-title">Request path for on-device and cloud inference</title>
+    <desc id="fig-path-desc">On-device path: the app calls ML Kit GenAI, which calls the AICore system service running Gemini Nano on device hardware; the data never leaves the phone. Cloud path: the app sends the request over the network, through Firebase AI Logic with App Check or your own backend, to a cloud Gemini model, and the response streams back.</desc>
+    <defs><marker id="p1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-box" x="14" y="14" width="330" height="242" rx="16" style="fill:#f0fdf4"/>
+    <text class="d-s" x="30" y="36">ON THE PHONE</text>
+    <rect class="d-blue" x="34" y="56" width="120" height="50" rx="10"/><text class="d-t" x="94" y="86" text-anchor="middle">Your app</text>
+    <rect class="d-green" x="196" y="56" width="132" height="50" rx="10"/><text class="d-t" x="262" y="78" text-anchor="middle">ML Kit GenAI</text><text class="d-s" x="262" y="96" text-anchor="middle">Prompt / Summarize…</text>
+    <rect class="d-green" x="196" y="150" width="132" height="58" rx="10"/><text class="d-t" x="262" y="174" text-anchor="middle">AICore</text><text class="d-s" x="262" y="194" text-anchor="middle">Gemini Nano · NPU</text>
+    <path class="d-flow" d="M154 81 H192 M262 106 V146" marker-end="url(#p1)"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M154 81 H262 V150');--dur:1.6s"/>
+    <text class="d-s" x="34" y="236">data stays on device · works offline</text>
+
+    <path class="d-flow" d="M94 106 V226 H380" marker-end="url(#p1)"/><text class="d-s" x="430" y="246" text-anchor="middle">network</text>
+    <rect class="d-violet" x="384" y="200" width="150" height="52" rx="10"/><text class="d-t" x="459" y="222" text-anchor="middle">Firebase AI Logic</text><text class="d-s" x="459" y="240" text-anchor="middle">+ App Check / backend</text>
+    <path class="d-flow" d="M534 226 H570 V120" marker-end="url(#p1)"/>
+    <rect class="d-amber" x="510" y="56" width="196" height="60" rx="10"/><text class="d-t" x="608" y="82" text-anchor="middle">Cloud Gemini</text><text class="d-s" x="608" y="100" text-anchor="middle">large models, long context</text>
+    <circle class="d-dot warm" r="6" style="offset-path:path('M94 106 V226 H570 V120');--dur:2.8s;--delay:.4s"/>
+  </svg>
+  <figcaption id="fig-path-cap">The on-device path never touches the network. The cloud path adds network latency and a data-handling boundary, but unlocks much larger models.</figcaption>
+</figure>
+
+<h2 id="comparison">Seven dimensions compared</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Dimension</th><th>On-device AI</th><th>Cloud AI</th></tr></thead>
+  <tbody>
+    <tr><td>Privacy</td><td>Input and output stay on the phone. AICore doesn't retain input or output after processing, per Android's documentation.</td><td>Data is sent to a provider; governed by their terms, your privacy policy and your Data safety declaration.</td></tr>
+    <tr><td>Latency</td><td>No network round-trip; speed depends on device hardware.</td><td>Network round-trip plus model time; streaming improves perceived speed.</td></tr>
+    <tr><td>Offline</td><td>Works offline once models are available.</td><td>Requires connectivity.</td></tr>
+    <tr><td>Cost</td><td>No per-request fee; AICore applies per-app quotas.</td><td>Per-token pricing (free tiers exist); scales with usage.</td></tr>
+    <tr><td>Capability</td><td>Small models: strong on focused tasks, limited context and reasoning.</td><td>Large models: long context, complex reasoning, multimodal, tool use.</td></tr>
+    <tr><td>Device reach</td><td>Gemini Nano: supported devices only. ML Kit/LiteRT: broad.</td><td>Any device with internet.</td></tr>
+    <tr><td>Control and updates</td><td>Model version is managed by AICore, and outputs can differ between Nano versions.</td><td>You choose the model version; providers retire old versions on their schedule.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="on-device-detail">On-device AI on Android in detail</h2>
+<p>Android's managed on-device generative stack has three layers. <strong>Gemini Nano</strong> is the model. <strong>AICore</strong> is the system service that distributes, updates and hardware-accelerates it. <strong>ML Kit GenAI APIs</strong> are what your app calls. Because AICore manages the model, your APK doesn't grow by gigabytes, and several apps share one model.</p>
+<p>The constraints are part of the design, and you must handle them:</p>
+<ul>
+  <li><strong>Feature status varies by device.</strong> It can be unavailable, downloadable, downloading or available. Check it before showing UI.</li>
+  <li><strong>Foreground only.</strong> Inference is permitted only when your app is the top foreground app. Background use returns an error.</li>
+  <li><strong>Quotas.</strong> Too many requests in a short time return <code>BUSY</code>, and long-running heavy use can hit a battery-use quota.</li>
+  <li><strong>Beta APIs.</strong> At the time of writing the GenAI APIs are beta (speech recognition is alpha) and carry no SLA.</li>
+</ul>
+<p>Outside Gemini Nano, <strong>LiteRT</strong> (formerly TensorFlow Lite) runs models you choose or train and bundle yourself. That gives you full control over the model and broad device support, in exchange for owning size, accuracy and updates.</p>
+
+<h2 id="cloud-detail">Cloud AI on Android in detail</h2>
+<p>Cloud inference gives you the strongest models and the same behaviour on every device. There are two common architectures:</p>
+<ul>
+  <li><strong>Firebase AI Logic from the app.</strong> A Kotlin SDK calls Gemini directly, protected by Firebase App Check, which the documentation says is enforced for AI Logic from July 2026. It's the quickest path with no backend to run.</li>
+  <li><strong>Your own backend.</strong> The app calls your API, and your server calls the model provider. It's the right choice when you need multiple providers, retrieval over private data (RAG), server-side tools, strict per-user quotas, or audit logs.</li>
+</ul>
+<div class="warn"><b>Security baseline for cloud AI</b>
+<p>Never embed a raw provider API key in the app. Use App Check (Firebase AI Logic) or your own authenticated backend, enforce per-user limits, and treat model output as untrusted input before it triggers any action.</p></div>
+
+<h2 id="hybrid">Hybrid inference: the best of both, with care</h2>
+<p>Many real features should run on-device when possible and fall back to the cloud otherwise, or the reverse. Firebase AI Logic offers <strong>experimental hybrid inference</strong> for Android. You configure an inference mode when you create the model, and the SDK routes each request between Gemini Nano (via ML Kit's Prompt API) and a cloud Gemini model:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Mode</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>PREFER_ON_DEVICE</code></td><td>Use the on-device model; fall back to cloud if it's unavailable or unsupported for the request.</td></tr>
+    <tr><td><code>PREFER_IN_CLOUD</code></td><td>Use the cloud when online; fall back to on-device only when offline.</td></tr>
+    <tr><td><code>ONLY_ON_DEVICE</code></td><td>On-device only; throws if unavailable.</td></tr>
+    <tr><td><code>ONLY_IN_CLOUD</code></td><td>Cloud only; throws when offline or unavailable.</td></tr>
+  </tbody>
+</table>
+</div>
+<code-block lang="kotlin" file="HybridModel.kt (experimental API, adapted from Android's snippet)">
+// Requires firebase-ai plus the experimental firebase-ai-ondevice artifact.
+// Check the Firebase AI Logic hybrid docs for current versions and imports.
+val model = Firebase.ai(backend = GenerativeBackend.googleAI())
+    .generativeModel(
+        modelName = "gemini-3.5-flash",   // cloud model used when routing to the cloud
+        onDeviceConfig = OnDeviceConfig(mode = InferenceMode.PREFER_ON_DEVICE),
+    )
+
+suspend fun shortReply(message: String): String? =
+    model.generateContent("Suggest a short, friendly reply to: $message").text
+</code-block>
+<p>Know the current limits before you adopt it. The API is experimental, routing is rule-based, and the on-device side is focused on <strong>single-turn</strong> generation from text or a single image. Multi-turn chat still needs the cloud. And a "prefer on-device" feature may silently send data to the cloud on unsupported devices, so your consent and disclosure must cover that.</p>
+
+<h2 id="custom-fallback">A provider-neutral fallback pattern</h2>
+<p>If you need more control, for example a consent check, a different cloud provider or backend mediation, write the routing yourself and expose a clear state to the UI:</p>
+<code-block lang="kotlin" file="SummaryRepository.kt">
+sealed interface SummaryResult {
+    data class Success(val text: String, val source: Source) : SummaryResult
+    data class Unavailable(val reason: String) : SummaryResult
+    data class Failed(val message: String) : SummaryResult
+    enum class Source { ON_DEVICE, CLOUD }
+}
+
+class SummaryRepository(
+    private val onDevice: Summarizer,          // wraps ML Kit GenAI Summarization
+    private val cloud: Summarizer,             // wraps Firebase AI Logic or your backend
+    private val settings: PrivacySettings,     // user's cloud-processing choice
+    private val connectivity: Connectivity,
+) {
+    suspend fun summarize(text: String): SummaryResult {
+        if (onDevice.isReady()) {
+            return runCatching { SummaryResult.Success(onDevice.summarize(text), SummaryResult.Source.ON_DEVICE) }
+                .getOrElse { SummaryResult.Failed("Couldn't summarise on this device. Try again.") }
+        }
+        if (!settings.cloudProcessingAllowed) return SummaryResult.Unavailable("Enable cloud processing in Settings to use this on your device.")
+        if (!connectivity.isOnline()) return SummaryResult.Unavailable("Connect to the internet to summarise.")
+        return runCatching { SummaryResult.Success(cloud.summarize(text), SummaryResult.Source.CLOUD) }
+            .getOrElse { SummaryResult.Failed("Summary service is busy. Please try again.") }
+    }
+}
+
+interface Summarizer {
+    suspend fun isReady(): Boolean
+    suspend fun summarize(text: String): String
+}
+interface PrivacySettings { val cloudProcessingAllowed: Boolean }
+interface Connectivity { fun isOnline(): Boolean }
+</code-block>
+<p>Returning the <code>Source</code> lets the UI label where the result came from, for example "Summarised on your device", which builds user trust, and lets your analytics measure fallback rates.</p>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Smart replies in a chat app</h3><dl><dt>Choice</dt><dd>On-device only.</dd><dt>Why</dt><dd>Private conversations, instant feel, high volume (cloud cost would scale with every message).</dd><dt>Trade-off</dt><dd>Unavailable on unsupported devices, which is acceptable for a convenience feature.</dd></dl></div>
+  <div class="card usecase"><h3>Travel app: itinerary planner chat</h3><dl><dt>Choice</dt><dd>Cloud via backend.</dd><dt>Why</dt><dd>Multi-turn reasoning, live data (flights, prices) via server-side tools.</dd><dt>Trade-off</dt><dd>Requires connectivity and per-token budgeting.</dd></dl></div>
+  <div class="card usecase"><h3>Journaling app: weekly summary</h3><dl><dt>Choice</dt><dd>Hybrid, preferring on-device, with explicit consent for cloud fallback.</dd><dt>Why</dt><dd>Very sensitive data; most users on supported devices get a fully private experience.</dd><dt>Trade-off</dt><dd>Two code paths to test; outputs differ between models.</dd></dl></div>
+</div>
+
+<h2 id="pitfalls">Pitfalls and troubleshooting</h2>
+<ul>
+  <li><strong>Feature works on your Pixel, not on test devices.</strong> Gemini Nano device support is limited. Check feature status at runtime and test on the device list your users actually have.</li>
+  <li><strong><code>BACKGROUND_USE_BLOCKED</code> errors.</strong> You're calling on-device GenAI from a worker or service. Move the call to a foreground interaction.</li>
+  <li><strong><code>BUSY</code> errors under load.</strong> Per-app quota. Add exponential backoff and avoid firing requests on every keystroke.</li>
+  <li><strong>Different answers on different devices.</strong> Different Gemini Nano versions can produce different output for the same prompt. Design the UI for variation.</li>
+  <li><strong>Unexpected cloud bills.</strong> Fallback rates were higher than assumed. Monitor routing and set server-side limits.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is on-device AI always more private?</summary><div><p>For the inference itself, yes: input doesn't leave the phone. But if your feature falls back to the cloud, or you log prompts or outputs to analytics, data can still leave the device. Privacy is a property of the whole feature, not just the model.</p></div></details>
+  <details><summary>Is on-device AI free?</summary><div><p>There's no per-request fee, but it costs engineering time, device battery and compute, and it's limited by quotas and device support.</p></div></details>
+  <details><summary>Can I run any open model on Android?</summary><div><p>Smaller models can run with LiteRT and related Google AI Edge tooling, but you manage size, memory, speed and updates yourself. Large models generally need the cloud.</p></div></details>
+  <details><summary>Should I use Firebase hybrid inference in production?</summary><div><p>It's experimental at the time of writing. Evaluate it for single-turn features, and keep the option to switch to your own routing logic if requirements change.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>On-device AI wins on <strong>privacy, offline use, latency and per-request cost</strong>. Cloud AI wins on <strong>capability and reach</strong>. For many Android features the right answer is <strong>hybrid</strong>: on-device where supported, cloud with consent where not, behind a repository that reports which path ran.</p>
+<p>Next step: build the cloud path first with <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android Using Kotlin</a>, then add the on-device path with <a href="../gemini-nano-ml-kit-genai-android/index.html">Gemini Nano and ML Kit GenAI on Android</a>.</p>

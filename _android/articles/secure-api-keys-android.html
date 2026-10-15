@@ -1,0 +1,107 @@
+<!--meta
+{
+  "seo_title": "Secure API Keys and Secrets in Android Apps",
+  "description": "How to handle API keys and secrets in Android apps: why the APK can't hide secrets, which keys are safe to ship, restricting keys, backend proxies, App Check, build-time config and leak response.",
+  "primary_keyword": "secure api keys android",
+  "keywords": ["hide api key android", "api key buildconfig security", "local.properties api key", "secrets gradle plugin", "api key restrictions android", "leaked api key github"],
+  "lede": "'How do I hide my API key in Android?' is one of the most asked questions, and the honest answer is that you can't hide a secret in an APK. What you can do is decide which keys may live in the app, restrict them, and keep real secrets on a server.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["secure-cloud-ai-api-android", "android-keystore-explained", "android-app-security-best-practices", "play-integrity-api-explained"],
+  "refs": [
+    ["Secrets Gradle Plugin for Android", "https://developers.google.com/maps/documentation/android-sdk/secrets-gradle-plugin"],
+    ["Google Cloud: API key best practices", "https://cloud.google.com/docs/authentication/api-keys-best-practices"],
+    ["Firebase App Check", "https://firebase.google.com/docs/app-check"],
+    ["GitHub secret scanning", "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning"]
+  ]
+}
+-->
+<p class="ad-lead">An APK is a zip file. Its strings, BuildConfig constants, resources and even native libraries can be extracted with free tools in minutes. Obfuscation and NDK tricks slow attackers slightly, and runtime interception defeats them anyway. Design as if every key in the app is public.</p>
+
+<h2 id="classify">Classify your keys</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-kc-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-kc-t fig-kc-d">
+    <title id="fig-kc-t">Which keys can ship in an Android app</title>
+    <desc id="fig-kc-d">Identifiers meant to be public, such as Firebase configuration or a Maps key restricted to your app, can ship in the app. Restricted keys should be limited by package and certificate and by API. Secrets that grant spending or data access, such as AI provider keys, payment secret keys, database credentials and admin tokens, must stay on servers.</desc>
+    <rect class="d-green" x="20" y="30" width="215" height="140" rx="12"/><text class="d-t" x="127" y="58" text-anchor="middle">OK in app</text><text class="d-s" x="127" y="84" text-anchor="middle">public identifiers</text><text class="d-s" x="127" y="102" text-anchor="middle">(e.g. Firebase config)</text>
+    <rect class="d-amber" x="252" y="30" width="215" height="140" rx="12"/><text class="d-t" x="359" y="58" text-anchor="middle">OK if restricted</text><text class="d-s" x="359" y="84" text-anchor="middle">client keys (Maps)</text><text class="d-s" x="359" y="102" text-anchor="middle">package + SHA + API limits</text>
+    <rect class="d-red" x="484" y="30" width="215" height="140" rx="12"/><text class="d-t" x="591" y="58" text-anchor="middle">Server only</text><text class="d-s" x="591" y="84" text-anchor="middle">AI provider keys, payment</text><text class="d-s" x="591" y="102" text-anchor="middle">secrets, DB creds, admin</text>
+  </svg>
+  <figcaption id="fig-kc-cap">If misuse of a key costs money or exposes data, it's a secret, and secrets don't ship.</figcaption>
+</figure>
+
+<h2 id="build-config">Keeping keys out of source control</h2>
+<p>Even for keys that are allowed in the app, avoid committing them to Git, where they're scraped quickly from public repos. The <strong>Secrets Gradle Plugin</strong> reads values from <code>local.properties</code> (which is ignored by Git) and exposes them as BuildConfig fields and manifest placeholders:</p>
+<code-block lang="properties" file="local.properties (not committed)">
+MAPS_API_KEY=your-restricted-maps-key
+</code-block>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins {
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+android {
+    buildFeatures { buildConfig = true }
+}
+</code-block>
+<code-block lang="xml" file="AndroidManifest.xml">
+<meta-data android:name="com.google.android.geo.API_KEY" android:value="${MAPS_API_KEY}" />
+</code-block>
+<div class="warn"><b>This hides keys from Git, not from the APK</b><p>The value still ends up in the built app. That's fine for restricted client keys, and never acceptable for real secrets.</p></div>
+
+<h2 id="restrict">Restrict client keys</h2>
+<ul>
+  <li><strong>Application restrictions:</strong> limit to your package name and signing certificate SHA-1 (include the Play App Signing certificate).</li>
+  <li><strong>API restrictions:</strong> allow only the APIs the app uses.</li>
+  <li><strong>Quotas and alerts:</strong> cap usage and alert on spikes.</li>
+</ul>
+<p>Remember that app restrictions rely on request metadata that a determined attacker can spoof. They limit casual abuse, not targeted attacks.</p>
+
+<h2 id="secrets">Real secrets: use a backend</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bp2-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-bp2-t fig-bp2-d">
+    <title id="fig-bp2-t">Backend holds the secret</title>
+    <desc id="fig-bp2-d">The app authenticates the user and calls your backend with a short-lived user token, optionally with an App Check or Play Integrity token. The backend validates them, applies quotas, and calls the third-party API with the secret key from a secret manager.</desc>
+    <defs><marker id="bpm2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M170 70 H256 M430 70 H516" marker-end="url(#bpm2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="40" width="150" height="60" rx="12"/><text class="d-t" x="95" y="66" text-anchor="middle">App</text><text class="d-s" x="95" y="84" text-anchor="middle">user token</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="260" y="40" width="170" height="60" rx="12"/><text class="d-t" x="345" y="66" text-anchor="middle">Your backend</text><text class="d-s" x="345" y="84" text-anchor="middle">auth · quotas</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="520" y="40" width="180" height="60" rx="12"/><text class="d-t" x="610" y="66" text-anchor="middle">Third-party API</text><text class="d-s" x="610" y="84" text-anchor="middle">secret key 🔒</text></g>
+    <text class="d-s" x="360" y="134" text-anchor="middle">Compromising the app yields, at most, one user's short-lived token.</text>
+  </svg>
+  <figcaption id="fig-bp2-cap">The blast radius of a compromised app shrinks from "everyone's money" to "one session".</figcaption>
+</figure>
+<p>For Gemini specifically, Firebase AI Logic with App Check provides this mediation without your own server. See <a href="../secure-cloud-ai-api-android/index.html">Integrating Cloud AI APIs Securely</a>.</p>
+
+<h2 id="leak">If a secret leaks</h2>
+<ol class="steps">
+  <li><strong>Revoke or rotate</strong> the key immediately in the provider console.</li>
+  <li><strong>Check usage logs and billing</strong> for abuse.</li>
+  <li><strong>Remove it from history</strong> (rewrite Git history if needed) and from any published APKs, by releasing an update.</li>
+  <li><strong>Fix the architecture</strong> so the secret no longer needs to be in the app.</li>
+  <li>Enable <strong>secret scanning</strong> on your repositories.</li>
+</ol>
+
+<h2 id="use-cases">Common keys and where they go</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Key</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td><code>google-services.json</code> (Firebase config)</td><td>App: identifiers, protected by Security Rules and App Check</td></tr>
+    <tr><td>Maps SDK key</td><td>App, restricted by package, SHA and API</td></tr>
+    <tr><td>Gemini / OpenAI / other AI keys</td><td>Server (or Firebase AI Logic)</td></tr>
+    <tr><td>Payment gateway secret key</td><td>Server only (publishable keys may ship)</td></tr>
+    <tr><td>Signing keystore passwords</td><td>CI secrets only</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>What about storing keys in native (C++) code?</summary><div><p>It adds a small amount of effort for attackers, who can still extract them from the binary or intercept them at runtime. It isn't a substitute for keeping secrets server-side.</p></div></details>
+  <details><summary>Can I fetch the key from my server at runtime?</summary><div><p>Then it's in device memory and network traffic, so still exposed. Instead, have the server make the call that needs the key.</p></div></details>
+  <details><summary>Is google-services.json a secret?</summary><div><p>It contains project identifiers meant to be in the app. Protect your Firebase data with Security Rules and App Check instead.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>You can't hide secrets in an APK. <strong>Ship only public or restricted client keys</strong>, keep them out of Git with the Secrets Gradle Plugin, <strong>put real secrets behind a backend</strong> (or Firebase AI Logic with App Check for Gemini), and have a <strong>rotation plan</strong> for leaks.</p>
+<p>Next step: decide whether pinning is right for your API in <a href="../certificate-pinning-android/index.html">Certificate Pinning: Benefits and Limitations</a>.</p>

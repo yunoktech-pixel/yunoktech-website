@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an AI Photo Caption Generator for Android | Yunok Tech</title>
+  <meta name="description" content="Project guide: an Android app that generates captions and alt text for photos using Gemini multimodal via Firebase AI Logic, with on-device ML Kit image description, photo picker, image downscaling, tone options and sharing.">
+  <meta name="keywords" content="ai photo caption generator android, gemini image to text android, multimodal gemini kotlin, image caption app kotlin, alt text generator android, photo picker compose, ml kit image description">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-photo-caption-generator-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-photo-caption-generator-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Build an AI Photo Caption Generator for Android">
+  <meta property="og:description" content="Project guide: an Android app that generates captions and alt text for photos using Gemini multimodal via Firebase AI Logic, with on-device ML Kit image description, photo picker, image downscaling, tone options and sharing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Build an AI Photo Caption Generator for Android">
+  <meta name="twitter:description" content="Project guide: an Android app that generates captions and alt text for photos using Gemini multimodal via Firebase AI Logic, with on-device ML Kit image description, photo picker, image downscaling, tone options and sharing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Build an AI Photo Caption Generator for Android", "description": "Project guide: an Android app that generates captions and alt text for photos using Gemini multimodal via Firebase AI Logic, with on-device ML Kit image description, photo picker, image downscaling, tone options and sharing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "gemini image to text android, multimodal gemini kotlin, image caption app kotlin, alt text generator android, photo picker compose, ml kit image description", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-photo-caption-generator-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Build an AI Photo Caption Generator for Android", "item": "https://yunoktech.com/android/ai-photo-caption-generator-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Build an AI Photo Caption Generator for Android</h1>
+    <p class="ad-lede">Pick a photo, choose a tone, get three caption ideas and accessible alt text. This project teaches multimodal prompting, image handling, structured output and responsible UX. Here's how to build it with Compose and Gemini.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#flow">App flow</a></li><li><a href="#pick">1. Pick and downscale</a></li><li><a href="#structured">2. Ask for structured output</a></li><li><a href="#on-device">3. On-device alternative</a></li><li><a href="#ui">4. UI</a></li><li><a href="#responsible">Responsible design</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Our <a href="../ai-image-description-android/index.html">AI Image Description</a> guide covers describing images. This project builds a complete app around it: caption styles, structured multi-option output, an on-device path, and sharing.</p>
+
+<h2 id="flow">App flow</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-pc-t fig-pc-d">
+    <title id="fig-pc-t">Photo caption generator flow</title>
+    <desc id="fig-pc-d">The user picks a photo with the photo picker and chooses a tone. The app downscales the image, sends it with a prompt to Gemini requesting structured JSON with three captions and alt text, validates the result, and shows options the user can edit, copy or share.</desc>
+    <defs><marker id="pcm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 80 H150 M270 80 H290 M420 80 H440 M570 80 H590" marker-end="url(#pcm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="10" y="50" width="120" height="60" rx="12"/><text class="d-t" x="70" y="76" text-anchor="middle">Pick photo</text><text class="d-s" x="70" y="94" text-anchor="middle">+ tone</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="152" y="50" width="118" height="60" rx="12"/><text class="d-t" x="211" y="76" text-anchor="middle">Downscale</text><text class="d-s" x="211" y="94" text-anchor="middle">~1024 px</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="292" y="50" width="128" height="60" rx="12"/><text class="d-t" x="356" y="76" text-anchor="middle">Gemini</text><text class="d-s" x="356" y="94" text-anchor="middle">image + prompt</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="442" y="50" width="128" height="60" rx="12"/><text class="d-t" x="506" y="76" text-anchor="middle">JSON</text><text class="d-s" x="506" y="94" text-anchor="middle">validate</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="592" y="50" width="118" height="60" rx="12"/><text class="d-t" x="651" y="76" text-anchor="middle">Edit</text><text class="d-s" x="651" y="94" text-anchor="middle">copy, share</text></g>
+  </svg>
+  <figcaption id="fig-pc-cap">Users always review and edit before sharing.</figcaption>
+</figure>
+
+<h2 id="pick">1. Pick and downscale</h2>
+<figure class="code"><figcaption><span class="file">Load a downscaled bitmap</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> loadScaled(context: <span class="tk-t">Context</span>, uri: <span class="tk-t">Uri</span>, maxSide: <span class="tk-t">Int</span> = <span class="tk-n">1024</span>): <span class="tk-t">Bitmap</span> =
+    withContext(<span class="tk-t">Dispatchers</span>.<span class="tk-t">IO</span>) {
+        <span class="tk-k">val</span> source = <span class="tk-t">ImageDecoder</span>.createSource(context.contentResolver, uri)
+        <span class="tk-t">ImageDecoder</span>.decodeBitmap(source) { decoder, info, _ -&gt;
+            <span class="tk-k">val</span> (w, h) = info.size.width to info.size.height
+            <span class="tk-k">val</span> scale = maxSide.toFloat() / maxOf(w, h)
+            <span class="tk-k">if</span> (scale &lt; <span class="tk-n">1f</span>) decoder.setTargetSize((w * scale).toInt(), (h * scale).toInt())
+            decoder.allocator = <span class="tk-t">ImageDecoder</span>.<span class="tk-t">ALLOCATOR_SOFTWARE</span>
+        }
+    }</code></pre></figure>
+<p>Downscaling reduces upload time, tokens and cost, with little effect on caption quality. Use the photo picker for selection. See <a href="../android-privacy-accessibility-reliability/index.html">Privacy and Accessibility</a>.</p>
+
+<h2 id="structured">2. Ask for structured output</h2>
+<figure class="code"><figcaption><span class="file">CaptionGenerator.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Serializable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">CaptionResult</span>(<span class="tk-k">val</span> captions: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;, <span class="tk-k">val</span> altText: <span class="tk-t">String</span>)
+
+<span class="tk-k">class</span> <span class="tk-t">CaptionGenerator</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> json: <span class="tk-t">Json</span> = <span class="tk-t">Json</span> { ignoreUnknownKeys = <span class="tk-k">true</span> }) {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> model = <span class="tk-t">Firebase</span>.ai(backend = <span class="tk-t">GenerativeBackend</span>.googleAI()).generativeModel(
+        modelName = <span class="tk-s">"gemini-3.8-flash"</span>,                                   <span class="tk-c">// check current models</span>
+        generationConfig = generationConfig {
+            responseMimeType = <span class="tk-s">"application/json"</span>
+            responseSchema = <span class="tk-t">Schema</span>.obj(
+                mapOf(
+                    <span class="tk-s">"captions"</span> to <span class="tk-t">Schema</span>.array(<span class="tk-t">Schema</span>.string()),
+                    <span class="tk-s">"altText"</span> to <span class="tk-t">Schema</span>.string(),
+                )
+            )
+            temperature = <span class="tk-n">0.8f</span>
+        },
+    )
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> generate(image: <span class="tk-t">Bitmap</span>, tone: <span class="tk-t">Tone</span>): <span class="tk-t">CaptionResult</span> {
+        <span class="tk-k">val</span> response = model.generateContent(content {
+            image(image)
+            text(
+                <span class="tk-s">"Write 3 short social media captions for this photo in a ${tone.label} tone "</span> +
+                <span class="tk-s">"(max 120 characters each, at most 2 hashtags). Also write factual alt text "</span> +
+                <span class="tk-s">"(max 150 characters) describing what is visible. Don't guess identities of people."</span>
+            )
+        })
+        <span class="tk-k">val</span> result = json.decodeFromString&lt;<span class="tk-t">CaptionResult</span>&gt;(response.text ?: error(<span class="tk-s">"Empty response"</span>))
+        <span class="tk-k">return</span> result.copy(
+            captions = result.captions.map { it.take(<span class="tk-n">150</span>).trim() }.filter { it.isNotEmpty() }.take(<span class="tk-n">3</span>),
+            altText = result.altText.take(<span class="tk-n">200</span>).trim(),
+        )
+    }
+}
+
+<span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">Tone</span>(<span class="tk-k">val</span> label: <span class="tk-t">String</span>) { <span class="tk-t">FUN</span>(<span class="tk-s">"fun"</span>), <span class="tk-t">PROFESSIONAL</span>(<span class="tk-s">"professional"</span>), <span class="tk-t">POETIC</span>(<span class="tk-s">"poetic"</span>), <span class="tk-t">MINIMAL</span>(<span class="tk-s">"minimal"</span>) }</code></pre></figure>
+
+<h2 id="on-device">3. On-device alternative</h2>
+<p>On supported devices, ML Kit GenAI Image Description (beta) produces a short description with Gemini Nano, privately and offline. Use it for alt text and offer cloud captions as an option, or use hybrid inference. See <a href="../gemini-nano-vs-cloud-gemini/index.html">Nano vs Cloud</a>.</p>
+
+<h2 id="ui">4. UI</h2>
+<figure class="code"><figcaption><span class="file">CaptionOptions.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">CaptionOptions</span>(result: <span class="tk-t">CaptionResult</span>, onShare: (<span class="tk-t">String</span>) -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-k">var</span> selected <span class="tk-k">by</span> rememberSaveable { mutableIntStateOf(<span class="tk-n">0</span>) }
+    <span class="tk-k">var</span> edited <span class="tk-k">by</span> rememberSaveable(selected) { mutableStateOf(result.captions.getOrElse(selected) { <span class="tk-s">""</span> }) }
+
+    <span class="tk-t">Column</span>(verticalArrangement = <span class="tk-t">Arrangement</span>.spacedBy(<span class="tk-n">8</span>.dp)) {
+        <span class="tk-t">Text</span>(<span class="tk-s">"AI suggestions. Review before posting."</span>, style = <span class="tk-t">MaterialTheme</span>.typography.labelMedium)
+        result.captions.forEachIndexed { i, caption -&gt;
+            <span class="tk-t">FilterChip</span>(selected = i == selected, onClick = { selected = i }, label = { <span class="tk-t">Text</span>(caption, maxLines = <span class="tk-n">2</span>) })
+        }
+        <span class="tk-t">OutlinedTextField</span>(<span class="tk-k">value</span> = edited, onValueChange = { edited = it }, label = { <span class="tk-t">Text</span>(<span class="tk-s">"Caption"</span>) })
+        <span class="tk-t">Text</span>(<span class="tk-s">"Alt text: ${result.altText}"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.bodySmall)
+        <span class="tk-t">Button</span>(onClick = { onShare(edited) }) { <span class="tk-t">Text</span>(<span class="tk-s">"Share"</span>) }
+    }
+}</code></pre></figure>
+
+<h2 id="responsible">Responsible design</h2>
+<ul>
+  <li>Instruct the model not to identify people or infer sensitive traits (age, ethnicity, health).</li>
+  <li>Let users edit everything, and never auto-post.</li>
+  <li>Disclose that photos are sent to a cloud service, unless processing is on-device.</li>
+  <li>Handle safety blocks gracefully ("Couldn't caption this photo").</li>
+  <li>See <a href="../responsible-ai-ux-android/index.html">Responsible AI UX</a>.</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>JSON parse errors:</strong> use a response schema, <code>ignoreUnknownKeys</code>, and catch failures with a retry.</li>
+  <li><strong>Slow uploads:</strong> downscale, and compress if you send bytes.</li>
+  <li><strong>OOM on large photos:</strong> decode with a target size, as shown.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can it caption multiple photos?</summary><div><p>Yes. Send several images in one request for a carousel caption, within the model's limits.</p></div></details>
+  <details><summary>How do I keep costs low?</summary><div><p>Downscale images, use a Flash-class model, cap output tokens, and rate-limit per user.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A caption generator combines the <strong>photo picker</strong>, <strong>downscaling</strong>, <strong>multimodal Gemini</strong> with <strong>structured JSON output</strong>, validation, and an <strong>editable</strong> UI, plus on-device alt text where available and clear responsible-AI choices.</p>
+<p>Next project: <a href="../ai-voice-notes-app-android/index.html">an AI Voice-Notes App</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/analyze-images" target="_blank" rel="noopener">Firebase AI Logic: analyze images</a></li><li><a href="https://firebase.google.com/docs/ai-logic/generate-structured-output" target="_blank" rel="noopener">Firebase AI Logic: structured output</a></li><li><a href="https://developer.android.com/training/data-storage/shared/photopicker" target="_blank" rel="noopener">Photo picker</a></li><li><a href="https://developers.google.com/ml-kit/genai/image-description/android" target="_blank" rel="noopener">ML Kit GenAI Image Description</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-photo-caption-generator-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-photo-caption-generator-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-image-description-android/index.html"><small>Android AI and Generative AI</small>Image Understanding and Description in Android Apps</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/on-device-image-text-processing/index.html"><small>Android AI Projects and Production</small>On-Device Image and Text Processing on Android</a></li><li><a href="../../android/responsible-ai-ux-android/index.html"><small>Android AI Projects and Production</small>Responsible AI User Experience on Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-photo-caption-generator-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-photo-caption-generator-android/&amp;text=Build an AI Photo Caption Generator for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-photo-caption-generator-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#flow">App flow</a></li><li><a href="#pick">1. Pick and downscale</a></li><li><a href="#structured">2. Ask for structured output</a></li><li><a href="#on-device">3. On-device alternative</a></li><li><a href="#ui">4. UI</a></li><li><a href="#responsible">Responsible design</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-photo-caption-generator-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-photo-caption-generator-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

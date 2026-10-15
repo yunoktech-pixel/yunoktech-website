@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Coroutines and Flow Explained for Android | Yunok Tech</title>
+  <meta name="description" content="Learn Kotlin coroutines and Flow for Android: suspend functions, scopes, dispatchers, cancellation, StateFlow, operators and testing, with diagrams and real code.">
+  <meta name="keywords" content="kotlin coroutines android, kotlin flow android, coroutines explained, viewModelScope, Dispatchers.IO vs Main, structured concurrency, stateflow vs flow, repeatOnLifecycle, coroutine cancellation">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-coroutines-flow-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-coroutines-flow-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Coroutines and Flow Explained for Android">
+  <meta property="og:description" content="Learn Kotlin coroutines and Flow for Android: suspend functions, scopes, dispatchers, cancellation, StateFlow, operators and testing, with diagrams and real code.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Coroutines and Flow Explained for Android">
+  <meta name="twitter:description" content="Learn Kotlin coroutines and Flow for Android: suspend functions, scopes, dispatchers, cancellation, StateFlow, operators and testing, with diagrams and real code.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Coroutines and Flow Explained for Android Developers", "description": "Learn Kotlin coroutines and Flow for Android: suspend functions, scopes, dispatchers, cancellation, StateFlow, operators and testing, with diagrams and real code.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Kotlin Programming", "keywords": "kotlin flow android, coroutines explained, viewModelScope, Dispatchers.IO vs Main, structured concurrency, stateflow vs flow, repeatOnLifecycle, coroutine cancellation", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-coroutines-flow-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Coroutines and Flow Explained for Android Developers", "item": "https://yunoktech.com/android/kotlin-coroutines-flow-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Coroutines and Flow Explained for Android Developers</h1>
+    <p class="ad-lede">Coroutines are how modern Android apps do anything that takes time without freezing the screen. This guide builds the mental model step by step, from suspend functions to Flow, with diagrams, real Android code and the mistakes that cause leaks and crashes.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>8 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#why-coroutines">The problem coroutines solve</a></li><li><a href="#suspend">Suspend functions: pausing without blocking</a></li><li><a href="#scopes">Coroutine scopes and structured concurrency</a></li><li><a href="#dispatchers">Dispatchers: which thread runs the code</a></li><li><a href="#launch-async">launch vs async, and running work in parallel</a></li><li><a href="#cancellation">Cancellation and exceptions</a></li><li><a href="#flow">Flow: streams of values over time</a></li><li><a href="#hot-flows">StateFlow and SharedFlow: hot flows</a></li><li><a href="#collecting">Collecting flows safely in the UI</a></li><li><a href="#testing">Testing coroutines and flows</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#mistakes">Common mistakes and how to fix them</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Every Android app waits for things: network responses, database queries, file reads, location updates. Do that waiting on the main thread and the UI freezes. Do it with callbacks and the code turns into nested, hard-to-cancel spaghetti. Kotlin coroutines solve both problems, and Flow extends them to values that change over time.</p>
+<p>This guide is for developers who know Kotlin basics and have seen <code>viewModelScope.launch</code> without fully understanding what happens inside it. By the end, you'll know how suspension works, what scopes and dispatchers are really for, how cancellation protects you from leaks, how cold and hot flows differ, and how to test all of it.</p>
+
+<h2 id="why-coroutines">The problem coroutines solve</h2>
+<p>Android draws the UI on the <strong>main thread</strong>. To stay smooth it must finish each frame in roughly 16 ms at 60 Hz, and less on high-refresh screens. A network call can take seconds. Block the main thread that long and the app stutters. Block it for about five seconds and Android shows an "Application Not Responding" dialog.</p>
+<p>The traditional fix, background threads with callbacks, works but creates three problems: callback nesting, manual thread switching back to the UI, and no automatic cancellation when the user leaves the screen. Coroutines address all three.</p>
+
+<h2 id="suspend">Suspend functions: pausing without blocking</h2>
+<p>A <code>suspend</code> function can <em>pause</em> its execution and resume later, without blocking the thread it runs on. While it's suspended, waiting for a network response for example, the thread is free to do other work, such as drawing frames.</p>
+<figure class="code"><figcaption><span class="file">UserRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">UserRepository</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">UserApi</span>,                       <span class="tk-c">// Retrofit interface with suspend functions</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> dao: <span class="tk-t">UserDao</span>,                       <span class="tk-c">// Room DAO with suspend functions</span>
+) {
+    <span class="tk-c">// Reads top to bottom like synchronous code, but never blocks the caller's thread.</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> refreshUser(id: <span class="tk-t">String</span>): <span class="tk-t">User</span> {
+        <span class="tk-k">val</span> remote = api.getUser(id)                <span class="tk-c">// suspends while waiting for the network</span>
+        dao.upsert(remote.toEntity())               <span class="tk-c">// suspends while Room writes on its own executor</span>
+        <span class="tk-k">return</span> remote.toDomain()
+    }
+}</code></pre></figure>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-suspend-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-suspend-title fig-suspend-desc">
+    <title id="fig-suspend-title">Blocking call compared with a suspending call on the main thread</title>
+    <desc id="fig-suspend-desc">Top timeline: a blocking network call occupies the main thread, so frames are dropped. Bottom timeline: a coroutine suspends at the network call, the main thread keeps drawing frames, and the coroutine resumes when the response arrives.</desc>
+    <text class="d-t" x="20" y="24">Blocking call on main thread</text>
+    <rect class="d-box" x="20" y="36" width="680" height="40" rx="8"/>
+    <rect class="d-blue" x="24" y="40" width="80" height="32" rx="6"/><text class="d-s" x="64" y="61" text-anchor="middle">frames</text>
+    <rect class="d-red" x="108" y="40" width="420" height="32" rx="6"/><text class="d-t" x="318" y="61" text-anchor="middle">waiting for network: UI frozen</text>
+    <rect class="d-blue" x="532" y="40" width="164" height="32" rx="6"/><text class="d-s" x="614" y="61" text-anchor="middle">frames</text>
+
+    <text class="d-t" x="20" y="120">Coroutine with suspend</text>
+    <rect class="d-box" x="20" y="132" width="680" height="40" rx="8"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="24" y="136" width="80" height="32" rx="6"/><text class="d-s" x="64" y="157" text-anchor="middle">launch</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="108" y="136" width="420" height="32" rx="6"/><text class="d-t" x="318" y="157" text-anchor="middle">suspended → main thread keeps drawing frames</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="532" y="136" width="164" height="32" rx="6"/><text class="d-s" x="614" y="157" text-anchor="middle">resume → update state</text></g>
+    <path class="d-dash" d="M108 186 H528"/><text class="d-s" x="318" y="204" text-anchor="middle">network work happens elsewhere (OkHttp threads)</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M30 152 H690');--dur:3s"/>
+  </svg>
+  <figcaption id="fig-suspend-cap">Suspension frees the thread. That's why calling a well-written suspend function from the main thread is safe.</figcaption>
+</figure>
+
+<div class="note"><b>Main-safety</b>
+<p>A suspend function is <em>main-safe</em> when it can be called from the main thread without blocking it. Retrofit and Room suspend functions are main-safe because they move their work to background threads internally. Your own blocking code, such as file I/O or heavy JSON parsing, isn't main-safe until you wrap it in <code>withContext(Dispatchers.IO)</code> or <code>Dispatchers.Default</code>.</p></div>
+
+<h2 id="scopes">Coroutine scopes and structured concurrency</h2>
+<p>Every coroutine runs inside a <strong>scope</strong>, and every scope has a lifetime. When the scope is cancelled, all coroutines inside it are cancelled too. This is <strong>structured concurrency</strong>, and it's the single most important idea for avoiding leaks.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Scope</th><th>Lives as long as</th><th>Use it for</th></tr></thead>
+  <tbody>
+    <tr><td><code>viewModelScope</code></td><td>The ViewModel (cancelled in <code>onCleared</code>)</td><td>Loading screen data, user actions</td></tr>
+    <tr><td><code>lifecycleScope</code></td><td>The Activity/Fragment lifecycle</td><td>UI-bound work, collecting flows with <code>repeatOnLifecycle</code></td></tr>
+    <tr><td><code>rememberCoroutineScope()</code></td><td>The composable in the composition</td><td>Launching from UI callbacks, such as scrolling a list on click</td></tr>
+    <tr><td><code>LaunchedEffect</code></td><td>The composable, restarted when its keys change</td><td>Work triggered by entering composition or by state changes</td></tr>
+    <tr><td>Application scope (custom, injected)</td><td>The process</td><td>Work that must outlive a screen, such as finishing a write</td></tr>
+    <tr><td><code>GlobalScope</code></td><td>Forever: no structure</td><td>Almost never. Avoid it.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-struct-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-struct-title fig-struct-desc">
+    <title id="fig-struct-title">Structured concurrency: cancelling a parent scope cancels its children</title>
+    <desc id="fig-struct-desc">viewModelScope is the parent of a loadFeed job, which has two child async jobs: fetch posts and fetch stories. When the ViewModel is cleared, cancellation propagates down to all children.</desc>
+    <defs><marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+    <rect class="d-violet" x="270" y="16" width="180" height="44" rx="10"/><text class="d-t" x="360" y="43" text-anchor="middle">viewModelScope</text>
+    <path class="d-line" d="M360 60 V86" marker-end="url(#s1)"/>
+    <rect class="d-blue" x="270" y="90" width="180" height="40" rx="10"/><text class="d-t" x="360" y="115" text-anchor="middle">launch { loadFeed() }</text>
+    <path class="d-line" d="M320 130 L210 154 M400 130 L510 154" marker-end="url(#s1)"/>
+    <rect class="d-box" x="120" y="156" width="180" height="36" rx="10"/><text class="d-s" x="210" y="179" text-anchor="middle">async { fetchPosts() }</text>
+    <rect class="d-box" x="420" y="156" width="180" height="36" rx="10"/><text class="d-s" x="510" y="179" text-anchor="middle">async { fetchStories() }</text>
+    <text class="d-s" x="490" y="38">onCleared() → cancel ↓ everything</text>
+  </svg>
+  <figcaption id="fig-struct-cap">Leave the screen, the ViewModel is cleared, and both network requests are cancelled. You write no cleanup code.</figcaption>
+</figure>
+
+<h2 id="dispatchers">Dispatchers: which thread runs the code</h2>
+<ul>
+  <li><code>Dispatchers.Main</code>: the Android main thread. Use it for UI and lightweight state updates. <code>viewModelScope</code> and <code>lifecycleScope</code> use <code>Dispatchers.Main.immediate</code> by default.</li>
+  <li><code>Dispatchers.IO</code>: a thread pool for <em>blocking</em> I/O such as files, legacy blocking SDKs and raw sockets.</li>
+  <li><code>Dispatchers.Default</code>: CPU-bound work such as sorting large lists, parsing big JSON or image processing.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">ReportRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ReportRepository</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> ioDispatcher: <span class="tk-t">CoroutineDispatcher</span> = <span class="tk-t">Dispatchers</span>.<span class="tk-t">IO</span>,   <span class="tk-c">// injectable for tests</span>
+) {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> exportCsv(file: <span class="tk-t">File</span>, rows: <span class="tk-t">List</span>&lt;<span class="tk-t">Row</span>&gt;) = withContext(ioDispatcher) {
+        <span class="tk-c">// Blocking file I/O is safe here; callers can stay on Main.</span>
+        file.bufferedWriter().use { writer -&gt;
+            rows.forEach { writer.appendLine(it.toCsvLine()) }
+        }
+    }
+}</code></pre></figure>
+<div class="tip"><b>Inject dispatchers</b>
+<p>Pass dispatchers in through the constructor instead of hard-coding <code>Dispatchers.IO</code>. In tests you can then swap in a test dispatcher and control time precisely.</p></div>
+
+<h2 id="launch-async">launch vs async, and running work in parallel</h2>
+<p><code>launch</code> starts a coroutine and returns a <code>Job</code> ("fire and forget, but cancellable"). <code>async</code> returns a <code>Deferred&lt;T&gt;</code> whose result you <code>await()</code>. Use <code>async</code> inside <code>coroutineScope</code> to run independent requests in parallel:</p>
+<figure class="code"><figcaption><span class="file">FeedViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> loadFeed() {
+    viewModelScope.launch {
+        _uiState.update { it.copy(isLoading = <span class="tk-k">true</span>) }
+        <span class="tk-k">try</span> {
+            <span class="tk-c">// Both requests start immediately; total time ≈ the slower one, not the sum.</span>
+            <span class="tk-k">val</span> feed = coroutineScope {
+                <span class="tk-k">val</span> posts = async { repository.getPosts() }
+                <span class="tk-k">val</span> stories = async { repository.getStories() }
+                <span class="tk-t">Feed</span>(posts.await(), stories.await())
+            }
+            _uiState.update { it.copy(isLoading = <span class="tk-k">false</span>, feed = feed) }
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-c">// If either request fails, coroutineScope cancels the other one too.</span>
+            _uiState.update { it.copy(isLoading = <span class="tk-k">false</span>, error = e.message) }
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="cancellation">Cancellation and exceptions</h2>
+<p>Cancellation in coroutines is <em>cooperative</em>. A coroutine is cancelled at its next suspension point, where it receives a <code>CancellationException</code>. Three rules prevent most bugs:</p>
+<ol class="steps">
+  <li><strong>Don't swallow <code>CancellationException</code>.</strong> A blanket <code>catch (e: Exception)</code> catches it too and can keep a cancelled coroutine running. Catch specific exceptions, or rethrow cancellation.</li>
+  <li><strong>Make long CPU loops cancellable</strong> with <code>ensureActive()</code> or <code>yield()</code>, because they have no suspension points of their own.</li>
+  <li><strong>Use <code>supervisorScope</code></strong> when one child's failure shouldn't cancel its siblings, for example loading independent dashboard widgets.</li>
+</ol>
+<figure class="code"><figcaption><span class="file">Safe error handling</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">viewModelScope.launch {
+    <span class="tk-k">try</span> {
+        <span class="tk-k">val</span> result = repository.sync()
+        _uiState.update { it.copy(lastSync = result.time) }
+    } <span class="tk-k">catch</span> (e: <span class="tk-t">CancellationException</span>) {
+        <span class="tk-k">throw</span> e                                   <span class="tk-c">// let cancellation propagate</span>
+    } <span class="tk-k">catch</span> (e: <span class="tk-t">Exception</span>) {
+        _uiState.update { it.copy(error = <span class="tk-s">"Sync failed"</span>) }
+    }
+}</code></pre></figure>
+
+<h2 id="flow">Flow: streams of values over time</h2>
+<p>A suspend function returns <em>one</em> value. A <code>Flow&lt;T&gt;</code> emits <em>many</em> values over time, such as database rows that change, search results as the user types, or location updates. Flows are <strong>cold</strong> by default: the code inside <code>flow { }</code> doesn't run until someone collects it, and it runs again for each collector.</p>
+<figure class="code"><figcaption><span class="file">Room + Flow</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Dao</span>
+<span class="tk-k">interface</span> <span class="tk-t">NoteDao</span> {
+    <span class="tk-c">// Room re-emits automatically whenever the notes table changes.</span>
+    <span class="tk-a">@Query</span>(<span class="tk-s">"SELECT * FROM notes ORDER BY updatedAt DESC"</span>)
+    <span class="tk-k">fun</span> observeNotes(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">List</span>&lt;<span class="tk-t">NoteEntity</span>&gt;&gt;
+}</code></pre></figure>
+
+<h3 id="operators">Operators: transforming flows</h3>
+<figure class="code"><figcaption><span class="file">SearchViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">FlowPreview</span>::<span class="tk-k">class</span>, <span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">SearchViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">ProductRepository</span>) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> query = <span class="tk-t">MutableStateFlow</span>(<span class="tk-s">""</span>)
+
+    <span class="tk-k">val</span> results: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SearchUiState</span>&gt; = query
+        .debounce(<span class="tk-n">300</span>)                                  <span class="tk-c">// wait for typing to pause</span>
+        .map { it.trim() }
+        .distinctUntilChanged()                         <span class="tk-c">// ignore identical queries</span>
+        .flatMapLatest { q -&gt;                           <span class="tk-c">// cancel the previous search when a new query arrives</span>
+            <span class="tk-k">if</span> (q.isEmpty()) flowOf(<span class="tk-t">SearchUiState</span>.<span class="tk-t">Idle</span>)
+            <span class="tk-k">else</span> flow {
+                emit(<span class="tk-t">SearchUiState</span>.<span class="tk-t">Loading</span>)
+                emit(<span class="tk-t">SearchUiState</span>.<span class="tk-t">Success</span>(repository.search(q)))
+            }.<span class="tk-k">catch</span> { emit(<span class="tk-t">SearchUiState</span>.<span class="tk-t">Error</span>(<span class="tk-s">"Search failed"</span>)) }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>),   <span class="tk-c">// keep alive briefly across rotation</span>
+            initialValue = <span class="tk-t">SearchUiState</span>.<span class="tk-t">Idle</span>,
+        )
+
+    <span class="tk-k">fun</span> onQueryChange(text: <span class="tk-t">String</span>) { query.<span class="tk-k">value</span> = text }
+}
+
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SearchUiState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Idle</span> : <span class="tk-t">SearchUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Loading</span> : <span class="tk-t">SearchUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Success</span>(<span class="tk-k">val</span> products: <span class="tk-t">List</span>&lt;<span class="tk-t">Product</span>&gt;) : <span class="tk-t">SearchUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Error</span>(<span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">SearchUiState</span>
+}</code></pre></figure>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-flow-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-flow-title fig-flow-desc">
+    <title id="fig-flow-title">Search query flowing through Flow operators</title>
+    <desc id="fig-flow-desc">Keystrokes enter a pipeline: debounce, map trim, distinctUntilChanged, flatMapLatest to the repository, then stateIn exposes a StateFlow to the UI.</desc>
+    <defs><marker id="f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M100 70 H130 M228 70 H256 M344 70 H372 M482 70 H510 M610 70 H624" marker-end="url(#f1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="44" width="90" height="52" rx="10"/><text class="d-t" x="55" y="68" text-anchor="middle">query</text><text class="d-s" x="55" y="85" text-anchor="middle">"ph", "pho"…</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-box" x="134" y="44" width="94" height="52" rx="10"/><text class="d-t" x="181" y="75" text-anchor="middle">debounce</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="260" y="44" width="84" height="52" rx="10"/><text class="d-t" x="302" y="68" text-anchor="middle">distinct</text><text class="d-s" x="302" y="85" text-anchor="middle">UntilChanged</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="376" y="44" width="106" height="52" rx="10"/><text class="d-t" x="429" y="68" text-anchor="middle">flatMapLatest</text><text class="d-s" x="429" y="85" text-anchor="middle">→ repository</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-blue" x="514" y="44" width="96" height="52" rx="10"/><text class="d-t" x="562" y="75" text-anchor="middle">stateIn</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-green" x="628" y="44" width="82" height="52" rx="10"/><text class="d-t" x="669" y="75" text-anchor="middle">UI</text></g>
+    <circle class="d-dot warm" r="6" style="offset-path:path('M100 70 H628');--dur:2.6s"/>
+  </svg>
+  <figcaption id="fig-flow-cap">Each operator does one job. <code>flatMapLatest</code> is what prevents an old, slow search from overwriting newer results.</figcaption>
+</figure>
+
+<h2 id="hot-flows">StateFlow and SharedFlow: hot flows</h2>
+<p><strong>Hot</strong> flows exist independently of collectors and share emissions among them.</p>
+<ul>
+  <li><strong><code>StateFlow</code></strong> always has a current value, replays it to new collectors, and skips emissions equal to the current value. It's ideal for UI state.</li>
+  <li><strong><code>SharedFlow</code></strong> is configurable (replay, buffer) and has no required initial value. Use it for broadcasting events to multiple collectors.</li>
+  <li><strong><code>stateIn</code> / <code>shareIn</code></strong> convert a cold flow into a hot one, so expensive upstream work such as a database query runs once and is shared.</li>
+</ul>
+<p>The differences deserve their own article: see <a href="../mvi-vs-mvvm-android/index.html">MVVM vs MVI</a> for how state and one-off events are exposed in practice.</p>
+
+<h2 id="collecting">Collecting flows safely in the UI</h2>
+<p>Collecting a flow while the app is in the background wastes resources, and can crash if you touch Views that no longer exist. Use lifecycle-aware collection:</p>
+<figure class="code"><figcaption><span class="file">In Compose</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">SearchRoute</span>(viewModel: <span class="tk-t">SearchViewModel</span> = viewModel()) {
+    <span class="tk-c">// Stops collecting when the lifecycle drops below STARTED, resumes when it returns.</span>
+    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.results.collectAsStateWithLifecycle()
+    <span class="tk-t">SearchScreen</span>(state = state, onQueryChange = viewModel::onQueryChange)
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">In a Fragment or Activity</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.repeatOnLifecycle(<span class="tk-t">Lifecycle</span>.<span class="tk-t">State</span>.<span class="tk-t">STARTED</span>) {
+        viewModel.results.collect { state -&gt; render(state) }
+    }
+}</code></pre></figure>
+
+<h2 id="testing">Testing coroutines and flows</h2>
+<p>The <code>kotlinx-coroutines-test</code> library provides <code>runTest</code>, which skips <code>delay()</code> calls in virtual time, so a test with a 300 ms debounce runs instantly. Replace <code>Dispatchers.Main</code> in tests, because there is no Android main looper on the JVM:</p>
+<figure class="code"><figcaption><span class="file">MainDispatcherRule.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">MainDispatcherRule</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> dispatcher: <span class="tk-t">TestDispatcher</span> = <span class="tk-t">UnconfinedTestDispatcher</span>(),
+) : <span class="tk-t">TestWatcher</span>() {
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> starting(description: <span class="tk-t">Description</span>) = <span class="tk-t">Dispatchers</span>.setMain(dispatcher)
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> finished(description: <span class="tk-t">Description</span>) = <span class="tk-t">Dispatchers</span>.resetMain()
+}</code></pre></figure>
+<figure class="code"><figcaption><span class="file">SearchViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SearchViewModelTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> mainRule = <span class="tk-t">MainDispatcherRule</span>()
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> fakeRepo = <span class="tk-k">object</span> : <span class="tk-t">ProductRepository</span> {
+        <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>) = listOf(<span class="tk-t">Product</span>(<span class="tk-s">"1"</span>, <span class="tk-s">"Phone case"</span>, <span class="tk-n">299.0</span>))
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `typing a query emits success after debounce`() = runTest {
+        <span class="tk-k">val</span> vm = <span class="tk-t">SearchViewModel</span>(fakeRepo)
+        <span class="tk-k">val</span> states = mutableListOf&lt;<span class="tk-t">SearchUiState</span>&gt;()
+        <span class="tk-c">// Collect in the background so stateIn's WhileSubscribed upstream is active.</span>
+        backgroundScope.launch(<span class="tk-t">UnconfinedTestDispatcher</span>(testScheduler)) { vm.results.toList(states) }
+
+        vm.onQueryChange(<span class="tk-s">"case"</span>)
+        advanceTimeBy(<span class="tk-n">301</span>)            <span class="tk-c">// move virtual time past the debounce</span>
+        runCurrent()
+
+        assertTrue(states.last() <span class="tk-k">is</span> <span class="tk-t">SearchUiState</span>.<span class="tk-t">Success</span>)
+    }
+}</code></pre></figure>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Offline-first list</h3><dl><dt>Problem</dt><dd>Show cached data instantly, refresh in the background.</dd><dt>Solution</dt><dd>UI observes Room's <code>Flow</code>; a <code>launch</code> refreshes from the network and writes to Room.</dd><dt>Why</dt><dd>The database is the single source of truth, and the UI updates automatically.</dd><dt>Trade-off</dt><dd>You need a clear staleness and refresh policy.</dd></dl></div>
+  <div class="card usecase"><h3>Search-as-you-type</h3><dl><dt>Problem</dt><dd>Avoid a request per keystroke and stale results.</dd><dt>Solution</dt><dd><code>debounce</code> + <code>distinctUntilChanged</code> + <code>flatMapLatest</code>.</dd><dt>Why</dt><dd>Fewer requests, automatic cancellation of outdated ones.</dd><dt>Trade-off</dt><dd>Debounce adds a small, deliberate delay.</dd></dl></div>
+  <div class="card usecase"><h3>Dashboard with independent widgets</h3><dl><dt>Problem</dt><dd>One failing widget shouldn't blank the whole screen.</dd><dt>Solution</dt><dd><code>supervisorScope</code> with per-widget error handling.</dd><dt>Why</dt><dd>Failures are isolated to each widget.</dd><dt>Trade-off</dt><dd>Each widget needs its own error UI.</dd></dl></div>
+</div>
+
+<h2 id="mistakes">Common mistakes and how to fix them</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td><code>GlobalScope.launch</code></td><td>Work continues after leaving the screen; leaks</td><td>Use <code>viewModelScope</code> or an injected application scope</td></tr>
+    <tr><td><code>runBlocking</code> in app code</td><td>Frozen UI, ANRs</td><td>Only use it in <code>main()</code> or tests</td></tr>
+    <tr><td>Blocking call without <code>withContext</code></td><td>Jank, StrictMode violations</td><td>Wrap it in <code>withContext(Dispatchers.IO)</code></td></tr>
+    <tr><td>Catching <code>Exception</code> broadly</td><td>Cancelled work keeps running</td><td>Rethrow <code>CancellationException</code></td></tr>
+    <tr><td><code>collect</code> in <code>lifecycleScope</code> without <code>repeatOnLifecycle</code></td><td>Collecting in the background; wasted work</td><td>Use <code>repeatOnLifecycle</code> or <code>collectAsStateWithLifecycle</code></td></tr>
+    <tr><td>Exposing <code>MutableStateFlow</code></td><td>UI mutates state directly</td><td>Expose <code>StateFlow</code> via <code>asStateFlow()</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Are coroutines threads?</summary><div><p>No. Coroutines are lightweight units of work that <em>run on</em> threads. Thousands of suspended coroutines can share a small thread pool, because a suspended coroutine doesn't occupy a thread.</p></div></details>
+  <details><summary>Do I still need Dispatchers.IO with Retrofit and Room?</summary><div><p>Not for their suspend functions, which are already main-safe. You need it for your own blocking code, such as file access or blocking SDK calls.</p></div></details>
+  <details><summary>When should I use Flow instead of a suspend function?</summary><div><p>Use a suspend function for a single result, such as fetching a user. Use Flow when values change over time, such as database observation, location updates or user input streams.</p></div></details>
+  <details><summary>Should I replace RxJava with coroutines?</summary><div><p>For new code in Kotlin, coroutines and Flow are the standard choice and integrate with Jetpack. Migrate existing RxJava code gradually. Interop libraries exist to bridge the two.</p></div></details>
+  <details><summary>What does WhileSubscribed(5000) do?</summary><div><p>It keeps the upstream flow active for five seconds after the last collector disappears. That's long enough to survive a configuration change such as rotation without restarting expensive work, but it still stops when the user truly leaves.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Coroutines give Android a simple promise: <strong>write asynchronous code sequentially, and let scopes clean up after you</strong>. Learn suspension and main-safety first, then structured concurrency and dispatchers, then Flow and its operators. Test with <code>runTest</code> and injected dispatchers, and avoid <code>GlobalScope</code> and swallowed cancellations.</p>
+<p>Next step: take one callback-based API call in a project and rewrite it as a suspend function called from <code>viewModelScope</code>. Then add a Room <code>Flow</code> to the same screen. To see where this code lives in a well-structured app, continue with <a href="../clean-architecture-android/index.html">Clean Architecture in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/kotlin/coroutines" target="_blank" rel="noopener">Kotlin coroutines on Android</a></li><li><a href="https://kotlinlang.org/docs/coroutines-guide.html" target="_blank" rel="noopener">Coroutines guide (Kotlin docs)</a></li><li><a href="https://developer.android.com/kotlin/flow" target="_blank" rel="noopener">Kotlin flows on Android</a></li><li><a href="https://developer.android.com/kotlin/flow/stateflow-and-sharedflow" target="_blank" rel="noopener">StateFlow and SharedFlow</a></li><li><a href="https://developer.android.com/kotlin/coroutines/coroutines-best-practices" target="_blank" rel="noopener">Best practices for coroutines in Android</a></li><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing Kotlin coroutines on Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-coroutines-flow-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-coroutines-flow-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/mvi-vs-mvvm-android/index.html"><small>Android Architecture and Clean Code</small>MVVM vs MVI: Which Android Architecture Should You Use?</a></li><li><a href="../../android/android-developer-roadmap-beginners/index.html"><small>Android Development for Beginners</small>Android Development Roadmap for Beginners in 2026</a></li><li><a href="../../android/clean-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Clean Architecture in Android: Practical Lessons</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-coroutines-flow-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-coroutines-flow-android/&amp;text=Kotlin Coroutines and Flow Explained for Android Developers" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-coroutines-flow-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#why-coroutines">The problem coroutines solve</a></li><li><a href="#suspend">Suspend functions: pausing without blocking</a></li><li><a href="#scopes">Coroutine scopes and structured concurrency</a></li><li><a href="#dispatchers">Dispatchers: which thread runs the code</a></li><li><a href="#launch-async">launch vs async, and running work in parallel</a></li><li><a href="#cancellation">Cancellation and exceptions</a></li><li><a href="#flow">Flow: streams of values over time</a></li><li><a href="#hot-flows">StateFlow and SharedFlow: hot flows</a></li><li><a href="#collecting">Collecting flows safely in the UI</a></li><li><a href="#testing">Testing coroutines and flows</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#mistakes">Common mistakes and how to fix them</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-coroutines-flow-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-coroutines-flow-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

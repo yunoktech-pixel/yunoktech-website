@@ -1,0 +1,126 @@
+<!--meta
+{
+  "seo_title": "Common Mistakes Beginners Make in Android Development",
+  "description": "15 common Android beginner mistakes, from main-thread work and leaked Contexts to lost state, ignored errors, hard-coded strings and leaked API keys, with fixes in Kotlin.",
+  "primary_keyword": "android beginner mistakes",
+  "keywords": ["android development mistakes", "android best practices beginners", "networkonmainthreadexception", "android memory leak context", "configuration change state loss", "android api key in code"],
+  "lede": "Most beginner Android bugs come from the same handful of mistakes. Each one is easy to fix once you understand why Android behaves the way it does. Here are the most common, with the symptom, the cause and the corrected code.",
+  "date": "2026-10-15",
+  "cta": "beginner",
+  "related": ["build-first-android-app", "how-android-app-works-internally", "android-memory-leaks", "secure-api-keys-android"],
+  "refs": [
+    ["Recommendations for Android architecture", "https://developer.android.com/topic/architecture/recommendations"],
+    ["Save UI states", "https://developer.android.com/topic/libraries/architecture/saving-states"],
+    ["Keep your app responsive", "https://developer.android.com/topic/performance/vitals/anr"],
+    ["Localize your app", "https://developer.android.com/guide/topics/resources/localization"],
+    ["Accessibility in Compose", "https://developer.android.com/develop/ui/compose/accessibility"]
+  ]
+}
+-->
+<p class="ad-lead">Every Android developer has shipped at least one of these: a screen that loses its data on rotation, a crash that only happens on slow networks, an API key committed to GitHub. They're not signs that you're bad at Android. They're the platform's sharp edges, and everyone cuts themselves once.</p>
+<p>This article collects the most common beginner mistakes, grouped by area. Each one has a <strong>symptom</strong> so you can recognise it, a <strong>cause</strong>, and a <strong>fix</strong> with Kotlin code.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-m-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-m-t fig-m-d">
+    <title id="fig-m-t">Categories of common beginner mistakes</title>
+    <desc id="fig-m-d">Five categories: threading, lifecycle and state, architecture, data and errors, and security and quality.</desc>
+    <rect class="d-red" x="10" y="30" width="130" height="80" rx="12"/><text class="d-t" x="75" y="66" text-anchor="middle">Threading</text><text class="d-s" x="75" y="86" text-anchor="middle">main thread</text>
+    <rect class="d-amber" x="152" y="30" width="130" height="80" rx="12"/><text class="d-t" x="217" y="66" text-anchor="middle">Lifecycle</text><text class="d-s" x="217" y="86" text-anchor="middle">state loss, leaks</text>
+    <rect class="d-violet" x="294" y="30" width="130" height="80" rx="12"/><text class="d-t" x="359" y="66" text-anchor="middle">Architecture</text><text class="d-s" x="359" y="86" text-anchor="middle">logic in UI</text>
+    <rect class="d-blue" x="436" y="30" width="130" height="80" rx="12"/><text class="d-t" x="501" y="66" text-anchor="middle">Data &amp; errors</text><text class="d-s" x="501" y="86" text-anchor="middle">happy path only</text>
+    <rect class="d-green" x="578" y="30" width="130" height="80" rx="12"/><text class="d-t" x="643" y="66" text-anchor="middle">Security &amp; QA</text><text class="d-s" x="643" y="86" text-anchor="middle">keys, a11y, tests</text>
+  </svg>
+  <figcaption id="fig-m-cap">Almost every beginner bug falls into one of these five buckets.</figcaption>
+</figure>
+
+<h2 id="threading">Threading mistakes</h2>
+<h3 id="m1">1. Doing slow work on the main thread</h3>
+<p><strong>Symptom:</strong> frozen UI, "App isn't responding" dialogs, <code>NetworkOnMainThreadException</code>. <strong>Cause:</strong> network, database or file work on the UI thread. <strong>Fix:</strong> use coroutines with main-safe APIs (Retrofit and Room suspend functions), and <code>withContext(Dispatchers.IO)</code> for your own blocking code.</p>
+<code-block lang="kotlin" file="Fix">
+fun load() = viewModelScope.launch {
+    val articles = repository.fetchArticles()     // suspend + main-safe
+    _uiState.update { it.copy(articles = articles) }
+}
+</code-block>
+<h3 id="m2">2. Using GlobalScope or unmanaged threads</h3>
+<p><strong>Symptom:</strong> work continues after the user leaves, crashes when updating destroyed UI, leaks. <strong>Fix:</strong> launch in <code>viewModelScope</code> or <code>lifecycleScope</code> so work is cancelled automatically. See <a href="../kotlin-coroutines-flow-android/index.html">Coroutines and Flow Explained</a>.</p>
+
+<h2 id="lifecycle">Lifecycle and state mistakes</h2>
+<h3 id="m3">3. Losing state on rotation</h3>
+<p><strong>Symptom:</strong> typed text or loaded data disappears when the screen rotates or dark mode toggles. <strong>Cause:</strong> state stored in the Activity or in plain <code>remember</code>. <strong>Fix:</strong> screen state in a ViewModel, and UI-element state in <code>rememberSaveable</code>.</p>
+<h3 id="m4">4. Ignoring process death</h3>
+<p><strong>Symptom:</strong> after the app has been in the background for a while, it returns with an empty or broken screen. <strong>Fix:</strong> persist critical in-progress input with <code>SavedStateHandle</code>, and test with <em>Don't keep activities</em>. See <a href="../how-android-app-works-internally/index.html">How an Android App Works Internally</a>.</p>
+<h3 id="m5">5. Holding a Context or View in a ViewModel or singleton</h3>
+<p><strong>Symptom:</strong> memory leaks, and LeakCanary warnings about destroyed Activities. <strong>Fix:</strong> never store Activity contexts in long-lived objects. Use the application context if you really need one.</p>
+<code-block lang="kotlin" file="Bad vs good">
+// ❌ Leaks the Activity after rotation
+class ProfileViewModel(private val activity: Activity) : ViewModel()
+
+// ✅ Depend on what you need, not on the Activity
+class ProfileViewModel(private val repository: ProfileRepository) : ViewModel()
+</code-block>
+
+<h2 id="architecture">Architecture mistakes</h2>
+<h3 id="m6">6. Putting logic in composables or Activities</h3>
+<p><strong>Symptom:</strong> screens that are hard to test and change, and duplicated logic. <strong>Fix:</strong> keep composables focused on rendering state and emitting events. Validation, formatting rules and data loading belong in the ViewModel or below.</p>
+<h3 id="m7">7. Exposing mutable state</h3>
+<code-block lang="kotlin" file="Fix">
+private val _uiState = MutableStateFlow(UiState())
+val uiState: StateFlow<UiState> = _uiState.asStateFlow()   // UI can read, not write
+</code-block>
+<h3 id="m8">8. Over-engineering too early</h3>
+<p><strong>Symptom:</strong> five modules and twenty interfaces for a two-screen app. <strong>Fix:</strong> start with ViewModel + repository, and add structure when real complexity appears. See <a href="../clean-architecture-android/index.html">Clean Architecture: Practical Lessons</a>.</p>
+
+<h2 id="data">Data and error-handling mistakes</h2>
+<h3 id="m9">9. Coding only the happy path</h3>
+<p><strong>Symptom:</strong> crashes or infinite spinners on slow or offline networks. <strong>Fix:</strong> model loading, empty, error and success explicitly, and offer retry.</p>
+<code-block lang="kotlin" file="Explicit screen states">
+sealed interface ArticlesUiState {
+    data object Loading : ArticlesUiState
+    data object Empty : ArticlesUiState
+    data class Success(val items: List<Article>) : ArticlesUiState
+    data class Error(val message: String) : ArticlesUiState
+}
+</code-block>
+<h3 id="m10">10. Using <code>!!</code> to silence the compiler</h3>
+<p><strong>Symptom:</strong> <code>NullPointerException</code> crashes. <strong>Fix:</strong> handle nullability with <code>?.</code>, <code>?:</code>, early returns, or better types. See <a href="../kotlin-null-safety/index.html">Kotlin Null Safety Explained</a>.</p>
+<h3 id="m11">11. Using Double for money</h3>
+<p><strong>Fix:</strong> use <code>BigDecimal</code> or integer minor units (paise or cents) for currency.</p>
+
+<h2 id="quality">Security and quality mistakes</h2>
+<h3 id="m12">12. Hard-coding API keys and secrets</h3>
+<p><strong>Symptom:</strong> keys leaked on GitHub or extracted from the APK, and unexpected bills. <strong>Fix:</strong> keep secrets on a server. Restrict any keys that must ship in the app. See <a href="../secure-api-keys-android/index.html">Secure API Keys in Android Apps</a>.</p>
+<h3 id="m13">13. Hard-coding text and sizes</h3>
+<p><strong>Fix:</strong> put user-facing text in <code>strings.xml</code> (via <code>stringResource</code>) for translation, use <code>sp</code> for text and <code>dp</code> for sizes, and test with large font scale.</p>
+<h3 id="m14">14. Ignoring accessibility</h3>
+<p><strong>Fix:</strong> give icons content descriptions, keep touch targets at least 48dp, ensure contrast, and try TalkBack once on every new screen.</p>
+<code-block lang="kotlin" file="Accessible icon button">
+IconButton(onClick = onDelete) {
+    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_note))
+}
+</code-block>
+<h3 id="m15">15. Skipping version control and tests</h3>
+<p><strong>Fix:</strong> commit small changes often, and write unit tests for ViewModels and pure logic first. They're cheap and catch regressions immediately.</p>
+
+<h2 id="checklist">A quick self-review checklist</h2>
+<ul>
+  <li>☐ No network, database or file work on the main thread</li>
+  <li>☐ All coroutines launched in a lifecycle-aware scope</li>
+  <li>☐ Screen survives rotation and process death</li>
+  <li>☐ No Activity, View or Context stored in a ViewModel</li>
+  <li>☐ Every data screen has loading, empty and error states</li>
+  <li>☐ No <code>!!</code> without a comment explaining why it's safe</li>
+  <li>☐ No secrets in source code</li>
+  <li>☐ Strings in resources; icons have content descriptions</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How do I find these mistakes in my own code?</summary><div><p>Enable StrictMode in debug builds, add LeakCanary, turn on <em>Don't keep activities</em>, test on a slow network profile, and run Android Studio's lint (Analyze → Inspect Code).</p></div></details>
+  <details><summary>Are these mistakes only for beginners?</summary><div><p>No. Experienced developers make them under deadline pressure too. That's why checklists, code review and tests exist.</p></div></details>
+  <details><summary>Which mistake should I fix first?</summary><div><p>Anything that crashes or loses user data: main-thread work, state loss and missing error handling. Then security, then quality.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Beginner mistakes in Android follow predictable patterns: <strong>blocking the main thread, ignoring lifecycle and process death, putting logic in the UI, coding only the happy path, and leaking secrets</strong>. Each has a well-established fix, and once you've internalised them your apps become dramatically more reliable.</p>
+<p>Next step: run the checklist against your current project, then deepen your Kotlin with <a href="../kotlin-basics-android/index.html">Kotlin Basics Every Android Developer Should Know</a>.</p>

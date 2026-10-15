@@ -1,0 +1,156 @@
+<!--meta
+{
+  "seo_title": "State Hoisting in Jetpack Compose Explained",
+  "description": "State hoisting in Jetpack Compose with examples: stateless vs stateful composables, value and onValueChange, how high to hoist, state holders, previews and testing benefits.",
+  "primary_keyword": "state hoisting compose",
+  "keywords": ["stateless composable", "stateful vs stateless compose", "compose onValueChange pattern", "where to hoist state", "compose reusable components", "unidirectional data flow compose"],
+  "lede": "State hoisting is the pattern that makes Compose components reusable, previewable and testable: move state out of a composable and pass it in with an event callback. Here's how to do it, how far to hoist, and when not to.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-state-management", "composable-functions-explained", "unidirectional-data-flow-android", "compose-ui-testing"],
+  "refs": [
+    ["Where to hoist state", "https://developer.android.com/develop/ui/compose/state-hoisting"],
+    ["State and Jetpack Compose: state hoisting", "https://developer.android.com/develop/ui/compose/state#state-hoisting"],
+    ["Architecting your Compose UI", "https://developer.android.com/develop/ui/compose/architecture"]
+  ]
+}
+-->
+<p class="ad-lead">You build a quantity selector with its own internal count. Later, the cart total needs that count, a "reset" button needs to change it, and a test needs to start it at 5. None of that is possible while the state is locked inside. State hoisting solves it.</p>
+
+<h2 id="definition">What state hoisting is</h2>
+<p>To hoist state, replace a composable's internal state with two parameters: the <strong>current value</strong>, and an <strong>event lambda</strong> requesting a change. The composable becomes <strong>stateless</strong>, and the caller owns the state.</p>
+<code-block lang="kotlin" file="Before: stateful (hard to reuse)">
+@Composable
+fun QuantitySelector() {
+    var qty by remember { mutableIntStateOf(1) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { if (qty > 1) qty-- }) { Icon(Icons.Default.Remove, "Decrease") }
+        Text("$qty")
+        IconButton(onClick = { qty++ }) { Icon(Icons.Default.Add, "Increase") }
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="After: stateless (hoisted)">
+@Composable
+fun QuantitySelector(
+    quantity: Int,
+    onQuantityChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    range: IntRange = 1..99,
+) {
+    Row(modifier, verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { onQuantityChange(quantity - 1) }, enabled = quantity > range.first) {
+            Icon(Icons.Default.Remove, contentDescription = "Decrease quantity")
+        }
+        Text("$quantity", Modifier.widthIn(min = 32.dp), textAlign = TextAlign.Center)
+        IconButton(onClick = { onQuantityChange(quantity + 1) }, enabled = quantity < range.last) {
+            Icon(Icons.Default.Add, contentDescription = "Increase quantity")
+        }
+    }
+}
+</code-block>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ho-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-ho-t fig-ho-d">
+    <title id="fig-ho-t">State hoisting: value down, events up</title>
+    <desc id="fig-ho-d">The parent CartItemRow owns quantity state. It passes the quantity value down to QuantitySelector, which sends onQuantityChange events back up. The parent updates its state, or forwards the event to the ViewModel.</desc>
+    <defs><marker id="hs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-violet" x="40" y="60" width="240" height="70" rx="14"/><text class="d-t" x="160" y="90" text-anchor="middle">Parent (state owner)</text><text class="d-s" x="160" y="110" text-anchor="middle">quantity in ViewModel/state</text>
+    <rect class="d-green" x="440" y="60" width="240" height="70" rx="14"/><text class="d-t" x="560" y="90" text-anchor="middle">QuantitySelector</text><text class="d-s" x="560" y="110" text-anchor="middle">stateless</text>
+    <path class="d-flow" d="M280 80 H436" marker-end="url(#hs)"/><text class="d-s" x="358" y="72" text-anchor="middle">quantity = 3</text>
+    <path class="d-flow" d="M440 112 H284" marker-end="url(#hs)"/><text class="d-s" x="362" y="134" text-anchor="middle">onQuantityChange(4)</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M280 80 H436');--dur:1.4s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M440 112 H284');--dur:1.4s;--delay:.8s"/>
+  </svg>
+  <figcaption id="fig-ho-cap">Hoisting creates unidirectional data flow at the component level, the same pattern as ViewModel and screen.</figcaption>
+</figure>
+
+<h2 id="benefits">Why it pays off</h2>
+<ul>
+  <li><strong>Single source of truth:</strong> the cart total and the selector can't disagree.</li>
+  <li><strong>Reusable:</strong> the same selector works in the cart, product page and wishlist.</li>
+  <li><strong>Previewable:</strong> preview any quantity or disabled state directly.</li>
+  <li><strong>Testable:</strong> UI tests set values and verify the events emitted.</li>
+  <li><strong>Interceptable:</strong> the parent can validate, clamp or reject changes.</li>
+</ul>
+
+<h2 id="how-high">How high should you hoist?</h2>
+<p>Hoist to the <strong>lowest common ancestor</strong> of all the composables that read or write the state, and no higher. Three practical levels:</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>State used by…</th><th>Hoist to</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>One component only</td><td>Keep it inside (stateful is fine)</td><td>Ripple, internal animation</td></tr>
+    <tr><td>Siblings on one screen</td><td>Their parent composable or a state holder</td><td>Search field + clear button + results list</td></tr>
+    <tr><td>Business logic or other screens</td><td>ViewModel</td><td>Cart quantities affecting price and checkout</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="stateful-wrapper">Offer both: stateless core, stateful convenience</h2>
+<code-block lang="kotlin" file="Pattern used by Material components">
+@Composable
+fun RatingBar(rating: Int, onRatingChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier) {
+        (1..5).forEach { star ->
+            IconToggleButton(checked = star <= rating, onCheckedChange = { onRatingChange(star) }) {
+                Icon(if (star <= rating) Icons.Filled.Star else Icons.Outlined.StarOutline,
+                    contentDescription = "$star stars")
+            }
+        }
+    }
+}
+
+// Convenience overload for simple use cases
+@Composable
+fun RatingBar(modifier: Modifier = Modifier, initial: Int = 0) {
+    var rating by rememberSaveable { mutableIntStateOf(initial) }
+    RatingBar(rating, { rating = it }, modifier)
+}
+</code-block>
+
+<h2 id="screen-level">Screen-level hoisting with a ViewModel</h2>
+<code-block lang="kotlin" file="Route + Screen split">
+@Composable
+fun CartRoute(viewModel: CartViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    CartScreen(state = state, onQuantityChange = viewModel::setQuantity, onCheckout = viewModel::checkout)
+}
+
+@Composable
+fun CartScreen(state: CartUiState, onQuantityChange: (String, Int) -> Unit, onCheckout: () -> Unit) {
+    LazyColumn {
+        items(state.items, key = { it.id }) { item ->
+            CartItemRow(item, onQuantityChange = { qty -> onQuantityChange(item.id, qty) })
+        }
+        item { Button(onClick = onCheckout, enabled = state.canCheckout) { Text("Checkout") } }
+    }
+}
+</code-block>
+<p>The <em>Route</em> composable connects to the ViewModel. The <em>Screen</em> is fully stateless, so previews and UI tests can drive it with any <code>CartUiState</code>.</p>
+
+<h2 id="use-cases">Real-world cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Form fields</h3><p>Every field takes <code>value</code> and <code>onValueChange</code>, and the form state lives in the ViewModel, which validates as the user types.</p></div>
+  <div class="card usecase"><h3>Tabs and pager</h3><p>The selected tab is hoisted to the screen so the toolbar title and content stay in sync.</p></div>
+  <div class="card usecase"><h3>Design system</h3><p>All library components are stateless, with optional stateful wrappers.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Hoisting everything to the ViewModel, including purely visual state such as tooltip visibility.</li>
+  <li>Passing a <code>MutableState</code> object down instead of a value and lambda, which lets children mutate state invisibly.</li>
+  <li>Passing the ViewModel into reusable components.</li>
+  <li>Keeping a local copy of hoisted state, creating two sources of truth.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Doesn't hoisting create too many lambdas?</summary><div><p>It creates some, and that's fine. Group related events into a small interface or data class if a component takes many of them.</p></div></details>
+  <details><summary>Is hoisting the same as unidirectional data flow?</summary><div><p>Hoisting is how you implement UDF in Compose: state flows down as parameters and events flow up as lambdas.</p></div></details>
+  <details><summary>Should TextField state be hoisted?</summary><div><p>Usually yes, to the screen or ViewModel, so validation and submission can read it. Compose also offers a <code>TextFieldState</code>-based API for more advanced text editing.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>State hoisting turns components into <strong>stateless functions of their inputs</strong>: value down, events up, hoisted to the lowest common owner. It's the single habit that most improves reuse, previews and tests in Compose.</p>
+<p>Next step: move between screens with <a href="../compose-navigation/index.html">Navigation in Jetpack Compose</a>.</p>

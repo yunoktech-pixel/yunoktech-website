@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How an Android App Works Internally (Explained) | Yunok Tech</title>
+  <meta name="description" content="What happens inside Android when an app starts and runs: APK/AAB, Zygote, processes, ART, the main thread and Looper, lifecycle, sandboxing, Binder and process death.">
+  <meta name="keywords" content="how android app works internally, android app internals, zygote android, android runtime art, main thread looper, android process lifecycle, process death android, binder ipc">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/how-android-app-works-internally/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/how-android-app-works-internally/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="How an Android App Works Internally (Explained)">
+  <meta property="og:description" content="What happens inside Android when an app starts and runs: APK/AAB, Zygote, processes, ART, the main thread and Looper, lifecycle, sandboxing, Binder and process death.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Development for Beginners">
+  <meta name="twitter:title" content="How an Android App Works Internally (Explained)">
+  <meta name="twitter:description" content="What happens inside Android when an app starts and runs: APK/AAB, Zygote, processes, ART, the main thread and Looper, lifecycle, sandboxing, Binder and process death.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "How an Android App Works Internally", "description": "What happens inside Android when an app starts and runs: APK/AAB, Zygote, processes, ART, the main thread and Looper, lifecycle, sandboxing, Binder and process death.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android Development for Beginners", "keywords": "android app internals, zygote android, android runtime art, main thread looper, android process lifecycle, process death android, binder ipc", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/how-android-app-works-internally/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "How an Android App Works Internally", "item": "https://yunoktech.com/android/how-android-app-works-internally/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#beginners">Android Development for Beginners</a></nav>
+    <span class="ad-chip">🌱 Android Development for Beginners</span>
+    <h1 id="article-title">How an Android App Works Internally</h1>
+    <p class="ad-lede">When a user taps your icon, a lot happens before your first line of code runs, and a lot keeps happening while it does. Understanding processes, the main thread, ART and process death explains many bugs that otherwise look random.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>5 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#package">1. What&#x27;s inside an installed app</a></li><li><a href="#startup">2. From tap to first frame</a></li><li><a href="#art">3. ART: how your code actually executes</a></li><li><a href="#main-thread">4. The main thread and its message loop</a></li><li><a href="#sandbox">5. The sandbox and Binder IPC</a></li><li><a href="#lifecycle">6. Lifecycles: who&#x27;s in control</a></li><li><a href="#process-death">7. Process death: the bug that only appears later</a></li><li><a href="#use-cases">How this knowledge prevents real bugs</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Why does a form lose its text when the user returns after an hour? Why does a long loop freeze the screen? Why can't your app read another app's files? These aren't Android quirks. They follow directly from how Android runs apps.</p>
+<p>This article walks through what happens from install to tap to background, in plain language, with code showing how each internal mechanism shapes the way you write apps.</p>
+
+<h2 id="package">1. What's inside an installed app</h2>
+<p>You publish an <strong>Android App Bundle</strong>. Google Play turns it into optimised APKs for each device. An installed APK contains:</p>
+<ul>
+  <li><strong>classes.dex</strong>: your Kotlin and library code compiled to DEX bytecode.</li>
+  <li><strong>resources.arsc and res/</strong>: compiled resources (layouts, strings, drawables).</li>
+  <li><strong>AndroidManifest.xml</strong>: the app's identity, components, permissions and requirements.</li>
+  <li><strong>lib/</strong>: native libraries, if any.</li>
+  <li><strong>A signature</strong> proving who built it.</li>
+</ul>
+<p>At install time, the system assigns the app a unique Linux user ID and a private data directory. That is the start of the <strong>sandbox</strong>.</p>
+
+<h2 id="startup">2. From tap to first frame</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-start-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-start-t fig-start-d">
+    <title id="fig-start-t">Cold start sequence of an Android app</title>
+    <desc id="fig-start-d">The launcher asks system_server's ActivityManager to start the app. Zygote forks a new process with preloaded framework classes. The app's Application object is created, then the launcher Activity runs onCreate, its UI is measured and drawn, and the first frame appears.</desc>
+    <defs><marker id="s2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M110 70 H130 M240 70 H260 M370 70 H390 M500 70 H520" marker-end="url(#s2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="10" y="40" width="100" height="60" rx="12"/><text class="d-t" x="60" y="66" text-anchor="middle">Tap icon</text><text class="d-s" x="60" y="84" text-anchor="middle">launcher</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="134" y="40" width="106" height="60" rx="12"/><text class="d-t" x="187" y="66" text-anchor="middle">system_server</text><text class="d-s" x="187" y="84" text-anchor="middle">ActivityManager</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="264" y="40" width="106" height="60" rx="12"/><text class="d-t" x="317" y="66" text-anchor="middle">Zygote</text><text class="d-s" x="317" y="84" text-anchor="middle">forks process</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="394" y="40" width="106" height="60" rx="12"/><text class="d-t" x="447" y="66" text-anchor="middle">Application</text><text class="d-s" x="447" y="84" text-anchor="middle">onCreate()</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="524" y="40" width="186" height="60" rx="12"/><text class="d-t" x="617" y="66" text-anchor="middle">Activity.onCreate()</text><text class="d-s" x="617" y="84" text-anchor="middle">→ measure, draw, first frame</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Everything in Application.onCreate() delays the first frame.</text>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Keep it small: that's the biggest lever on cold start time.</text>
+  </svg>
+  <figcaption id="fig-start-cap">A cold start. Zygote is a pre-warmed process that already has framework classes loaded, so forking it is much faster than starting a JVM from scratch.</figcaption>
+</figure>
+<p>Not every launch is a cold start. If your process is still alive, Android may perform a <strong>warm</strong> or <strong>hot</strong> start, reusing the existing process and possibly the existing Activity. See <a href="../reduce-android-app-startup-time/index.html">Reducing Android App Startup Time</a>.</p>
+
+<h2 id="art">3. ART: how your code actually executes</h2>
+<p>The <strong>Android Runtime (ART)</strong> executes DEX bytecode. Modern ART combines an interpreter, just-in-time (JIT) compilation of hot methods, and ahead-of-time (AOT) compilation guided by profiles, including <a href="../baseline-profiles-android/index.html">Baseline Profiles</a> you ship with your app. ART also manages memory with a garbage collector, which is why creating many short-lived objects in a tight loop, such as inside a composable that recomposes often, can cause jank.</p>
+
+<h2 id="main-thread">4. The main thread and its message loop</h2>
+<p>Each app process has one <strong>main thread</strong>, also called the UI thread, running a <code>Looper</code> that processes a queue of messages: input events, lifecycle callbacks, drawing frames, and your posted work. Everything runs one item at a time.</p>
+<figure class="code"><figcaption><span class="file">Why blocking the main thread freezes the UI</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">button.setOnClickListener {
+    <span class="tk-c">// ❌ Runs on the main thread. While this sleeps, no frames are drawn and no touches are handled.</span>
+    <span class="tk-t">Thread</span>.sleep(<span class="tk-n">6_000</span>)          <span class="tk-c">// long enough to trigger an ANR dialog on input</span>
+}
+
+<span class="tk-c">// ✅ Move slow work off the main thread; resume on main to update UI.</span>
+button.setOnClickListener {
+    lifecycleScope.launch {
+        <span class="tk-k">val</span> report = withContext(<span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>) { buildLargeReport() }
+        textView.text = report.summary
+    }
+}</code></pre></figure>
+<p>If the main thread can't respond to input for about five seconds, Android shows an <strong>ANR</strong> ("Application Not Responding") dialog. See <a href="../android-anr-errors/index.html">ANR Errors Explained</a>.</p>
+
+<h2 id="sandbox">5. The sandbox and Binder IPC</h2>
+<p>Because each app runs as its own Linux user in its own process, it can't read other apps' private files or memory. To use system features such as location, notifications or the camera, your app calls system services in <code>system_server</code> through <strong>Binder</strong>, Android's inter-process communication mechanism, subject to permissions. When you call <code>getSystemService()</code>, you get a proxy that sends Binder transactions to the real service.</p>
+
+<h2 id="lifecycle">6. Lifecycles: who's in control</h2>
+<p>You don't control when your Activity is created or destroyed; the system does. It calls lifecycle methods (<code>onCreate</code>, <code>onStart</code>, <code>onResume</code>, <code>onPause</code>, <code>onStop</code>, <code>onDestroy</code>) as the user navigates, rotates the screen or switches apps. Configuration changes such as rotation, language or dark mode recreate the Activity by default. That's why state belongs in a <code>ViewModel</code>, which survives configuration changes.</p>
+
+<h2 id="process-death">7. Process death: the bug that only appears later</h2>
+<p>When memory is low, Android may <strong>kill your process while it's in the background</strong>. When the user returns, Android recreates the Activity in a new process, and it expects your app to restore what the user saw. ViewModels <em>don't</em> survive process death. Saved instance state does.</p>
+<figure class="code"><figcaption><span class="file">Surviving process death in a ViewModel</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">CheckoutViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> savedState: <span class="tk-t">SavedStateHandle</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-c">// Persisted in the saved-instance-state Bundle: survives rotation AND process death.</span>
+    <span class="tk-k">val</span> couponCode: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">String</span>&gt; = savedState.getStateFlow(<span class="tk-s">"coupon"</span>, <span class="tk-s">""</span>)
+
+    <span class="tk-k">fun</span> onCouponChange(code: <span class="tk-t">String</span>) { savedState[<span class="tk-s">"coupon"</span>] = code }
+}
+
+<span class="tk-c">// In Compose, rememberSaveable does the same for UI-element state:</span>
+<span class="tk-c">// var query by rememberSaveable { mutableStateOf("") }</span></code></pre></figure>
+<div class="tip"><b>Test it</b>
+<p>Enable <em>Don't keep activities</em> in Developer options, or put the app in the background and run <code>adb shell am kill &lt;package&gt;</code>, then return to the app. Anything you lose is a process-death bug.</p></div>
+
+<h2 id="use-cases">How this knowledge prevents real bugs</h2>
+<div class="cards">
+  <div class="card usecase"><h3>"Form clears randomly"</h3><p>Cause: process death. Fix: store user input in <code>SavedStateHandle</code> or <code>rememberSaveable</code>, and drafts in Room or DataStore.</p></div>
+  <div class="card usecase"><h3>"App freezes when exporting"</h3><p>Cause: file I/O on the main thread. Fix: <code>withContext(Dispatchers.IO)</code> and a progress state.</p></div>
+  <div class="card usecase"><h3>"Slow startup after adding SDKs"</h3><p>Cause: heavy <code>Application.onCreate()</code>. Fix: lazy initialisation after the first frame.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does each app run in its own process?</summary><div><p>By default, yes: one process per app, running as a unique Linux user. Apps can declare additional processes for specific components, but most apps don't need to.</p></div></details>
+  <details><summary>Is ART a Java Virtual Machine?</summary><div><p>No. ART runs DEX bytecode, not Java class files, and it uses its own compilation and garbage-collection strategies. The build converts JVM bytecode to DEX.</p></div></details>
+  <details><summary>Why is Application.onCreate() called for background work too?</summary><div><p>Starting any component (an Activity, Service, BroadcastReceiver, WorkManager job or ContentProvider) in a new process creates the Application first. Heavy initialisation there slows every entry point.</p></div></details>
+  <details><summary>Will my coroutines keep running after process death?</summary><div><p>No. The process and all its threads are gone. Use WorkManager for work that must complete reliably.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>An Android app is a sandboxed process forked from <strong>Zygote</strong>, executing DEX on <strong>ART</strong>, driven by a <strong>single main-thread message loop</strong>, with lifecycles controlled by the system and the ever-present possibility of <strong>process death</strong>. Writing apps that respect these facts is most of what "Android best practices" means.</p>
+<p>Next step: learn the four building blocks the system can launch in <a href="../android-app-components/index.html">Android App Components</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/guide/components/fundamentals" target="_blank" rel="noopener">Application fundamentals</a></li><li><a href="https://developer.android.com/guide/components/activities/process-lifecycle" target="_blank" rel="noopener">Processes and app lifecycle</a></li><li><a href="https://source.android.com/docs/core/runtime" target="_blank" rel="noopener">Android Runtime (ART) and Dalvik</a></li><li><a href="https://developer.android.com/topic/performance/vitals/anr" target="_blank" rel="noopener">Keep your app responsive (ANRs)</a></li><li><a href="https://developer.android.com/topic/performance/vitals/launch-time" target="_blank" rel="noopener">App startup time</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhow-android-app-works-internally-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhow-android-app-works-internally-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-app-components/index.html"><small>Android Development for Beginners</small>Android App Components: Activities, Services, and Receivers</a></li><li><a href="../../android/android-anr-errors/index.html"><small>Testing, Debugging, and Performance</small>ANR Errors Explained and How to Fix Them</a></li><li><a href="../../android/android-sdk-vs-jdk-vs-gradle/index.html"><small>Android Development for Beginners</small>Android SDK vs JDK vs Gradle: What&#x27;s the Difference?</a></li><li><a href="../../android/reduce-android-app-startup-time/index.html"><small>Testing, Debugging, and Performance</small>Reducing Android App Startup Time</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/how-android-app-works-internally/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/how-android-app-works-internally/&amp;text=How an Android App Works Internally" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/how-android-app-works-internally/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#package">1. What&#x27;s inside an installed app</a></li><li><a href="#startup">2. From tap to first frame</a></li><li><a href="#art">3. ART: how your code actually executes</a></li><li><a href="#main-thread">4. The main thread and its message loop</a></li><li><a href="#sandbox">5. The sandbox and Binder IPC</a></li><li><a href="#lifecycle">6. Lifecycles: who&#x27;s in control</a></li><li><a href="#process-death">7. Process death: the bug that only appears later</a></li><li><a href="#use-cases">How this knowledge prevents real bugs</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhow-android-app-works-internally-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dhow-android-app-works-internally-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

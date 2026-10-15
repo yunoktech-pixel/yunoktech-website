@@ -1,0 +1,147 @@
+<!--meta
+{
+  "seo_title": "Flow vs StateFlow vs SharedFlow in Kotlin (Android)",
+  "description": "Flow vs StateFlow vs SharedFlow explained for Android: cold vs hot, replay, conflation, stateIn and shareIn, one-off events, Channels, and which to use in ViewModels.",
+  "primary_keyword": "flow vs stateflow vs sharedflow",
+  "keywords": ["stateflow vs sharedflow", "cold flow vs hot flow", "stateIn shareIn", "sharedflow replay", "channel vs sharedflow", "kotlin flow android viewmodel"],
+  "lede": "Flow, StateFlow and SharedFlow look similar and are often used interchangeably, which causes lost events, duplicate network calls and screens that don't update. Here's the precise difference and a simple rule for choosing.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-coroutines-flow-android", "viewmodel-stateflow-ui-state", "mvi-vs-mvvm-android", "coroutines-flow-interview-questions"],
+  "refs": [
+    ["StateFlow and SharedFlow (Android)", "https://developer.android.com/kotlin/flow/stateflow-and-sharedflow"],
+    ["Kotlin flows on Android", "https://developer.android.com/kotlin/flow"],
+    ["Asynchronous Flow (Kotlin docs)", "https://kotlinlang.org/docs/flow.html"],
+    ["UI events guidance", "https://developer.android.com/topic/architecture/ui-layer/events"]
+  ]
+}
+-->
+<p class="ad-lead">Two collectors of the same Flow trigger two network requests. A snackbar event fires while the screen is rotating and disappears. A StateFlow doesn't emit after you "update" a list. Each of these comes from choosing the wrong kind of flow, or misunderstanding how it behaves.</p>
+
+<h2 id="summary">The one-table summary</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Property</th><th>Flow (cold)</th><th>StateFlow (hot)</th><th>SharedFlow (hot)</th></tr></thead>
+  <tbody>
+    <tr><td>Runs when</td><td>Each collector starts it</td><td>Independent of collectors</td><td>Independent of collectors</td></tr>
+    <tr><td>Multiple collectors</td><td>Each gets its own execution</td><td>Share one value stream</td><td>Share one stream</td></tr>
+    <tr><td>Current value</td><td>No</td><td>Always (<code>.value</code>)</td><td>No (optional replay cache)</td></tr>
+    <tr><td>Initial value</td><td>No</td><td>Required</td><td>Not required</td></tr>
+    <tr><td>New collector receives</td><td>Everything from the start</td><td>The latest value immediately</td><td><code>replay</code> most recent values (default 0)</td></tr>
+    <tr><td>Duplicate consecutive values</td><td>Emitted</td><td>Skipped (equality-based)</td><td>Emitted</td></tr>
+    <tr><td>Best for</td><td>Data streams from repositories (Room, network)</td><td>UI state</td><td>Broadcast events to several listeners</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-f-cap">
+  <svg viewBox="0 0 720 260" role="img" aria-labelledby="fig-f-t fig-f-d">
+    <title id="fig-f-t">Cold flow versus StateFlow with two collectors</title>
+    <desc id="fig-f-d">Top: a cold flow with two collectors runs its producer twice, causing two network calls. Bottom: a StateFlow created with stateIn runs the producer once and both collectors receive the same latest value.</desc>
+    <defs><marker id="ff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-t" x="20" y="22">Cold Flow: a producer per collector</text>
+    <rect class="d-amber" x="20" y="36" width="160" height="34" rx="8"/><text class="d-s" x="100" y="58" text-anchor="middle">flow { api.load() } #1</text>
+    <rect class="d-amber" x="20" y="78" width="160" height="34" rx="8"/><text class="d-s" x="100" y="100" text-anchor="middle">flow { api.load() } #2</text>
+    <path class="d-line" d="M180 53 H300 M180 95 H300" marker-end="url(#ff)"/>
+    <rect class="d-box" x="304" y="36" width="130" height="34" rx="8"/><text class="d-s" x="369" y="58" text-anchor="middle">collector A</text>
+    <rect class="d-box" x="304" y="78" width="130" height="34" rx="8"/><text class="d-s" x="369" y="100" text-anchor="middle">collector B</text>
+    <text class="d-s" x="470" y="80">2 network calls</text>
+
+    <text class="d-t" x="20" y="152">StateFlow via stateIn: one shared producer</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="170" width="160" height="40" rx="8"/><text class="d-s" x="100" y="195" text-anchor="middle">flow { api.load() } ×1</text></g>
+    <path class="d-flow" d="M180 190 H226" marker-end="url(#ff)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="230" y="166" width="140" height="48" rx="10"/><text class="d-t" x="300" y="188" text-anchor="middle">StateFlow</text><text class="d-s" x="300" y="204" text-anchor="middle">.value = latest</text></g>
+    <path class="d-flow" d="M370 182 H446 M370 200 H446" marker-end="url(#ff)"/>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="450" y="160" width="130" height="30" rx="8"/><text class="d-s" x="515" y="180" text-anchor="middle">collector A</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="450" y="196" width="130" height="30" rx="8"/><text class="d-s" x="515" y="216" text-anchor="middle">collector B</text></g>
+    <text class="d-s" x="600" y="196">1 call, shared</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M180 190 H446');--dur:1.8s"/>
+  </svg>
+  <figcaption id="fig-f-cap">Cold flows are recipes that run per collector. Hot flows are broadcasts that run once and are shared.</figcaption>
+</figure>
+
+<h2 id="flow">Flow: the cold default for data sources</h2>
+<code-block lang="kotlin" file="Repositories expose cold Flows">
+class NotesRepository(private val dao: NoteDao) {
+    fun observeNotes(): Flow<List<Note>> = dao.observeAll().map { rows -> rows.map { it.toDomain() } }
+}
+</code-block>
+<p>A cold flow does nothing until collected, and each collector gets its own run. That's ideal for repositories: the caller decides when and how long to observe.</p>
+
+<h2 id="stateflow">StateFlow: state holders for the UI</h2>
+<code-block lang="kotlin" file="Two ways to produce StateFlow in a ViewModel">
+class NotesViewModel(repo: NotesRepository) : ViewModel() {
+
+    // 1. Derive state from a cold Flow with stateIn: shared, cached, lifecycle-friendly
+    val notes: StateFlow<List<Note>> = repo.observeNotes()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), initialValue = emptyList())
+
+    // 2. Hold mutable state directly with MutableStateFlow
+    private val _query = MutableStateFlow("")
+    val query: StateFlow<String> = _query.asStateFlow()
+    fun onQueryChange(q: String) { _query.value = q }
+}
+</code-block>
+<div class="warn"><b>StateFlow uses equality</b>
+<p>If you mutate a list inside the current value and set it again, <code>StateFlow</code> sees an equal object and emits nothing. Always emit a <em>new</em> immutable value, for example <code>_state.update { it.copy(items = it.items + item) }</code>.</p></div>
+<p><code>SharingStarted.WhileSubscribed(5_000)</code> stops the upstream five seconds after the last collector leaves. That survives rotation without restarting, but stops work when the user truly leaves the screen.</p>
+
+<h2 id="sharedflow">SharedFlow: broadcasts</h2>
+<code-block lang="kotlin" file="App-wide event bus for sign-out">
+class SessionEvents {
+    private val _signedOut = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val signedOut: SharedFlow<Unit> = _signedOut.asSharedFlow()
+
+    fun notifySignedOut() { _signedOut.tryEmit(Unit) }
+}
+</code-block>
+<p>Key configuration: <code>replay</code> (how many past values new collectors receive), <code>extraBufferCapacity</code> and <code>onBufferOverflow</code>. With the default <code>replay = 0</code>, events emitted while nobody is collecting are <strong>lost</strong>. That's correct for some broadcasts, and wrong for one-off UI events.</p>
+
+<h2 id="events">One-off UI events: which tool?</h2>
+<p>Navigation and snackbars are where these choices bite. The options:</p>
+<ul>
+  <li><strong>Model the event as state</strong> (recommended by Android's architecture guidance): store <code>userMessage: String?</code> in UI state and clear it after showing. Nothing can be lost.</li>
+  <li><strong><code>Channel</code> + <code>receiveAsFlow()</code></strong>: buffers events until a single collector receives them. Each event is delivered to one collector.</li>
+  <li><strong>SharedFlow with replay 0</strong>: events emitted during rotation, when nobody is collecting, are dropped. Generally avoid it for UI events.</li>
+</ul>
+<code-block lang="kotlin" file="Event as state (recommended)">
+data class EditorUiState(val text: String = "", val userMessage: String? = null)
+
+fun save() = viewModelScope.launch {
+    repo.save(_state.value.text)
+    _state.update { it.copy(userMessage = "Saved") }
+}
+fun messageShown() = _state.update { it.copy(userMessage = null) }
+
+// In Compose:
+// state.userMessage?.let { msg ->
+//     LaunchedEffect(msg) { snackbarHostState.showSnackbar(msg); onMessageShown() }
+// }
+</code-block>
+
+<h2 id="decision">Decision rule</h2>
+<ol class="steps">
+  <li><strong>Exposing data from a repository or data source?</strong> Return a cold <code>Flow</code>.</li>
+  <li><strong>Exposing state to the UI?</strong> Use a <code>StateFlow</code> (via <code>stateIn</code> or <code>MutableStateFlow</code>).</li>
+  <li><strong>Broadcasting to several independent listeners</strong>, where missed values are acceptable or handled by replay? Use a <code>SharedFlow</code>.</li>
+  <li><strong>One-off UI event?</strong> Prefer state. Otherwise use a buffered <code>Channel</code> collected with <code>repeatOnLifecycle</code>.</li>
+</ol>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Exposing a cold flow from a ViewModel and collecting it from several composables, which restarts work on each collection and on every rotation.</li>
+  <li>Using <code>stateIn(..., SharingStarted.Eagerly, ...)</code> everywhere, which keeps upstreams running even when no UI is visible.</li>
+  <li>Calling <code>stateIn</code> inside a function that's called repeatedly, creating a new StateFlow each time. Create it once, as a property.</li>
+  <li>Using SharedFlow with no replay for navigation events.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is StateFlow a replacement for LiveData?</summary><div><p>For new Kotlin code, generally yes. Collect it with <code>collectAsStateWithLifecycle()</code> or <code>repeatOnLifecycle</code> to get LiveData's lifecycle awareness.</p></div></details>
+  <details><summary>Is StateFlow just a SharedFlow with replay 1?</summary><div><p>Close: it behaves like a SharedFlow with replay 1, a required initial value, conflation and equality-based de-duplication. It also exposes a synchronous <code>.value</code>.</p></div></details>
+  <details><summary>How do I test these?</summary><div><p>Use <code>runTest</code> and collect into a list in <code>backgroundScope</code>, or use a library such as Turbine. See <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels with Coroutines and Flow</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Flow</strong> is a cold recipe for data. <strong>StateFlow</strong> is hot, always holds the latest value, and is the right tool for UI state. <strong>SharedFlow</strong> is a configurable broadcast. Expose cold flows from repositories, convert them to StateFlow in ViewModels with <code>stateIn</code>, and model one-off UI events as state whenever you can.</p>
+<p>Next step: master the building block underneath all of these in <a href="../kotlin-suspend-functions/index.html">Suspend Functions Explained</a>.</p>

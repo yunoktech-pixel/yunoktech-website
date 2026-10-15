@@ -1,0 +1,97 @@
+<!--meta
+{
+  "seo_title": "AI Model Selection: Gemini vs OpenAI vs Open-Source",
+  "description": "Compare Gemini, OpenAI and open-weight models for Android apps: Android integration, on-device options, data terms, cost model, hosting, evaluation and a provider-neutral architecture.",
+  "primary_keyword": "gemini vs openai for android",
+  "keywords": ["openai android app", "open source llm mobile", "gemini vs gpt android", "self hosted llm app", "llm provider comparison", "multi provider ai architecture"],
+  "lede": "Gemini, OpenAI and open-weight models can all power Android features. They differ in Android integration, on-device options, data handling terms, pricing models and operational burden. This guide compares them on what matters for mobile teams, without leaderboard hype.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["choose-ai-model-android-app", "openai-api-android-patterns", "secure-cloud-ai-api-android", "litert-litert-lm-android"],
+  "refs": [
+    ["Gemini models", "https://ai.google.dev/gemini-api/docs/models"],
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"],
+    ["OpenAI platform documentation", "https://platform.openai.com/docs"],
+    ["Gemma open models", "https://ai.google.dev/gemma"],
+    ["LiteRT-LM / on-device LLMs (Google AI Edge)", "https://ai.google.dev/edge"]
+  ]
+}
+-->
+<p class="ad-lead">Model rankings change monthly. What changes slowly is how each option fits an Android product: SDKs, on-device availability, data terms, cost structure and who operates the infrastructure. Decide on those, keep providers behind an interface, and let your own evaluation choose the specific model.</p>
+
+<h2 id="comparison">Comparison for Android teams</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Gemini (Google)</th><th>OpenAI</th><th>Open-weight models (e.g. Gemma, others)</th></tr></thead>
+  <tbody>
+    <tr><td>Android client SDK</td><td>Firebase AI Logic (Kotlin), App Check integration</td><td>No first-party Android SDK; call via your backend</td><td>Depends on hosting; on-device via LiteRT / LiteRT-LM</td></tr>
+    <tr><td>On-device option</td><td>Gemini Nano via ML Kit GenAI (supported devices)</td><td>No on-device Android runtime from the provider</td><td>Yes, smaller models can run on-device</td></tr>
+    <tr><td>Hosting</td><td>Managed (Gemini Developer API or Vertex AI)</td><td>Managed API</td><td>You host (cloud GPUs) or on-device</td></tr>
+    <tr><td>Cost model</td><td>Per token; free tier available</td><td>Per token</td><td>Infrastructure and ops cost, or free on-device</td></tr>
+    <tr><td>Data control</td><td>Provider terms; enterprise options via Vertex AI</td><td>Provider terms; enterprise options</td><td>Full control when self-hosted or on-device</td></tr>
+    <tr><td>Operational burden</td><td>Low</td><td>Low</td><td>High (serving, scaling, updates)</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Model names, capabilities and prices change frequently. Verify current details on each provider's documentation before deciding.</p>
+
+<h2 id="architecture">Provider-neutral architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pn-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-pn-t fig-pn-d">
+    <title id="fig-pn-t">Provider-neutral AI architecture</title>
+    <desc id="fig-pn-d">The Android app calls an AiAssistant interface. On the client, implementations exist for on-device Gemini Nano and for Gemini via Firebase. Through your backend, a gateway routes requests to Gemini, OpenAI or a self-hosted open model, chosen by configuration and evaluation results.</desc>
+    <defs><marker id="pnm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="80" width="140" height="56" rx="12"/><text class="d-t" x="90" y="106" text-anchor="middle">Feature code</text><text class="d-s" x="90" y="124" text-anchor="middle">AiAssistant</text></g>
+    <path class="d-flow" d="M160 100 L226 46 M160 108 H226 M160 116 L226 170" marker-end="url(#pnm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="230" y="20" width="170" height="46" rx="10"/><text class="d-s" x="315" y="48" text-anchor="middle">On-device (Gemini Nano)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="230" y="86" width="170" height="46" rx="10"/><text class="d-s" x="315" y="114" text-anchor="middle">Firebase AI Logic</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="230" y="152" width="170" height="46" rx="10"/><text class="d-s" x="315" y="180" text-anchor="middle">Your AI gateway</text></g>
+    <path class="d-flow" d="M400 168 L466 120 M400 175 H466 M400 182 L466 200" marker-end="url(#pnm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="470" y="100" width="150" height="34" rx="8"/><text class="d-s" x="545" y="122" text-anchor="middle">Gemini</text><rect class="d-box" x="470" y="158" width="150" height="34" rx="8"/><text class="d-s" x="545" y="180" text-anchor="middle">OpenAI</text><rect class="d-box" x="630" y="158" width="80" height="34" rx="8"/><text class="d-s" x="670" y="180" text-anchor="middle">Open</text></g>
+  </svg>
+  <figcaption id="fig-pn-cap">The app depends on capabilities, not vendors. Routing lives in configuration or on your server.</figcaption>
+</figure>
+<code-block lang="kotlin" file="AiAssistant.kt">
+interface AiAssistant {
+    val id: String                                     // e.g. "gemini-cloud", "backend-gateway"
+    suspend fun isAvailable(): Boolean
+    fun reply(messages: List<ChatTurn>): Flow<String>  // streaming text
+}
+
+data class ChatTurn(val role: Role, val text: String) { enum class Role { USER, ASSISTANT } }
+</code-block>
+
+<h2 id="decide">Decision factors</h2>
+<ol class="steps">
+  <li><strong>Where must data go?</strong> If it must stay on the device, choose Gemini Nano or an on-device open model. If it must stay in your cloud, choose self-hosted open models or enterprise offerings.</li>
+  <li><strong>Do you need a backend anyway?</strong> For RAG over private data, tools and quotas, a gateway makes multiple providers easy.</li>
+  <li><strong>Time to market:</strong> Firebase AI Logic is the fastest secure path to Gemini on Android.</li>
+  <li><strong>Quality on your task:</strong> run the same evaluation set across candidates. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses</a>.</li>
+  <li><strong>Cost at your scale:</strong> estimate tokens per user per month for each. See <a href="../ai-tokens-latency-cost-mobile/index.html">Tokens, Latency and Cost</a>.</li>
+</ol>
+
+<h2 id="use-cases">Typical choices</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Startup, Android-first</h3><p>Gemini via Firebase AI Logic for cloud, plus Gemini Nano where supported. Minimal infrastructure.</p></div>
+  <div class="card usecase"><h3>Company with an existing OpenAI integration</h3><p>Keep the backend gateway and add Gemini or on-device options behind the same interface for specific features.</p></div>
+  <div class="card usecase"><h3>Strict data residency</h3><p>Self-hosted open-weight models in your region, or on-device models, with no third-party inference.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Choosing by benchmark headlines instead of task evaluation.</li>
+  <li>Hard-coding one provider's request format throughout the app.</li>
+  <li>Underestimating the operational cost of self-hosting open models.</li>
+  <li>Ignoring data terms and regional requirements until legal review.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I call OpenAI directly from Android?</summary><div><p>Technically yes, but you'd have to ship a secret key. Use your own backend instead. See <a href="../openai-api-android-patterns/index.html">OpenAI API Integration Patterns</a>.</p></div></details>
+  <details><summary>Are open-weight models free?</summary><div><p>The weights may be free to use under their licence, but hosting costs money, and on-device use costs app size, memory and battery. Check each model's licence terms.</p></div></details>
+  <details><summary>Should I use multiple providers?</summary><div><p>It can improve resilience and fit (cheap model for simple tasks, stronger model for hard ones), but adds evaluation and maintenance work. Start with one, behind an interface.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Gemini offers the deepest <strong>Android integration and on-device option</strong>, OpenAI is a strong <strong>managed cloud</strong> choice through your backend, and <strong>open-weight models</strong> give maximum control at operational cost. Decide by data requirements, architecture and your own evaluation, behind a provider-neutral interface.</p>
+<p>Next step: control the economics with <a href="../ai-tokens-latency-cost-mobile/index.html">AI Tokens, Latency and Cost Optimization</a>.</p>

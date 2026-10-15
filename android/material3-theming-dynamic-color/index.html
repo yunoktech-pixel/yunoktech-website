@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Material 3 Theming and Dynamic Colors in Compose | Yunok Tech</title>
+  <meta name="description" content="Set up Material 3 theming in Jetpack Compose: color schemes, dynamic color on Android 12+, dark theme, typography, shapes, custom tokens with CompositionLocal and accessibility checks.">
+  <meta name="keywords" content="material 3 theming compose, dynamic color android, material you compose, compose dark theme, material theme builder, compose typography shapes, custom theme tokens compose">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/material3-theming-dynamic-color/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/material3-theming-dynamic-color/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Material 3 Theming and Dynamic Colors in Compose">
+  <meta property="og:description" content="Set up Material 3 theming in Jetpack Compose: color schemes, dynamic color on Android 12+, dark theme, typography, shapes, custom tokens with CompositionLocal and accessibility checks.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="Material 3 Theming and Dynamic Colors in Compose">
+  <meta name="twitter:description" content="Set up Material 3 theming in Jetpack Compose: color schemes, dynamic color on Android 12+, dark theme, typography, shapes, custom tokens with CompositionLocal and accessibility checks.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Material 3 Theming and Dynamic Colors", "description": "Set up Material 3 theming in Jetpack Compose: color schemes, dynamic color on Android 12+, dark theme, typography, shapes, custom tokens with CompositionLocal and accessibility checks.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Jetpack Compose", "keywords": "dynamic color android, material you compose, compose dark theme, material theme builder, compose typography shapes, custom theme tokens compose", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/material3-theming-dynamic-color/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Material 3 Theming and Dynamic Colors", "item": "https://yunoktech.com/android/material3-theming-dynamic-color/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">Material 3 Theming and Dynamic Colors</h1>
+    <p class="ad-lede">A consistent theme makes an app feel professional, supports dark mode, and with Material 3's dynamic color can adapt to each user's wallpaper. Here's how to set up a robust Material 3 theme in Compose, extend it with your own tokens, and avoid hard-coded colours.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#system">The three pillars of a Material 3 theme</a></li><li><a href="#setup">Building the theme</a></li><li><a href="#dynamic">Dynamic color: when to use it</a></li><li><a href="#typography">Typography and shapes</a></li><li><a href="#usage">Using theme values in components</a></li><li><a href="#custom-tokens">Extending the theme with your own tokens</a></li><li><a href="#use-cases">Real-world setups</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Hard-coded <code>Color(0xFF6200EE)</code> scattered across screens looks fine until you add dark mode, rebrand, or test contrast. Then every screen needs edits. A well-built Material 3 theme fixes this once: components read <em>roles</em> like <code>primary</code> and <code>surface</code>, and the theme decides the actual colours.</p>
+
+<h2 id="system">The three pillars of a Material 3 theme</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-th-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-th-t fig-th-d">
+    <title id="fig-th-t">MaterialTheme provides color scheme, typography and shapes</title>
+    <desc id="fig-th-d">MaterialTheme wraps the app and provides three systems: a ColorScheme of roles such as primary, onPrimary, surface and error; Typography with roles such as headline, title, body and label; and Shapes from extra small to extra large. Components read these roles instead of hard-coded values.</desc>
+    <rect class="d-dark" x="220" y="10" width="280" height="40" rx="10"/><text class="d-w" x="360" y="35" text-anchor="middle">MaterialTheme { app content }</text>
+    <rect class="d-violet" x="20" y="80" width="220" height="96" rx="12"/><text class="d-t" x="130" y="104" text-anchor="middle">ColorScheme</text><text class="d-s" x="130" y="126" text-anchor="middle">primary · onPrimary</text><text class="d-s" x="130" y="144" text-anchor="middle">surface · surfaceContainer</text><text class="d-s" x="130" y="162" text-anchor="middle">error · outline …</text>
+    <rect class="d-blue" x="250" y="80" width="220" height="96" rx="12"/><text class="d-t" x="360" y="104" text-anchor="middle">Typography</text><text class="d-s" x="360" y="126" text-anchor="middle">display · headline · title</text><text class="d-s" x="360" y="144" text-anchor="middle">body · label</text><text class="d-s" x="360" y="162" text-anchor="middle">(Large / Medium / Small)</text>
+    <rect class="d-green" x="480" y="80" width="220" height="96" rx="12"/><text class="d-t" x="590" y="104" text-anchor="middle">Shapes</text><text class="d-s" x="590" y="126" text-anchor="middle">extraSmall … extraLarge</text><text class="d-s" x="590" y="144" text-anchor="middle">corner radii for</text><text class="d-s" x="590" y="162" text-anchor="middle">cards, sheets, buttons</text>
+    <path class="d-line" d="M300 50 L130 80 M360 50 L360 80 M420 50 L590 80"/>
+  </svg>
+  <figcaption id="fig-th-cap">Components ask for roles, not values. Change the theme and every screen follows.</figcaption>
+</figure>
+
+<h2 id="setup">Building the theme</h2>
+<p>Generate a palette from your brand colour with the <a href="https://material-foundation.github.io/material-theme-builder/" target="_blank" rel="noopener">Material Theme Builder</a>, which exports Compose code for light and dark schemes. Then wire it up:</p>
+<figure class="code"><figcaption><span class="file">ui/theme/Theme.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">private</span> <span class="tk-k">val</span> <span class="tk-t">LightColors</span> = lightColorScheme(
+    primary = <span class="tk-t">Color</span>(0xFF0061A4),
+    onPrimary = <span class="tk-t">Color</span>(0xFFFFFFFF),
+    primaryContainer = <span class="tk-t">Color</span>(0xFFD1E4FF),
+    onPrimaryContainer = <span class="tk-t">Color</span>(0xFF001D36),
+    <span class="tk-c">// ... remaining roles exported from Material Theme Builder</span>
+)
+
+<span class="tk-k">private</span> <span class="tk-k">val</span> <span class="tk-t">DarkColors</span> = darkColorScheme(
+    primary = <span class="tk-t">Color</span>(0xFF9ECAFF),
+    onPrimary = <span class="tk-t">Color</span>(0xFF003258),
+    primaryContainer = <span class="tk-t">Color</span>(0xFF00497D),
+    onPrimaryContainer = <span class="tk-t">Color</span>(0xFFD1E4FF),
+    <span class="tk-c">// ...</span>
+)
+
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">AppTheme</span>(
+    darkTheme: <span class="tk-t">Boolean</span> = isSystemInDarkTheme(),
+    dynamicColor: <span class="tk-t">Boolean</span> = <span class="tk-k">true</span>,
+    content: <span class="tk-a">@Composable</span> () -&gt; <span class="tk-t">Unit</span>,
+) {
+    <span class="tk-k">val</span> context = <span class="tk-t">LocalContext</span>.current
+    <span class="tk-k">val</span> colorScheme = <span class="tk-k">when</span> {
+        dynamicColor &amp;&amp; <span class="tk-t">Build</span>.<span class="tk-t">VERSION</span>.<span class="tk-t">SDK_INT</span> &gt;= <span class="tk-t">Build</span>.<span class="tk-t">VERSION_CODES</span>.<span class="tk-t">S</span> -&gt;
+            <span class="tk-k">if</span> (darkTheme) dynamicDarkColorScheme(context) <span class="tk-k">else</span> dynamicLightColorScheme(context)
+        darkTheme -&gt; <span class="tk-t">DarkColors</span>
+        <span class="tk-k">else</span> -&gt; <span class="tk-t">LightColors</span>
+    }
+    <span class="tk-t">MaterialTheme</span>(colorScheme = colorScheme, typography = <span class="tk-t">AppTypography</span>, shapes = <span class="tk-t">AppShapes</span>, content = content)
+}</code></pre></figure>
+
+<h2 id="dynamic">Dynamic color: when to use it</h2>
+<p>On Android 12 (API 31) and later, <strong>dynamic color</strong> derives a scheme from the user's wallpaper, making your app feel native to their device. It's not always right:</p>
+<ul>
+  <li><strong>Use it</strong> for utility and personal apps where blending with the system is a plus.</li>
+  <li><strong>Make it optional or skip it</strong> where brand recognition matters, such as banking, retail or media brands. You can still apply dynamic color only to neutral surfaces.</li>
+  <li>Always provide a <strong>fallback scheme</strong> for older devices.</li>
+</ul>
+
+<h2 id="typography">Typography and shapes</h2>
+<figure class="code"><figcaption><span class="file">ui/theme/Type.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> <span class="tk-t">Brand</span> = <span class="tk-t">FontFamily</span>(<span class="tk-t">Font</span>(<span class="tk-t">R</span>.font.inter_regular), <span class="tk-t">Font</span>(<span class="tk-t">R</span>.font.inter_semibold, <span class="tk-t">FontWeight</span>.<span class="tk-t">SemiBold</span>))
+
+<span class="tk-k">val</span> <span class="tk-t">AppTypography</span> = <span class="tk-t">Typography</span>().run {
+    copy(
+        headlineSmall = headlineSmall.copy(fontFamily = <span class="tk-t">Brand</span>, fontWeight = <span class="tk-t">FontWeight</span>.<span class="tk-t">SemiBold</span>),
+        titleMedium = titleMedium.copy(fontFamily = <span class="tk-t">Brand</span>, fontWeight = <span class="tk-t">FontWeight</span>.<span class="tk-t">SemiBold</span>),
+        bodyLarge = bodyLarge.copy(fontFamily = <span class="tk-t">Brand</span>),
+        labelLarge = labelLarge.copy(fontFamily = <span class="tk-t">Brand</span>, fontWeight = <span class="tk-t">FontWeight</span>.<span class="tk-t">SemiBold</span>),
+    )
+}
+
+<span class="tk-k">val</span> <span class="tk-t">AppShapes</span> = <span class="tk-t">Shapes</span>(
+    small = <span class="tk-t">RoundedCornerShape</span>(<span class="tk-n">8</span>.dp),
+    medium = <span class="tk-t">RoundedCornerShape</span>(<span class="tk-n">12</span>.dp),
+    large = <span class="tk-t">RoundedCornerShape</span>(<span class="tk-n">20</span>.dp),
+)</code></pre></figure>
+
+<h2 id="usage">Using theme values in components</h2>
+<figure class="code"><figcaption><span class="file">Read roles, never hard-code</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">Card</span>(
+    colors = <span class="tk-t">CardDefaults</span>.cardColors(containerColor = <span class="tk-t">MaterialTheme</span>.colorScheme.surfaceContainerHigh),
+    shape = <span class="tk-t">MaterialTheme</span>.shapes.large,
+) {
+    <span class="tk-t">Text</span>(<span class="tk-s">"Order #1042"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.titleMedium,
+        color = <span class="tk-t">MaterialTheme</span>.colorScheme.onSurface)
+    <span class="tk-t">Text</span>(<span class="tk-s">"Out for delivery"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.bodyMedium,
+        color = <span class="tk-t">MaterialTheme</span>.colorScheme.onSurfaceVariant)
+}</code></pre></figure>
+<p>Always pair a container with its "on" role (<code>primary</code> with <code>onPrimary</code>, <code>surface</code> with <code>onSurface</code>). Material 3's tonal palettes are designed so these pairs meet contrast guidelines.</p>
+
+<h2 id="custom-tokens">Extending the theme with your own tokens</h2>
+<figure class="code"><figcaption><span class="file">Semantic colors via CompositionLocal</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Immutable</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ExtendedColors</span>(<span class="tk-k">val</span> success: <span class="tk-t">Color</span>, <span class="tk-k">val</span> onSuccess: <span class="tk-t">Color</span>, <span class="tk-k">val</span> warning: <span class="tk-t">Color</span>)
+
+<span class="tk-k">val</span> <span class="tk-t">LocalExtendedColors</span> = staticCompositionLocalOf {
+    <span class="tk-t">ExtendedColors</span>(success = <span class="tk-t">Color</span>.<span class="tk-t">Unspecified</span>, onSuccess = <span class="tk-t">Color</span>.<span class="tk-t">Unspecified</span>, warning = <span class="tk-t">Color</span>.<span class="tk-t">Unspecified</span>)
+}
+
+<span class="tk-c">// In AppTheme:</span>
+<span class="tk-c">// CompositionLocalProvider(LocalExtendedColors provides if (darkTheme) DarkExtended else LightExtended) {</span>
+<span class="tk-c">//     MaterialTheme(colorScheme = colorScheme, typography = AppTypography, shapes = AppShapes, content = content)</span>
+<span class="tk-c">// }</span>
+
+<span class="tk-k">object</span> <span class="tk-t">AppTheme</span> {
+    <span class="tk-k">val</span> extendedColors: <span class="tk-t">ExtendedColors</span>
+        <span class="tk-a">@Composable</span> <span class="tk-k">get</span>() = <span class="tk-t">LocalExtendedColors</span>.current
+}
+
+<span class="tk-c">// Usage: Text("Paid", color = AppTheme.extendedColors.success)</span></code></pre></figure>
+
+<h2 id="use-cases">Real-world setups</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Brand-first app</h3><p>Fixed brand schemes for light and dark, with dynamic color disabled. Semantic success and warning tokens via CompositionLocal.</p></div>
+  <div class="card usecase"><h3>Personal utility app</h3><p>Dynamic color on by default, with a settings toggle and a brand fallback.</p></div>
+  <div class="card usecase"><h3>Multi-brand white-label</h3><p>Build one theme function per brand from the same token structure. Screens never change.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Hard-coding colours and text sizes in components.</li>
+  <li>Using <code>Color.White</code> text on <code>primary</code>, which breaks in dark mode or with dynamic color. Use <code>onPrimary</code>.</li>
+  <li>Forgetting to theme the system bars and the window background, which causes flashes on startup.</li>
+  <li>Not testing large font scale and contrast. Run Android Studio's accessibility checks and try TalkBack.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I still define an XML theme?</summary><div><p>Yes, a minimal one for the Activity window (background, splash and system bar defaults), even if all UI is in Compose.</p></div></details>
+  <details><summary>Can users choose light or dark in the app?</summary><div><p>Yes. Store the preference in DataStore and pass <code>darkTheme</code> into your theme instead of relying only on <code>isSystemInDarkTheme()</code>.</p></div></details>
+  <details><summary>Is Material 3 required?</summary><div><p>No. You can build a fully custom design system on Compose foundation, but Material 3 gives you accessible, well-tested defaults.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A solid Material 3 theme defines <strong>color roles, typography and shapes</strong> once, supports <strong>dark mode and optional dynamic color</strong>, and extends cleanly with your own semantic tokens. Components that read roles instead of raw values make rebrands and accessibility fixes painless.</p>
+<p>Next step: keep that polished UI fast with <a href="../compose-performance-optimization/index.html">Compose Performance Optimization</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/designsystems/material3" target="_blank" rel="noopener">Material Design 3 in Compose</a></li><li><a href="https://m3.material.io/styles/color/system/overview" target="_blank" rel="noopener">Material 3 color system</a></li><li><a href="https://m3.material.io/styles/color/dynamic/choosing-a-source" target="_blank" rel="noopener">Dynamic color</a></li><li><a href="https://material-foundation.github.io/material-theme-builder/" target="_blank" rel="noopener">Material Theme Builder</a></li><li><a href="https://developer.android.com/develop/ui/compose/designsystems/custom" target="_blank" rel="noopener">Custom design systems in Compose</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmaterial3-theming-dynamic-color-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmaterial3-theming-dynamic-color-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-animations-beginners/index.html"><small>Jetpack Compose</small>Jetpack Compose Animations for Beginners</a></li><li><a href="../../android/what-is-jetpack-compose/index.html"><small>Jetpack Compose</small>What Is Jetpack Compose and Why Should You Learn It?</a></li><li><a href="../../android/compose-adaptive-ui-tablets-foldables/index.html"><small>Jetpack Compose</small>Adaptive UI for Tablets and Foldable Devices</a></li><li><a href="../../android/android-privacy-accessibility-reliability/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Building Android Apps for Privacy, Accessibility, and Reliability</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/material3-theming-dynamic-color/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/material3-theming-dynamic-color/&amp;text=Material 3 Theming and Dynamic Colors" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/material3-theming-dynamic-color/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#system">The three pillars of a Material 3 theme</a></li><li><a href="#setup">Building the theme</a></li><li><a href="#dynamic">Dynamic color: when to use it</a></li><li><a href="#typography">Typography and shapes</a></li><li><a href="#usage">Using theme values in components</a></li><li><a href="#custom-tokens">Extending the theme with your own tokens</a></li><li><a href="#use-cases">Real-world setups</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmaterial3-theming-dynamic-color-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dmaterial3-theming-dynamic-color-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

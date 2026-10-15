@@ -1,0 +1,117 @@
+<!--meta
+{
+  "seo_title": "Protecting User Data in AI-Powered Android Apps",
+  "description": "Protect user data in AI features on Android: data minimisation, on-device first, redaction before cloud calls, consent, provider data terms, retention, logging, Play Data safety and deletion.",
+  "primary_keyword": "user data privacy ai android",
+  "keywords": ["ai privacy mobile app", "redact pii before llm", "on-device ai privacy", "ai data retention", "consent ai features", "data safety ai android"],
+  "lede": "AI features are hungry for context: messages, photos, documents, location. Every byte you send to a model is data you're responsible for. This guide shows how to design AI features that are useful and respectful of user privacy, from architecture to disclosure.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["ai-privacy-data-retention", "cloud-ai-vs-on-device-ai-android", "secure-cloud-ai-api-android", "android-permissions-privacy"],
+  "refs": [
+    ["Gemini Nano and AICore privacy", "https://developer.android.com/ai/gemini-nano"],
+    ["Play Console: Data safety", "https://support.google.com/googleplay/android-developer/answer/10787469"],
+    ["Google Play User Data policy", "https://support.google.com/googleplay/android-developer/answer/10144311"],
+    ["Gemini API additional terms", "https://ai.google.dev/gemini-api/terms"]
+  ]
+}
+-->
+<p class="ad-lead">A "summarise my chats" feature is helpful, and it also means private conversations may travel to a cloud model. Users deserve to know, to choose, and to trust that you sent only what was needed. Privacy-respecting AI is mostly about design decisions made early.</p>
+
+<h2 id="principles">Principles</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-pp2-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-pp2-t fig-pp2-d">
+    <title id="fig-pp2-t">Privacy principles for AI features</title>
+    <desc id="fig-pp2-d">Five principles: minimise what data is sent; prefer on-device processing; redact personal identifiers before cloud calls; obtain informed consent and disclose; limit retention and logging, and support deletion.</desc>
+    <rect class="d-green" x="10" y="30" width="132" height="140" rx="12"/><text class="d-t" x="76" y="62" text-anchor="middle">Minimise</text><text class="d-s" x="76" y="90" text-anchor="middle">send only</text><text class="d-s" x="76" y="106" text-anchor="middle">what's needed</text>
+    <rect class="d-blue" x="152" y="30" width="132" height="140" rx="12"/><text class="d-t" x="218" y="62" text-anchor="middle">On-device</text><text class="d-s" x="218" y="90" text-anchor="middle">first where</text><text class="d-s" x="218" y="106" text-anchor="middle">possible</text>
+    <rect class="d-violet" x="294" y="30" width="132" height="140" rx="12"/><text class="d-t" x="360" y="62" text-anchor="middle">Redact</text><text class="d-s" x="360" y="90" text-anchor="middle">PII before</text><text class="d-s" x="360" y="106" text-anchor="middle">cloud calls</text>
+    <rect class="d-amber" x="436" y="30" width="132" height="140" rx="12"/><text class="d-t" x="502" y="62" text-anchor="middle">Consent</text><text class="d-s" x="502" y="90" text-anchor="middle">clear choice,</text><text class="d-s" x="502" y="106" text-anchor="middle">disclosure</text>
+    <rect class="d-red" x="578" y="30" width="132" height="140" rx="12"/><text class="d-t" x="644" y="62" text-anchor="middle">Retain less</text><text class="d-s" x="644" y="90" text-anchor="middle">no raw logs,</text><text class="d-s" x="644" y="106" text-anchor="middle">deletion</text>
+  </svg>
+  <figcaption id="fig-pp2-cap">Each principle reduces what can go wrong, and what you have to disclose.</figcaption>
+</figure>
+
+<h2 id="minimise">1. Minimise input</h2>
+<ul>
+  <li>Send the specific text needed (one note), not the whole database.</li>
+  <li>Use on-device OCR or extraction first, and send structured fields rather than raw photos.</li>
+  <li>Strip image metadata (GPS, device info) before upload.</li>
+  <li>Downscale images and truncate long inputs. That's less data and lower cost.</li>
+</ul>
+
+<h2 id="on-device">2. Prefer on-device processing</h2>
+<p>Gemini Nano via ML Kit GenAI processes data on the device. Android's documentation states that AICore doesn't retain inputs or outputs after processing. For supported tasks and devices, that's the most private option. See <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud vs On-Device AI</a>.</p>
+
+<h2 id="redact">3. Redact before cloud calls</h2>
+<code-block lang="kotlin" file="Redactor.kt">
+/** Simple pattern-based redaction. Not perfect, but reduces accidental exposure of obvious identifiers. */
+object Redactor {
+    private val patterns = listOf(
+        Regex("""\b[\w.+-]+@[\w-]+\.[\w.]+\b""") to "[email]",
+        Regex("""(?<!\d)(?:\+?91[\s-]?)?[6-9]\d{9}(?!\d)""") to "[phone]",     // Indian mobile numbers
+        Regex("""\b\d{4}\s?\d{4}\s?\d{4}\b""") to "[id-number]",               // 12-digit ID formats
+        Regex("""\b(?:\d[ -]*?){13,19}\b""") to "[card]",
+    )
+
+    fun redact(text: String): String = patterns.fold(text) { acc, (rx, label) -> rx.replace(acc, label) }
+}
+
+// Usage: model.generateContent(Redactor.redact(userNote))
+</code-block>
+<p>Pattern redaction catches obvious identifiers. It won't catch names or context, so combine it with minimisation and consent rather than relying on it alone.</p>
+
+<h2 id="consent">4. Consent and disclosure</h2>
+<code-block lang="kotlin" file="Consent gate for cloud AI">
+@Composable
+fun CloudAiConsentDialog(onAccept: () -> Unit, onDecline: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDecline,
+        title = { Text("Use cloud AI for summaries?") },
+        text = {
+            Text("Your device can't summarise this offline. If you continue, the note text is sent to " +
+                "Google's Gemini service to create a summary. We don't store the note text on our servers. " +
+                "You can turn this off anytime in Settings → AI features.")
+        },
+        confirmButton = { TextButton(onClick = onAccept) { Text("Allow") } },
+        dismissButton = { TextButton(onClick = onDecline) { Text("Not now") } },
+    )
+}
+</code-block>
+<ul>
+  <li>Ask before the first cloud processing of personal content, and remember the choice in DataStore.</li>
+  <li>Make the setting reversible and visible.</li>
+  <li>Keep your privacy policy and Play <strong>Data safety</strong> declarations accurate, including data sent to AI providers.</li>
+</ul>
+
+<h2 id="provider">5. Provider terms and configuration</h2>
+<ul>
+  <li>Read the AI provider's data usage terms for your tier. Free and paid tiers may differ in how inputs can be used.</li>
+  <li>Prefer enterprise or paid tiers with clear data handling for production user data, where appropriate.</li>
+  <li>Choose regions and data residency options if regulations require them.</li>
+</ul>
+
+<h2 id="retention">6. Retention and logging</h2>
+<ul>
+  <li>Don't log raw prompts or responses by default. Log metadata such as tokens, latency, model and error codes.</li>
+  <li>If you store AI outputs (summaries, chats), treat them as user data: protect them, allow export and deletion, and apply retention limits.</li>
+  <li>Make account deletion remove AI-derived data too. See <a href="../ai-privacy-data-retention/index.html">AI Privacy and Data Retention</a>.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Chat summary</h3><p>On-device where supported, otherwise opt-in cloud with redaction and no server-side storage.</p></div>
+  <div class="card usecase"><h3>Receipt scanning</h3><p>On-device OCR, then send only the amounts and merchant text, with photos never uploaded.</p></div>
+  <div class="card usecase"><h3>Health journal insights</h3><p>On-device only, or no AI. Some data shouldn't leave the device at all.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is sending data to an AI API "sharing" for Data safety?</summary><div><p>It depends on the relationship (for example, a service provider processing on your behalf) and Play's definitions. Review the Data safety guidance carefully and disclose accurately.</p></div></details>
+  <details><summary>Can users opt out of AI features entirely?</summary><div><p>They should be able to. Provide a setting to disable cloud AI processing, and ideally all AI features.</p></div></details>
+  <details><summary>Does redaction make cloud AI safe for any data?</summary><div><p>No. Redaction reduces exposure of obvious identifiers. Highly sensitive categories may require on-device processing or no AI at all.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Privacy-respecting AI <strong>minimises</strong> data, prefers <strong>on-device</strong> processing, <strong>redacts</strong> before cloud calls, asks for <strong>informed consent</strong>, understands <strong>provider terms</strong>, and limits <strong>retention and logging</strong>, all reflected honestly in your disclosures.</p>
+<p>Next step: protect your backend from abuse with <a href="../play-integrity-api-explained/index.html">Play Integrity API Explained</a>.</p>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Nano and ML Kit GenAI on Android Explained | Yunok Tech</title>
+  <meta name="description" content="How on-device AI works on Android: Gemini Nano, AICore and the ML Kit GenAI APIs. Check feature status, download models and summarise text in Kotlin, with limits and fallbacks.">
+  <meta name="keywords" content="gemini nano android, ml kit genai, aicore android, on-device llm android, ml kit summarization api, gemini nano kotlin example, prompt api android, on-device ai privacy">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Gemini Nano and ML Kit GenAI on Android Explained">
+  <meta property="og:description" content="How on-device AI works on Android: Gemini Nano, AICore and the ML Kit GenAI APIs. Check feature status, download models and summarise text in Kotlin, with limits and fallbacks.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Gemini Nano and ML Kit GenAI on Android Explained">
+  <meta name="twitter:description" content="How on-device AI works on Android: Gemini Nano, AICore and the ML Kit GenAI APIs. Check feature status, download models and summarise text in Kotlin, with limits and fallbacks.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works", "description": "How on-device AI works on Android: Gemini Nano, AICore and the ML Kit GenAI APIs. Check feature status, download models and summarise text in Kotlin, with limits and fallbacks.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "ml kit genai, aicore android, on-device llm android, ml kit summarization api, gemini nano kotlin example, prompt api android, on-device ai privacy", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works", "item": "https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works</h1>
+    <p class="ad-lede">Gemini Nano lets Android apps summarise, proofread, rewrite and describe images entirely on the device, with no network and no per-request fee. Here's how AICore and the ML Kit GenAI APIs work, a complete Kotlin summarisation example, and the limits you must design around.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>6 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#how-it-works">How on-device generative AI works on Android</a></li><li><a href="#apis">The ML Kit GenAI APIs at a glance</a></li><li><a href="#implementation">Implementation: on-device summarisation in Kotlin</a></li><li><a href="#limits">The limits that shape your design</a></li><li><a href="#prompt-api">When to use the Prompt API instead</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Imagine a notes app that summarises a long meeting note while the user is offline on a flight, without sending a single word to a server and without costing you anything per request. That's what on-device generative AI on Android makes possible, on supported devices and within some important limits.</p>
+<p>This article explains how <strong>Gemini Nano</strong>, <strong>AICore</strong> and the <strong>ML Kit GenAI APIs</strong> fit together, walks through a complete Kotlin implementation of on-device summarisation with feature checks, model download and streaming, and covers the constraints (device support, foreground-only use, quotas, input limits) that determine whether this approach fits your feature.</p>
+
+<div class="note"><b>Status at the time of writing</b>
+<p>Google's documentation lists the ML Kit GenAI APIs as <strong>beta</strong>: Summarization, Proofreading, Rewriting, Image Description and Prompt. Speech Recognition is <strong>alpha</strong>. Beta APIs carry no SLA and can change, so check the official pages before relying on the exact names below.</p></div>
+
+<h2 id="how-it-works">How on-device generative AI works on Android</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-stack-cap">
+  <svg viewBox="0 0 720 260" role="img" aria-labelledby="fig-stack-title fig-stack-desc">
+    <title id="fig-stack-title">Android on-device generative AI stack</title>
+    <desc id="fig-stack-desc">Top: your app. Below it, the ML Kit GenAI APIs: Summarization, Proofreading, Rewriting, Image Description, Speech Recognition and Prompt. Below them, AICore, the Android system service that manages Gemini Nano and safety features. At the bottom, device hardware: NPU, GPU and CPU. Model downloads come through Private Compute Services.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="120" y="12" width="480" height="44" rx="12"/><text class="d-t" x="360" y="39" text-anchor="middle">Your app (Kotlin, Compose)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="120" y="66" width="480" height="62" rx="12"/><text class="d-t" x="360" y="90" text-anchor="middle">ML Kit GenAI APIs</text><text class="d-s" x="360" y="110" text-anchor="middle">Summarization · Proofreading · Rewriting · Image Description · Speech · Prompt</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="120" y="138" width="480" height="56" rx="12"/><text class="d-t" x="360" y="162" text-anchor="middle">AICore system service · Gemini Nano</text><text class="d-s" x="360" y="181" text-anchor="middle">model distribution &amp; updates · isolated · no direct internet access</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-dark" x="120" y="204" width="480" height="44" rx="12"/><text class="d-w" x="360" y="231" text-anchor="middle">Device hardware: NPU / GPU / CPU</text></g>
+    <rect class="d-amber" x="616" y="138" width="96" height="56" rx="12"/><text class="d-s" x="664" y="161" text-anchor="middle">Private</text><text class="d-s" x="664" y="177" text-anchor="middle">Compute Svc</text>
+    <path class="d-dash" d="M616 166 H604"/>
+  </svg>
+  <figcaption id="fig-stack-cap">Your app talks only to ML Kit. AICore owns the model, so you never bundle or update gigabytes of weights yourself, and apps on the device share one copy.</figcaption>
+</figure>
+<ul>
+  <li><strong>Gemini Nano</strong> is Google's on-device foundation model.</li>
+  <li><strong>AICore</strong> is the Android system service that distributes and updates Gemini Nano and uses device hardware for fast inference. According to Android's documentation, it's isolated from most packages, has no direct internet access, and doesn't store input data or outputs after processing.</li>
+  <li><strong>ML Kit GenAI APIs</strong> are the developer-facing layer. The <em>task-specific</em> APIs (summarise, proofread, rewrite, describe images) come with tuned prompts and built-in quality work. The <em>Prompt API</em> accepts your own prompts for custom tasks.</li>
+</ul>
+
+<h2 id="apis">The ML Kit GenAI APIs at a glance</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>API</th><th>What it does</th><th>Good fit</th></tr></thead>
+  <tbody>
+    <tr><td>Summarization</td><td>Summarises articles or conversations as bullet points</td><td>Long notes, chat threads, articles</td></tr>
+    <tr><td>Proofreading</td><td>Fixes grammar and spelling in short text</td><td>Message composers, comments</td></tr>
+    <tr><td>Rewriting</td><td>Rewrites short text in a different tone or style</td><td>"Make it more formal", "shorten"</td></tr>
+    <tr><td>Image Description</td><td>Generates a short description of an image</td><td>Alt text, accessibility, cataloguing</td></tr>
+    <tr><td>Speech Recognition</td><td>Transcribes spoken audio (alpha)</td><td>Voice notes, dictation</td></tr>
+    <tr><td>Prompt</td><td>Custom text or multimodal prompts to Gemini Nano</td><td>Classification, extraction, custom short generation</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="implementation">Implementation: on-device summarisation in Kotlin</h2>
+<p>The flow is the same for every task-specific API: <strong>create a client → check feature status → download if needed → run inference → close the client</strong>.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-status-cap">
+  <svg viewBox="0 0 720 170" role="img" aria-labelledby="fig-status-title fig-status-desc">
+    <title id="fig-status-title">Feature status flow for ML Kit GenAI</title>
+    <desc id="fig-status-desc">checkFeatureStatus returns one of four values. UNAVAILABLE: hide the feature or use a fallback. DOWNLOADABLE: call downloadFeature and show progress. DOWNLOADING: wait, the request runs when ready. AVAILABLE: run inference.</desc>
+    <defs><marker id="n1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#64748b"/></marker></defs>
+    <rect class="d-amber" x="10" y="58" width="150" height="54" rx="12"/><text class="d-t" x="85" y="82" text-anchor="middle">checkFeature</text><text class="d-t" x="85" y="100" text-anchor="middle">Status()</text>
+    <path class="d-line" d="M160 85 L200 26 M160 85 L200 66 M160 85 L200 106 M160 85 L200 146" marker-end="url(#n1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-red" x="204" y="8" width="150" height="34" rx="8"/><text class="d-s" x="279" y="30" text-anchor="middle">UNAVAILABLE</text><text class="d-s" x="370" y="30">→ hide feature or use cloud fallback (with consent)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="204" y="48" width="150" height="34" rx="8"/><text class="d-s" x="279" y="70" text-anchor="middle">DOWNLOADABLE</text><text class="d-s" x="370" y="70">→ downloadFeature(), show progress</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="204" y="88" width="150" height="34" rx="8"/><text class="d-s" x="279" y="110" text-anchor="middle">DOWNLOADING</text><text class="d-s" x="370" y="110">→ wait; the request runs once ready</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="204" y="128" width="150" height="34" rx="8"/><text class="d-s" x="279" y="150" text-anchor="middle">AVAILABLE</text><text class="d-s" x="370" y="150">→ runInference()</text></g>
+  </svg>
+  <figcaption id="fig-status-cap">Always check status before showing any AI UI. On many devices the answer will be UNAVAILABLE.</figcaption>
+</figure>
+
+<h3 id="dependency">1. Add the dependency</h3>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    <span class="tk-c">// Beta at the time of writing: check the ML Kit release notes for the current version.</span>
+    implementation(<span class="tk-s">"com.google.mlkit:genai-summarization:1.0.0-beta1"</span>)
+    <span class="tk-c">// await() for ListenableFuture, used by the GenAI APIs</span>
+    implementation(<span class="tk-s">"org.jetbrains.kotlinx:kotlinx-coroutines-guava:&lt;latest&gt;"</span>)
+}</code></pre></figure>
+
+<h3 id="wrapper">2. Wrap the API behind your own interface</h3>
+<p>Wrapping keeps beta API details in one file, makes the ViewModel testable with a fake, and lets you add a cloud fallback later without touching the UI.</p>
+<figure class="code"><figcaption><span class="file">OnDeviceSummarizer.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> android.content.<span class="tk-t">Context</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.common.<span class="tk-t">DownloadCallback</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.common.<span class="tk-t">FeatureStatus</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.common.<span class="tk-t">GenAiException</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.summarization.<span class="tk-t">Summarization</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.summarization.<span class="tk-t">SummarizationRequest</span>
+<span class="tk-k">import</span> com.google.mlkit.genai.summarization.<span class="tk-t">SummarizerOptions</span>
+<span class="tk-k">import</span> kotlinx.coroutines.channels.awaitClose
+<span class="tk-k">import</span> kotlinx.coroutines.flow.<span class="tk-t">Flow</span>
+<span class="tk-k">import</span> kotlinx.coroutines.flow.callbackFlow
+<span class="tk-k">import</span> kotlinx.coroutines.guava.await
+
+<span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">ModelState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Unavailable</span> : <span class="tk-t">ModelState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">NeedsDownload</span> : <span class="tk-t">ModelState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Downloading</span>(<span class="tk-k">val</span> downloadedBytes: <span class="tk-t">Long</span>, <span class="tk-k">val</span> totalBytes: <span class="tk-t">Long</span>) : <span class="tk-t">ModelState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Ready</span> : <span class="tk-t">ModelState</span>
+}
+
+<span class="tk-k">class</span> <span class="tk-t">OnDeviceSummarizer</span>(context: <span class="tk-t">Context</span>) : <span class="tk-t">AutoCloseable</span> {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> summarizer = <span class="tk-t">Summarization</span>.getClient(
+        <span class="tk-t">SummarizerOptions</span>.builder(context)
+            .setInputType(<span class="tk-t">SummarizerOptions</span>.<span class="tk-t">InputType</span>.<span class="tk-t">ARTICLE</span>)
+            .setOutputType(<span class="tk-t">SummarizerOptions</span>.<span class="tk-t">OutputType</span>.<span class="tk-t">THREE_BULLETS</span>)
+            .setLanguage(<span class="tk-t">SummarizerOptions</span>.<span class="tk-t">Language</span>.<span class="tk-t">ENGLISH</span>)
+            .build()
+    )
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> status(): <span class="tk-t">ModelState</span> = <span class="tk-k">when</span> (summarizer.checkFeatureStatus().await()) {
+        <span class="tk-t">FeatureStatus</span>.<span class="tk-t">AVAILABLE</span> -&gt; <span class="tk-t">ModelState</span>.<span class="tk-t">Ready</span>
+        <span class="tk-t">FeatureStatus</span>.<span class="tk-t">DOWNLOADABLE</span> -&gt; <span class="tk-t">ModelState</span>.<span class="tk-t">NeedsDownload</span>
+        <span class="tk-t">FeatureStatus</span>.<span class="tk-t">DOWNLOADING</span> -&gt; <span class="tk-t">ModelState</span>.<span class="tk-t">Downloading</span>(<span class="tk-n">0</span>, <span class="tk-n">0</span>)
+        <span class="tk-k">else</span> -&gt; <span class="tk-t">ModelState</span>.<span class="tk-t">Unavailable</span>
+    }
+
+    <span class="tk-c">/** Emits download progress, then Ready. Fails the flow if the download fails. */</span>
+    <span class="tk-k">fun</span> download(): <span class="tk-t">Flow</span>&lt;<span class="tk-t">ModelState</span>&gt; = callbackFlow {
+        <span class="tk-k">var</span> total = <span class="tk-n">0L</span>
+        summarizer.downloadFeature(<span class="tk-k">object</span> : <span class="tk-t">DownloadCallback</span> {
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onDownloadStarted(bytesToDownload: <span class="tk-t">Long</span>) {
+                total = bytesToDownload
+                trySend(<span class="tk-t">ModelState</span>.<span class="tk-t">Downloading</span>(<span class="tk-n">0</span>, total))
+            }
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onDownloadProgress(totalBytesDownloaded: <span class="tk-t">Long</span>) {
+                trySend(<span class="tk-t">ModelState</span>.<span class="tk-t">Downloading</span>(totalBytesDownloaded, total))
+            }
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onDownloadCompleted() {
+                trySend(<span class="tk-t">ModelState</span>.<span class="tk-t">Ready</span>)
+                close()
+            }
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onDownloadFailed(e: <span class="tk-t">GenAiException</span>) {
+                close(e)
+            }
+        })
+        awaitClose { }
+    }
+
+    <span class="tk-c">/** Streams partial text through [onPartial] and returns the final summary. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>, onPartial: (<span class="tk-t">String</span>) -&gt; <span class="tk-t">Unit</span>): <span class="tk-t">String</span> {
+        <span class="tk-k">val</span> request = <span class="tk-t">SummarizationRequest</span>.builder(text).build()
+        <span class="tk-k">val</span> result = summarizer.runInference(request) { newText -&gt; onPartial(newText) }.await()
+        <span class="tk-k">return</span> result.summary
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> close() = summarizer.close()
+}</code></pre></figure>
+
+<h3 id="viewmodel">3. Drive it from a ViewModel</h3>
+<figure class="code"><figcaption><span class="file">SummaryViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">SummaryUiState</span>(
+    <span class="tk-k">val</span> model: <span class="tk-t">ModelState</span> = <span class="tk-t">ModelState</span>.<span class="tk-t">Unavailable</span>,
+    <span class="tk-k">val</span> summary: <span class="tk-t">String</span> = <span class="tk-s">""</span>,
+    <span class="tk-k">val</span> isSummarizing: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> error: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+)
+
+<span class="tk-k">class</span> <span class="tk-t">SummaryViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> summarizer: <span class="tk-t">OnDeviceSummarizer</span>) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _uiState = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">SummaryUiState</span>())
+    <span class="tk-k">val</span> uiState = _uiState.asStateFlow()
+
+    <span class="tk-k">init</span> {
+        viewModelScope.launch { _uiState.update { it.copy(model = summarizer.status()) } }
+    }
+
+    <span class="tk-k">fun</span> downloadModel() {
+        viewModelScope.launch {
+            summarizer.download()
+                .<span class="tk-k">catch</span> { _uiState.update { s -&gt; s.copy(error = <span class="tk-s">"Download failed. Check storage and connection."</span>) } }
+                .collect { state -&gt; _uiState.update { it.copy(model = state) } }
+        }
+    }
+
+    <span class="tk-k">fun</span> summarize(note: <span class="tk-t">String</span>) {
+        <span class="tk-c">// The API documents input limits (roughly 4,000 tokens); very short inputs give poor summaries.</span>
+        <span class="tk-k">if</span> (note.length &lt; <span class="tk-n">400</span>) {
+            _uiState.update { it.copy(error = <span class="tk-s">"Write a little more before summarising."</span>) }
+            <span class="tk-k">return</span>
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSummarizing = <span class="tk-k">true</span>, summary = <span class="tk-s">""</span>, error = <span class="tk-k">null</span>) }
+            <span class="tk-k">try</span> {
+                <span class="tk-k">val</span> final = summarizer.summarize(note) { partial -&gt;
+                    _uiState.update { it.copy(summary = it.summary + partial) }
+                }
+                _uiState.update { it.copy(isSummarizing = <span class="tk-k">false</span>, summary = final) }
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">GenAiException</span>) {
+                _uiState.update { it.copy(isSummarizing = <span class="tk-k">false</span>, error = <span class="tk-s">"Couldn't summarise right now. Please try again."</span>) }
+            }
+        }
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onCleared() = summarizer.close()
+}</code></pre></figure>
+<p>In the Compose screen, show the summarise button only when <code>model</code> is <code>Ready</code>, a "Download (one-time)" button with a progress bar for <code>NeedsDownload</code> and <code>Downloading</code>, and nothing at all, or a cloud option if the user has consented, for <code>Unavailable</code>.</p>
+
+<h2 id="limits">The limits that shape your design</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Constraint</th><th>What the docs say</th><th>Design response</th></tr></thead>
+  <tbody>
+    <tr><td>Device support</td><td>Specific devices from several manufacturers, with plans to expand</td><td>Runtime checks; fallback or hide the feature</td></tr>
+    <tr><td>Foreground only</td><td>Inference allowed only when your app is the top foreground app; background use is blocked</td><td>Trigger from user actions, not from WorkManager or services</td></tr>
+    <tr><td>Quotas</td><td>Per-app inference quota (<code>BUSY</code>); long-duration battery quota</td><td>Exponential backoff; avoid per-keystroke calls</td></tr>
+    <tr><td>Input size (Summarization)</td><td>Under ~4,000 tokens; article input over 400 characters</td><td>Validate length; chunk or truncate long text</td></tr>
+    <tr><td>Languages (Summarization)</td><td>English, Japanese and Korean at the time of writing</td><td>Detect language first, for example with ML Kit Language ID</td></tr>
+    <tr><td>Device state</td><td>Not supported on devices with an unlocked bootloader</td><td>Handle as UNAVAILABLE</td></tr>
+    <tr><td>Output variation</td><td>Different Gemini Nano versions may return different output</td><td>Don't depend on exact wording; test on several devices</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="prompt-api">When to use the Prompt API instead</h2>
+<p>The task-specific APIs are the easiest and most predictable option. Choose the <strong>Prompt API</strong> when your task doesn't match them, for example classifying a support message into categories, extracting a date and amount from a text, or generating a short custom label. Keep prompts short and specific, test across devices, and remember that Prompt API device support is grouped by Gemini Nano version. Official sample code lives in the <a href="https://github.com/googlesamples/mlkit/tree/master/android/genai" target="_blank" rel="noopener">ML Kit GenAI samples repository</a>.</p>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Meeting notes summary</h3><dl><dt>Problem</dt><dd>Long notes, sensitive content, often offline.</dd><dt>Solution</dt><dd>Summarization API, three bullets.</dd><dt>Why</dt><dd>Private, free per request, works without signal.</dd><dt>Trade-off</dt><dd>Supported devices and languages only.</dd></dl></div>
+  <div class="card usecase"><h3>Polish before sending</h3><dl><dt>Problem</dt><dd>Typos in quick messages.</dd><dt>Solution</dt><dd>Proofreading API on demand, shown as a suggestion to accept.</dd><dt>Why</dt><dd>Private messages never leave the phone.</dd><dt>Trade-off</dt><dd>Short text only; user must review.</dd></dl></div>
+  <div class="card usecase"><h3>Alt text for gallery images</h3><dl><dt>Problem</dt><dd>Images lack accessible descriptions.</dd><dt>Solution</dt><dd>Image Description API generates a draft the user can edit.</dd><dt>Why</dt><dd>Personal photos stay local.</dd><dt>Trade-off</dt><dd>Short, generic descriptions; foreground only.</dd></dl></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Always UNAVAILABLE on your test device.</strong> Check the published device list, update Google Play services and AICore, and make sure the bootloader isn't unlocked. Emulators generally won't have Gemini Nano.</li>
+  <li><strong>Download never completes.</strong> Model downloads can be large and may wait for suitable network conditions. Show clear progress and let users continue using the app.</li>
+  <li><strong><code>BACKGROUND_USE_BLOCKED</code></strong> means the call happened while your app wasn't the top foreground app. Only trigger inference from visible UI.</li>
+  <li><strong><code>BUSY</code></strong> means you hit the per-app quota. Retry with exponential backoff and reduce request frequency.</li>
+  <li><strong>Poor summaries of short text.</strong> The model performs best on longer input (the docs suggest 300+ words for articles), so don't offer summaries for tiny notes.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does Gemini Nano increase my APK size?</summary><div><p>No. AICore downloads and manages the model at the system level, and your app only includes the ML Kit client library.</p></div></details>
+  <details><summary>Can I fine-tune Gemini Nano or bring my own model to AICore?</summary><div><p>The ML Kit GenAI APIs expose Google's managed model. To run your own model on-device, use LiteRT and the related Google AI Edge tooling instead.</p></div></details>
+  <details><summary>Can I run on-device GenAI in a background job?</summary><div><p>No. The documentation states inference is only permitted when your app is the top foreground app, and background use, including from a foreground service, is blocked.</p></div></details>
+  <details><summary>How do I support users on unsupported devices?</summary><div><p>Either hide the feature or offer a cloud path with clear consent. Firebase AI Logic's experimental hybrid inference can route between on-device and cloud automatically for single-turn requests.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Gemini Nano with the ML Kit GenAI APIs gives Android apps <strong>private, offline, no-per-request-cost generative features</strong>, managed by the system rather than bundled in your APK. The price is <strong>limited device reach, beta APIs, foreground-only execution and quotas</strong>, so design every feature with a status check and a fallback.</p>
+<p>Next step: add the <code>OnDeviceSummarizer</code> wrapper to a notes screen and handle all four feature states. Then combine it with the cloud path from <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android</a>, following the patterns in <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/ai/gemini-nano" target="_blank" rel="noopener">Gemini Nano on Android</a></li><li><a href="https://developers.google.com/ml-kit/genai" target="_blank" rel="noopener">ML Kit GenAI APIs overview and device support</a></li><li><a href="https://developers.google.com/ml-kit/genai/summarization/android" target="_blank" rel="noopener">ML Kit GenAI Summarization (Android)</a></li><li><a href="https://developers.google.com/ml-kit/genai/prompt/android" target="_blank" rel="noopener">ML Kit GenAI Prompt API</a></li><li><a href="https://github.com/googlesamples/mlkit/tree/master/android/genai" target="_blank" rel="noopener">ML Kit GenAI samples on GitHub</a></li><li><a href="https://developer.android.com/ai/hybrid" target="_blank" rel="noopener">Hybrid inference</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-nano-ml-kit-genai-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-nano-ml-kit-genai-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/cloud-ai-vs-on-device-ai-android/index.html"><small>Android AI and Generative AI</small>Cloud AI vs On-Device AI for Android</a></li><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/choose-ai-model-android-app/index.html"><small>Android AI and Generative AI</small>How to Choose the Right AI Model for an Android App</a></li><li><a href="../../android/ai-in-android-development/index.html"><small>Android AI and Generative AI</small>What Is AI in Android Development? A Complete Developer&#x27;s Guide</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/&amp;text=Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/gemini-nano-ml-kit-genai-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#how-it-works">How on-device generative AI works on Android</a></li><li><a href="#apis">The ML Kit GenAI APIs at a glance</a></li><li><a href="#implementation">Implementation: on-device summarisation in Kotlin</a></li><li><a href="#limits">The limits that shape your design</a></li><li><a href="#prompt-api">When to use the Prompt API instead</a></li><li><a href="#use-cases">Real-world use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-nano-ml-kit-genai-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dgemini-nano-ml-kit-genai-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

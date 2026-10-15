@@ -1,0 +1,173 @@
+<!--meta
+{
+  "seo_title": "Kotlin Basics Every Android Developer Should Know",
+  "description": "The Kotlin basics Android developers use daily: val vs var, types, functions, string templates, when, classes, null safety, collections, lambdas and scope functions, with Android examples.",
+  "primary_keyword": "kotlin basics for android",
+  "keywords": ["learn kotlin for android", "kotlin tutorial beginners", "kotlin val vs var", "kotlin when expression", "kotlin scope functions", "kotlin lambdas android"],
+  "lede": "You don't need all of Kotlin to build Android apps, but you need a core set fluently. This guide covers exactly that core, with examples drawn from real Android code rather than abstract puzzles.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-null-safety", "kotlin-data-sealed-enum-classes", "kotlin-collections-functional", "kotlin-vs-java-android"],
+  "refs": [
+    ["Kotlin basic syntax", "https://kotlinlang.org/docs/basic-syntax.html"],
+    ["Kotlin idioms", "https://kotlinlang.org/docs/idioms.html"],
+    ["Scope functions", "https://kotlinlang.org/docs/scope-functions.html"],
+    ["Kotlin style guide for Android", "https://developer.android.com/kotlin/style-guide"],
+    ["Kotlin Playground", "https://play.kotlinlang.org/"]
+  ]
+}
+-->
+<p class="ad-lead">Kotlin is a big language, with coroutines, generics, DSLs, multiplatform and more. Beginners often try to learn it all at once. You'll be far more productive if you first master the <strong>small core you'll use in every Android file</strong>, then pick up the advanced features as you need them.</p>
+<p>Every example below is runnable in the <a href="https://play.kotlinlang.org/" target="_blank" rel="noopener">Kotlin Playground</a> or shows a real Android pattern.</p>
+
+<h2 id="variables">1. val, var and type inference</h2>
+<code-block lang="kotlin" file="Variables">
+val appName = "NotiVault"        // read-only reference (prefer this)
+var unreadCount = 0              // mutable: use only when the value must change
+unreadCount += 1
+
+val price: Double = 499.0        // explicit type when it improves clarity
+val tags = listOf("kotlin", "android")   // inferred as List<String>
+</code-block>
+<div class="tip"><b>Rule of thumb</b><p>Default to <code>val</code>. Immutable values make code, and especially UI state, easier to reason about.</p></div>
+
+<h2 id="functions">2. Functions, default and named arguments</h2>
+<code-block lang="kotlin" file="Functions">
+fun formatPrice(amount: Double, currency: String = "₹", decimals: Int = 2): String =
+    "$currency${"%.${decimals}f".format(amount)}"
+
+formatPrice(1299.5)                       // ₹1299.50
+formatPrice(19.99, currency = "$")        // named argument: clear at the call site
+</code-block>
+<p>Default arguments remove the need for overloads, and named arguments make calls self-documenting. Compose relies on both heavily, for example <code>Text(text = "Hi", maxLines = 1)</code>.</p>
+
+<h2 id="strings">3. String templates</h2>
+<code-block lang="kotlin" file="Templates">
+val name = "Kamal"
+val items = 3
+println("Hi $name, you have $items items")             // simple values
+println("Total: ${items * 199} (${if (items > 1) "items" else "item"})")   // expressions
+</code-block>
+
+<h2 id="when">4. if and when are expressions</h2>
+<code-block lang="kotlin" file="when as an expression">
+val label = when (statusCode) {
+    200 -> "OK"
+    401, 403 -> "Please sign in again"
+    in 500..599 -> "Server problem, try later"
+    else -> "Unexpected error ($statusCode)"
+}
+
+val badge = if (unreadCount > 99) "99+" else unreadCount.toString()
+</code-block>
+
+<h2 id="classes">5. Classes, properties and objects</h2>
+<code-block lang="kotlin" file="Classes">
+class Counter(private val max: Int) {       // primary constructor + property
+    var value = 0
+        private set                          // readable outside, writable only inside
+
+    fun increment() { if (value < max) value++ }
+}
+
+data class User(val id: String, val name: String)   // equals/hashCode/toString/copy for free
+
+object Analytics {                           // a singleton
+    fun log(event: String) = println("event: $event")
+}
+</code-block>
+<p>Data classes, sealed classes and enums each get their own article: <a href="../kotlin-data-sealed-enum-classes/index.html">Data, Sealed and Enum Classes</a>.</p>
+
+<h2 id="null-safety">6. Null safety in one minute</h2>
+<code-block lang="kotlin" file="Null safety">
+var nickname: String? = null                // the ? means "may be null"
+val length = nickname?.length ?: 0          // safe call + Elvis default
+nickname?.let { println("Hello, $it") }    // run only when not null
+</code-block>
+<p>Full details are in <a href="../kotlin-null-safety/index.html">Kotlin Null Safety Explained</a>.</p>
+
+<h2 id="collections">7. Collections and lambdas</h2>
+<code-block lang="kotlin" file="Collections">
+data class Order(val id: Int, val total: Double, val paid: Boolean)
+
+val orders = listOf(Order(1, 250.0, true), Order(2, 999.0, false), Order(3, 120.0, true))
+
+val paidTotal = orders.filter { it.paid }.sumOf { it.total }        // 370.0
+val ids = orders.map { it.id }                                       // [1, 2, 3]
+val biggest = orders.maxByOrNull { it.total }                        // Order(2, …)
+val byStatus = orders.groupBy { if (it.paid) "Paid" else "Pending" }
+</code-block>
+<p><code>it</code> is the implicit name of a single lambda parameter. More in <a href="../kotlin-collections-functional/index.html">Collections and Functional Programming</a>.</p>
+
+<h2 id="lambdas">8. Lambdas and trailing lambda syntax</h2>
+<p>If a function's last parameter is a function, you can pass the lambda outside the parentheses. This is why Compose code looks like a tree:</p>
+<code-block lang="kotlin" file="Trailing lambdas in Compose">
+Button(onClick = { viewModel.save() }) {     // the content lambda trails the call
+    Text("Save")
+}
+
+Column {                                       // only a lambda: no parentheses needed
+    Text("Title")
+    Text("Subtitle")
+}
+</code-block>
+
+<h2 id="scope">9. Scope functions: let, apply, also, run, with</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Function</th><th>Object reference</th><th>Returns</th><th>Typical Android use</th></tr></thead>
+  <tbody>
+    <tr><td><code>let</code></td><td><code>it</code></td><td>Lambda result</td><td>Run code only for non-null values</td></tr>
+    <tr><td><code>apply</code></td><td><code>this</code></td><td>The object</td><td>Configure an object (Intent, Bundle, Paint)</td></tr>
+    <tr><td><code>also</code></td><td><code>it</code></td><td>The object</td><td>Side effects such as logging</td></tr>
+    <tr><td><code>run</code></td><td><code>this</code></td><td>Lambda result</td><td>Compute a value from an object's members</td></tr>
+    <tr><td><code>with</code></td><td><code>this</code></td><td>Lambda result</td><td>Call several members of one object</td></tr>
+  </tbody>
+</table>
+</div>
+<code-block lang="kotlin" file="apply and let in practice">
+val intent = Intent(context, DetailActivity::class.java).apply {
+    putExtra("articleId", article.id)
+    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+}
+
+savedInstanceState?.getString("query")?.let { restoredQuery -> viewModel.onQueryChange(restoredQuery) }
+</code-block>
+<div class="warn"><b>Don't over-nest</b><p>Chains like <code>a?.let { b?.apply { also { … } } }</code> hurt readability. A plain <code>if</code> is often clearer.</p></div>
+
+<h2 id="android-patterns">10. Putting it together: a realistic Android snippet</h2>
+<code-block lang="kotlin" file="ArticlesViewModel.kt">
+data class ArticleUi(val id: String, val title: String, val isNew: Boolean)
+
+class ArticlesViewModel(private val repo: ArticleRepository) : ViewModel() {
+    private val _items = MutableStateFlow<List<ArticleUi>>(emptyList())
+    val items: StateFlow<List<ArticleUi>> = _items.asStateFlow()
+
+    fun load(now: Long = System.currentTimeMillis()) = viewModelScope.launch {
+        val dayMillis = 24 * 60 * 60 * 1000L
+        _items.value = repo.getArticles()
+            .sortedByDescending { it.publishedAt }
+            .map { ArticleUi(it.id, it.title.trim(), isNew = now - it.publishedAt < dayMillis) }
+    }
+}
+</code-block>
+<p>Data classes, <code>val</code>, collection operations, lambdas, named arguments and an expression-bodied function all appear in ten lines. This is everyday Android Kotlin.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>var</code> everywhere, out of Java habit.</li>
+  <li>Writing Java-style getters and setters instead of properties.</li>
+  <li>Using <code>==</code> versus <code>===</code> incorrectly: <code>==</code> is structural equality (like <code>equals</code>); <code>===</code> compares references.</li>
+  <li>Forgetting that <code>listOf</code> returns a read-only list. Use <code>mutableListOf</code> or, better, create a new list.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How long does it take to learn Kotlin basics?</summary><div><p>With prior programming experience, a week or two of focused practice. As a first language, plan three to four weeks before moving to Android.</p></div></details>
+  <details><summary>Do I need to learn coroutines as part of the basics?</summary><div><p>Learn them right after the basics, once you start Android. They have their own guide: <a href="../kotlin-coroutines-flow-android/index.html">Coroutines and Flow Explained</a>.</p></div></details>
+  <details><summary>Where can I practise?</summary><div><p>The Kotlin Playground, Kotlin Koans and small console exercises, then real Android screens.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>The Kotlin you'll use daily on Android is a compact set: <strong>val and var, functions with defaults, templates, when expressions, classes and data classes, null safety, collections, lambdas and a few scope functions</strong>. Master these and Android code becomes much easier to read and write.</p>
+<p>Next step: go deeper on the feature that prevents the most crashes, <a href="../kotlin-null-safety/index.html">Kotlin Null Safety</a>.</p>

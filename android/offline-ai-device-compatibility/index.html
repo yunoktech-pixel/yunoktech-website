@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline AI Features and Device Compatibility on Android | Yunok Tech</title>
+  <meta name="description" content="Ship AI features that work across Android devices and offline: capability detection, feature status checks, model downloads, RAM and API-level gating, tiered experiences, connectivity handling and testing on low-end devices.">
+  <meta name="keywords" content="offline ai android device compatibility, on device ai device support, check gemini nano availability, android low ram ai, offline ai fallback, model download android, ai feature gating android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/offline-ai-device-compatibility/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/offline-ai-device-compatibility/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Offline AI Features and Device Compatibility on Android">
+  <meta property="og:description" content="Ship AI features that work across Android devices and offline: capability detection, feature status checks, model downloads, RAM and API-level gating, tiered experiences, connectivity handling and testing on low-end devices.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="Offline AI Features and Device Compatibility on Android">
+  <meta name="twitter:description" content="Ship AI features that work across Android devices and offline: capability detection, feature status checks, model downloads, RAM and API-level gating, tiered experiences, connectivity handling and testing on low-end devices.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Offline AI Features and Device Compatibility", "description": "Ship AI features that work across Android devices and offline: capability detection, feature status checks, model downloads, RAM and API-level gating, tiered experiences, connectivity handling and testing on low-end devices.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI Projects and Production", "keywords": "on device ai device support, check gemini nano availability, android low ram ai, offline ai fallback, model download android, ai feature gating android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/offline-ai-device-compatibility/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Offline AI Features and Device Compatibility", "item": "https://yunoktech.com/android/offline-ai-device-compatibility/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">Offline AI Features and Device Compatibility</h1>
+    <p class="ad-lede">Your AI feature works perfectly on a flagship phone on office Wi-Fi. But many users have mid-range devices, limited storage and patchy connectivity. Designing for that reality means detecting capability, delivering models carefully, and offering tiered experiences.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#tiers">Tiered experiences</a></li><li><a href="#detect">Detect capability</a></li><li><a href="#downloads">Model downloads</a></li><li><a href="#gating">Gating your own models</a></li><li><a href="#offline">Designing for offline</a></li><li><a href="#testing">Testing across devices</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Android runs on thousands of device models. An AI feature has to answer three questions at runtime: can this device run the model, is the model present, and is the network available if we need the cloud? The answers decide which experience the user gets.</p>
+
+<h2 id="tiers">Tiered experiences</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-tier-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-tier-t fig-tier-d">
+    <title id="fig-tier-t">Choosing an AI tier at runtime</title>
+    <desc id="fig-tier-d">Check whether the on-device model is available; if yes, use on-device AI, which also works offline. If not, check network and policy; if online and allowed, use cloud AI. Otherwise use a non-AI fallback such as manual tools or a queued request for later.</desc>
+    <defs><marker id="tierm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M200 60 H246 M200 60 V130 H246 M420 140 H466 M420 140 V200 H466" marker-end="url(#tierm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="30" width="180" height="60" rx="12"/><text class="d-t" x="110" y="56" text-anchor="middle">On-device model</text><text class="d-s" x="110" y="74" text-anchor="middle">available?</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="250" y="30" width="200" height="50" rx="12"/><text class="d-t" x="350" y="60" text-anchor="middle">Tier 1: on-device</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="250" y="110" width="170" height="60" rx="12"/><text class="d-t" x="335" y="136" text-anchor="middle">Online +</text><text class="d-s" x="335" y="154" text-anchor="middle">cloud allowed?</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="470" y="115" width="230" height="50" rx="12"/><text class="d-t" x="585" y="145" text-anchor="middle">Tier 2: cloud</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="470" y="178" width="230" height="44" rx="12"/><text class="d-t" x="585" y="205" text-anchor="middle">Tier 3: non-AI fallback</text></g>
+  </svg>
+  <figcaption id="fig-tier-cap">Decide the tier per request, not once at install: availability and connectivity change.</figcaption>
+</figure>
+
+<h2 id="detect">Detect capability</h2>
+<figure class="code"><figcaption><span class="file">AiCapabilities.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">AiCapabilities</span>(
+    <span class="tk-k">val</span> onDevice: <span class="tk-t">OnDeviceStatus</span>,
+    <span class="tk-k">val</span> online: <span class="tk-t">Boolean</span>,
+    <span class="tk-k">val</span> lowRam: <span class="tk-t">Boolean</span>,
+)
+
+<span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">OnDeviceStatus</span> { <span class="tk-t">AVAILABLE</span>, <span class="tk-t">DOWNLOADABLE</span>, <span class="tk-t">DOWNLOADING</span>, <span class="tk-t">UNAVAILABLE</span> }
+
+<span class="tk-k">class</span> <span class="tk-t">CapabilityChecker</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> context: <span class="tk-t">Context</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> summarizer: <span class="tk-t">OnDeviceSummarizer</span>,      <span class="tk-c">// wraps ML Kit GenAI checkFeatureStatus()</span>
+) {
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> check(): <span class="tk-t">AiCapabilities</span> {
+        <span class="tk-k">val</span> am = context.getSystemService(<span class="tk-t">ActivityManager</span>::<span class="tk-k">class</span>.java)
+        <span class="tk-k">val</span> cm = context.getSystemService(<span class="tk-t">ConnectivityManager</span>::<span class="tk-k">class</span>.java)
+        <span class="tk-k">val</span> caps = cm.getNetworkCapabilities(cm.activeNetwork)
+        <span class="tk-k">return</span> <span class="tk-t">AiCapabilities</span>(
+            onDevice = summarizer.status(),
+            online = caps?.hasCapability(<span class="tk-t">NetworkCapabilities</span>.<span class="tk-t">NET_CAPABILITY_VALIDATED</span>) == <span class="tk-k">true</span>,
+            lowRam = am.isLowRamDevice,
+        )
+    }
+}</code></pre></figure>
+<p>For Gemini Nano, always use the API's own status check (ML Kit GenAI's <code>checkFeatureStatus()</code>) instead of hard-coding device lists. Supported devices change over time.</p>
+
+<h2 id="downloads">Model downloads</h2>
+<ul>
+  <li>Download only when the user is likely to use the feature, preferably on unmetered networks.</li>
+  <li>Show progress and size, and allow cancel.</li>
+  <li>Handle storage-full and interrupted downloads, and verify checksums for your own model files.</li>
+  <li>Use WorkManager for large downloads with constraints. See <a href="../workmanager-background-work/index.html">WorkManager</a>.</li>
+</ul>
+
+<h2 id="gating">Gating your own models</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Signal</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>isLowRamDevice</code>, total RAM</td><td>Skip large LLMs on low-memory devices</td></tr>
+    <tr><td>Free storage</td><td>Check before downloading models</td></tr>
+    <tr><td>API level, ABI</td><td>Ensure runtime and native library support</td></tr>
+    <tr><td>Benchmark on first run</td><td>Measure tokens/second; disable if too slow</td></tr>
+    <tr><td>Remote config</td><td>Disable for problematic device models without an app update</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="offline">Designing for offline</h2>
+<ul>
+  <li><strong>On-device first</strong> for features users need anywhere (dictation, translation, OCR).</li>
+  <li><strong>Queue cloud requests</strong> for non-urgent work (summarise later) and notify when done.</li>
+  <li><strong>Be explicit in UI:</strong> "Summaries need internet on this device" is better than a spinner that fails.</li>
+</ul>
+<figure class="code"><figcaption><span class="file">Choose the path per request</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> summarize(text: <span class="tk-t">String</span>): <span class="tk-t">SummaryResult</span> {
+    <span class="tk-k">val</span> caps = capabilityChecker.check()
+    <span class="tk-k">return</span> <span class="tk-k">when</span> {
+        caps.onDevice == <span class="tk-t">OnDeviceStatus</span>.<span class="tk-t">AVAILABLE</span> &amp;&amp; text.length &lt; <span class="tk-t">ON_DEVICE_CHAR_LIMIT</span> -&gt;
+            <span class="tk-t">SummaryResult</span>.<span class="tk-t">Ok</span>(onDevice.summarize(text), source = <span class="tk-t">Source</span>.<span class="tk-t">ON_DEVICE</span>)
+        caps.online &amp;&amp; settings.cloudAllowed -&gt;
+            <span class="tk-t">SummaryResult</span>.<span class="tk-t">Ok</span>(cloud.summarize(text), source = <span class="tk-t">Source</span>.<span class="tk-t">CLOUD</span>)
+        <span class="tk-k">else</span> -&gt; <span class="tk-t">SummaryResult</span>.<span class="tk-t">Unavailable</span>(reason = <span class="tk-k">if</span> (!caps.online) <span class="tk-s">"offline"</span> <span class="tk-k">else</span> <span class="tk-s">"not supported"</span>)
+    }
+}</code></pre></figure>
+
+<h2 id="testing">Testing across devices</h2>
+<ul>
+  <li>Test on at least one low-end and one mid-range device, not just flagships.</li>
+  <li>Test airplane mode, flaky networks and low storage.</li>
+  <li>Use Firebase Test Lab or device farms for broad coverage.</li>
+  <li>Log tier selection (without content) to see real-world availability. See <a href="../monitor-ai-latency-errors-costs/index.html">Monitoring AI</a>.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I make Gemini Nano available on unsupported devices?</summary><div><p>No. Use the cloud or your own smaller model through LiteRT-LM as alternatives.</p></div></details>
+  <details><summary>Should I hide AI features on unsupported devices?</summary><div><p>Hide them if no tier works. Otherwise show the feature with the available tier and clear messaging.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Design AI features in <strong>tiers</strong>: on-device when available, cloud when online and allowed, and a <strong>non-AI fallback</strong> otherwise. Detect capability with official status APIs, download models carefully, and test on real low-end devices and offline.</p>
+<p>Next step: integrate other cloud providers safely with <a href="../openai-api-android-patterns/index.html">OpenAI API Integration Patterns for Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/ai/gemini-nano" target="_blank" rel="noopener">Gemini Nano on Android</a></li><li><a href="https://developers.google.com/ml-kit/genai" target="_blank" rel="noopener">ML Kit GenAI: feature status and download</a></li><li><a href="https://developer.android.com/reference/android/app/ActivityManager.MemoryInfo" target="_blank" rel="noopener">ActivityManager.MemoryInfo</a></li><li><a href="https://developer.android.com/develop/connectivity/network-ops/reading-network-state" target="_blank" rel="noopener">Monitor connectivity status</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Doffline-ai-device-compatibility-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Doffline-ai-device-compatibility-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/ai-fallbacks-android/index.html"><small>Android AI Projects and Production</small>Fallbacks When AI Is Unavailable</a></li><li><a href="../../android/gemini-nano-vs-cloud-gemini/index.html"><small>Android AI Projects and Production</small>Gemini Nano vs Cloud-Based Gemini Models</a></li><li><a href="../../android/litert-litert-lm-android/index.html"><small>Android AI Projects and Production</small>LiteRT and LiteRT-LM on Android</a></li><li><a href="../../android/gemini-nano-ml-kit-genai-android/index.html"><small>Android AI and Generative AI</small>Gemini Nano and ML Kit GenAI on Android: How On-Device AI Works</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/offline-ai-device-compatibility/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/offline-ai-device-compatibility/&amp;text=Offline AI Features and Device Compatibility" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/offline-ai-device-compatibility/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#tiers">Tiered experiences</a></li><li><a href="#detect">Detect capability</a></li><li><a href="#downloads">Model downloads</a></li><li><a href="#gating">Gating your own models</a></li><li><a href="#offline">Designing for offline</a></li><li><a href="#testing">Testing across devices</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Doffline-ai-device-compatibility-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Doffline-ai-device-compatibility-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

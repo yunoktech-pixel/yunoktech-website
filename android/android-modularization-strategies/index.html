@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modularization Strategies for Large Android Apps | Yunok Tech</title>
+  <meta name="description" content="Compare Android modularization strategies: by layer, by feature, hybrid, api/impl split and dynamic features, with dependency rules, migration steps and how to measure success.">
+  <meta name="keywords" content="android modularization strategies, modularize android app, feature vs layer modules, api impl module split, dynamic feature modules, android module dependency rules, migrate monolith android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-modularization-strategies/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-modularization-strategies/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Modularization Strategies for Large Android Apps">
+  <meta property="og:description" content="Compare Android modularization strategies: by layer, by feature, hybrid, api/impl split and dynamic features, with dependency rules, migration steps and how to measure success.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Architecture and Clean Code">
+  <meta name="twitter:title" content="Modularization Strategies for Large Android Apps">
+  <meta name="twitter:description" content="Compare Android modularization strategies: by layer, by feature, hybrid, api/impl split and dynamic features, with dependency rules, migration steps and how to measure success.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Modularization Strategies for Large Android Apps", "description": "Compare Android modularization strategies: by layer, by feature, hybrid, api/impl split and dynamic features, with dependency rules, migration steps and how to measure success.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android Architecture and Clean Code", "keywords": "modularize android app, feature vs layer modules, api impl module split, dynamic feature modules, android module dependency rules, migrate monolith android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-modularization-strategies/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Modularization Strategies for Large Android Apps", "item": "https://yunoktech.com/android/android-modularization-strategies/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#architecture">Android Architecture and Clean Code</a></nav>
+    <span class="ad-chip">🏛️ Android Architecture and Clean Code</span>
+    <h1 id="article-title">Modularization Strategies for Large Android Apps</h1>
+    <p class="ad-lede">Once you've decided to modularize, the harder question is how to slice the app. By layer, by feature, or a hybrid? With api/impl splits? This guide compares the strategies used in large Android codebases and shows how to migrate a monolith without stopping feature work.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#strategies">The main strategies</a></li><li><a href="#api-impl">The api/impl split</a></li><li><a href="#rules">Dependency rules worth enforcing</a></li><li><a href="#migration">Migrating a monolith step by step</a></li><li><a href="#dynamic">Dynamic feature modules</a></li><li><a href="#measure">Measuring success</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Two teams modularize the same 200-screen app. One splits by layer and ends up with a <code>:data</code> module that every change touches. The other splits by feature and gets independent teams and fast builds. The strategy you choose shapes your build times and your team's daily experience for years.</p>
+
+<h2 id="strategies">The main strategies</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ms-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ms-t fig-ms-d">
+    <title id="fig-ms-t">Layer-based versus feature-based versus hybrid modularization</title>
+    <desc id="fig-ms-d">Layer-based: three horizontal modules, ui, domain and data, each containing all features. Feature-based: vertical modules per feature, each containing its own layers. Hybrid: vertical feature modules on top of shared horizontal core modules.</desc>
+    <text class="d-t" x="110" y="20" text-anchor="middle">By layer</text>
+    <rect class="d-blue" x="20" y="34" width="180" height="40" rx="8"/><text class="d-s" x="110" y="58" text-anchor="middle">:ui (all features)</text>
+    <rect class="d-violet" x="20" y="84" width="180" height="40" rx="8"/><text class="d-s" x="110" y="108" text-anchor="middle">:domain (all features)</text>
+    <rect class="d-amber" x="20" y="134" width="180" height="40" rx="8"/><text class="d-s" x="110" y="158" text-anchor="middle">:data (all features)</text>
+    <text class="d-t" x="360" y="20" text-anchor="middle">By feature</text>
+    <rect class="d-green" x="260" y="34" width="60" height="140" rx="8"/><text class="d-s" x="290" y="108" text-anchor="middle">home</text>
+    <rect class="d-green" x="330" y="34" width="60" height="140" rx="8"/><text class="d-s" x="360" y="108" text-anchor="middle">search</text>
+    <rect class="d-green" x="400" y="34" width="60" height="140" rx="8"/><text class="d-s" x="430" y="108" text-anchor="middle">cart</text>
+    <text class="d-t" x="610" y="20" text-anchor="middle">Hybrid (common)</text>
+    <rect class="d-green" x="520" y="34" width="54" height="84" rx="8"/><text class="d-s" x="547" y="80" text-anchor="middle">home</text>
+    <rect class="d-green" x="583" y="34" width="54" height="84" rx="8"/><text class="d-s" x="610" y="80" text-anchor="middle">search</text>
+    <rect class="d-green" x="646" y="34" width="54" height="84" rx="8"/><text class="d-s" x="673" y="80" text-anchor="middle">cart</text>
+    <rect class="d-amber" x="520" y="128" width="180" height="46" rx="8"/><text class="d-s" x="610" y="156" text-anchor="middle">:core:* (data, ui, model)</text>
+  </svg>
+  <figcaption id="fig-ms-cap">Most large Android apps converge on the hybrid: vertical features over horizontal core modules.</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Strategy</th><th>Pros</th><th>Cons</th><th>Fits</th></tr></thead>
+  <tbody>
+    <tr><td>By layer</td><td>Simple; enforces layering</td><td>Every feature change touches every layer module; poor build parallelism; no team ownership</td><td>Small apps wanting layer enforcement</td></tr>
+    <tr><td>By feature</td><td>Independent features; ownership; good caching</td><td>Shared code needs a home; risk of duplication</td><td>Apps with clear product areas</td></tr>
+    <tr><td>Hybrid</td><td>Feature independence plus shared core</td><td>Requires discipline about what goes in core</td><td>Most medium and large apps</td></tr>
+    <tr><td>api/impl split</td><td>Consumers depend on a small API module; impl changes don't recompile consumers</td><td>Doubles module count for split features</td><td>Very large apps, cross-feature contracts</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="api-impl">The api/impl split</h2>
+<figure class="code"><figcaption><span class="file">Module layout</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">:feature:payments:api     ← interfaces + models other features may use (tiny, stable)
+:feature:payments:impl    ← UI, ViewModels, repositories (changes often)
+
+:feature:checkout  → depends on :feature:payments:api only
+:app               → depends on :feature:payments:impl (to bind implementations via DI)</code></pre></figure>
+<figure class="code"><figcaption><span class="file">feature/payments/api/PaymentLauncher.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">interface</span> <span class="tk-t">PaymentLauncher</span> {
+    <span class="tk-k">fun</span> paymentRoute(orderId: <span class="tk-t">String</span>): <span class="tk-t">NavKey</span>      <span class="tk-c">// checkout navigates without knowing the impl</span>
+}</code></pre></figure>
+<p>Because <code>checkout</code> sees only the small API module, editing payment screens doesn't recompile checkout. That pays off in large codebases.</p>
+
+<h2 id="rules">Dependency rules worth enforcing</h2>
+<ul>
+  <li>Feature modules don't depend on other feature modules, only on their <code>:api</code> modules.</li>
+  <li>Core modules never depend on feature modules.</li>
+  <li><code>:core:model</code> and <code>:core:domain</code> are pure Kotlin (no Android dependencies).</li>
+  <li>Only <code>:app</code> knows about every implementation.</li>
+</ul>
+<p>Enforce these in CI with a dependency-analysis plugin or a custom Gradle check, not by convention alone.</p>
+
+<h2 id="migration">Migrating a monolith step by step</h2>
+<ol class="steps">
+  <li><strong>Measure:</strong> record clean and incremental build times and the main pain points.</li>
+  <li><strong>Set up build logic:</strong> a version catalog and convention plugins.</li>
+  <li><strong>Extract leaf core modules:</strong> model, design system, network and database. These have few dependencies on the rest.</li>
+  <li><strong>Extract one well-bounded feature</strong>, such as settings, to prove the pattern, including navigation and DI.</li>
+  <li><strong>Continue feature by feature</strong>, prioritising frequently changed or team-owned areas.</li>
+  <li><strong>Re-measure</strong> and adjust granularity.</li>
+</ol>
+<div class="tip"><b>Keep shipping</b><p>Move code in small, behaviour-preserving PRs. Avoid long-lived modularization branches, which conflict with ongoing feature work.</p></div>
+
+<h2 id="dynamic">Dynamic feature modules</h2>
+<p>Play Feature Delivery can deliver modules on demand or conditionally, which reduces initial download size for large, rarely used features (an AR viewer, an advanced editor). They add complexity: different navigation, testing and dependency direction. Reserve them for genuinely large, optional features.</p>
+
+<h2 id="measure">Measuring success</h2>
+<ul>
+  <li>Incremental build time for typical changes.</li>
+  <li>CI time and build-cache hit rate.</li>
+  <li>Number of modules touched per PR (it should drop).</li>
+  <li>Developer feedback on sync time and navigation.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>E-commerce app</h3><p>Hybrid: catalogue, product, cart, checkout and account features over core data, design system and analytics, with an api/impl split for payments.</p></div>
+  <div class="card usecase"><h3>Banking app</h3><p>Strict feature isolation, security-sensitive core modules owned by a platform team, and dependency rules in CI.</p></div>
+  <div class="card usecase"><h3>Media app</h3><p>Player as a core module, with a dynamic feature for offline downloads in markets where it's used.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How big should a feature module be?</summary><div><p>Roughly one product area owned by one team: a few screens with their ViewModels and data. Split further only for build or ownership reasons.</p></div></details>
+  <details><summary>Where does shared UI go?</summary><div><p>Generic components go in <code>:core:designsystem</code>. Feature-specific but shared UI may need a small shared module, but avoid a dumping-ground "common" module.</p></div></details>
+  <details><summary>Does modularization help app size?</summary><div><p>Not by itself. R8 already removes unused code. Dynamic features can reduce initial download size.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>For most large Android apps, the winning strategy is <strong>hybrid</strong>: vertical feature modules over a disciplined set of core modules, with api/impl splits where cross-feature contracts are hot. Migrate incrementally, enforce dependency rules automatically, and measure the outcome.</p>
+<p>Next step: apply design principles inside those modules with <a href="../solid-principles-android/index.html">SOLID Principles in Android Development</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/modularization" target="_blank" rel="noopener">Guide to Android app modularization</a></li><li><a href="https://developer.android.com/topic/modularization/patterns" target="_blank" rel="noopener">Common modularization patterns</a></li><li><a href="https://developer.android.com/guide/playcore/feature-delivery" target="_blank" rel="noopener">Play Feature Delivery</a></li><li><a href="https://docs.gradle.org/current/userguide/build_cache.html" target="_blank" rel="noopener">Gradle build cache</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-modularization-strategies-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-modularization-strategies-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Architecture makes the most sense when you apply it to a real project and see why each boundary exists. Learn how maintainable Android applications are designed by building one.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/multi-module-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Multi-Module Architecture in Android: Pros, Cons, and Lessons</a></li><li><a href="../../android/gradle-multi-module-build-optimization/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Multi-Module Gradle Builds and Build Optimization</a></li><li><a href="../../android/scaling-android-codebase-teams/index.html"><small>Android Architecture and Clean Code</small>Scaling an Android Codebase Across Multiple Teams</a></li><li><a href="../../android/android-architecture-at-scale/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Android App Architecture at Scale</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-modularization-strategies/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-modularization-strategies/&amp;text=Modularization Strategies for Large Android Apps" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-modularization-strategies/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#strategies">The main strategies</a></li><li><a href="#api-impl">The api/impl split</a></li><li><a href="#rules">Dependency rules worth enforcing</a></li><li><a href="#migration">Migrating a monolith step by step</a></li><li><a href="#dynamic">Dynamic feature modules</a></li><li><a href="#measure">Measuring success</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-modularization-strategies-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-modularization-strategies-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

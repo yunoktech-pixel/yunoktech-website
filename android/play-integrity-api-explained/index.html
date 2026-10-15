@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Integrity API Explained for Android Developers | Yunok Tech</title>
+  <meta name="description" content="How the Play Integrity API works: standard vs classic requests, integrity verdicts (app, device, account), server-side decoding, request hashes, nonces, responses to risk and common mistakes.">
+  <meta name="keywords" content="play integrity api, play integrity standard request, device integrity verdict, safetynet replacement, app integrity verdict, integrity token server verification, android anti abuse">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/play-integrity-api-explained/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/play-integrity-api-explained/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Play Integrity API Explained for Android Developers">
+  <meta property="og:description" content="How the Play Integrity API works: standard vs classic requests, integrity verdicts (app, device, account), server-side decoding, request hashes, nonces, responses to risk and common mistakes.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Play Integrity API Explained for Android Developers">
+  <meta name="twitter:description" content="How the Play Integrity API works: standard vs classic requests, integrity verdicts (app, device, account), server-side decoding, request hashes, nonces, responses to risk and common mistakes.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Play Integrity API Explained", "description": "How the Play Integrity API works: standard vs classic requests, integrity verdicts (app, device, account), server-side decoding, request hashes, nonces, responses to risk and common mistakes.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Security and Privacy", "keywords": "play integrity standard request, device integrity verdict, safetynet replacement, app integrity verdict, integrity token server verification, android anti abuse", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/play-integrity-api-explained/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Play Integrity API Explained", "item": "https://yunoktech.com/android/play-integrity-api-explained/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Play Integrity API Explained</h1>
+    <p class="ad-lede">Your backend can't tell whether a request came from your genuine app on a genuine device, or from a script, an emulator farm or a modified APK. The Play Integrity API gives your server signals to make that decision. Here's how it works and how to use it without harming legitimate users.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#flow">How it works</a></li><li><a href="#verdicts">The verdicts</a></li><li><a href="#client">Client code (standard request)</a></li><li><a href="#server">Server-side verification</a></li><li><a href="#policy">Designing a fair response policy</a></li><li><a href="#app-check">With Firebase</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Fraudsters automate sign-ups, farm promotions, scrape APIs and abuse paid features using modified apps or emulators. Client-side checks are easy to bypass. The Play Integrity API moves the decision to your server, using signed verdicts from Google Play.</p>
+
+<h2 id="flow">How it works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pi-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-pi-t fig-pi-d">
+    <title id="fig-pi-t">Play Integrity standard request flow</title>
+    <desc id="fig-pi-d">The app prepares an integrity token provider in advance. For a sensitive action, it computes a request hash of the action's data and requests an integrity token. The app sends the token with the action to your server. The server decodes the token through Google's API, checks the request hash and verdicts, and decides to allow, step up, or deny.</desc>
+    <defs><marker id="pim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="30" width="170" height="60" rx="12"/><text class="d-t" x="105" y="56" text-anchor="middle">App</text><text class="d-s" x="105" y="74" text-anchor="middle">prepare provider</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="20" y="120" width="170" height="60" rx="12"/><text class="d-t" x="105" y="146" text-anchor="middle">App</text><text class="d-s" x="105" y="164" text-anchor="middle">request(token, hash)</text></g>
+    <path class="d-flow" d="M105 90 V116" marker-end="url(#pim)"/>
+    <path class="d-flow" d="M190 150 H266" marker-end="url(#pim)"/><text class="d-s" x="228" y="142" text-anchor="middle">token + action</text>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="270" y="120" width="180" height="60" rx="12"/><text class="d-t" x="360" y="146" text-anchor="middle">Your server</text><text class="d-s" x="360" y="164" text-anchor="middle">decode + verify</text></g>
+    <path class="d-flow" d="M450 140 H506" marker-end="url(#pim)"/>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="510" y="110" width="190" height="80" rx="12"/><text class="d-t" x="605" y="136" text-anchor="middle">Google Play</text><text class="d-s" x="605" y="156" text-anchor="middle">decodeIntegrityToken</text><text class="d-s" x="605" y="172" text-anchor="middle">→ verdicts</text></g>
+    <text class="d-s" x="360" y="210" text-anchor="middle">Decision happens on the server: allow, step up (e.g. OTP), limit, or deny.</text>
+  </svg>
+  <figcaption id="fig-pi-cap">Never decide on the device. A modified app can lie about anything it computes locally.</figcaption>
+</figure>
+
+<h2 id="verdicts">The verdicts</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Verdict</th><th>Question it answers</th><th>Example values</th></tr></thead>
+  <tbody>
+    <tr><td>Request details</td><td>Is this token for this request?</td><td>Package name, request hash, timestamp</td></tr>
+    <tr><td>App integrity</td><td>Is this your unmodified app, as distributed by Play?</td><td><code>PLAY_RECOGNIZED</code>, <code>UNRECOGNIZED_VERSION</code></td></tr>
+    <tr><td>Device integrity</td><td>Is it a genuine, certified Android device?</td><td><code>MEETS_DEVICE_INTEGRITY</code>, <code>MEETS_BASIC_INTEGRITY</code>, <code>MEETS_STRONG_INTEGRITY</code></td></tr>
+    <tr><td>Account details</td><td>Did the user get the app from Play (licensed)?</td><td><code>LICENSED</code>, <code>UNLICENSED</code></td></tr>
+    <tr><td>Optional signals</td><td>Additional environment details</td><td>See current docs (for example app access risk)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="client">Client code (standard request)</h2>
+<figure class="code"><figcaption><span class="file">IntegrityClient.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">IntegrityClient</span>(context: <span class="tk-t">Context</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> cloudProjectNumber: <span class="tk-t">Long</span>) {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> manager = <span class="tk-t">IntegrityManagerFactory</span>.createStandard(context)
+    <span class="tk-k">private</span> <span class="tk-k">var</span> provider: <span class="tk-t">StandardIntegrityManager</span>.<span class="tk-t">StandardIntegrityTokenProvider</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-c">/** Call early (e.g. app start); preparation can take a few seconds. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> warmUp() {
+        provider = manager.prepareIntegrityToken(
+            <span class="tk-t">StandardIntegrityManager</span>.<span class="tk-t">PrepareIntegrityTokenRequest</span>.builder()
+                .setCloudProjectNumber(cloudProjectNumber)
+                .build()
+        ).await()
+    }
+
+    <span class="tk-c">/** requestHash binds the token to THIS action (e.g. SHA-256 of "redeem:$couponCode:$userId"). */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> token(requestHash: <span class="tk-t">String</span>): <span class="tk-t">String</span> {
+        <span class="tk-k">val</span> p = provider ?: run { warmUp(); provider!! }
+        <span class="tk-k">return</span> p.request(
+            <span class="tk-t">StandardIntegrityManager</span>.<span class="tk-t">StandardIntegrityTokenRequest</span>.builder()
+                .setRequestHash(requestHash)
+                .build()
+        ).await().token()
+    }
+}</code></pre></figure>
+
+<h2 id="server">Server-side verification</h2>
+<ol class="steps">
+  <li>Receive the token with the action payload.</li>
+  <li>Call Google's <code>decodeIntegrityToken</code> API using service-account credentials (server only).</li>
+  <li>Check that <strong>package name</strong> and <strong>request hash</strong> match this exact action, and that the timestamp is recent.</li>
+  <li>Evaluate the app, device and account verdicts against your <strong>risk policy</strong>.</li>
+  <li>Decide: allow, require step-up (OTP, CAPTCHA, review), rate-limit, or deny.</li>
+</ol>
+
+<h2 id="policy">Designing a fair response policy</h2>
+<ul>
+  <li><strong>Tier by risk:</strong> require integrity for redeeming money or high-value promotions, not for reading articles.</li>
+  <li><strong>Don't hard-block too eagerly:</strong> some legitimate users have older or uncertified devices. Prefer step-up or limited functionality.</li>
+  <li><strong>Handle API errors gracefully:</strong> network issues or outdated Play services shouldn't lock users out. Retry or fall back to other checks.</li>
+  <li><strong>Monitor verdict distributions</strong> to tune your thresholds.</li>
+</ul>
+
+<h2 id="app-check">With Firebase</h2>
+<p>If your backend is Firebase (Firestore, Functions, AI Logic), <strong>App Check</strong> with the Play Integrity provider applies integrity checks to Firebase requests for you. See <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration</a> for an example.</p>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Promotion abuse</h3><p>Require good device and app integrity for referral rewards, and step up for borderline verdicts.</p></div>
+  <div class="card usecase"><h3>API scraping</h3><p>Integrity tokens on sensitive endpoints, plus rate limits per account.</p></div>
+  <div class="card usecase"><h3>Paid features</h3><p>Check app integrity and licensing for premium content unlocks.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Decoding or evaluating the verdict on the device.</li>
+  <li>Not binding tokens to the request (missing request hash), which enables replay.</li>
+  <li>Calling the API on every request. Use it for sensitive actions, within quota.</li>
+  <li>Blocking all users on API errors.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Play Integrity the replacement for SafetyNet Attestation?</summary><div><p>Yes. SafetyNet Attestation was deprecated in favour of the Play Integrity API.</p></div></details>
+  <details><summary>Does it work for apps not installed from Play?</summary><div><p>Verdicts will reflect that, for example as unrecognized or unlicensed. Decide how your policy treats sideloaded installs.</p></div></details>
+  <details><summary>Are there usage limits?</summary><div><p>Yes, there are daily quotas, which can be increased on request. Check the current documentation and design calls around sensitive actions.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Play Integrity gives your <strong>server</strong> trustworthy signals about the <strong>app, device and account</strong> behind a request. Bind tokens to actions with request hashes, verify server-side, apply a <strong>graduated risk policy</strong>, and handle errors without punishing legitimate users.</p>
+<p>Next step: review the threats it helps with in <a href="../common-android-security-vulnerabilities/index.html">Common Android Security Vulnerabilities</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/google/play/integrity/overview" target="_blank" rel="noopener">Play Integrity API overview</a></li><li><a href="https://developer.android.com/google/play/integrity/standard" target="_blank" rel="noopener">Make a standard API request</a></li><li><a href="https://developer.android.com/google/play/integrity/verdicts" target="_blank" rel="noopener">Integrity verdicts</a></li><li><a href="https://firebase.google.com/docs/app-check/android/play-integrity-provider" target="_blank" rel="noopener">Firebase App Check with Play Integrity</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dplay-integrity-api-explained-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dplay-integrity-api-explained-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-app-security-best-practices/index.html"><small>Android Security and Privacy</small>Android App Security Best Practices</a></li><li><a href="../../android/secure-cloud-ai-api-android/index.html"><small>Android AI and Generative AI</small>Integrating Cloud AI APIs Securely in Android</a></li><li><a href="../../android/secure-api-keys-android/index.html"><small>Android Security and Privacy</small>Secure API Keys and Secrets in Android Apps</a></li><li><a href="../../android/certificate-pinning-android/index.html"><small>Android Security and Privacy</small>Certificate Pinning: Benefits and Limitations</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/play-integrity-api-explained/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/play-integrity-api-explained/&amp;text=Play Integrity API Explained" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/play-integrity-api-explained/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#flow">How it works</a></li><li><a href="#verdicts">The verdicts</a></li><li><a href="#client">Client code (standard request)</a></li><li><a href="#server">Server-side verification</a></li><li><a href="#policy">Designing a fair response policy</a></li><li><a href="#app-check">With Firebase</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dplay-integrity-api-explained-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dplay-integrity-api-explained-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

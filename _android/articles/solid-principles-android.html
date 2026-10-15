@@ -1,0 +1,128 @@
+<!--meta
+{
+  "seo_title": "SOLID Principles in Android Development (Kotlin)",
+  "description": "SOLID principles applied to Android with Kotlin examples: single responsibility, open/closed, Liskov, interface segregation and dependency inversion, plus where SOLID is overkill.",
+  "primary_keyword": "solid principles android",
+  "keywords": ["solid principles kotlin", "single responsibility android", "dependency inversion android", "interface segregation kotlin", "open closed principle example", "clean code android"],
+  "lede": "SOLID is often taught with shapes and animals. On Android, the same five principles show up as ViewModels that do too much, repositories that are hard to fake, and features that need edits in ten places. Here's each principle with real Android Kotlin code.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-design-patterns", "clean-architecture-android", "hilt-dependency-injection", "refactor-legacy-android-apps"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Kotlin interfaces", "https://kotlinlang.org/docs/interfaces.html"],
+    ["Kotlin sealed classes", "https://kotlinlang.org/docs/sealed-classes.html"]
+  ]
+}
+-->
+<p class="ad-lead">SOLID is a set of five design principles, popularised by Robert C. Martin, for code that's easier to change. They're not rules to apply mechanically. They're questions to ask when code starts to hurt. Here's what each one looks like in an Android codebase.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-so-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-so-t fig-so-d">
+    <title id="fig-so-t">The five SOLID principles</title>
+    <desc id="fig-so-d">S: single responsibility, one reason to change. O: open/closed, extend without modifying. L: Liskov substitution, implementations honour contracts. I: interface segregation, small focused interfaces. D: dependency inversion, depend on abstractions.</desc>
+    <rect class="d-blue" x="10" y="20" width="130" height="110" rx="12"/><text class="d-t" x="75" y="56" text-anchor="middle">S</text><text class="d-s" x="75" y="80" text-anchor="middle">Single</text><text class="d-s" x="75" y="96" text-anchor="middle">responsibility</text>
+    <rect class="d-violet" x="152" y="20" width="130" height="110" rx="12"/><text class="d-t" x="217" y="56" text-anchor="middle">O</text><text class="d-s" x="217" y="80" text-anchor="middle">Open for extension,</text><text class="d-s" x="217" y="96" text-anchor="middle">closed for change</text>
+    <rect class="d-green" x="294" y="20" width="130" height="110" rx="12"/><text class="d-t" x="359" y="56" text-anchor="middle">L</text><text class="d-s" x="359" y="80" text-anchor="middle">Liskov</text><text class="d-s" x="359" y="96" text-anchor="middle">substitution</text>
+    <rect class="d-amber" x="436" y="20" width="130" height="110" rx="12"/><text class="d-t" x="501" y="56" text-anchor="middle">I</text><text class="d-s" x="501" y="80" text-anchor="middle">Interface</text><text class="d-s" x="501" y="96" text-anchor="middle">segregation</text>
+    <rect class="d-red" x="578" y="20" width="130" height="110" rx="12"/><text class="d-t" x="643" y="56" text-anchor="middle">D</text><text class="d-s" x="643" y="80" text-anchor="middle">Dependency</text><text class="d-s" x="643" y="96" text-anchor="middle">inversion</text>
+  </svg>
+  <figcaption id="fig-so-cap">Five questions to ask when code becomes hard to change.</figcaption>
+</figure>
+
+<h2 id="srp">S: Single Responsibility</h2>
+<p><em>A class should have one reason to change.</em> On Android, the classic violation is a ViewModel or Activity that formats, validates, fetches, caches and tracks analytics.</p>
+<code-block lang="kotlin" file="Splitting responsibilities">
+// ❌ One class changes for UI tweaks, API changes, caching policy AND analytics events
+class ProfileViewModel(/* api, dao, prefs, analytics */) : ViewModel() { /* 600 lines */ }
+
+// ✅ Each concern has an owner
+class ProfileRepository(/* api, dao */)            // data access + caching
+class ProfileValidator                              // business rules for edits
+class ProfileViewModel(                             // screen state + coordination
+    private val repository: ProfileRepository,
+    private val validator: ProfileValidator,
+    private val analytics: Analytics,
+) : ViewModel()
+</code-block>
+
+<h2 id="ocp">O: Open/Closed</h2>
+<p><em>Extend behaviour without modifying existing code.</em> Example: adding a payment method shouldn't require editing a giant <code>when</code> in five places.</p>
+<code-block lang="kotlin" file="Pluggable payment methods">
+interface PaymentMethodHandler {
+    val id: String
+    suspend fun pay(orderId: String, amountPaise: Long): PaymentResult
+}
+
+class UpiHandler @Inject constructor(/* ... */) : PaymentMethodHandler { override val id = "upi" /* ... */ }
+class CardHandler @Inject constructor(/* ... */) : PaymentMethodHandler { override val id = "card" /* ... */ }
+
+class PaymentProcessor @Inject constructor(
+    private val handlers: Set<@JvmSuppressWildcards PaymentMethodHandler>,   // Hilt multibinding
+) {
+    suspend fun pay(methodId: String, orderId: String, amount: Long) =
+        handlers.first { it.id == methodId }.pay(orderId, amount)
+}
+// Adding Wallet = new class + @IntoSet binding; PaymentProcessor never changes.
+</code-block>
+<div class="note"><b>Sealed types are the exception</b><p>For a <em>closed</em> set of states, such as UI state, a sealed type with an exhaustive <code>when</code> is better, because the compiler forces you to handle new cases. Use open extension for plug-in style variation.</p></div>
+
+<h2 id="lsp">L: Liskov Substitution</h2>
+<p><em>Implementations must honour the contract of their abstraction.</em> If <code>ArticleRepository.observeArticles()</code> promises cached data even when offline, a "network-only" implementation that throws offline breaks every caller that relied on that promise.</p>
+<code-block lang="kotlin" file="Document and test the contract">
+interface ArticleRepository {
+    /** Emits cached articles immediately (possibly empty); never throws for network failures. */
+    fun observeArticles(): Flow<List<Article>>
+}
+</code-block>
+<p>Shared contract tests that run against every implementation, including fakes, catch Liskov violations early.</p>
+
+<h2 id="isp">I: Interface Segregation</h2>
+<p><em>Clients shouldn't depend on methods they don't use.</em></p>
+<code-block lang="kotlin" file="Split a fat interface">
+// ❌ The bookmarks screen depends on admin operations it never calls
+interface ArticleService {
+    fun observe(): Flow<List<Article>>
+    suspend fun bookmark(id: String)
+    suspend fun publish(article: Article)
+    suspend fun delete(id: String)
+}
+
+// ✅ Focused interfaces; one class can implement several
+interface ArticleReader { fun observe(): Flow<List<Article>> }
+interface BookmarkWriter { suspend fun bookmark(id: String) }
+interface ArticleAdmin { suspend fun publish(article: Article); suspend fun delete(id: String) }
+</code-block>
+
+<h2 id="dip">D: Dependency Inversion</h2>
+<p><em>High-level policy shouldn't depend on low-level details. Both depend on abstractions.</em> Your ViewModel depends on <code>WeatherRepository</code> (an interface), not on Retrofit. Hilt supplies the implementation. This is what makes testing with fakes trivial.</p>
+<code-block lang="kotlin" file="Inverted dependency">
+class WeatherViewModel @Inject constructor(private val repo: WeatherRepository) : ViewModel()
+// Production: DefaultWeatherRepository(Retrofit, Room). Tests: FakeWeatherRepository.
+</code-block>
+
+<h2 id="overkill">When SOLID becomes over-engineering</h2>
+<ul>
+  <li>An interface for every class "just in case", which adds navigation cost and no flexibility.</li>
+  <li>Splitting simple classes into many tiny ones that are always used together.</li>
+  <li>Plugin architectures for variation that will never happen.</li>
+</ul>
+<p>Apply SOLID where change actually happens: areas that change often, are tested heavily, or are shared across features.</p>
+
+<h2 id="use-cases">Where it pays off on Android</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Analytics</h3><p>An <code>Analytics</code> interface (DIP) with a Firebase implementation, plus a no-op for tests and debug builds.</p></div>
+  <div class="card usecase"><h3>Feature flags</h3><p>A small <code>FeatureFlags</code> reader interface (ISP), so features don't see the remote-config SDK.</p></div>
+  <div class="card usecase"><h3>Notifications</h3><p>Handlers per notification type (OCP) registered in a set, with a dispatcher routing by type.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is SOLID still relevant with Kotlin and Compose?</summary><div><p>Yes. The principles are language-agnostic. Kotlin features such as interfaces, sealed types and extension functions make them lighter to apply.</p></div></details>
+  <details><summary>Which principle matters most in Android apps?</summary><div><p>Single responsibility and dependency inversion usually give the largest practical benefit: smaller ViewModels and testable code.</p></div></details>
+  <details><summary>How do I explain SOLID in interviews?</summary><div><p>Use a concrete Android example for each principle, like the ones above, and mention when you'd choose <em>not</em> to apply one.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>SOLID on Android means <strong>focused classes</strong>, <strong>extension points where variation is real</strong>, <strong>honest contracts</strong>, <strong>small interfaces</strong> and <strong>dependencies on abstractions</strong>, applied where code actually changes, not everywhere.</p>
+<p>Next step: see recurring solutions in <a href="../android-design-patterns/index.html">Design Patterns Every Android Developer Should Know</a>.</p>

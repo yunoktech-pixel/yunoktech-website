@@ -1,0 +1,125 @@
+<!--meta
+{
+  "seo_title": "Room vs DataStore: Which Should You Use?",
+  "description": "Room vs DataStore (Preferences and Proto) compared for Android: data shape, queries, consistency, performance, migration from SharedPreferences and when to use each.",
+  "primary_keyword": "room vs datastore",
+  "keywords": ["preferences datastore", "proto datastore", "datastore vs sharedpreferences", "android local storage options", "room database vs datastore", "store settings android"],
+  "lede": "Room and DataStore both persist data on the device, but they solve different problems. Room is a relational database. DataStore stores small, simple values or typed objects. Pick by the shape and size of your data.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["room-database-kotlin", "secure-token-storage-android", "offline-first-android-architecture", "encrypted-data-storage-android"],
+  "refs": [
+    ["DataStore", "https://developer.android.com/topic/libraries/architecture/datastore"],
+    ["Room", "https://developer.android.com/training/data-storage/room"],
+    ["Data and file storage overview", "https://developer.android.com/training/data-storage"]
+  ]
+}
+-->
+<p class="ad-lead">"Where do I save this?" comes up constantly. A theme preference, a list of 5,000 transactions, the last-opened tab, an onboarding flag, cached articles. Using a database for one boolean is overkill. Using key-value storage for thousands of records is a mistake. Here's how to choose.</p>
+
+<h2 id="quick">Quick answer</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Settings and flags (theme, onboarding done, last tab)</td><td><strong>Preferences DataStore</strong></td></tr>
+    <tr><td>A small typed settings object with schema</td><td><strong>Proto DataStore</strong> (or DataStore with a serializer)</td></tr>
+    <tr><td>Collections, records, anything you query, sort or relate</td><td><strong>Room</strong></td></tr>
+    <tr><td>Large binary files (images, PDFs)</td><td><strong>Files</strong> in app storage, with paths in Room</td></tr>
+    <tr><td>Secrets (tokens, keys)</td><td>Encrypted storage backed by the Android Keystore. See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-rd-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-rd-t fig-rd-d">
+    <title id="fig-rd-t">Decision guide between DataStore and Room</title>
+    <desc id="fig-rd-d">Is it many records you query or relate? Use Room. Is it a few simple values? Use Preferences DataStore. Is it a small typed object needing schema and type safety? Use Proto DataStore.</desc>
+    <rect class="d-amber" x="230" y="10" width="260" height="44" rx="12"/><text class="d-t" x="360" y="37" text-anchor="middle">Many records, queries, relations?</text>
+    <path class="d-line" d="M300 54 L130 100 M420 54 L590 100"/><text class="d-s" x="190" y="80">yes</text><text class="d-s" x="520" y="80">no</text>
+    <rect class="d-green" x="30" y="100" width="200" height="60" rx="12"/><text class="d-t" x="130" y="134" text-anchor="middle">Room</text>
+    <rect class="d-blue" x="400" y="100" width="140" height="60" rx="12"/><text class="d-t" x="470" y="126" text-anchor="middle">Preferences</text><text class="d-s" x="470" y="144" text-anchor="middle">simple keys</text>
+    <rect class="d-violet" x="560" y="100" width="140" height="60" rx="12"/><text class="d-t" x="630" y="126" text-anchor="middle">Proto/typed</text><text class="d-s" x="630" y="144" text-anchor="middle">schema object</text>
+  </svg>
+  <figcaption id="fig-rd-cap">Shape and size decide. Many apps use both: DataStore for settings, Room for content.</figcaption>
+</figure>
+
+<h2 id="datastore">DataStore</h2>
+<p>DataStore replaces <code>SharedPreferences</code>. It's asynchronous (Flow and suspend), consistent (transactional updates), and safe to call from the UI thread because I/O happens off the main thread. It's designed for <strong>small</strong> datasets, and every update rewrites the whole file.</p>
+<code-block lang="kotlin" file="SettingsRepository.kt (Preferences DataStore)">
+private val Context.settingsStore by preferencesDataStore(name = "settings")   // one instance per file
+
+enum class ThemeMode { SYSTEM, LIGHT, DARK }
+data class Settings(val theme: ThemeMode, val onboardingDone: Boolean)
+
+class SettingsRepository(private val context: Context) {
+    private object Keys {
+        val THEME = stringPreferencesKey("theme")
+        val ONBOARDED = booleanPreferencesKey("onboarding_done")
+    }
+
+    val settings: Flow<Settings> = context.settingsStore.data
+        .catch { e -> if (e is IOException) emit(emptyPreferences()) else throw e }   // corrupted/unreadable file
+        .map { p ->
+            Settings(
+                theme = p[Keys.THEME]?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: ThemeMode.SYSTEM,
+                onboardingDone = p[Keys.ONBOARDED] ?: false,
+            )
+        }
+
+    suspend fun setTheme(mode: ThemeMode) = context.settingsStore.edit { it[Keys.THEME] = mode.name }
+    suspend fun completeOnboarding() = context.settingsStore.edit { it[Keys.ONBOARDED] = true }
+}
+</code-block>
+
+<h2 id="room">Room</h2>
+<p>Room is a full SQLite database: indexed queries, relations, partial updates, paging, and observation per table. Use it whenever data is a collection, or you need to filter or sort. See <a href="../room-database-kotlin/index.html">the Room tutorial</a>.</p>
+
+<h2 id="comparison">Side-by-side</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>DataStore</th><th>Room</th></tr></thead>
+  <tbody>
+    <tr><td>Data model</td><td>Key-value or one typed object</td><td>Tables, rows, relations</td></tr>
+    <tr><td>Queries</td><td>None (read everything, map in Kotlin)</td><td>SQL with compile-time checks</td></tr>
+    <tr><td>Partial updates</td><td>No: rewrites the file</td><td>Yes</td></tr>
+    <tr><td>Size</td><td>Small (settings)</td><td>Large datasets</td></tr>
+    <tr><td>Observation</td><td>Flow of whole data</td><td>Flow per query</td></tr>
+    <tr><td>Migrations</td><td>Key or schema evolution; SharedPreferences migration helper</td><td>Versioned SQL migrations</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="migrate-sp">Migrating from SharedPreferences</h2>
+<code-block lang="kotlin" file="One-time migration">
+private val Context.settingsStore by preferencesDataStore(
+    name = "settings",
+    produceMigrations = { context -> listOf(SharedPreferencesMigration(context, "legacy_prefs")) },
+)
+</code-block>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Notes app</h3><p>Room for notes and folders, DataStore for sort order and theme.</p></div>
+  <div class="card usecase"><h3>Shopping app</h3><p>Room for cached catalogue and cart, DataStore for recent search terms (small, capped list) and preferences.</p></div>
+  <div class="card usecase"><h3>Fitness app</h3><p>Room for workout history (queried by date range), DataStore for units (km or miles) and goals.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Storing large lists as JSON strings in DataStore or SharedPreferences.</li>
+  <li>Creating multiple DataStore instances for the same file, which throws an error at runtime.</li>
+  <li>Blocking reads with <code>runBlocking { dataStore.data.first() }</code> on the main thread.</li>
+  <li>Putting secrets in plain DataStore.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is SharedPreferences deprecated?</summary><div><p>It isn't removed, but Google recommends DataStore for new code because SharedPreferences has synchronous APIs that can block the UI thread and weaker consistency guarantees.</p></div></details>
+  <details><summary>Should I use Proto DataStore?</summary><div><p>Use it when you want a schema and type safety for a settings object. Preferences DataStore is simpler for a handful of keys.</p></div></details>
+  <details><summary>Can DataStore be used in Kotlin Multiplatform?</summary><div><p>Yes. DataStore supports KMP targets in recent versions.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>DataStore</strong> for small settings and flags, <strong>Room</strong> for collections you query, <strong>files</strong> for large binaries, and <strong>Keystore-backed encryption</strong> for secrets. Most production apps use more than one, each for what it does best.</p>
+<p>Next step: combine local and remote data in <a href="../offline-first-android-architecture/index.html">Offline-First Android App Architecture</a>.</p>

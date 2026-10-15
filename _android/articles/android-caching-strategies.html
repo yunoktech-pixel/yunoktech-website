@@ -1,0 +1,156 @@
+<!--meta
+{
+  "seo_title": "Caching Strategies for Android Apps (Complete Guide)",
+  "description": "Caching strategies for Android apps: HTTP cache with OkHttp, in-memory caches, Room as a persistent cache, stale-while-revalidate, invalidation, image caching and offline behaviour.",
+  "primary_keyword": "android caching strategies",
+  "keywords": ["okhttp cache android", "stale while revalidate android", "lrucache android", "cache invalidation mobile", "room cache network", "image caching android coil"],
+  "lede": "Caching makes apps faster, cheaper and usable offline, and it's also where stale-data bugs come from. This guide covers the cache layers available on Android, the main strategies, and how to decide freshness and invalidation for each kind of data.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["offline-first-android-architecture", "okhttp-interceptors", "repository-pattern-android", "reduce-android-app-size"],
+  "refs": [
+    ["OkHttp (HTTP caching): official repository and docs", "https://github.com/square/okhttp"],
+    ["HTTP caching (MDN)", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching"],
+    ["Offline-first data layer", "https://developer.android.com/topic/architecture/data-layer/offline-first"],
+    ["Coil image loading", "https://coil-kt.github.io/coil/"]
+  ]
+}
+-->
+<p class="ad-lead">"There are only two hard things in computer science: cache invalidation and naming things." On Android, caching is also essential: users on slow networks, data caps and flaky connections notice every unnecessary request. The goal is a deliberate policy per data type, not caching everything.</p>
+
+<h2 id="layers">Cache layers on Android</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-cl-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-cl-t fig-cl-d">
+    <title id="fig-cl-t">Layered caching from memory to network</title>
+    <desc id="fig-cl-d">A request first checks the in-memory cache, fastest but lost when the process dies; then the persistent cache in Room or files, which survives restarts; then the OkHttp HTTP disk cache, which respects server headers; and finally the network. Responses populate the layers on the way back.</desc>
+    <defs><marker id="clm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 60 H176 M326 60 H352 M502 60 H528" marker-end="url(#clm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="10" y="30" width="140" height="60" rx="12"/><text class="d-t" x="80" y="54" text-anchor="middle">Memory</text><text class="d-s" x="80" y="72" text-anchor="middle">nanoseconds</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="180" y="30" width="146" height="60" rx="12"/><text class="d-t" x="253" y="54" text-anchor="middle">Room / files</text><text class="d-s" x="253" y="72" text-anchor="middle">survives restarts</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="356" y="30" width="146" height="60" rx="12"/><text class="d-t" x="429" y="54" text-anchor="middle">HTTP cache</text><text class="d-s" x="429" y="72" text-anchor="middle">OkHttp, headers</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="532" y="30" width="178" height="60" rx="12"/><text class="d-t" x="621" y="54" text-anchor="middle">Network</text><text class="d-s" x="621" y="72" text-anchor="middle">slowest, costs data</text></g>
+    <text class="d-s" x="360" y="130" text-anchor="middle">Faster ← → fresher</text>
+    <text class="d-s" x="360" y="150" text-anchor="middle">Each layer trades freshness for speed and availability.</text>
+  </svg>
+  <figcaption id="fig-cl-cap">You rarely need all four for the same data. Choose per data type.</figcaption>
+</figure>
+
+<h2 id="strategies">Core strategies</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Strategy</th><th>Behaviour</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td>Cache-first</td><td>Use cache if present; network only when missing</td><td>Static or rarely changing data (country lists, config)</td></tr>
+    <tr><td>Network-first</td><td>Try network; fall back to cache on failure</td><td>Data that must be fresh but should degrade offline (account balance with "last updated")</td></tr>
+    <tr><td>Stale-while-revalidate</td><td>Show cache immediately, refresh in background, update UI</td><td>Feeds, lists, profiles: most content</td></tr>
+    <tr><td>Network-only</td><td>Never cache</td><td>Payments, OTPs, highly sensitive or one-time data</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="swr">Stale-while-revalidate with Room</h2>
+<code-block lang="kotlin" file="ProfileRepository.kt">
+class ProfileRepository(
+    private val api: ProfileApi,
+    private val dao: ProfileDao,
+    private val clock: Clock,
+) {
+    private val maxAge = Duration.ofMinutes(10)
+
+    /** Emits cached profile immediately; refreshes in the background if stale. */
+    fun observeProfile(userId: String): Flow<Profile?> = dao.observe(userId)
+        .onStart { refreshIfStale(userId) }
+        .map { it?.toDomain() }
+
+    private suspend fun refreshIfStale(userId: String) {
+        val cached = dao.get(userId)
+        val stale = cached == null ||
+            Duration.between(Instant.ofEpochMilli(cached.fetchedAt), clock.instant()) > maxAge
+        if (stale) {
+            runCatching { api.profile(userId) }
+                .onSuccess { dao.upsert(it.toEntity(fetchedAt = clock.millis())) }
+            // On failure, keep serving the cached copy; the UI can show "last updated".
+        }
+    }
+}
+</code-block>
+<p>Running the refresh in <code>onStart</code> delays the first emission until the refresh attempt finishes. To show the cache instantly, launch the refresh in a separate coroutine from the ViewModel instead.</p>
+
+<h2 id="http">HTTP caching with OkHttp</h2>
+<p>If your server sends proper <code>Cache-Control</code> and <code>ETag</code> headers, OkHttp's disk cache handles freshness and conditional requests (<code>304 Not Modified</code>) automatically:</p>
+<code-block lang="kotlin" file="OkHttp cache">
+val client = OkHttpClient.Builder()
+    .cache(Cache(directory = File(context.cacheDir, "http_cache"), maxSize = 50L * 1024 * 1024))
+    .build()
+
+// Offline fallback: accept stale cached responses when there is no connectivity
+class OfflineCacheInterceptor(private val isOnline: () -> Boolean) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        var request = chain.request()
+        if (!isOnline()) {
+            request = request.newBuilder()
+                .cacheControl(CacheControl.Builder().onlyIfCached().maxStale(7, TimeUnit.DAYS).build())
+                .build()
+        }
+        return chain.proceed(request)
+    }
+}
+</code-block>
+<p>HTTP caching is great for GET responses you display as-is. When you need to query, combine or modify data locally, Room is the better cache.</p>
+
+<h2 id="memory">In-memory caches</h2>
+<code-block lang="kotlin" file="Small LRU cache">
+class ExchangeRateCache(maxEntries: Int = 50) {
+    private val cache = LruCache<String, Pair<Double, Long>>(maxEntries)
+
+    fun get(pair: String, maxAgeMs: Long, now: Long): Double? =
+        cache.get(pair)?.takeIf { now - it.second < maxAgeMs }?.first
+
+    fun put(pair: String, rate: Double, now: Long) { cache.put(pair, rate to now) }
+}
+</code-block>
+<p>Memory caches are fast but vanish with the process, so use them for hot, recomputable data. Respond to <code>onTrimMemory</code> by clearing large ones.</p>
+
+<h2 id="images">Images</h2>
+<p>Image libraries such as Coil and Glide provide memory and disk caching, downsampling and request deduplication. Don't build your own. Make sure image URLs change when content changes (versioned URLs), or use cache headers correctly.</p>
+
+<h2 id="invalidation">Invalidation rules</h2>
+<ul>
+  <li><strong>Time-based (TTL):</strong> simple and predictable. Choose per data type.</li>
+  <li><strong>Event-based:</strong> after a user edits their profile, update or invalidate the cache immediately.</li>
+  <li><strong>Server-driven:</strong> ETags and versions, or push messages that trigger a refresh.</li>
+  <li><strong>On logout:</strong> clear all user-specific caches, including the HTTP cache if it contains personal data.</li>
+</ul>
+
+<h2 id="use-cases">Policy per data type: an example</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Strategy</th><th>TTL / trigger</th></tr></thead>
+  <tbody>
+    <tr><td>Product catalogue</td><td>Stale-while-revalidate (Room)</td><td>1 hour; pull-to-refresh</td></tr>
+    <tr><td>Prices and stock</td><td>Network-first</td><td>Always refresh on product open</td></tr>
+    <tr><td>User profile</td><td>Stale-while-revalidate</td><td>10 minutes; invalidate on edit</td></tr>
+    <tr><td>App config</td><td>Cache-first</td><td>Refresh on app start in background</td></tr>
+    <tr><td>Payment status</td><td>Network-only</td><td>-</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Caching without any invalidation, so users see outdated data indefinitely.</li>
+  <li>Different screens caching the same data separately, so they disagree.</li>
+  <li>Personal data left in caches after logout.</li>
+  <li>Unbounded caches that grow until storage or memory runs out.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Room cache or HTTP cache?</summary><div><p>HTTP cache for responses you show directly and that the server controls with headers. Room when you need queries, joins, offline edits or a single source of truth across screens.</p></div></details>
+  <details><summary>Where should cache logic live?</summary><div><p>In repositories or data sources, so every caller gets consistent freshness.</p></div></details>
+  <details><summary>How do I show staleness to users?</summary><div><p>Store <code>fetchedAt</code> with cached data, and display "Updated 5 min ago" when it matters, for example for balances and prices.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Effective caching is <strong>per data type</strong>: choose cache-first, network-first, stale-while-revalidate or network-only; pick the right layer (memory, Room, HTTP); and define <strong>clear invalidation</strong>, including on logout.</p>
+<p>Next step: secure the credentials behind those requests with <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>, or move on to quality with <a href="../android-unit-testing-junit/index.html">Unit Testing in Android with JUnit</a>.</p>

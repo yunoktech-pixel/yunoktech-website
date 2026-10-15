@@ -1,0 +1,151 @@
+<!--meta
+{
+  "seo_title": "Kotlin Null Safety Explained with Examples",
+  "description": "Kotlin null safety for Android: nullable types, safe calls, Elvis, let, smart casts, lateinit, platform types from Java, and when !! is acceptable, with real examples.",
+  "primary_keyword": "kotlin null safety",
+  "keywords": ["kotlin nullable types", "kotlin elvis operator", "kotlin safe call", "kotlin lateinit vs lazy", "kotlin platform types", "nullpointerexception android kotlin"],
+  "lede": "NullPointerException was once one of the most common causes of Android crashes. Kotlin moves nullability into the type system so the compiler catches most of these bugs before they ship. Here's how it works and how to use it well in Android code.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-basics-android", "kotlin-data-sealed-enum-classes", "kotlin-vs-java-android", "android-beginner-mistakes"],
+  "refs": [
+    ["Null safety (Kotlin docs)", "https://kotlinlang.org/docs/null-safety.html"],
+    ["Calling Java from Kotlin: null safety and platform types", "https://kotlinlang.org/docs/java-interop.html#null-safety-and-platform-types"],
+    ["Properties: late-initialized properties", "https://kotlinlang.org/docs/properties.html#late-initialized-properties-and-variables"],
+    ["Android Kotlin style guide", "https://developer.android.com/kotlin/style-guide"]
+  ]
+}
+-->
+<p class="ad-lead">In Java, any object reference might be null, and you only find out at runtime, often in a user's hands. Kotlin flips this: a type is <strong>non-null by default</strong>, and you must explicitly say when something can be null. The compiler then makes you handle that case.</p>
+<p>This article covers the operators, the patterns that keep Android code clean, the edge cases (Java interop, <code>lateinit</code>, platform types), and the habits that keep <code>!!</code> out of your codebase.</p>
+
+<h2 id="types">Nullable and non-null types</h2>
+<code-block lang="kotlin" file="Basics">
+var title: String = "Inbox"
+// title = null            // ❌ compile error: String can't hold null
+
+var subtitle: String? = null   // ✅ nullable type
+// subtitle.length          // ❌ compile error: must handle the null case
+</code-block>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-n-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-n-t fig-n-d">
+    <title id="fig-n-t">Ways to handle a nullable value</title>
+    <desc id="fig-n-d">A String? value can be handled with a safe call returning null, the Elvis operator providing a default, let to run code only when non-null, an if check enabling a smart cast, or the not-null assertion operator which throws if null.</desc>
+    <defs><marker id="n2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-amber" x="290" y="10" width="140" height="44" rx="12"/><text class="d-t" x="360" y="37" text-anchor="middle">name: String?</text>
+    <path class="d-flow" d="M320 54 L75 100 M340 54 L215 100 M360 54 L360 100 M380 54 L505 100 M400 54 L645 100" marker-end="url(#n2)"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="10" y="104" width="130" height="66" rx="10"/><text class="d-t" x="75" y="130" text-anchor="middle">?.</text><text class="d-s" x="75" y="150" text-anchor="middle">safe call → null</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="150" y="104" width="130" height="66" rx="10"/><text class="d-t" x="215" y="130" text-anchor="middle">?:</text><text class="d-s" x="215" y="150" text-anchor="middle">Elvis default</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="295" y="104" width="130" height="66" rx="10"/><text class="d-t" x="360" y="130" text-anchor="middle">?.let { }</text><text class="d-s" x="360" y="150" text-anchor="middle">run if present</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="440" y="104" width="130" height="66" rx="10"/><text class="d-t" x="505" y="130" text-anchor="middle">if (x != null)</text><text class="d-s" x="505" y="150" text-anchor="middle">smart cast</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-red" x="580" y="104" width="130" height="66" rx="10"/><text class="d-t" x="645" y="130" text-anchor="middle">!!</text><text class="d-s" x="645" y="150" text-anchor="middle">throws if null</text></g>
+  </svg>
+  <figcaption id="fig-n-cap">Four safe options and one escape hatch. Reach for <code>!!</code> last, if at all.</figcaption>
+</figure>
+
+<h2 id="operators">The operators</h2>
+<code-block lang="kotlin" file="Operators in practice">
+data class Address(val city: String?)
+data class User(val name: String, val address: Address?)
+
+fun cityLabel(user: User?): String =
+    user?.address?.city ?: "City not set"          // safe-call chain + Elvis default
+
+fun greet(user: User?) {
+    user?.let { println("Welcome back, ${it.name}") }   // runs only when user != null
+}
+
+fun requireUser(user: User?): User =
+    user ?: throw IllegalStateException("User must be signed in")   // Elvis can throw or return
+
+fun firstChar(text: String?): Char? {
+    if (text.isNullOrEmpty()) return null           // early return
+    return text[0]                                   // smart cast: text is String here
+}
+</code-block>
+
+<h2 id="smart-casts">Smart casts and their limits</h2>
+<p>After a null check, the compiler treats a local <code>val</code> as non-null. It <em>can't</em> do this for mutable properties (<code>var</code>) or values from other modules, because another thread or code path could change them between the check and the use. Copy them into a local <code>val</code> first:</p>
+<code-block lang="kotlin" file="Smart cast on a var property">
+class PlayerScreen {
+    var currentTrack: Track? = null
+
+    fun showTitle() {
+        val track = currentTrack ?: return       // capture once, then it's non-null
+        titleView.text = track.title
+    }
+}
+</code-block>
+
+<h2 id="android">Null safety in Android code</h2>
+<h3 id="intents">Intent extras and arguments</h3>
+<code-block lang="kotlin" file="Reading navigation arguments safely">
+class ArticleViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+    // Fail fast with a clear message if a required argument is missing.
+    private val articleId: String = checkNotNull(savedStateHandle["articleId"]) {
+        "ArticleViewModel requires an articleId argument"
+    }
+}
+</code-block>
+<h3 id="ui-state">Model absence explicitly in UI state</h3>
+<p>Nullable fields are fine for genuinely optional data, but don't use <code>null</code> to mean "loading", "error" <em>and</em> "empty". Use a sealed type so every state is explicit (see <a href="../kotlin-data-sealed-enum-classes/index.html">sealed classes</a>).</p>
+<h3 id="compose">Compose</h3>
+<code-block lang="kotlin" file="Optional UI pieces">
+@Composable
+fun ProfileHeader(name: String, bio: String?) {
+    Column {
+        Text(name, style = MaterialTheme.typography.titleLarge)
+        bio?.takeIf { it.isNotBlank() }?.let { Text(it) }   // render only when present
+    }
+}
+</code-block>
+
+<h2 id="lateinit">lateinit and lazy</h2>
+<ul>
+  <li><strong><code>lateinit var</code></strong>: a non-null <code>var</code> initialised after construction, such as a View Binding in <code>onCreate</code> or an injected field. Accessing it before initialisation throws <code>UninitializedPropertyAccessException</code>.</li>
+  <li><strong><code>by lazy</code></strong>: a read-only value computed on first access, then cached. It's thread-safe by default.</li>
+</ul>
+<code-block lang="kotlin" file="lateinit vs lazy">
+class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding            // set in onCreate
+    private val dateFormatter by lazy { DateTimeFormatter.ofPattern("d MMM yyyy") }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+}
+</code-block>
+
+<h2 id="java-interop">Java interop and platform types</h2>
+<p>Kotlin can't know whether an unannotated Java method returns null, so the result is a <strong>platform type</strong> (shown as <code>String!</code>). Kotlin lets you treat it either way, and if you choose non-null and it's null, you crash at that line.</p>
+<code-block lang="kotlin" file="Defend at the boundary">
+// Legacy Java: public String getDisplayName() { ... may return null ... }
+val displayName: String? = legacyUser.displayName     // declare it nullable deliberately
+val label = displayName ?: "Guest"
+</code-block>
+<p>Better still, add <code>@Nullable</code> or <code>@NonNull</code> annotations to the Java code. The Android SDK and AndroidX are annotated, so Kotlin sees accurate types for them.</p>
+
+<h2 id="bang-bang">When is <code>!!</code> acceptable?</h2>
+<p>Rarely: in tests, or when an invariant is guaranteed and a crash is the correct outcome if it's violated. Even then, <code>checkNotNull(x) { "reason" }</code> or <code>requireNotNull</code> gives a much better error message than a bare <code>!!</code>.</p>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>!!</code> to make red underlines disappear.</li>
+  <li>Making everything nullable "to be safe". This pushes null checks everywhere and hides real bugs.</li>
+  <li>Using empty strings or <code>-1</code> as fake "no value" markers instead of nullable or sealed types.</li>
+  <li>Trusting platform types from Java or JSON without handling nulls.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can a Kotlin app still crash with NullPointerException?</summary><div><p>Yes: through <code>!!</code>, platform types from Java, uninitialised <code>lateinit</code> properties, or reflection and serialisation that bypass constructors. They're much rarer, but possible.</p></div></details>
+  <details><summary>How does JSON parsing interact with null safety?</summary><div><p>kotlinx.serialization respects nullability and default values in your data classes, so mark fields nullable or give defaults when the API may omit them.</p></div></details>
+  <details><summary>Is <code>?.let</code> always better than <code>if</code>?</summary><div><p>No. For simple checks, <code>if (x != null)</code> with a smart cast is often clearer, especially when there's an else branch.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Kotlin's null safety turns a whole class of runtime crashes into compile-time errors. Use <strong>non-null types by default</strong>, handle optional values with <code>?.</code>, <code>?:</code>, <code>let</code> and smart casts, defend at Java boundaries, and treat <code>!!</code> as a code smell that needs justification.</p>
+<p>Next step: model your screen states with <a href="../kotlin-data-sealed-enum-classes/index.html">data, sealed and enum classes</a>.</p>

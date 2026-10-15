@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-World Android Coding Interview Problems (Kotlin) | Yunok Tech</title>
+  <meta name="description" content="Practise realistic Android coding interview problems in Kotlin: search with debounce, paginated list, offline cache, LRU cache, rate limiter and image grid, with solutions and evaluation tips.">
+  <meta name="keywords" content="android coding interview problems, android live coding interview, kotlin coding interview, android take home assignment, debounce search kotlin interview, lru cache kotlin, android machine coding round">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-coding-interview-problems/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-coding-interview-problems/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Real-World Android Coding Interview Problems (Kotlin)">
+  <meta property="og:description" content="Practise realistic Android coding interview problems in Kotlin: search with debounce, paginated list, offline cache, LRU cache, rate limiter and image grid, with solutions and evaluation tips.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Interview Preparation and Career">
+  <meta name="twitter:title" content="Real-World Android Coding Interview Problems (Kotlin)">
+  <meta name="twitter:description" content="Practise realistic Android coding interview problems in Kotlin: search with debounce, paginated list, offline cache, LRU cache, rate limiter and image grid, with solutions and evaluation tips.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Real-World Android Coding Interview Problems", "description": "Practise realistic Android coding interview problems in Kotlin: search with debounce, paginated list, offline cache, LRU cache, rate limiter and image grid, with solutions and evaluation tips.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Interview Preparation and Career", "keywords": "android live coding interview, kotlin coding interview, android take home assignment, debounce search kotlin interview, lru cache kotlin, android machine coding round", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-coding-interview-problems/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Real-World Android Coding Interview Problems", "item": "https://yunoktech.com/android/android-coding-interview-problems/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#career">Android Interview Preparation and Career</a></nav>
+    <span class="ad-chip">🎯 Android Interview Preparation and Career</span>
+    <h1 id="article-title">Real-World Android Coding Interview Problems</h1>
+    <p class="ad-lede">Many Android coding rounds aren't abstract puzzles. They ask you to build a small, realistic feature well, under time pressure. Here are common problem types, with Kotlin solutions and what interviewers evaluate.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#evaluate">What interviewers evaluate</a></li><li><a href="#p1">Problem 1: Search with debounce and cancellation</a></li><li><a href="#p2">Problem 2: LRU cache</a></li><li><a href="#p3">Problem 3: Rate limiter (token bucket)</a></li><li><a href="#p4">Problem 4: Paginated list with error and retry (feature task)</a></li><li><a href="#p5">Problem 5: Group and summarise transactions</a></li><li><a href="#tips">Tips for the round</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">In a machine-coding or take-home round, a working feature is the minimum. What earns a strong signal is clean structure, correct state handling, error and edge cases, and a few meaningful tests, all explained clearly.</p>
+
+<h2 id="evaluate">What interviewers evaluate</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ce-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-ce-t fig-ce-d">
+    <title id="fig-ce-t">Coding round evaluation criteria</title>
+    <desc id="fig-ce-d">Correctness, structure and readability, state and lifecycle handling, edge cases and errors, testing, and communication about trade-offs.</desc>
+    <rect class="d-green" x="10" y="30" width="108" height="100" rx="10"/><text class="d-s" x="64" y="84" text-anchor="middle">Correctness</text>
+    <rect class="d-blue" x="128" y="30" width="108" height="100" rx="10"/><text class="d-s" x="182" y="84" text-anchor="middle">Structure</text>
+    <rect class="d-violet" x="246" y="30" width="108" height="100" rx="10"/><text class="d-s" x="300" y="84" text-anchor="middle">State/lifecycle</text>
+    <rect class="d-amber" x="364" y="30" width="108" height="100" rx="10"/><text class="d-s" x="418" y="84" text-anchor="middle">Edge cases</text>
+    <rect class="d-red" x="482" y="30" width="108" height="100" rx="10"/><text class="d-s" x="536" y="84" text-anchor="middle">Tests</text>
+    <rect class="d-box" x="600" y="30" width="110" height="100" rx="10"/><text class="d-s" x="655" y="84" text-anchor="middle">Communication</text>
+  </svg>
+  <figcaption id="fig-ce-cap">Talk while you code: state assumptions, mention what you'd do with more time.</figcaption>
+</figure>
+
+<h2 id="p1">Problem 1: Search with debounce and cancellation</h2>
+<p><em>Build a search ViewModel that waits 300 ms after typing stops, ignores blank queries, cancels outdated searches, and exposes loading, results and error states.</em></p>
+<figure class="code"><figcaption><span class="file">SearchViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">SearchState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Idle</span> : <span class="tk-t">SearchState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Loading</span> : <span class="tk-t">SearchState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Results</span>(<span class="tk-k">val</span> items: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;) : <span class="tk-t">SearchState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Error</span>(<span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">SearchState</span>
+}
+
+<span class="tk-a">@OptIn</span>(<span class="tk-t">FlowPreview</span>::<span class="tk-k">class</span>, <span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">SearchViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-k">suspend</span> (<span class="tk-t">String</span>) -&gt; <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> query = <span class="tk-t">MutableStateFlow</span>(<span class="tk-s">""</span>)
+
+    <span class="tk-k">val</span> state: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">SearchState</span>&gt; = query
+        .map(<span class="tk-t">String</span>::trim)
+        .debounce(<span class="tk-n">300</span>)
+        .distinctUntilChanged()
+        .flatMapLatest { q -&gt;
+            <span class="tk-k">if</span> (q.isEmpty()) flowOf(<span class="tk-t">SearchState</span>.<span class="tk-t">Idle</span>)
+            <span class="tk-k">else</span> flow&lt;<span class="tk-t">SearchState</span>&gt; {
+                emit(<span class="tk-t">SearchState</span>.<span class="tk-t">Loading</span>)
+                emit(<span class="tk-t">SearchState</span>.<span class="tk-t">Results</span>(api(q)))
+            }.<span class="tk-k">catch</span> { emit(<span class="tk-t">SearchState</span>.<span class="tk-t">Error</span>(<span class="tk-s">"Search failed"</span>)) }
+        }
+        .stateIn(viewModelScope, <span class="tk-t">SharingStarted</span>.<span class="tk-t">WhileSubscribed</span>(<span class="tk-n">5_000</span>), <span class="tk-t">SearchState</span>.<span class="tk-t">Idle</span>)
+
+    <span class="tk-k">fun</span> onQueryChange(q: <span class="tk-t">String</span>) { query.<span class="tk-k">value</span> = q }
+}</code></pre></figure>
+<p><strong>Discuss:</strong> why <code>flatMapLatest</code> (cancels stale requests), why <code>distinctUntilChanged</code>, and how you'd test it with virtual time.</p>
+
+<h2 id="p2">Problem 2: LRU cache</h2>
+<p><em>Implement a fixed-capacity least-recently-used cache with O(1) get and put.</em></p>
+<figure class="code"><figcaption><span class="file">LruCache.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">LruCache</span>&lt;<span class="tk-t">K</span>, <span class="tk-t">V</span>&gt;(<span class="tk-k">private</span> <span class="tk-k">val</span> capacity: <span class="tk-t">Int</span>) {
+    <span class="tk-k">init</span> { require(capacity &gt; <span class="tk-n">0</span>) }
+    <span class="tk-c">// accessOrder = true: iteration order is least → most recently accessed</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> map = <span class="tk-k">object</span> : <span class="tk-t">LinkedHashMap</span>&lt;<span class="tk-t">K</span>, <span class="tk-t">V</span>&gt;(capacity, <span class="tk-n">0.75f</span>, <span class="tk-k">true</span>) {
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> removeEldestEntry(eldest: <span class="tk-t">MutableMap</span>.<span class="tk-t">MutableEntry</span>&lt;<span class="tk-t">K</span>, <span class="tk-t">V</span>&gt;?) = size &gt; capacity
+    }
+
+    <span class="tk-a">@Synchronized</span> <span class="tk-k">fun</span> <span class="tk-k">get</span>(key: <span class="tk-t">K</span>): <span class="tk-t">V</span>? = map[key]
+    <span class="tk-a">@Synchronized</span> <span class="tk-k">fun</span> put(key: <span class="tk-t">K</span>, <span class="tk-k">value</span>: <span class="tk-t">V</span>) { map[key] = <span class="tk-k">value</span> }
+    <span class="tk-a">@Synchronized</span> <span class="tk-k">fun</span> size(): <span class="tk-t">Int</span> = map.size
+}</code></pre></figure>
+<p><strong>Discuss:</strong> thread safety, why <code>LinkedHashMap</code> with access order works, and Android's built-in <code>LruCache</code> with size-of for bitmaps.</p>
+
+<h2 id="p3">Problem 3: Rate limiter (token bucket)</h2>
+<figure class="code"><figcaption><span class="file">TokenBucket.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">TokenBucket</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> capacity: <span class="tk-t">Int</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> refillPerSecond: <span class="tk-t">Double</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> now: () -&gt; <span class="tk-t">Long</span> = <span class="tk-t">System</span>::nanoTime,
+) {
+    <span class="tk-k">private</span> <span class="tk-k">var</span> tokens = capacity.toDouble()
+    <span class="tk-k">private</span> <span class="tk-k">var</span> last = now()
+
+    <span class="tk-a">@Synchronized</span>
+    <span class="tk-k">fun</span> tryAcquire(): <span class="tk-t">Boolean</span> {
+        <span class="tk-k">val</span> t = now()
+        tokens = minOf(capacity.toDouble(), tokens + (t - last) / 1e9 * refillPerSecond)
+        last = t
+        <span class="tk-k">return</span> <span class="tk-k">if</span> (tokens &gt;= <span class="tk-n">1</span>) { tokens -= <span class="tk-n">1</span>; <span class="tk-k">true</span> } <span class="tk-k">else</span> <span class="tk-k">false</span>
+    }
+}
+<span class="tk-c">// Use: limit AI or API calls per user action burst; inject `now` for deterministic tests.</span></code></pre></figure>
+
+<h2 id="p4">Problem 4: Paginated list with error and retry (feature task)</h2>
+<p><em>Show a list from a paged API, load more near the end, show a footer spinner or retry, and keep state across rotation.</em> Approach: Paging 3 if allowed (explain the choice), otherwise a manual pager:</p>
+<figure class="code"><figcaption><span class="file">Manual pager state</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ListState</span>(
+    <span class="tk-k">val</span> items: <span class="tk-t">List</span>&lt;<span class="tk-t">Item</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> nextPage: <span class="tk-t">Int</span>? = <span class="tk-n">1</span>,
+    <span class="tk-k">val</span> loadingMore: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>,
+    <span class="tk-k">val</span> error: <span class="tk-t">String</span>? = <span class="tk-k">null</span>,
+)
+
+<span class="tk-k">fun</span> loadMore() {
+    <span class="tk-k">val</span> s = _state.<span class="tk-k">value</span>
+    <span class="tk-k">if</span> (s.loadingMore || s.nextPage == <span class="tk-k">null</span>) <span class="tk-k">return</span>            <span class="tk-c">// guard duplicate and end-of-list loads</span>
+    _state.update { it.copy(loadingMore = <span class="tk-k">true</span>, error = <span class="tk-k">null</span>) }
+    viewModelScope.launch {
+        _state.update { cur -&gt;
+            <span class="tk-k">try</span> {
+                <span class="tk-k">val</span> page = api.page(s.nextPage)
+                cur.copy(items = cur.items + page.items, nextPage = page.next, loadingMore = <span class="tk-k">false</span>)
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+                cur.copy(loadingMore = <span class="tk-k">false</span>, error = <span class="tk-s">"Couldn't load more"</span>)
+            }
+        }
+    }
+}</code></pre></figure>
+<p>Note: calling a suspend function inside <code>update { }</code> isn't allowed, because the lambda isn't suspending. In the interview, fetch first, then <code>update</code>. Spotting this kind of detail is exactly what interviewers watch for.</p>
+<figure class="code"><figcaption><span class="file">Corrected</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin">viewModelScope.launch {
+    <span class="tk-k">val</span> result = runCatching { api.page(s.nextPage) }
+    _state.update { cur -&gt;
+        result.fold(
+            onSuccess = { page -&gt; cur.copy(items = cur.items + page.items, nextPage = page.next, loadingMore = <span class="tk-k">false</span>) },
+            onFailure = { cur.copy(loadingMore = <span class="tk-k">false</span>, error = <span class="tk-s">"Couldn't load more"</span>) },
+        )
+    }
+}</code></pre></figure>
+
+<h2 id="p5">Problem 5: Group and summarise transactions</h2>
+<figure class="code"><figcaption><span class="file">Collections problem</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Txn</span>(<span class="tk-k">val</span> category: <span class="tk-t">String</span>, <span class="tk-k">val</span> amountPaise: <span class="tk-t">Long</span>, <span class="tk-k">val</span> date: <span class="tk-t">LocalDate</span>)
+
+<span class="tk-c">/** Top N categories by spend in a month, with totals. */</span>
+<span class="tk-k">fun</span> topCategories(txns: <span class="tk-t">List</span>&lt;<span class="tk-t">Txn</span>&gt;, month: <span class="tk-t">YearMonth</span>, n: <span class="tk-t">Int</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">Pair</span>&lt;<span class="tk-t">String</span>, <span class="tk-t">Long</span>&gt;&gt; =
+    txns.asSequence()
+        .filter { <span class="tk-t">YearMonth</span>.from(it.date) == month }
+        .groupingBy { it.category }
+        .fold(<span class="tk-n">0L</span>) { acc, t -&gt; acc + t.amountPaise }
+        .entries
+        .sortedByDescending { it.<span class="tk-k">value</span> }
+        .take(n)
+        .map { it.key to it.<span class="tk-k">value</span> }</code></pre></figure>
+
+<h2 id="tips">Tips for the round</h2>
+<ol class="steps">
+  <li>Clarify requirements and constraints before coding.</li>
+  <li>Start with the data model and state, then logic, then UI.</li>
+  <li>Handle loading, empty and error states, and rotation.</li>
+  <li>Add one or two focused tests if time allows.</li>
+  <li>Summarise trade-offs and next steps at the end.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I use libraries in a take-home?</summary><div><p>Use standard ones (Retrofit, Room, Compose), unless told otherwise, and explain why. Avoid exotic dependencies.</p></div></details>
+  <details><summary>DS&amp;A or Android tasks?</summary><div><p>Companies differ. Product companies often include both. Practise common algorithm patterns in Kotlin as well as feature tasks.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android coding rounds reward <strong>correct, well-structured, state-aware code</strong> with <strong>edge cases, a few tests and clear communication</strong>. Practise realistic features (debounced search, pagination, caching) and classic Kotlin collection problems.</p>
+<p>Next step: prepare for legacy-code questions with <a href="../java-to-kotlin-migration-interview/index.html">Java to Kotlin Migration Interview Questions</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/collections-overview.html" target="_blank" rel="noopener">Kotlin collections</a></li><li><a href="https://kotlinlang.org/docs/coroutines-guide.html" target="_blank" rel="noopener">Coroutines guide</a></li><li><a href="https://developer.android.com/kotlin/coroutines/test" target="_blank" rel="noopener">Testing coroutines on Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-coding-interview-problems-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-coding-interview-problems-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Interviews reward developers who can explain why, not just how. Build the Kotlin, Compose and architecture depth that lets you discuss real trade-offs with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-interview-questions/index.html"><small>Android Interview Preparation and Career</small>Top 50 Android Interview Questions and Answers</a></li><li><a href="../../android/coroutines-flow-interview-questions/index.html"><small>Android Interview Preparation and Career</small>Coroutines and Flow Interview Questions</a></li><li><a href="../../android/senior-android-developer-interview/index.html"><small>Android Interview Preparation and Career</small>How to Prepare for a Senior Android Developer Interview</a></li><li><a href="../../android/kotlin-collections-functional/index.html"><small>Kotlin Programming</small>Kotlin Collections and Functional Programming</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-coding-interview-problems/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-coding-interview-problems/&amp;text=Real-World Android Coding Interview Problems" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-coding-interview-problems/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#evaluate">What interviewers evaluate</a></li><li><a href="#p1">Problem 1: Search with debounce and cancellation</a></li><li><a href="#p2">Problem 2: LRU cache</a></li><li><a href="#p3">Problem 3: Rate limiter (token bucket)</a></li><li><a href="#p4">Problem 4: Paginated list with error and retry (feature task)</a></li><li><a href="#p5">Problem 5: Group and summarise transactions</a></li><li><a href="#tips">Tips for the round</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-coding-interview-problems-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-coding-interview-problems-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

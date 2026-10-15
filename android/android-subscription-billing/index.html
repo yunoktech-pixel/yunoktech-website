@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Billing in Android Apps (Play Billing) | Yunok Tech</title>
+  <meta name="description" content="Implement subscriptions with Google Play Billing: products, base plans and offers, BillingClient flow, purchase verification on your server, acknowledgement, RTDN, entitlements and testing.">
+  <meta name="keywords" content="android subscription billing, google play billing library kotlin, base plans offers, acknowledge purchase, real-time developer notifications, purchase token verification, license testing play billing">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-subscription-billing/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-subscription-billing/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Subscription Billing in Android Apps (Play Billing)">
+  <meta property="og:description" content="Implement subscriptions with Google Play Billing: products, base plans and offers, BillingClient flow, purchase verification on your server, acknowledgement, RTDN, entitlements and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="App Publishing, Monetization, and Product Development">
+  <meta name="twitter:title" content="Subscription Billing in Android Apps (Play Billing)">
+  <meta name="twitter:description" content="Implement subscriptions with Google Play Billing: products, base plans and offers, BillingClient flow, purchase verification on your server, acknowledgement, RTDN, entitlements and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Subscription Billing in Android Apps", "description": "Implement subscriptions with Google Play Billing: products, base plans and offers, BillingClient flow, purchase verification on your server, acknowledgement, RTDN, entitlements and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "App Publishing, Monetization, and Product Development", "keywords": "google play billing library kotlin, base plans offers, acknowledge purchase, real-time developer notifications, purchase token verification, license testing play billing", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-subscription-billing/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Subscription Billing in Android Apps", "item": "https://yunoktech.com/android/android-subscription-billing/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#publishing">App Publishing, Monetization, and Product Development</a></nav>
+    <span class="ad-chip">🚀 App Publishing, Monetization, and Product Development</span>
+    <h1 id="article-title">Subscription Billing in Android Apps</h1>
+    <p class="ad-lede">Subscriptions turn an app into a business, and billing bugs turn paying users into angry ones. Google Play Billing handles payments, but entitlement, verification and lifecycle events are your job. Here's the architecture and the code that make subscriptions reliable.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#architecture">Architecture</a></li><li><a href="#products">Products, base plans and offers</a></li><li><a href="#client">Client flow</a></li><li><a href="#server">Server responsibilities</a></li><li><a href="#states">Subscription states to handle in UI</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">The happy path, where a user taps "Subscribe", pays and gets access, is a small part of subscription billing. The rest is renewals, failed payments and grace periods, upgrades, refunds, restores on new devices and fraud. A server-backed design handles all of them consistently.</p>
+
+<div class="note"><b>Keep the library current</b><p>Google deprecates older Play Billing Library versions on a published schedule. As of late 2026, new apps and updates can no longer use version 7 or older. Check the deprecation FAQ and use the latest version. API shapes change between major versions, so verify the code below against the reference docs for your version.</p></div>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bill-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-bill-t fig-bill-d">
+    <title id="fig-bill-t">Server-backed subscription architecture</title>
+    <desc id="fig-bill-d">The app queries product details and launches the purchase flow with BillingClient. On purchase, the app sends the purchase token to your backend. The backend verifies it with the Google Play Developer API, acknowledges it, and stores the entitlement. Google sends real-time developer notifications for renewals, cancellations and refunds; the backend updates entitlements, and the app reads entitlements from the backend.</desc>
+    <defs><marker id="blm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="80" width="170" height="70" rx="12"/><text class="d-t" x="105" y="108" text-anchor="middle">App</text><text class="d-s" x="105" y="128" text-anchor="middle">BillingClient</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="290" y="80" width="170" height="70" rx="12"/><text class="d-t" x="375" y="108" text-anchor="middle">Your backend</text><text class="d-s" x="375" y="128" text-anchor="middle">entitlements DB</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="550" y="80" width="150" height="70" rx="12"/><text class="d-t" x="625" y="108" text-anchor="middle">Google Play</text><text class="d-s" x="625" y="128" text-anchor="middle">Developer API</text></g>
+    <path class="d-flow" d="M190 100 H286" marker-end="url(#blm)"/><text class="d-s" x="238" y="92" text-anchor="middle">purchase token</text>
+    <path class="d-flow" d="M460 100 H546" marker-end="url(#blm)"/><text class="d-s" x="503" y="92" text-anchor="middle">verify + ack</text>
+    <path class="d-flow" d="M550 140 H464" marker-end="url(#blm)"/><text class="d-s" x="507" y="162" text-anchor="middle">RTDN events</text>
+    <path class="d-flow" d="M290 130 H194" marker-end="url(#blm)"/><text class="d-s" x="242" y="150" text-anchor="middle">entitlements</text>
+    <path class="d-dash" d="M105 80 V40 H625 V76" marker-end="url(#blm)"/><text class="d-s" x="365" y="34" text-anchor="middle">purchase flow (Play UI)</text>
+  </svg>
+  <figcaption id="fig-bill-cap">The server is the source of truth for who has access. The app displays it.</figcaption>
+</figure>
+
+<h2 id="products">Products, base plans and offers</h2>
+<ul>
+  <li>A <strong>subscription</strong> product (for example <code>premium</code>) has one or more <strong>base plans</strong> (monthly, yearly; auto-renewing or prepaid).</li>
+  <li><strong>Offers</strong> add trials or introductory prices to a base plan, with eligibility rules.</li>
+  <li>Create them in Play Console → Monetize. The app queries them at runtime, so never hard-code prices.</li>
+</ul>
+
+<h2 id="client">Client flow</h2>
+<figure class="code"><figcaption><span class="file">BillingRepository.kt (simplified; verify APIs for your PBL version)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">BillingRepository</span>(
+    context: <span class="tk-t">Context</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> backend: <span class="tk-t">EntitlementApi</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> scope: <span class="tk-t">CoroutineScope</span>,
+) : <span class="tk-t">PurchasesUpdatedListener</span> {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> client = <span class="tk-t">BillingClient</span>.newBuilder(context)
+        .setListener(<span class="tk-k">this</span>)
+        .enablePendingPurchases(<span class="tk-t">PendingPurchasesParams</span>.newBuilder().enableOneTimeProducts().build())
+        .build()
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> connect(): <span class="tk-t">Boolean</span> = suspendCancellableCoroutine { cont -&gt;
+        client.startConnection(<span class="tk-k">object</span> : <span class="tk-t">BillingClientStateListener</span> {
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onBillingSetupFinished(result: <span class="tk-t">BillingResult</span>) {
+                <span class="tk-k">if</span> (cont.isActive) cont.resume(result.responseCode == <span class="tk-t">BillingClient</span>.<span class="tk-t">BillingResponseCode</span>.<span class="tk-t">OK</span>)
+            }
+            <span class="tk-k">override</span> <span class="tk-k">fun</span> onBillingServiceDisconnected() { <span class="tk-c">/* reconnect on next call */</span> }
+        })
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> premiumDetails(): <span class="tk-t">ProductDetails</span>? {
+        <span class="tk-k">val</span> params = <span class="tk-t">QueryProductDetailsParams</span>.newBuilder().setProductList(listOf(
+            <span class="tk-t">QueryProductDetailsParams</span>.<span class="tk-t">Product</span>.newBuilder()
+                .setProductId(<span class="tk-s">"premium"</span>).setProductType(<span class="tk-t">BillingClient</span>.<span class="tk-t">ProductType</span>.<span class="tk-t">SUBS</span>).build()
+        )).build()
+        <span class="tk-k">return</span> client.queryProductDetails(params).productDetailsList?.firstOrNull()   <span class="tk-c">// billing-ktx suspend API</span>
+    }
+
+    <span class="tk-k">fun</span> launch(activity: <span class="tk-t">Activity</span>, details: <span class="tk-t">ProductDetails</span>, offerToken: <span class="tk-t">String</span>) {
+        <span class="tk-k">val</span> flowParams = <span class="tk-t">BillingFlowParams</span>.newBuilder().setProductDetailsParamsList(listOf(
+            <span class="tk-t">BillingFlowParams</span>.<span class="tk-t">ProductDetailsParams</span>.newBuilder()
+                .setProductDetails(details).setOfferToken(offerToken).build()
+        )).build()
+        client.launchBillingFlow(activity, flowParams)
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> onPurchasesUpdated(result: <span class="tk-t">BillingResult</span>, purchases: <span class="tk-t">MutableList</span>&lt;<span class="tk-t">Purchase</span>&gt;?) {
+        <span class="tk-k">if</span> (result.responseCode != <span class="tk-t">BillingClient</span>.<span class="tk-t">BillingResponseCode</span>.<span class="tk-t">OK</span>) <span class="tk-k">return</span>   <span class="tk-c">// cancelled / error → show message</span>
+        purchases.orEmpty()
+            .filter { it.purchaseState == <span class="tk-t">Purchase</span>.<span class="tk-t">PurchaseState</span>.<span class="tk-t">PURCHASED</span> }
+            .forEach { purchase -&gt;
+                <span class="tk-c">// Server verifies with Google, acknowledges, and grants the entitlement.</span>
+                scope.launch { backend.verifyAndGrant(purchase.purchaseToken, purchase.products) }
+            }
+    }
+}</code></pre></figure>
+<div class="warn"><b>Acknowledge within the deadline</b><p>Purchases not acknowledged within three days are refunded automatically. Acknowledge on the server after verification (or on the client with <code>acknowledgePurchase</code> if you have no backend).</p></div>
+
+<h2 id="server">Server responsibilities</h2>
+<ol class="steps">
+  <li><strong>Verify</strong> each purchase token with the Google Play Developer API (subscriptions v2 endpoint).</li>
+  <li><strong>Link</strong> the purchase to your user account (and guard against token reuse across accounts).</li>
+  <li><strong>Acknowledge</strong> the purchase.</li>
+  <li><strong>Store the entitlement</strong> with its expiry and state.</li>
+  <li><strong>Process RTDN</strong> (real-time developer notifications via Pub/Sub) for renewals, grace periods, account holds, cancellations and refunds, re-querying the API for the latest state.</li>
+</ol>
+
+<h2 id="states">Subscription states to handle in UI</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>State</th><th>User access</th><th>UI</th></tr></thead>
+  <tbody>
+    <tr><td>Active</td><td>Full</td><td>Normal premium experience</td></tr>
+    <tr><td>Cancelled (still in period)</td><td>Until expiry</td><td>"Your plan ends on …", resubscribe option</td></tr>
+    <tr><td>Grace period</td><td>Usually keep access</td><td>Ask to fix payment method</td></tr>
+    <tr><td>Account hold</td><td>Remove access</td><td>Explain and link to Play subscription centre</td></tr>
+    <tr><td>Expired / refunded</td><td>None</td><td>Offer to resubscribe</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Add <strong>license testers</strong> in Play Console, whose purchases use test payment methods.</li>
+  <li>Upload to a testing track: billing requires the app to be published on a track with matching signing.</li>
+  <li>Test renewals (accelerated for testers), cancellation, grace period and restore on a second device.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Content subscription</h3><p>Monthly and yearly base plans, a 7-day trial offer, and server-checked entitlements for premium content.</p></div>
+  <div class="card usecase"><h3>Remove ads (one-time)</h3><p>A one-time product, acknowledged and verified, with the entitlement cached locally and checked periodically.</p></div>
+  <div class="card usecase"><h3>Multi-platform account</h3><p>Entitlements stored per user on the server, so access works across the user's devices.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I skip the backend?</summary><div><p>For simple one-time unlocks you can verify and acknowledge on the device, but it's easier to defraud and harder to sync across devices. Subscriptions benefit greatly from a backend.</p></div></details>
+  <details><summary>How do users manage or cancel?</summary><div><p>Through the Play Store subscription centre. Provide a deep link from your app's settings.</p></div></details>
+  <details><summary>Should I use a subscription management service?</summary><div><p>Third-party services can handle verification, RTDN and analytics for you. Evaluate their cost and data handling against building it yourself.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Reliable subscriptions need <strong>Play Billing on the client</strong>, <strong>verification, acknowledgement and entitlements on your server</strong>, <strong>RTDN</strong> for lifecycle events, clear UI for every state, and thorough testing with license testers. Keep the Billing Library up to date with Google's schedule.</p>
+<p>Next step: keep subscribers happy and ratings high with <a href="../improve-android-app-ratings/index.html">How to Improve Android App Ratings and Reviews</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/google/play/billing/integrate" target="_blank" rel="noopener">Integrate the Google Play Billing Library</a></li><li><a href="https://developer.android.com/google/play/billing/subscriptions" target="_blank" rel="noopener">Subscriptions overview (base plans and offers)</a></li><li><a href="https://developer.android.com/google/play/billing/security" target="_blank" rel="noopener">Fight fraud and abuse: verify purchases</a></li><li><a href="https://developer.android.com/google/play/billing/getting-ready#configure-rtdn" target="_blank" rel="noopener">Real-time developer notifications</a></li><li><a href="https://developer.android.com/google/play/billing/deprecation-faq" target="_blank" rel="noopener">Play Billing Library deprecation schedule</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-subscription-billing-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-subscription-billing-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Shipping is a skill of its own. Learn to take an app from a working build to a polished, signed release that real users can install from Google Play.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-monetization-ads-vs-iap/index.html"><small>App Publishing, Monetization, and Product Development</small>Android App Monetization: Ads vs In-App Purchases</a></li><li><a href="../../android/play-integrity-api-explained/index.html"><small>Android Security and Privacy</small>Play Integrity API Explained</a></li><li><a href="../../android/prepare-android-app-production/index.html"><small>App Publishing, Monetization, and Product Development</small>How to Prepare an Android App for Production</a></li><li><a href="../../android/firebase-cloud-messaging-push-notifications/index.html"><small>APIs, Databases, and Backend Integration</small>Firebase Cloud Messaging and Push Notifications</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-subscription-billing/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-subscription-billing/&amp;text=Subscription Billing in Android Apps" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-subscription-billing/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#architecture">Architecture</a></li><li><a href="#products">Products, base plans and offers</a></li><li><a href="#client">Client flow</a></li><li><a href="#server">Server responsibilities</a></li><li><a href="#states">Subscription states to handle in UI</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-subscription-billing-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-subscription-billing-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

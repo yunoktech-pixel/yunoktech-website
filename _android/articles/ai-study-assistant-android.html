@@ -1,0 +1,125 @@
+<!--meta
+{
+  "seo_title": "Build an AI Study Assistant App for Android",
+  "description": "Project guide: an Android study assistant that answers questions from the learner's own notes, generates quizzes and flashcards, explains step by step, uses retrieval for grounding, and encourages learning over answer-copying.",
+  "primary_keyword": "ai study assistant android",
+  "keywords": ["ai tutor app android", "quiz generator ai kotlin", "flashcards ai android", "rag study app", "gemini education app", "android ai project portfolio"],
+  "lede": "A good AI study assistant doesn't just hand out answers. It explains, quizzes and grounds itself in what the learner is actually studying. This project combines retrieval over notes, structured quiz generation, chat, and spaced-repetition flashcards.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["rag-android-apps", "ai-chatbot-jetpack-compose", "ai-document-summarizer-android", "evaluate-ai-responses-hallucinations"],
+  "refs": [
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"],
+    ["Structured output", "https://firebase.google.com/docs/ai-logic/generate-structured-output"],
+    ["Gemini embeddings", "https://ai.google.dev/gemini-api/docs/embeddings"],
+    ["Google: People + AI Guidebook", "https://pair.withgoogle.com/guidebook/"]
+  ]
+}
+-->
+<p class="ad-lead">Learners import notes or chapters, then ask questions, get explanations grounded in their material, and practise with generated quizzes and flashcards. The design goal is understanding, not shortcuts.</p>
+
+<h2 id="features">Features and architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sa-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-sa-t fig-sa-d">
+    <title id="fig-sa-t">Study assistant architecture</title>
+    <desc id="fig-sa-d">Study material is imported, chunked and embedded into a local vector index. Three features use it: Ask, which retrieves relevant chunks and answers with citations; Quiz, which generates structured questions from a chunk; and Flashcards, which are generated, then scheduled with spaced repetition stored in Room.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="20" width="220" height="60" rx="12"/><text class="d-t" x="130" y="46" text-anchor="middle">Notes / chapters</text><text class="d-s" x="130" y="64" text-anchor="middle">import, chunk, embed</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="260" y="20" width="200" height="60" rx="12"/><text class="d-t" x="360" y="46" text-anchor="middle">Local index</text><text class="d-s" x="360" y="64" text-anchor="middle">chunks + vectors (Room)</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="20" y="110" width="220" height="70" rx="12"/><text class="d-t" x="130" y="138" text-anchor="middle">Ask</text><text class="d-s" x="130" y="158" text-anchor="middle">retrieve → answer + cite</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-violet" x="260" y="110" width="200" height="70" rx="12"/><text class="d-t" x="360" y="138" text-anchor="middle">Quiz</text><text class="d-s" x="360" y="158" text-anchor="middle">JSON questions</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-green" x="480" y="110" width="220" height="70" rx="12"/><text class="d-t" x="590" y="138" text-anchor="middle">Flashcards</text><text class="d-s" x="590" y="158" text-anchor="middle">spaced repetition</text></g>
+    <text class="d-s" x="360" y="212" text-anchor="middle">All features ground on the learner's own material.</text>
+  </svg>
+  <figcaption id="fig-sa-cap">Grounding reduces hallucination and keeps answers relevant to the syllabus.</figcaption>
+</figure>
+
+<h2 id="ask">1. Ask with grounding (RAG)</h2>
+<p>Retrieve the most relevant chunks from the learner's notes, then answer using only them, with citations. See <a href="../rag-android-apps/index.html">RAG on Android</a> for indexing and retrieval details.</p>
+<code-block lang="kotlin" file="AskUseCase.kt">
+class AskUseCase(private val index: NotesIndex, private val llm: Llm) {
+
+    fun ask(question: String, mode: Mode): Flow<String> = flow {
+        val hits = index.search(question, topK = 5)
+        if (hits.isEmpty()) { emit("I couldn't find this in your notes. Try importing the relevant chapter."); return@flow }
+        val context = hits.joinToString("\n\n") { "[${it.id}] ${it.text}" }
+        val style = when (mode) {
+            Mode.EXPLAIN -> "Explain step by step for a student, then give one check-your-understanding question."
+            Mode.HINT -> "Give a hint only, not the full answer. Encourage the student to try."
+        }
+        emitAll(llm.stream(
+            "You are a study tutor. Use ONLY the notes below. Cite sources like [id]. " +
+            "If the notes don't contain the answer, say so.\n$style\n\nNotes:\n$context\n\nQuestion: $question"
+        ))
+    }
+    enum class Mode { EXPLAIN, HINT }
+}
+</code-block>
+
+<h2 id="quiz">2. Generate quizzes as structured data</h2>
+<code-block lang="kotlin" file="QuizGenerator.kt">
+@Serializable
+data class Question(val prompt: String, val options: List<String>, val correctIndex: Int, val explanation: String)
+
+@Serializable
+data class Quiz(val questions: List<Question>)
+
+suspend fun generateQuiz(llm: Llm, chunk: String, count: Int = 5): List<Question> {
+    val raw = llm.generateJson(
+        "Create $count multiple-choice questions (4 options each) testing understanding of this text. " +
+        "Include a one-sentence explanation citing the text. Use only facts in the text.\n\n$chunk"
+    )
+    return Json { ignoreUnknownKeys = true }.decodeFromString<Quiz>(raw).questions
+        .filter { q -> q.options.size == 4 && q.correctIndex in 0..3 && q.options.toSet().size == 4 }
+}
+</code-block>
+<p>Validate every question: model output can have duplicate options or out-of-range answers.</p>
+
+<h2 id="flashcards">3. Flashcards with spaced repetition</h2>
+<code-block lang="kotlin" file="Simple spaced repetition scheduling">
+@Entity data class Card(
+    @PrimaryKey val id: String,
+    val front: String, val back: String,
+    val intervalDays: Int = 0, val ease: Double = 2.5, val dueAt: Long = 0,
+)
+
+fun Card.review(grade: Int, now: Long): Card {       // grade: 0 = forgot, 1 = hard, 2 = good, 3 = easy
+    val newEase = (ease + 0.1 - (3 - grade) * 0.08).coerceAtLeast(1.3)
+    val newInterval = when {
+        grade == 0 -> 1
+        intervalDays == 0 -> 1
+        intervalDays == 1 -> 3
+        else -> (intervalDays * newEase).roundToInt()
+    }
+    return copy(intervalDays = newInterval, ease = newEase, dueAt = now + newInterval * 86_400_000L)
+}
+</code-block>
+<p>This is a simplified SM-2-style scheduler. Learners can edit generated cards before saving them.</p>
+
+<h2 id="learning">Design for learning, not copying</h2>
+<ul>
+  <li>Offer <strong>Hint</strong> mode before full answers.</li>
+  <li>End explanations with a check question.</li>
+  <li>Show citations to the learner's notes, so they can verify.</li>
+  <li>Track quiz results to suggest weak topics.</li>
+  <li>Be clear that AI can be wrong. See <a href="../responsible-ai-ux-android/index.html">Responsible AI UX</a>.</li>
+</ul>
+
+<h2 id="safety">Safety and privacy</h2>
+<ul>
+  <li>If your audience includes minors, follow applicable regulations and platform policies (for example Google Play's Families policies).</li>
+  <li>Imported notes may be sent to a cloud model: disclose this and minimise what's sent (only retrieved chunks).</li>
+  <li>Treat imported content as untrusted: it may contain instructions aimed at the model. See <a href="../prompt-injection-android-ai/index.html">Prompt Injection</a>.</li>
+</ul>
+
+<h2 id="evaluate">Evaluate quality</h2>
+<p>Create a small test set of questions with known answers from sample notes, and check groundedness, correctness and refusal when information is missing. See <a href="../evaluate-ai-responses-hallucinations/index.html">Evaluating AI Responses</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can it work offline?</summary><div><p>Flashcard review works offline. Q&amp;A and generation need a model: cloud (online) or on-device (limited capability on supported devices).</p></div></details>
+  <details><summary>Why not just use a general chatbot?</summary><div><p>Grounding in the learner's material, quizzes and spaced repetition make it a learning tool rather than an answer machine.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>A study assistant <strong>grounds answers in the learner's notes</strong> with citations, generates <strong>validated quizzes</strong> and <strong>flashcards with spaced repetition</strong>, and is designed to <strong>encourage understanding</strong>, with clear privacy and safety choices.</p>
+<p>Next step: handle data responsibly in <a href="../ai-privacy-data-retention/index.html">AI Privacy and Data Retention</a>.</p>

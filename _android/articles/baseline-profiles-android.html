@@ -1,0 +1,135 @@
+<!--meta
+{
+  "seo_title": "Baseline Profiles and Android App Performance",
+  "description": "How Baseline Profiles speed up Android apps: ART compilation, generating profiles with Macrobenchmark, the Baseline Profile Gradle plugin, startup profiles, verifying gains and CI.",
+  "primary_keyword": "baseline profiles android",
+  "keywords": ["baseline profile generator", "art aot compilation android", "startup profile dex layout", "macrobenchmark compilation mode", "compose baseline profile", "profileinstaller"],
+  "lede": "Baseline Profiles tell Android which parts of your code are critical, so they're compiled ahead of time from the very first launch. They're one of the most effective performance improvements available, especially for Compose apps, and they take about an hour to set up.",
+  "date": "2026-10-15",
+  "cta": "performance",
+  "related": ["reduce-android-app-startup-time", "android-app-performance-optimization", "compose-performance-optimization", "proguard-r8-explained"],
+  "refs": [
+    ["Baseline Profiles overview", "https://developer.android.com/topic/performance/baselineprofiles/overview"],
+    ["Create Baseline Profiles", "https://developer.android.com/topic/performance/baselineprofiles/create-baselineprofile"],
+    ["Measure Baseline Profiles with Macrobenchmark", "https://developer.android.com/topic/performance/baselineprofiles/measure-baselineprofile"],
+    ["Startup profiles (DEX layout optimization)", "https://developer.android.com/topic/performance/baselineprofiles/dex-layout-optimizations"]
+  ]
+}
+-->
+<p class="ad-lead">On a fresh install, ART hasn't yet learned which code your app runs most. It interprets or JIT-compiles hot paths, so the first launches and first scrolls are slower than later ones. A Baseline Profile ships that knowledge with your app.</p>
+
+<h2 id="how">How it works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bp-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-bp-t fig-bp-d">
+    <title id="fig-bp-t">Baseline Profile lifecycle</title>
+    <desc id="fig-bp-d">A generator test runs critical user journeys and records the classes and methods used into baseline-prof.txt. The file is packaged with the app. Google Play and ProfileInstaller use it so ART compiles those methods ahead of time on install, making startup and key interactions faster from first launch.</desc>
+    <defs><marker id="bpm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H176 M326 70 H352 M502 70 H528" marker-end="url(#bpm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="10" y="40" width="140" height="60" rx="12"/><text class="d-t" x="80" y="64" text-anchor="middle">Generator test</text><text class="d-s" x="80" y="82" text-anchor="middle">critical journeys</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="180" y="40" width="146" height="60" rx="12"/><text class="d-t" x="253" y="64" text-anchor="middle">baseline-prof.txt</text><text class="d-s" x="253" y="82" text-anchor="middle">hot classes/methods</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="356" y="40" width="146" height="60" rx="12"/><text class="d-t" x="429" y="64" text-anchor="middle">App bundle</text><text class="d-s" x="429" y="82" text-anchor="middle">profile packaged</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="532" y="40" width="178" height="60" rx="12"/><text class="d-t" x="621" y="64" text-anchor="middle">ART on install</text><text class="d-s" x="621" y="82" text-anchor="middle">AOT-compiles hot code</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Result: less interpretation and JIT work during startup and first interactions.</text>
+    <text class="d-s" x="360" y="160" text-anchor="middle">Measure the gain with Macrobenchmark (CompilationMode.None vs Partial).</text>
+  </svg>
+  <figcaption id="fig-bp-cap">The profile describes what to compile, and the platform does the compiling.</figcaption>
+</figure>
+
+<h2 id="setup">Setup with the Gradle plugin</h2>
+<p>In Android Studio, add a module from the <strong>Baseline Profile Generator</strong> template. It creates a test module and applies the <code>androidx.baselineprofile</code> plugin. The resulting configuration looks like this:</p>
+<code-block lang="kts" file="app/build.gradle.kts">
+plugins {
+    id("com.android.application")
+    id("androidx.baselineprofile")
+}
+dependencies {
+    implementation("androidx.profileinstaller:profileinstaller:<version>")   // installs profiles for sideloaded/non-Play installs
+    "baselineProfile"(project(":baselineprofile"))
+}
+</code-block>
+
+<h2 id="generator">Write the generator</h2>
+<code-block lang="kotlin" file="baselineprofile/src/main/java/.../BaselineProfileGenerator.kt">
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class BaselineProfileGenerator {
+    @get:Rule val rule = BaselineProfileRule()
+
+    @Test
+    fun generate() = rule.collect(
+        packageName = "com.example.app",
+        includeInStartupProfile = true,          // also generate a startup profile for DEX layout
+    ) {
+        // 1. Startup
+        pressHome()
+        startActivityAndWait()
+
+        // 2. Most important journey: scroll the feed, open an item
+        val feed = device.findObject(By.res("feed_list"))
+        feed.setGestureMargin(device.displayWidth / 5)
+        feed.fling(Direction.DOWN)
+        device.waitForIdle()
+        device.findObject(By.res("feed_item_0"))?.click()
+        device.waitForIdle()
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="Expose Compose test tags as resource IDs">
+Scaffold(modifier = Modifier.semantics { testTagsAsResourceId = true }) { /* ... */ }
+LazyColumn(Modifier.testTag("feed_list")) { /* ... */ }
+</code-block>
+<code-block lang="bash" file="Generate">
+./gradlew :app:generateBaselineProfile
+# Writes the profile into the app module's source set; commit it to version control.
+</code-block>
+
+<h2 id="measure">Verify the improvement</h2>
+<code-block lang="kotlin" file="StartupBenchmark.kt">
+@Test fun startupNoProfile() = startup(CompilationMode.None())
+@Test fun startupWithProfile() = startup(CompilationMode.Partial(BaselineProfileMode.Require))
+
+private fun startup(mode: CompilationMode) = benchmarkRule.measureRepeated(
+    packageName = "com.example.app",
+    metrics = listOf(StartupTimingMetric()),
+    compilationMode = mode,
+    startupMode = StartupMode.COLD,
+    iterations = 10,
+) { pressHome(); startActivityAndWait() }
+</code-block>
+<p>Compare the median <code>timeToInitialDisplayMs</code> between the two. Add a <code>FrameTimingMetric</code> benchmark for scrolling journeys too.</p>
+
+<h2 id="journeys">Choosing journeys</h2>
+<ul>
+  <li><strong>Startup</strong>, always.</li>
+  <li><strong>The first screen's main interaction</strong>: scrolling the feed, opening search.</li>
+  <li><strong>High-value flows</strong> where jank hurts: checkout, the player screen.</li>
+</ul>
+<p>Keep journeys deterministic. Use test accounts or fake data so they don't depend on live content.</p>
+
+<h2 id="libraries">Libraries ship profiles too</h2>
+<p>Jetpack libraries such as Compose include their own Baseline Profile rules, which are merged into your app. Your profile adds <em>your</em> code paths on top.</p>
+
+<h2 id="ci">Keeping profiles fresh</h2>
+<ul>
+  <li>Regenerate when critical journeys or major code paths change, for example before each release.</li>
+  <li>Automate generation on CI with Gradle Managed Devices where feasible.</li>
+  <li>Track startup benchmarks over time to catch regressions.</li>
+</ul>
+
+<h2 id="use-cases">Where they help most</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Compose-heavy apps</h3><p>Compose is a large library executed at startup. Profiles reduce first-frame and first-scroll cost.</p></div>
+  <div class="card usecase"><h3>Apps with frequent updates</h3><p>Each update resets learned profiles on devices, and shipping a profile restores fast performance immediately.</p></div>
+  <div class="card usecase"><h3>Mid-range devices</h3><p>The slower the device, the more noticeable the difference.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do Baseline Profiles work outside Google Play?</summary><div><p>With the <code>profileinstaller</code> library, profiles can also be installed for sideloaded builds and other distribution channels, as described in the documentation.</p></div></details>
+  <details><summary>Do they increase APK size?</summary><div><p>Only slightly: the profile is a text-based list compiled into a compact binary format.</p></div></details>
+  <details><summary>Baseline Profile vs startup profile?</summary><div><p>Baseline Profiles guide AOT compilation. Startup profiles guide DEX layout so startup code is packed together. The plugin can generate both from the same journeys.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Baseline Profiles <strong>pre-compile your critical code paths</strong> so users get fast startup and smooth first interactions from the first launch. Generate them from deterministic journeys, commit them, verify the gain with Macrobenchmark, and regenerate as the app evolves.</p>
+<p>Next step: shrink and optimise your release build with <a href="../proguard-r8-explained/index.html">ProGuard and R8 Explained</a>.</p>

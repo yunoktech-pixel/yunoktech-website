@@ -1,0 +1,129 @@
+<!--meta
+{
+  "seo_title": "LiteRT and LiteRT-LM on Android (Kotlin Guide)",
+  "description": "Run your own ML models and open LLMs on Android with LiteRT (formerly TensorFlow Lite) and LiteRT-LM: model formats, CPU/GPU/NPU acceleration, loading, streaming LLM responses with Flow, model size and delivery.",
+  "primary_keyword": "litert android",
+  "keywords": ["litert-lm android", "tensorflow lite successor", "on device llm kotlin", "gemma on android", "litert gpu npu delegate", "run llm offline android"],
+  "lede": "ML Kit and Gemini Nano cover common tasks, but sometimes you need your own model, a custom classifier or an open LLM like Gemma that runs on any capable device. LiteRT (the successor to TensorFlow Lite) runs custom models; LiteRT-LM is its runtime for language models.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["llms-vs-traditional-machine-learning", "gemini-nano-vs-cloud-gemini", "offline-ai-device-compatibility", "on-device-image-text-processing"],
+  "refs": [
+    ["LiteRT overview", "https://ai.google.dev/edge/litert"],
+    ["Get started with LiteRT-LM on Android", "https://ai.google.dev/edge/litert-lm/android"],
+    ["LiteRT-LM API overview", "https://developers.google.com/edge/litert-lm/api_overview"],
+    ["Play for On-device AI", "https://developer.android.com/google/play/on-device-ai"]
+  ]
+}
+-->
+<p class="ad-lead">LiteRT is Google's on-device inference runtime for <code>.tflite</code> models, the evolution of TensorFlow Lite. LiteRT-LM builds on it to run language models efficiently, with conversation handling, streaming, and GPU or NPU acceleration.</p>
+
+<div class="callout note"><b>APIs evolve quickly</b><p>The code below follows the LiteRT-LM Kotlin documentation at the time of writing. Check the dependency coordinates, versions and class names on the official pages before you build.</p></div>
+
+<h2 id="stack">Where LiteRT fits</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lrt-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-lrt-t fig-lrt-d">
+    <title id="fig-lrt-t">On-device AI options on Android</title>
+    <desc id="fig-lrt-d">At the top level, ML Kit offers ready-made tasks and ML Kit GenAI uses Gemini Nano. For custom models, LiteRT runs tflite models, and LiteRT-LM runs language models such as Gemma. All run on CPU, GPU or NPU hardware.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="20" width="330" height="56" rx="12"/><text class="d-t" x="185" y="44" text-anchor="middle">ML Kit / ML Kit GenAI</text><text class="d-s" x="185" y="62" text-anchor="middle">ready-made tasks, Gemini Nano</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="370" y="20" width="160" height="56" rx="12"/><text class="d-t" x="450" y="44" text-anchor="middle">LiteRT</text><text class="d-s" x="450" y="62" text-anchor="middle">your .tflite models</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="545" y="20" width="155" height="56" rx="12"/><text class="d-t" x="622" y="44" text-anchor="middle">LiteRT-LM</text><text class="d-s" x="622" y="62" text-anchor="middle">open LLMs (Gemma)</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="20" y="100" width="680" height="50" rx="12"/><text class="d-t" x="360" y="130" text-anchor="middle">Acceleration: CPU · GPU · NPU</text></g>
+    <g class="d-step" style="--i:4"><text class="d-s" x="360" y="190" text-anchor="middle">More control and device reach than Gemini Nano, but you ship and manage the model.</text></g>
+  </svg>
+  <figcaption id="fig-lrt-cap">Use ML Kit first; reach for LiteRT when you need a custom or open model.</figcaption>
+</figure>
+
+<h2 id="litert">LiteRT for custom models</h2>
+<p>Typical uses are image classifiers, audio models or custom detectors exported to <code>.tflite</code>. The flow is: load the model, prepare input tensors in the exact shape and normalisation used in training, run inference, and post-process outputs.</p>
+<code-block lang="kotlin" file="Classic LiteRT Interpreter usage (shape of the API)">
+class Classifier(context: Context) : AutoCloseable {
+    private val interpreter = Interpreter(
+        FileUtil.loadMappedFile(context, "classifier.tflite"),
+        Interpreter.Options().setNumThreads(4),
+    )
+
+    fun classify(input: FloatArray): FloatArray {
+        val output = Array(1) { FloatArray(NUM_CLASSES) }
+        interpreter.run(arrayOf(input), output)          // input must match the model's shape
+        return output[0]
+    }
+
+    override fun close() = interpreter.close()
+}
+</code-block>
+<p>LiteRT also offers a newer <code>CompiledModel</code> API with improved GPU and NPU acceleration. Check the docs for the version you use.</p>
+
+<h2 id="litert-lm">LiteRT-LM for language models</h2>
+<p>LiteRT-LM's Kotlin API follows this pattern: configure an <code>Engine</code> with a model file and a backend, initialise it off the main thread (loading can take several seconds), open a conversation, and stream responses as a Flow.</p>
+<code-block lang="kotlin" file="LocalLlm.kt (based on the LiteRT-LM Android docs)">
+class LocalLlm(private val modelPath: String, private val cacheDir: String) : AutoCloseable {
+    private var engine: Engine? = null
+
+    /** Slow: loads the model. Call from a background coroutine. */
+    suspend fun load() = withContext(Dispatchers.Default) {
+        val config = EngineConfig(
+            modelPath = modelPath,
+            backend = Backend.GPU(),          // or CPU / NPU depending on device
+            cacheDir = cacheDir,              // speeds up subsequent loads
+        )
+        engine = Engine(config).also { it.initialize() }
+    }
+
+    /** Streams the reply; collect in a ViewModel and append chunks to UI state. */
+    fun ask(prompt: String): Flow<String> {
+        val conversation = checkNotNull(engine) { "Call load() first" }.createConversation()
+        return conversation.sendMessageAsync(Message.of(prompt))
+            .map { it.toString() }
+            .onCompletion { conversation.close() }
+    }
+
+    override fun close() { engine?.close(); engine = null }
+}
+</code-block>
+
+<h2 id="models">Choosing and delivering a model</h2>
+<ul>
+  <li><strong>Models:</strong> open models such as Gemma variants converted for LiteRT-LM. Smaller (around 1B parameters or less, quantised) models suit more devices.</li>
+  <li><strong>Size:</strong> LLM files are often hundreds of MB to several GB. Don't bundle them in the base APK.</li>
+  <li><strong>Delivery:</strong> download on demand over Wi-Fi with progress and checksums, or use Play for On-device AI for model delivery through Play.</li>
+  <li><strong>Licences:</strong> check each model's licence and usage terms.</li>
+</ul>
+
+<h2 id="performance">Performance and devices</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Concern</th><th>Guidance</th></tr></thead>
+  <tbody>
+    <tr><td>Memory</td><td>Check available RAM before loading; low-RAM devices may fail or be killed</td></tr>
+    <tr><td>Backend</td><td>GPU or NPU is faster where supported; fall back to CPU</td></tr>
+    <tr><td>Thermal</td><td>Long generations heat devices; cap output length</td></tr>
+    <tr><td>Load time</td><td>Load once and reuse; use a cache directory; show progress</td></tr>
+  </tbody>
+</table>
+</div>
+<p>See <a href="../offline-ai-device-compatibility/index.html">Offline AI and Device Compatibility</a> for gating features by device capability.</p>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Custom classifier</h3><p>Plant disease or product defect detection with a LiteRT model.</p></div>
+  <div class="card usecase"><h3>Offline assistant</h3><p>A small Gemma model for private, offline Q&amp;A on capable devices.</p></div>
+  <div class="card usecase"><h3>Field apps</h3><p>AI that must work without connectivity.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Wrong outputs from a custom model:</strong> input preprocessing (size, normalisation, channel order) doesn't match training.</li>
+  <li><strong>OOM or crash when loading an LLM:</strong> the model is too large for the device; use a smaller or more quantised model.</li>
+  <li><strong>UI freezes:</strong> initialisation or inference on the main thread.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is TensorFlow Lite deprecated?</summary><div><p>TensorFlow Lite has been renamed and continued as LiteRT. Existing .tflite models work with LiteRT.</p></div></details>
+  <details><summary>LiteRT-LM or Gemini Nano?</summary><div><p>Gemini Nano needs no model shipping but only runs on supported devices. LiteRT-LM lets you choose and ship your own model, at the cost of size and management.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>LiteRT</strong> runs your custom models; <strong>LiteRT-LM</strong> runs open LLMs on device with streaming and hardware acceleration. Load off the main thread, deliver models on demand, gate by device capability, and check model licences.</p>
+<p>Next step: process images and text on device with <a href="../on-device-image-text-processing/index.html">On-Device Image and Text Processing</a>.</p>

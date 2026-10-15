@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encrypted Data Storage in Android (Modern Approach) | Yunok Tech</title>
+  <meta name="description" content="Encrypt data at rest on Android: what to encrypt, file-based encryption, Tink with Keystore master keys, encrypted DataStore and files, SQLCipher for Room, migrating off EncryptedSharedPreferences.">
+  <meta name="keywords" content="encrypted data storage android, encrypt files android tink, room encryption sqlcipher, encryptedsharedpreferences alternative, data at rest encryption android, keystore master key tink, secure local storage android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/encrypted-data-storage-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/encrypted-data-storage-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Encrypted Data Storage in Android (Modern Approach)">
+  <meta property="og:description" content="Encrypt data at rest on Android: what to encrypt, file-based encryption, Tink with Keystore master keys, encrypted DataStore and files, SQLCipher for Room, migrating off EncryptedSharedPreferences.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Security and Privacy">
+  <meta name="twitter:title" content="Encrypted Data Storage in Android (Modern Approach)">
+  <meta name="twitter:description" content="Encrypt data at rest on Android: what to encrypt, file-based encryption, Tink with Keystore master keys, encrypted DataStore and files, SQLCipher for Room, migrating off EncryptedSharedPreferences.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Encrypted Data Storage in Android", "description": "Encrypt data at rest on Android: what to encrypt, file-based encryption, Tink with Keystore master keys, encrypted DataStore and files, SQLCipher for Room, migrating off EncryptedSharedPreferences.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Security and Privacy", "keywords": "encrypt files android tink, room encryption sqlcipher, encryptedsharedpreferences alternative, data at rest encryption android, keystore master key tink, secure local storage android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/encrypted-data-storage-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Encrypted Data Storage in Android", "item": "https://yunoktech.com/android/encrypted-data-storage-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#security">Android Security and Privacy</a></nav>
+    <span class="ad-chip">🔐 Android Security and Privacy</span>
+    <h1 id="article-title">Encrypted Data Storage in Android</h1>
+    <p class="ad-lede">Android already encrypts user data at the device level, but app-level encryption adds protection for specific sensitive data against backups, extraction and some compromised-device scenarios. Here's what to encrypt, the modern tools to do it with, and how to migrate off deprecated libraries.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#what">What to encrypt at the app level</a></li><li><a href="#deprecated">About EncryptedSharedPreferences and EncryptedFile</a></li><li><a href="#tink-files">Encrypting files with Tink</a></li><li><a href="#room">Encrypting a Room database</a></li><li><a href="#practices">Practices</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Modern Android devices use <strong>file-based encryption</strong>: data at rest is encrypted, and apps' private directories are protected by the sandbox. So why encrypt again? Because device encryption protects a powered-off, locked device, not your app's data from backups, debugging tools on compromised devices, or another layer of defence your compliance team requires.</p>
+
+<h2 id="what">What to encrypt at the app level</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Data</th><th>Encrypt?</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Auth tokens, session secrets</td><td>Yes</td><td>See <a href="../secure-token-storage-android/index.html">Secure Token Storage</a></td></tr>
+    <tr><td>Health, financial, identity documents</td><td>Yes</td><td>Often required by policy or regulation</td></tr>
+    <tr><td>Private user content (journals, private notes)</td><td>Often</td><td>Consider user expectations</td></tr>
+    <tr><td>Cached public content, preferences like theme</td><td>No</td><td>Encryption adds cost without benefit</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" role="group" aria-labelledby="fig-enc-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-enc-t fig-enc-d">
+    <title id="fig-enc-t">Encryption tools for different storage types</title>
+    <desc id="fig-enc-d">A Keystore-wrapped master key protects Tink keysets. Tink AEAD encrypts small values for DataStore; Tink streaming AEAD encrypts files; SQLCipher encrypts entire Room databases with a key protected by the Keystore.</desc>
+    <rect class="d-dark" x="260" y="10" width="200" height="44" rx="10"/><text class="d-w" x="360" y="37" text-anchor="middle">Keystore master key</text>
+    <path class="d-line" d="M300 54 L130 100 M360 54 V100 M420 54 L590 100"/>
+    <rect class="d-green" x="30" y="100" width="200" height="70" rx="12"/><text class="d-t" x="130" y="128" text-anchor="middle">Small values</text><text class="d-s" x="130" y="148" text-anchor="middle">Tink AEAD → DataStore</text>
+    <rect class="d-blue" x="260" y="100" width="200" height="70" rx="12"/><text class="d-t" x="360" y="128" text-anchor="middle">Files</text><text class="d-s" x="360" y="148" text-anchor="middle">Tink streaming AEAD</text>
+    <rect class="d-violet" x="490" y="100" width="200" height="70" rx="12"/><text class="d-t" x="590" y="128" text-anchor="middle">Databases</text><text class="d-s" x="590" y="148" text-anchor="middle">SQLCipher + Room</text>
+  </svg>
+  <figcaption id="fig-enc-cap">One Keystore-protected root, with the right tool for each storage type.</figcaption>
+</figure>
+
+<h2 id="deprecated">About EncryptedSharedPreferences and EncryptedFile</h2>
+<p>Jetpack Security (<code>androidx.security:security-crypto</code>), which provided <code>EncryptedSharedPreferences</code> and <code>EncryptedFile</code>, has been <strong>deprecated</strong>. Existing apps keep working, but new code should use alternatives such as <strong>Tink</strong> directly (which security-crypto used internally), together with DataStore or files. Plan a migration that reads old values once and re-writes them with the new mechanism.</p>
+
+<h2 id="tink-files">Encrypting files with Tink</h2>
+<figure class="code"><figcaption><span class="file">EncryptedFiles.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">object</span> <span class="tk-t">EncryptedFiles</span> {
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> streamingAead(context: <span class="tk-t">Context</span>): <span class="tk-t">StreamingAead</span> {
+        <span class="tk-t">StreamingAeadConfig</span>.register()
+        <span class="tk-k">return</span> <span class="tk-t">AndroidKeysetManager</span>.<span class="tk-t">Builder</span>()
+            .withSharedPref(context, <span class="tk-s">"file_keyset"</span>, <span class="tk-s">"file_keyset_prefs"</span>)
+            .withKeyTemplate(<span class="tk-t">KeyTemplates</span>.<span class="tk-k">get</span>(<span class="tk-s">"AES256_GCM_HKDF_4KB"</span>))
+            .withMasterKeyUri(<span class="tk-s">"android-keystore://file_master_key"</span>)
+            .build()
+            .keysetHandle
+            .getPrimitive(<span class="tk-t">RegistryConfiguration</span>.<span class="tk-k">get</span>(), <span class="tk-t">StreamingAead</span>::<span class="tk-k">class</span>.java)
+    }
+
+    <span class="tk-k">fun</span> write(context: <span class="tk-t">Context</span>, file: <span class="tk-t">File</span>, bytes: <span class="tk-t">ByteArray</span>) {
+        <span class="tk-k">val</span> aad = file.name.toByteArray()               <span class="tk-c">// bind ciphertext to the file name</span>
+        <span class="tk-t">FileOutputStream</span>(file).use { <span class="tk-k">out</span> -&gt;
+            streamingAead(context).newEncryptingStream(<span class="tk-k">out</span>, aad).use { it.write(bytes) }
+        }
+    }
+
+    <span class="tk-k">fun</span> read(context: <span class="tk-t">Context</span>, file: <span class="tk-t">File</span>): <span class="tk-t">ByteArray</span> {
+        <span class="tk-k">val</span> aad = file.name.toByteArray()
+        <span class="tk-k">return</span> <span class="tk-t">FileInputStream</span>(file).use { input -&gt;
+            streamingAead(context).newDecryptingStream(input, aad).use { it.readBytes() }
+        }
+    }
+}</code></pre></figure>
+<p>In production, create the primitive once and reuse it. For small values, use Tink's <code>Aead</code> with a DataStore serializer, as shown in <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</p>
+
+<h2 id="room">Encrypting a Room database</h2>
+<p>Room doesn't encrypt by itself. A common approach is <strong>SQLCipher</strong>, which plugs into Room through an <code>openHelperFactory</code>. Protect the database passphrase by generating random bytes and storing them encrypted with a Keystore-backed key:</p>
+<figure class="code"><figcaption><span class="file">Encrypted Room (outline)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">val</span> passphrase: <span class="tk-t">ByteArray</span> = <span class="tk-t">DbKeyProvider</span>.getOrCreate(context)   <span class="tk-c">// random 32 bytes, stored Tink/Keystore-encrypted</span>
+<span class="tk-k">val</span> factory = <span class="tk-t">SupportOpenHelperFactory</span>(passphrase)                <span class="tk-c">// from the SQLCipher Android library</span>
+<span class="tk-k">val</span> db = <span class="tk-t">Room</span>.databaseBuilder(context, <span class="tk-t">AppDatabase</span>::<span class="tk-k">class</span>.java, <span class="tk-s">"secure.db"</span>)
+    .openHelperFactory(factory)
+    .build()</code></pre></figure>
+<p>Check the SQLCipher library's current artifact and class names, and measure the performance impact on your queries.</p>
+
+<h2 id="practices">Practices</h2>
+<ul>
+  <li>Use authenticated encryption (AES-GCM / AEAD), never ECB or unauthenticated modes.</li>
+  <li>Never hard-code keys, and never derive keys from constants in the APK.</li>
+  <li>Exclude encrypted data and keysets from backups, since Keystore keys don't restore.</li>
+  <li>Handle key loss: treat undecryptable data as missing, and re-sync or sign out.</li>
+  <li>Encrypt only what needs it, because encryption costs CPU and complexity.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Health diary</h3><p>Room with SQLCipher, biometric lock on open, and no cloud backup of the database.</p></div>
+  <div class="card usecase"><h3>Document wallet</h3><p>PDFs encrypted with Tink streaming AEAD, plus FLAG_SECURE on the viewer.</p></div>
+  <div class="card usecase"><h3>Banking session</h3><p>Tokens via Tink AEAD in DataStore, cleared on logout.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is device encryption enough?</summary><div><p>For low-sensitivity data, usually yes. For secrets and regulated data, app-level encryption adds protection for backups and some compromised-device scenarios.</p></div></details>
+  <details><summary>Does encryption slow my app?</summary><div><p>Some, especially for large files or databases. Measure, and encrypt selectively.</p></div></details>
+  <details><summary>Can I use the deprecated library a bit longer?</summary><div><p>Existing code continues to function, but it won't get updates. Plan migration rather than adding new usage.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Encrypt <strong>sensitive</strong> data at the app level with <strong>Keystore-protected keys</strong>: Tink AEAD for small values, streaming AEAD for files, and SQLCipher for databases. Migrate off the deprecated EncryptedSharedPreferences, exclude secrets from backup, and handle key loss gracefully.</p>
+<p>Next step: limit what you collect in the first place with <a href="../android-permissions-privacy/index.html">Android Permissions and Privacy Best Practices</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/training/data-storage" target="_blank" rel="noopener">Data and file storage overview</a></li><li><a href="https://source.android.com/docs/security/features/encryption/file-based" target="_blank" rel="noopener">File-based encryption (platform)</a></li><li><a href="https://developers.google.com/tink" target="_blank" rel="noopener">Tink</a></li><li><a href="https://developer.android.com/privacy-and-security/keystore" target="_blank" rel="noopener">Android Keystore system</a></li><li><a href="https://www.zetetic.net/sqlcipher/sqlcipher-for-android/" target="_blank" rel="noopener">SQLCipher for Android</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dencrypted-data-storage-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dencrypted-data-storage-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Security is easiest to get right when it is part of how you build from the first screen. Strengthen the Android fundamentals that secure, privacy-respecting apps are built on.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/android-keystore-explained/index.html"><small>Android Security and Privacy</small>Android Keystore Explained</a></li><li><a href="../../android/secure-token-storage-android/index.html"><small>APIs, Databases, and Backend Integration</small>Secure Token Storage and API Authentication</a></li><li><a href="../../android/room-vs-datastore/index.html"><small>APIs, Databases, and Backend Integration</small>Room vs DataStore: Which Should You Use?</a></li><li><a href="../../android/protect-user-data-ai-android-apps/index.html"><small>Android Security and Privacy</small>Protecting User Data in AI-Powered Android Apps</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/encrypted-data-storage-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/encrypted-data-storage-android/&amp;text=Encrypted Data Storage in Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/encrypted-data-storage-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#what">What to encrypt at the app level</a></li><li><a href="#deprecated">About EncryptedSharedPreferences and EncryptedFile</a></li><li><a href="#tink-files">Encrypting files with Tink</a></li><li><a href="#room">Encrypting a Room database</a></li><li><a href="#practices">Practices</a></li><li><a href="#use-cases">Examples</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dencrypted-data-storage-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dencrypted-data-storage-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

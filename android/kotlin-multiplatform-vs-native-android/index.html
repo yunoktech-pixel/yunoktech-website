@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Multiplatform vs Native Android Development | Yunok Tech</title>
+  <meta name="description" content="Kotlin Multiplatform vs native Android: what KMP shares, Compose Multiplatform for UI, expect/actual, architecture, team impact, risks and a decision guide with code.">
+  <meta name="keywords" content="kotlin multiplatform vs native android, kotlin multiplatform android ios, kmp vs native, compose multiplatform ios, expect actual kotlin, share business logic android ios, kmp architecture">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Multiplatform vs Native Android Development">
+  <meta property="og:description" content="Kotlin Multiplatform vs native Android: what KMP shares, Compose Multiplatform for UI, expect/actual, architecture, team impact, risks and a decision guide with code.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Multiplatform vs Native Android Development">
+  <meta name="twitter:description" content="Kotlin Multiplatform vs native Android: what KMP shares, Compose Multiplatform for UI, expect/actual, architecture, team impact, risks and a decision guide with code.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Kotlin Multiplatform vs Native Android Development", "description": "Kotlin Multiplatform vs native Android: what KMP shares, Compose Multiplatform for UI, expect/actual, architecture, team impact, risks and a decision guide with code.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Kotlin Programming", "keywords": "kotlin multiplatform android ios, kmp vs native, compose multiplatform ios, expect actual kotlin, share business logic android ios, kmp architecture", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Kotlin Multiplatform vs Native Android Development", "item": "https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Kotlin Multiplatform vs Native Android Development</h1>
+    <p class="ad-lede">Kotlin Multiplatform (KMP) lets Android and iOS share Kotlin code while each keeps native capabilities. It isn't all-or-nothing: you can share a single module or nearly the whole app. Here's what KMP shares, how it compares with a native-only Android app, and how to decide.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#status">Where KMP stands</a></li><li><a href="#what-is-shared">What can be shared</a></li><li><a href="#expect-actual">expect/actual: reaching platform APIs</a></li><li><a href="#shared-example">A shared business rule</a></li><li><a href="#comparison">KMP vs native-only Android</a></li><li><a href="#use-cases">When KMP is a good fit</a></li><li><a href="#adoption">An incremental adoption path</a></li><li><a href="#pitfalls">Pitfalls</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Your company has an Android app in Kotlin and an iOS app in Swift. The same validation rules, pricing logic and API models are written twice, and they drift apart. Kotlin Multiplatform promises to write that logic once, without forcing either app into a non-native framework.</p>
+<p>This guide explains what KMP is, what you can share, how it compares with native-only Android development, and how to decide whether it fits your team.</p>
+
+<h2 id="status">Where KMP stands</h2>
+<ul>
+  <li><strong>Kotlin Multiplatform</strong> is stable, and Google announced official support for using it to share business logic between Android and iOS in 2024. Several Jetpack libraries, such as Room, DataStore, ViewModel and Lifecycle, now support KMP targets.</li>
+  <li><strong>Compose Multiplatform</strong> (from JetBrains) extends Compose UI beyond Android. JetBrains declared Compose for iOS stable and production-ready in version 1.8.0, released in 2025.</li>
+</ul>
+<p>Check the current platform stability page before you commit, since targets and libraries evolve.</p>
+
+<h2 id="what-is-shared">What can be shared</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-kmp-cap">
+  <svg viewBox="0 0 720 250" role="img" aria-labelledby="fig-kmp-t fig-kmp-d">
+    <title id="fig-kmp-t">Kotlin Multiplatform sharing spectrum</title>
+    <desc id="fig-kmp-d">A shared Kotlin module contains domain models, business rules, networking with Ktor, persistence with Room or SQLDelight, and optionally ViewModels. Android uses it from Jetpack Compose UI; iOS uses it from SwiftUI, or both use Compose Multiplatform UI if UI is also shared. Platform-specific code uses expect and actual declarations.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-violet" x="210" y="10" width="300" height="130" rx="14"/><text class="d-t" x="360" y="36" text-anchor="middle">shared (commonMain, Kotlin)</text>
+      <text class="d-s" x="360" y="62" text-anchor="middle">models · business rules · validation</text>
+      <text class="d-s" x="360" y="84" text-anchor="middle">networking (Ktor) · persistence (Room/SQLDelight)</text>
+      <text class="d-s" x="360" y="106" text-anchor="middle">repositories · optionally ViewModels</text>
+      <text class="d-s" x="360" y="128" text-anchor="middle">expect/actual for platform APIs</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="20" y="170" width="250" height="66" rx="12"/><text class="d-t" x="145" y="196" text-anchor="middle">androidApp</text><text class="d-s" x="145" y="218" text-anchor="middle">Jetpack Compose UI</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="450" y="170" width="250" height="66" rx="12"/><text class="d-t" x="575" y="196" text-anchor="middle">iosApp</text><text class="d-s" x="575" y="218" text-anchor="middle">SwiftUI, or Compose Multiplatform</text></g>
+    <path class="d-line" d="M300 140 L170 170 M420 140 L550 170"/>
+  </svg>
+  <figcaption id="fig-kmp-cap">Teams usually start by sharing the data and domain layers and keep native UI. Sharing UI with Compose Multiplatform is a separate, optional step.</figcaption>
+</figure>
+
+<h2 id="expect-actual">expect/actual: reaching platform APIs</h2>
+<figure class="code"><figcaption><span class="file">shared/src/commonMain/kotlin/Platform.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Declared in common code...</span>
+<span class="tk-k">expect</span> <span class="tk-k">fun</span> currentTimeMillis(): <span class="tk-t">Long</span>
+<span class="tk-k">expect</span> <span class="tk-k">fun</span> randomUuid(): <span class="tk-t">String</span></code></pre></figure>
+<figure class="code"><figcaption><span class="file">shared/src/androidMain/kotlin/Platform.android.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">actual</span> <span class="tk-k">fun</span> currentTimeMillis(): <span class="tk-t">Long</span> = <span class="tk-t">System</span>.currentTimeMillis()
+<span class="tk-k">actual</span> <span class="tk-k">fun</span> randomUuid(): <span class="tk-t">String</span> = java.util.<span class="tk-t">UUID</span>.randomUUID().toString()</code></pre></figure>
+<figure class="code"><figcaption><span class="file">shared/src/iosMain/kotlin/Platform.ios.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> platform.<span class="tk-t">Foundation</span>.<span class="tk-t">NSDate</span>
+<span class="tk-k">import</span> platform.<span class="tk-t">Foundation</span>.<span class="tk-t">NSUUID</span>
+<span class="tk-k">import</span> platform.<span class="tk-t">Foundation</span>.timeIntervalSince1970
+
+<span class="tk-k">actual</span> <span class="tk-k">fun</span> currentTimeMillis(): <span class="tk-t">Long</span> = (<span class="tk-t">NSDate</span>().timeIntervalSince1970 * <span class="tk-n">1000</span>).toLong()
+<span class="tk-k">actual</span> <span class="tk-k">fun</span> randomUuid(): <span class="tk-t">String</span> = <span class="tk-t">NSUUID</span>().<span class="tk-t">UUIDString</span>()</code></pre></figure>
+<p>In practice, prefer <strong>interfaces plus dependency injection</strong> for larger platform services (location, secure storage), and keep <code>expect</code>/<code>actual</code> for small utilities.</p>
+
+<h2 id="shared-example">A shared business rule</h2>
+<figure class="code"><figcaption><span class="file">shared/src/commonMain/kotlin/Pricing.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">CartLine</span>(<span class="tk-k">val</span> sku: <span class="tk-t">String</span>, <span class="tk-k">val</span> unitPaise: <span class="tk-t">Long</span>, <span class="tk-k">val</span> qty: <span class="tk-t">Int</span>)
+
+<span class="tk-c">/** One implementation used by both apps: no more Android/iOS pricing mismatches. */</span>
+<span class="tk-k">fun</span> cartTotalPaise(lines: <span class="tk-t">List</span>&lt;<span class="tk-t">CartLine</span>&gt;, couponPercent: <span class="tk-t">Int</span> = <span class="tk-n">0</span>): <span class="tk-t">Long</span> {
+    require(couponPercent <span class="tk-k">in</span> <span class="tk-n">0</span>..<span class="tk-n">100</span>)
+    <span class="tk-k">val</span> subtotal = lines.sumOf { it.unitPaise * it.qty }
+    <span class="tk-k">return</span> subtotal - subtotal * couponPercent / <span class="tk-n">100</span>
+}</code></pre></figure>
+<p>The shared function is tested once in <code>commonTest</code>, and the tests run on every target.</p>
+
+<h2 id="comparison">KMP vs native-only Android</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th>Native Android only</th><th>Kotlin Multiplatform</th></tr></thead>
+  <tbody>
+    <tr><td>Code reuse with iOS</td><td>None</td><td>Logic (and optionally UI) shared</td></tr>
+    <tr><td>Android libraries</td><td>Entire Android/Java ecosystem</td><td>Shared code needs KMP-compatible libraries (Ktor, kotlinx.serialization, KMP-enabled Jetpack)</td></tr>
+    <tr><td>Build complexity</td><td>Standard Gradle Android build</td><td>Multiplatform Gradle setup, Xcode integration, iOS build times</td></tr>
+    <tr><td>Team skills</td><td>Android/Kotlin</td><td>Kotlin plus enough iOS knowledge to integrate and debug</td></tr>
+    <tr><td>Platform look and feel</td><td>Fully native</td><td>Fully native with shared logic; a shared UI needs care on iOS conventions</td></tr>
+    <tr><td>Adoption risk</td><td>Low</td><td>Incremental: start with one module</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">When KMP is a good fit</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Fits well</h3><ul><li>Android and iOS apps with substantial shared business logic</li><li>Kotlin-strong teams wanting consistency across platforms</li><li>Offline-first apps with complex sync rules</li><li>SDKs shipped to both platforms</li></ul></div>
+  <div class="card usecase"><h3>Weaker fit</h3><ul><li>Android-only products with no iOS plans</li><li>Apps that are mostly thin UI over an API</li><li>Teams with no capacity to own iOS integration</li><li>Heavy reliance on Android-only libraries in core logic</li></ul></div>
+</div>
+
+<h2 id="adoption">An incremental adoption path</h2>
+<ol class="steps">
+  <li><strong>Structure the Android app cleanly first.</strong> A pure-Kotlin domain layer is easy to move. See <a href="../clean-architecture-android/index.html">Clean Architecture</a>.</li>
+  <li><strong>Create a <code>shared</code> module</strong> with one feature's models and business rules, and consume it from Android.</li>
+  <li><strong>Integrate it into iOS</strong> as a framework, and agree ownership with the iOS team.</li>
+  <li><strong>Move networking and persistence</strong> with KMP libraries once the workflow is proven.</li>
+  <li><strong>Evaluate shared UI</strong> with Compose Multiplatform screen by screen, if it makes sense.</li>
+</ol>
+
+<h2 id="pitfalls">Pitfalls</h2>
+<ul>
+  <li>Forcing Android-only types (Context, LiveData) into shared code.</li>
+  <li>Underestimating iOS-side work: build integration, Swift interop ergonomics, and debugging.</li>
+  <li>Sharing too early, before the business rules are stable.</li>
+  <li>Choosing libraries without checking KMP support for all your targets.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Kotlin Multiplatform the same as Flutter?</summary><div><p>No. Flutter shares UI and logic in Dart with its own rendering engine. KMP shares Kotlin code and lets each platform keep native UI, or optionally share UI with Compose Multiplatform.</p></div></details>
+  <details><summary>Do Android developers need to learn Swift?</summary><div><p>Not deeply, but you need enough to integrate the shared framework and collaborate with iOS developers.</p></div></details>
+  <details><summary>Can I use Jetpack Compose code on iOS?</summary><div><p>With Compose Multiplatform, much Compose UI code can run on iOS, but Android-specific APIs and libraries must be replaced or abstracted.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Native Android remains the simplest choice for Android-only products. <strong>Kotlin Multiplatform</strong> becomes compelling when you maintain both Android and iOS apps with meaningful shared logic, and it can be adopted one module at a time. Clean, pure-Kotlin layers are the foundation that makes either path work.</p>
+<p>Next step: compare UI-sharing options in <a href="../compose-multiplatform-vs-kotlin-multiplatform/index.html">Compose Multiplatform vs Kotlin Multiplatform</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/multiplatform/get-started.html" target="_blank" rel="noopener">Kotlin Multiplatform overview</a></li><li><a href="https://kotlinlang.org/docs/multiplatform/supported-platforms.html" target="_blank" rel="noopener">Stability of supported platforms</a></li><li><a href="https://kotlinlang.org/docs/multiplatform/multiplatform-expect-actual.html" target="_blank" rel="noopener">Expected and actual declarations</a></li><li><a href="https://developer.android.com/kotlin/multiplatform" target="_blank" rel="noopener">Kotlin Multiplatform on Android Developers</a></li><li><a href="https://blog.jetbrains.com/kotlin/2025/05/compose-multiplatform-1-8-0-released-compose-multiplatform-for-ios-is-stable-and-production-ready/" target="_blank" rel="noopener">Compose Multiplatform 1.8.0: iOS stable (JetBrains blog)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-multiplatform-vs-native-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-multiplatform-vs-native-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-multiplatform-vs-kotlin-multiplatform/index.html"><small>Advanced Android Engineering and Emerging Technology</small>Compose Multiplatform vs Kotlin Multiplatform</a></li><li><a href="../../android/clean-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Clean Architecture in Android: Practical Lessons</a></li><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/multi-module-architecture-android/index.html"><small>Android Architecture and Clean Code</small>Multi-Module Architecture in Android: Pros, Cons, and Lessons</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/&amp;text=Kotlin Multiplatform vs Native Android Development" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-multiplatform-vs-native-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#status">Where KMP stands</a></li><li><a href="#what-is-shared">What can be shared</a></li><li><a href="#expect-actual">expect/actual: reaching platform APIs</a></li><li><a href="#shared-example">A shared business rule</a></li><li><a href="#comparison">KMP vs native-only Android</a></li><li><a href="#use-cases">When KMP is a good fit</a></li><li><a href="#adoption">An incremental adoption path</a></li><li><a href="#pitfalls">Pitfalls</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-multiplatform-vs-native-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-multiplatform-vs-native-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

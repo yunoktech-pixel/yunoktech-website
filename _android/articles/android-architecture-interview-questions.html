@@ -1,0 +1,85 @@
+<!--meta
+{
+  "seo_title": "Android Architecture Interview Questions (with Answers)",
+  "description": "Android architecture interview questions: layers, MVVM vs MVI, UDF, repositories and sources of truth, DI, modularization, offline-first, error handling and how to justify trade-offs.",
+  "primary_keyword": "android architecture interview questions",
+  "keywords": ["mvvm interview questions android", "clean architecture interview", "android modularization interview", "single source of truth interview", "hilt interview questions", "senior android architecture"],
+  "lede": "Architecture questions reveal how you think about change: where logic lives, how data flows, how teams scale, and which trade-offs you accept. These are the questions interviewers commonly ask, with answers that show judgement rather than dogma.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["android-system-design-interview", "clean-architecture-android", "mvi-vs-mvvm-android", "multi-module-architecture-android"],
+  "refs": [
+    ["Guide to app architecture", "https://developer.android.com/topic/architecture"],
+    ["Recommendations for Android architecture", "https://developer.android.com/topic/architecture/recommendations"],
+    ["Guide to modularization", "https://developer.android.com/topic/modularization"]
+  ]
+}
+-->
+<p class="ad-lead">There's rarely one right architecture answer. Interviewers listen for whether you know the options, can explain trade-offs, and can tie choices to a real context: team size, app complexity, offline needs. Use "it depends, and here's on what" well.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-aq-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-aq-t fig-aq-d">
+    <title id="fig-aq-t">Reference architecture to sketch in interviews</title>
+    <desc id="fig-aq-d">UI layer with Compose screens and ViewModels exposing UiState; optional domain layer with use cases; data layer with repositories coordinating remote and local data sources; dependencies point inward; DI wires implementations.</desc>
+    <rect class="d-blue" x="20" y="30" width="200" height="120" rx="14"/><text class="d-t" x="120" y="58" text-anchor="middle">UI layer</text><text class="d-s" x="120" y="84" text-anchor="middle">Compose screens</text><text class="d-s" x="120" y="104" text-anchor="middle">ViewModels → UiState</text>
+    <rect class="d-violet" x="260" y="30" width="200" height="120" rx="14"/><text class="d-t" x="360" y="58" text-anchor="middle">Domain (optional)</text><text class="d-s" x="360" y="84" text-anchor="middle">use cases</text><text class="d-s" x="360" y="104" text-anchor="middle">pure Kotlin</text>
+    <rect class="d-amber" x="500" y="30" width="200" height="120" rx="14"/><text class="d-t" x="600" y="58" text-anchor="middle">Data layer</text><text class="d-s" x="600" y="84" text-anchor="middle">repositories</text><text class="d-s" x="600" y="104" text-anchor="middle">remote + local sources</text>
+    <path class="d-line" d="M220 90 H260 M460 90 H500"/>
+    <text class="d-s" x="360" y="172" text-anchor="middle">State flows up to the UI, events flow down; DI wires it together</text>
+  </svg>
+  <figcaption id="fig-aq-cap">Be ready to sketch this and explain each boundary in under a minute.</figcaption>
+</figure>
+
+<h2 id="layers">Layers and data flow</h2>
+<h3>Describe your recommended Android architecture.</h3>
+<p>UI layer (stateless composables plus ViewModels exposing one immutable UiState), optional domain layer for reusable business logic, and a data layer of repositories hiding data sources. Unidirectional data flow, DI and lifecycle-aware collection. Then mention where you'd simplify for small apps.</p>
+<h3>What is unidirectional data flow, and why does it matter?</h3>
+<p>State flows down, and events flow up to the state owner. It creates a single source of truth, predictable updates and easy testing.</p>
+<h3>Where should business logic live?</h3>
+<p>Not in composables. Screen-specific presentation logic goes in ViewModels, reusable business rules in use cases or domain classes, and data policies in repositories.</p>
+
+<h2 id="patterns">Patterns</h2>
+<h3>MVVM vs MVI: which would you choose?</h3>
+<p>MVVM with a single state for most screens, and MVI-style intents and reducers for complex, highly interactive screens where traceability matters. Consistency across the team matters more than the label.</p>
+<h3>How do you handle one-off events like navigation or snackbars?</h3>
+<p>Preferably as state that the UI consumes and then clears. Alternatively a buffered Channel collected lifecycle-aware. Explain the risk of lost events with a SharedFlow without replay.</p>
+<h3>Do you always use use cases?</h3>
+<p>No, only where logic is reused, complex or combines repositories. Pass-through use cases add files without value.</p>
+
+<h2 id="data">Data</h2>
+<h3>What is a single source of truth?</h3>
+<p>One owner for each piece of data, often the local database for offline-capable data. The network updates it, and the UI observes it.</p>
+<h3>How would you design offline support?</h3>
+<p>Room as the source of truth, local-first writes with pending flags, WorkManager sync with backoff, and a conflict policy. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p>
+<h3>How do you handle errors across layers?</h3>
+<p>Classify errors at the data boundary into typed errors, then map them to UI messages and recovery actions in the ViewModel. Pick one convention: exceptions or Result.</p>
+
+<h2 id="scale">Scaling</h2>
+<h3>When would you modularize, and how?</h3>
+<p>When build times, ownership or boundaries hurt. Feature modules over core modules, convention plugins, <code>implementation</code> by default, and no feature-to-feature dependencies. See <a href="../android-modularization-strategies/index.html">Modularization Strategies</a>.</p>
+<h3>How does DI help architecture?</h3>
+<p>It decouples creation from use, enables fakes in tests, and manages lifetimes (scopes). Hilt adds compile-time validation for Android.</p>
+<h3>How would you migrate a legacy app?</h3>
+<p>Incrementally: characterization tests, extract ViewModels and repositories, coroutines instead of callbacks, Compose for new screens, and the strangler pattern rather than a rewrite.</p>
+
+<h2 id="tradeoffs">Showing judgement</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Context</th><th>Reasonable choice</th></tr></thead>
+  <tbody>
+    <tr><td>Solo, 5 screens</td><td>Single module, ViewModel + repository, no domain layer</td></tr>
+    <tr><td>Startup, growing team</td><td>Feature packages, Hilt, offline cache for key data, CI tests</td></tr>
+    <tr><td>Large org, many teams</td><td>Feature + core modules, platform team, ADRs, dependency rules</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I mention Google's Now in Android sample?</summary><div><p>Yes, as a reference for modularization, offline-first and testing patterns, but explain what you'd adapt for your context.</p></div></details>
+  <details><summary>What if the interviewer prefers a different pattern?</summary><div><p>Discuss trade-offs respectfully. Showing you can reason about alternatives is the goal.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Strong architecture answers explain <strong>layers, data flow, sources of truth and boundaries</strong>, and always tie choices to <strong>context and trade-offs</strong>. Practise sketching the reference architecture and adapting it to small and large scenarios.</p>
+<p>Next step: practise async questions with <a href="../coroutines-flow-interview-questions/index.html">Coroutines and Flow Interview Questions</a>.</p>

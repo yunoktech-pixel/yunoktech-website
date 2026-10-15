@@ -1,0 +1,165 @@
+<!--meta
+{
+  "seo_title": "Testing ViewModels with Coroutines and Flow",
+  "description": "Test Android ViewModels that use coroutines and Flow: MainDispatcherRule, runTest, virtual time, StateFlow with stateIn, Turbine, testing errors, debounce and SavedStateHandle.",
+  "primary_keyword": "testing viewmodel coroutines flow",
+  "keywords": ["runTest viewmodel", "MainDispatcherRule", "test stateflow android", "turbine flow testing", "advanceUntilIdle", "test dispatcher kotlin"],
+  "lede": "ViewModels launch coroutines on Dispatchers.Main, collect Flows and use delays, all of which make naive tests hang, flake or pass for the wrong reason. With kotlinx-coroutines-test and a few patterns, ViewModel tests become fast and deterministic.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["android-unit-testing-junit", "kotlin-coroutines-flow-android", "flow-vs-stateflow-vs-sharedflow", "viewmodel-stateflow-ui-state"],
+  "refs": [
+    ["Testing Kotlin coroutines on Android", "https://developer.android.com/kotlin/coroutines/test"],
+    ["Testing Kotlin flows on Android", "https://developer.android.com/kotlin/flow/test"],
+    ["kotlinx-coroutines-test", "https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/"],
+    ["Turbine", "https://github.com/cashapp/turbine"]
+  ]
+}
+-->
+<p class="ad-lead">The first ViewModel test many developers write fails with "Module with the Main dispatcher had failed to initialize". The second passes, even though the code is broken, because the assertion ran before the coroutine finished. Both come from not controlling dispatchers and time.</p>
+
+<h2 id="model">The testing model</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-tm-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-tm-t fig-tm-d">
+    <title id="fig-tm-t">Controlling dispatchers and time in coroutine tests</title>
+    <desc id="fig-tm-d">MainDispatcherRule replaces Dispatchers.Main with a test dispatcher. runTest provides a TestScope with a virtual-time scheduler shared with the test dispatcher. Injected dispatchers in repositories also use the test dispatcher. advanceUntilIdle and advanceTimeBy move virtual time so delays complete instantly.</desc>
+    <rect class="d-violet" x="20" y="20" width="200" height="70" rx="12"/><text class="d-t" x="120" y="50" text-anchor="middle">MainDispatcherRule</text><text class="d-s" x="120" y="70" text-anchor="middle">Main → TestDispatcher</text>
+    <rect class="d-blue" x="260" y="20" width="200" height="70" rx="12"/><text class="d-t" x="360" y="50" text-anchor="middle">runTest { }</text><text class="d-s" x="360" y="70" text-anchor="middle">virtual time scheduler</text>
+    <rect class="d-green" x="500" y="20" width="200" height="70" rx="12"/><text class="d-t" x="600" y="50" text-anchor="middle">Injected dispatchers</text><text class="d-s" x="600" y="70" text-anchor="middle">IO/Default → test</text>
+    <rect class="d-amber" x="160" y="120" width="400" height="56" rx="12"/><text class="d-t" x="360" y="144" text-anchor="middle">advanceUntilIdle() · advanceTimeBy(ms)</text><text class="d-s" x="360" y="164" text-anchor="middle">delays complete instantly, deterministically</text>
+    <path class="d-line" d="M120 90 L300 120 M360 90 V120 M600 90 L420 120"/>
+  </svg>
+  <figcaption id="fig-tm-cap">Replace every dispatcher with test dispatchers that share one scheduler, and you control time completely.</figcaption>
+</figure>
+
+<h2 id="rule">1. Replace Dispatchers.Main</h2>
+<code-block lang="kotlin" file="MainDispatcherRule.kt (src/test)">
+@OptIn(ExperimentalCoroutinesApi::class)
+class MainDispatcherRule(
+    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
+) : TestWatcher() {
+    override fun starting(description: Description) = Dispatchers.setMain(testDispatcher)
+    override fun finished(description: Description) = Dispatchers.resetMain()
+}
+</code-block>
+<p><code>UnconfinedTestDispatcher</code> starts coroutines eagerly, which suits simple state assertions. <code>StandardTestDispatcher</code> queues them until you advance the scheduler, which suits testing intermediate states such as Loading.</p>
+
+<h2 id="vm">The ViewModel under test</h2>
+<code-block lang="kotlin" file="SearchViewModel.kt">
+class SearchViewModel(private val repo: SearchRepository) : ViewModel() {
+    private val query = MutableStateFlow("")
+
+    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+    val state: StateFlow<SearchState> = query
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { q ->
+            if (q.isBlank()) flowOf(SearchState.Idle)
+            else flow {
+                emit(SearchState.Loading)
+                emit(runCatching { repo.search(q) }.fold(
+                    onSuccess = { SearchState.Results(it) },
+                    onFailure = { SearchState.Error("Search failed") },
+                ))
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SearchState.Idle)
+
+    fun onQueryChange(q: String) { query.value = q }
+}
+</code-block>
+
+<h2 id="tests">2. Tests with virtual time</h2>
+<code-block lang="kotlin" file="SearchViewModelTest.kt">
+@OptIn(ExperimentalCoroutinesApi::class)
+class SearchViewModelTest {
+    @get:Rule val mainRule = MainDispatcherRule(StandardTestDispatcher())
+
+    private class FakeRepo(var fail: Boolean = false) : SearchRepository {
+        var calls = 0
+        override suspend fun search(q: String): List<String> {
+            calls++
+            if (fail) throw IOException()
+            return listOf("$q result")
+        }
+    }
+
+    @Test
+    fun `debounces typing and shows results`() = runTest(mainRule.testDispatcher) {
+        val repo = FakeRepo()
+        val vm = SearchViewModel(repo)
+        val states = mutableListOf<SearchState>()
+        backgroundScope.launch { vm.state.toList(states) }      // keeps WhileSubscribed active
+
+        vm.onQueryChange("k"); vm.onQueryChange("ko"); vm.onQueryChange("kotlin")
+        advanceTimeBy(299); runCurrent()
+        assertEquals(0, repo.calls)                            // still within debounce window
+
+        advanceUntilIdle()
+        assertEquals(1, repo.calls)                            // only the final query searched
+        assertEquals(SearchState.Results(listOf("kotlin result")), states.last())
+        assertTrue(SearchState.Loading in states)              // intermediate state observed
+    }
+
+    @Test
+    fun `failure shows error`() = runTest(mainRule.testDispatcher) {
+        val vm = SearchViewModel(FakeRepo(fail = true))
+        backgroundScope.launch { vm.state.collect {} }
+        vm.onQueryChange("x")
+        advanceUntilIdle()
+        assertEquals(SearchState.Error("Search failed"), vm.state.value)
+    }
+}
+</code-block>
+<p>Passing <code>mainRule.testDispatcher</code> to <code>runTest</code> makes the test and <code>viewModelScope</code> share one scheduler, so advancing time affects both.</p>
+
+<h2 id="turbine">3. Turbine for flow assertions</h2>
+<code-block lang="kotlin" file="With Turbine">
+@Test
+fun `emits loading then results`() = runTest(mainRule.testDispatcher) {
+    val vm = SearchViewModel(FakeRepo())
+    vm.state.test {
+        assertEquals(SearchState.Idle, awaitItem())
+        vm.onQueryChange("compose")
+        assertEquals(SearchState.Loading, awaitItem())
+        assertEquals(SearchState.Results(listOf("compose result")), awaitItem())
+        cancelAndIgnoreRemainingEvents()
+    }
+}
+</code-block>
+<p>Turbine's <code>test {}</code> collects in order and fails on unexpected or missing emissions. That's excellent for testing sequences.</p>
+
+<h2 id="io">4. Inject the other dispatchers too</h2>
+<p>If a repository uses <code>withContext(Dispatchers.IO)</code> directly, tests run that code on real threads and lose determinism. Inject dispatchers and pass the test dispatcher in tests. See <a href="../hilt-dependency-injection/index.html">Hilt qualifiers</a>.</p>
+
+<h2 id="saved-state">5. SavedStateHandle</h2>
+<code-block lang="kotlin" file="Restoring state in tests">
+val vm = FiltersViewModel(SavedStateHandle(mapOf("filter" to "UNREAD")))
+assertEquals(Filter.UNREAD, vm.uiState.value.filter)
+</code-block>
+
+<h2 id="use-cases">What to cover</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Happy path</h3><p>The event leads to the expected final state.</p></div>
+  <div class="card usecase"><h3>Failure paths</h3><p>Network errors, empty results and retries.</p></div>
+  <div class="card usecase"><h3>Timing</h3><p>Debounce, timeouts and cancellation of outdated requests.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>Thread.sleep</code> or real delays in tests.</li>
+  <li>Asserting <code>stateIn(WhileSubscribed)</code> values without any collector, so the upstream never runs.</li>
+  <li>Creating a new <code>StandardTestDispatcher()</code> in the rule and another in <code>runTest</code>, giving two schedulers where time doesn't advance together.</li>
+  <li>Using <code>runBlocking</code> instead of <code>runTest</code>, which runs real time and is slow.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Why does runTest skip my delays?</summary><div><p>That's the point: virtual time. <code>delay(5_000)</code> completes instantly when the scheduler advances.</p></div></details>
+  <details><summary>Do I need Turbine?</summary><div><p>No, collecting into a list works. Turbine makes sequence assertions clearer and fails fast on unexpected events.</p></div></details>
+  <details><summary>How do I test LiveData?</summary><div><p>Use <code>InstantTaskExecutorRule</code> from <code>androidx.arch.core:core-testing</code>, or convert to Flow with <code>asFlow()</code>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Deterministic ViewModel tests need three things: <strong>Main replaced with a test dispatcher</strong>, <strong><code>runTest</code> sharing that scheduler</strong>, and <strong>injected dispatchers everywhere else</strong>. Collect StateFlows in <code>backgroundScope</code> or use Turbine, and drive time explicitly.</p>
+<p>Next step: test what the user actually sees with <a href="../compose-ui-testing/index.html">UI Testing in Jetpack Compose</a>.</p>

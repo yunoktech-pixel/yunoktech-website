@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagination with Paging 3 in Android (Compose) | Yunok Tech</title>
+  <meta name="description" content="Implement pagination with Paging 3 in Android: PagingSource, Pager, cachedIn, LazyPagingItems in Compose, load states, retry, RemoteMediator with Room and testing.">
+  <meta name="keywords" content="paging 3 android, paging 3 compose, pagingsource kotlin, remotemediator room, collectAsLazyPagingItems, infinite scroll android, paging load state">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/paging-3-pagination/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/paging-3-pagination/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Pagination with Paging 3 in Android (Compose)">
+  <meta property="og:description" content="Implement pagination with Paging 3 in Android: PagingSource, Pager, cachedIn, LazyPagingItems in Compose, load states, retry, RemoteMediator with Room and testing.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="APIs, Databases, and Backend Integration">
+  <meta name="twitter:title" content="Pagination with Paging 3 in Android (Compose)">
+  <meta name="twitter:description" content="Implement pagination with Paging 3 in Android: PagingSource, Pager, cachedIn, LazyPagingItems in Compose, load states, retry, RemoteMediator with Room and testing.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Pagination with Paging 3", "description": "Implement pagination with Paging 3 in Android: PagingSource, Pager, cachedIn, LazyPagingItems in Compose, load states, retry, RemoteMediator with Room and testing.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "APIs, Databases, and Backend Integration", "keywords": "paging 3 compose, pagingsource kotlin, remotemediator room, collectAsLazyPagingItems, infinite scroll android, paging load state", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/paging-3-pagination/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Pagination with Paging 3", "item": "https://yunoktech.com/android/paging-3-pagination/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#data">APIs, Databases, and Backend Integration</a></nav>
+    <span class="ad-chip">🔌 APIs, Databases, and Backend Integration</span>
+    <h1 id="article-title">Pagination with Paging 3</h1>
+    <p class="ad-lede">Loading thousands of items at once wastes data, memory and time. Paging 3 loads data page by page as the user scrolls, handles loading and error states, deduplicates requests, and works with Room for offline caching.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#pieces">The pieces</a></li><li><a href="#setup">Setup</a></li><li><a href="#source">1. PagingSource</a></li><li><a href="#pager">2. Pager and ViewModel</a></li><li><a href="#compose">3. Compose UI with load states</a></li><li><a href="#mediator">4. Network + Room with RemoteMediator</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Where Paging fits</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A hand-rolled infinite scroll has to track the current page, avoid duplicate requests while scrolling fast, show a footer spinner, handle errors with retry, reset on refresh, and survive rotation. Paging 3 handles all of this. You implement one function that loads a page.</p>
+
+<h2 id="pieces">The pieces</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-pg-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-pg-t fig-pg-d">
+    <title id="fig-pg-t">Paging 3 data flow</title>
+    <desc id="fig-pg-d">A PagingSource loads pages from the API. A Pager in the repository creates a Flow of PagingData. The ViewModel caches it with cachedIn. Compose collects it as LazyPagingItems and LazyColumn requests more pages as the user scrolls.</desc>
+    <defs><marker id="pgm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H176 M310 70 H336 M490 70 H516" marker-end="url(#pgm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="140" height="60" rx="12"/><text class="d-t" x="80" y="64" text-anchor="middle">PagingSource</text><text class="d-s" x="80" y="82" text-anchor="middle">load(page)</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="180" y="40" width="130" height="60" rx="12"/><text class="d-t" x="245" y="64" text-anchor="middle">Pager</text><text class="d-s" x="245" y="82" text-anchor="middle">Flow&lt;PagingData&gt;</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="340" y="40" width="150" height="60" rx="12"/><text class="d-t" x="415" y="64" text-anchor="middle">ViewModel</text><text class="d-s" x="415" y="82" text-anchor="middle">cachedIn(scope)</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="40" width="190" height="60" rx="12"/><text class="d-t" x="615" y="64" text-anchor="middle">LazyPagingItems</text><text class="d-s" x="615" y="82" text-anchor="middle">LazyColumn</text></g>
+    <path class="d-dash" d="M615 100 V150 H80 V104" marker-end="url(#pgm)"/><text class="d-s" x="350" y="168" text-anchor="middle">scrolling near the end triggers the next load</text>
+  </svg>
+  <figcaption id="fig-pg-cap">The UI drives loading. Paging prefetches the next page before the user reaches the end.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<figure class="code"><figcaption><span class="file">app/build.gradle.kts</span><span class="lang">Gradle KTS</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kts">dependencies {
+    implementation(<span class="tk-s">"androidx.paging:paging-runtime:&lt;paging-version&gt;"</span>)
+    implementation(<span class="tk-s">"androidx.paging:paging-compose:&lt;paging-version&gt;"</span>)
+    testImplementation(<span class="tk-s">"androidx.paging:paging-testing:&lt;paging-version&gt;"</span>)
+}</code></pre></figure>
+
+<h2 id="source">1. PagingSource</h2>
+<figure class="code"><figcaption><span class="file">ArticlePagingSource.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ArticlePagingSource</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">ArticleApi</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> query: <span class="tk-t">String</span>,
+) : <span class="tk-t">PagingSource</span>&lt;<span class="tk-t">Int</span>, <span class="tk-t">Article</span>&gt;() {
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> load(params: <span class="tk-t">LoadParams</span>&lt;<span class="tk-t">Int</span>&gt;): <span class="tk-t">LoadResult</span>&lt;<span class="tk-t">Int</span>, <span class="tk-t">Article</span>&gt; {
+        <span class="tk-k">val</span> page = params.key ?: <span class="tk-n">1</span>
+        <span class="tk-k">return</span> <span class="tk-k">try</span> {
+            <span class="tk-k">val</span> items = api.search(query, page = page, pageSize = params.loadSize).map { it.toDomain() }
+            <span class="tk-t">LoadResult</span>.<span class="tk-t">Page</span>(
+                <span class="tk-k">data</span> = items,
+                prevKey = <span class="tk-k">if</span> (page == <span class="tk-n">1</span>) <span class="tk-k">null</span> <span class="tk-k">else</span> page - <span class="tk-n">1</span>,
+                nextKey = <span class="tk-k">if</span> (items.isEmpty()) <span class="tk-k">null</span> <span class="tk-k">else</span> page + <span class="tk-n">1</span>,
+            )
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-t">LoadResult</span>.<span class="tk-t">Error</span>(e)
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">HttpException</span>) {
+            <span class="tk-t">LoadResult</span>.<span class="tk-t">Error</span>(e)
+        }
+    }
+
+    <span class="tk-c">// Which page to load when the list is refreshed (e.g. after invalidation), based on scroll position</span>
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> getRefreshKey(state: <span class="tk-t">PagingState</span>&lt;<span class="tk-t">Int</span>, <span class="tk-t">Article</span>&gt;): <span class="tk-t">Int</span>? =
+        state.anchorPosition?.let { anchor -&gt;
+            state.closestPageToPosition(anchor)?.let { it.prevKey?.plus(<span class="tk-n">1</span>) ?: it.nextKey?.minus(<span class="tk-n">1</span>) }
+        }
+}</code></pre></figure>
+<p>If your API uses cursors instead of page numbers, use the cursor string as the key type.</p>
+
+<h2 id="pager">2. Pager and ViewModel</h2>
+<figure class="code"><figcaption><span class="file">SearchViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">SearchViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">ArticleApi</span>) : <span class="tk-t">ViewModel</span>() {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> query = <span class="tk-t">MutableStateFlow</span>(<span class="tk-s">"android"</span>)
+
+    <span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalCoroutinesApi</span>::<span class="tk-k">class</span>)
+    <span class="tk-k">val</span> results: <span class="tk-t">Flow</span>&lt;<span class="tk-t">PagingData</span>&lt;<span class="tk-t">Article</span>&gt;&gt; = query
+        .flatMapLatest { q -&gt;
+            <span class="tk-t">Pager</span>(<span class="tk-t">PagingConfig</span>(pageSize = <span class="tk-n">20</span>, prefetchDistance = <span class="tk-n">5</span>, enablePlaceholders = <span class="tk-k">false</span>)) {
+                <span class="tk-t">ArticlePagingSource</span>(api, q)
+            }.flow
+        }
+        .cachedIn(viewModelScope)        <span class="tk-c">// survive rotation; share between collectors</span>
+
+    <span class="tk-k">fun</span> search(q: <span class="tk-t">String</span>) { query.<span class="tk-k">value</span> = q }
+}</code></pre></figure>
+
+<h2 id="compose">3. Compose UI with load states</h2>
+<figure class="code"><figcaption><span class="file">SearchResults.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">SearchResults</span>(viewModel: <span class="tk-t">SearchViewModel</span>) {
+    <span class="tk-k">val</span> items = viewModel.results.collectAsLazyPagingItems()
+
+    <span class="tk-k">when</span> (<span class="tk-k">val</span> refresh = items.loadState.refresh) {
+        <span class="tk-k">is</span> <span class="tk-t">LoadState</span>.<span class="tk-t">Loading</span> -&gt; <span class="tk-k">if</span> (items.itemCount == <span class="tk-n">0</span>) { <span class="tk-t">FullScreenLoading</span>(); <span class="tk-k">return</span> }
+        <span class="tk-k">is</span> <span class="tk-t">LoadState</span>.<span class="tk-t">Error</span> -&gt; <span class="tk-k">if</span> (items.itemCount == <span class="tk-n">0</span>) {
+            <span class="tk-t">FullScreenError</span>(refresh.error.message ?: <span class="tk-s">"Couldn't load"</span>, onRetry = items::retry); <span class="tk-k">return</span>
+        }
+        <span class="tk-k">is</span> <span class="tk-t">LoadState</span>.<span class="tk-t">NotLoading</span> -&gt; <span class="tk-k">if</span> (items.itemCount == <span class="tk-n">0</span> &amp;&amp; refresh.endOfPaginationReached) { <span class="tk-t">EmptyState</span>(); <span class="tk-k">return</span> }
+    }
+
+    <span class="tk-t">LazyColumn</span> {
+        items(count = items.itemCount, key = items.itemKey { it.id }) { index -&gt;
+            items[index]?.let { <span class="tk-t">ArticleRow</span>(it) }
+        }
+        <span class="tk-k">when</span> (<span class="tk-k">val</span> append = items.loadState.append) {
+            <span class="tk-k">is</span> <span class="tk-t">LoadState</span>.<span class="tk-t">Loading</span> -&gt; item { <span class="tk-t">LoadingFooter</span>() }
+            <span class="tk-k">is</span> <span class="tk-t">LoadState</span>.<span class="tk-t">Error</span> -&gt; item { <span class="tk-t">RetryFooter</span>(onRetry = items::retry) }
+            <span class="tk-k">else</span> -&gt; <span class="tk-t">Unit</span>
+        }
+    }
+}</code></pre></figure>
+
+<h2 id="mediator">4. Network + Room with RemoteMediator</h2>
+<p>For offline support, the database becomes the source of truth. Room provides the <code>PagingSource</code>, and a <code>RemoteMediator</code> fetches pages from the network into Room when the local data runs out or needs refreshing:</p>
+<figure class="code"><figcaption><span class="file">ArticleRemoteMediator.kt (outline)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalPagingApi</span>::<span class="tk-k">class</span>)
+<span class="tk-k">class</span> <span class="tk-t">ArticleRemoteMediator</span>(
+    <span class="tk-k">private</span> <span class="tk-k">val</span> api: <span class="tk-t">ArticleApi</span>,
+    <span class="tk-k">private</span> <span class="tk-k">val</span> db: <span class="tk-t">AppDatabase</span>,
+) : <span class="tk-t">RemoteMediator</span>&lt;<span class="tk-t">Int</span>, <span class="tk-t">ArticleEntity</span>&gt;() {
+
+    <span class="tk-k">override</span> <span class="tk-k">suspend</span> <span class="tk-k">fun</span> load(loadType: <span class="tk-t">LoadType</span>, state: <span class="tk-t">PagingState</span>&lt;<span class="tk-t">Int</span>, <span class="tk-t">ArticleEntity</span>&gt;): <span class="tk-t">MediatorResult</span> {
+        <span class="tk-k">val</span> page = <span class="tk-k">when</span> (loadType) {
+            <span class="tk-t">LoadType</span>.<span class="tk-t">REFRESH</span> -&gt; <span class="tk-n">1</span>
+            <span class="tk-t">LoadType</span>.<span class="tk-t">PREPEND</span> -&gt; <span class="tk-k">return</span> <span class="tk-t">MediatorResult</span>.<span class="tk-t">Success</span>(endOfPaginationReached = <span class="tk-k">true</span>)
+            <span class="tk-t">LoadType</span>.<span class="tk-t">APPEND</span> -&gt; db.remoteKeysDao().lastKey()?.nextPage
+                ?: <span class="tk-k">return</span> <span class="tk-t">MediatorResult</span>.<span class="tk-t">Success</span>(endOfPaginationReached = <span class="tk-k">true</span>)
+        }
+        <span class="tk-k">return</span> <span class="tk-k">try</span> {
+            <span class="tk-k">val</span> response = api.list(page = page, pageSize = state.config.pageSize)
+            db.withTransaction {
+                <span class="tk-k">if</span> (loadType == <span class="tk-t">LoadType</span>.<span class="tk-t">REFRESH</span>) { db.articleDao().clearAll(); db.remoteKeysDao().clear() }
+                db.remoteKeysDao().insert(<span class="tk-t">RemoteKey</span>(nextPage = <span class="tk-k">if</span> (response.isEmpty()) <span class="tk-k">null</span> <span class="tk-k">else</span> page + <span class="tk-n">1</span>))
+                db.articleDao().insertAll(response.map { it.toEntity() })
+            }
+            <span class="tk-t">MediatorResult</span>.<span class="tk-t">Success</span>(endOfPaginationReached = response.isEmpty())
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            <span class="tk-t">MediatorResult</span>.<span class="tk-t">Error</span>(e)
+        }
+    }
+}
+<span class="tk-c">// Pager(config, remoteMediator = ArticleRemoteMediator(api, db)) { db.articleDao().pagingSource() }</span></code></pre></figure>
+
+<h2 id="testing">Testing</h2>
+<figure class="code"><figcaption><span class="file">ArticlePagingSourceTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Test</span>
+<span class="tk-k">fun</span> `loads first page and sets next key`() = runTest {
+    <span class="tk-k">val</span> source = <span class="tk-t">ArticlePagingSource</span>(<span class="tk-t">FakeArticleApi</span>(totalItems = <span class="tk-n">45</span>), query = <span class="tk-s">"kotlin"</span>)
+    <span class="tk-k">val</span> pager = <span class="tk-t">TestPager</span>(<span class="tk-t">PagingConfig</span>(pageSize = <span class="tk-n">20</span>), source)
+    <span class="tk-k">val</span> result = pager.refresh() <span class="tk-k">as</span> <span class="tk-t">PagingSource</span>.<span class="tk-t">LoadResult</span>.<span class="tk-t">Page</span>
+    assertEquals(<span class="tk-n">20</span>, result.<span class="tk-k">data</span>.size)
+    assertEquals(<span class="tk-n">2</span>, result.nextKey)
+}</code></pre></figure>
+
+<h2 id="use-cases">Where Paging fits</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Search results</h3><p>Network-only PagingSource, recreated per query with <code>flatMapLatest</code>.</p></div>
+  <div class="card usecase"><h3>Feeds with offline</h3><p>RemoteMediator plus Room, so cached pages appear instantly and new pages load as needed.</p></div>
+  <div class="card usecase"><h3>Large local tables</h3><p>Room's built-in PagingSource for chat history or logs with tens of thousands of rows.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Forgetting <code>cachedIn(viewModelScope)</code>, which reloads everything on rotation.</li>
+  <li>Transforming <code>PagingData</code> after <code>cachedIn</code>. Apply <code>map</code> and <code>filter</code> before caching.</li>
+  <li>Missing stable keys in the LazyColumn.</li>
+  <li>Unstable sort order on the server, causing duplicates or gaps between pages.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I modify items, such as toggling a like, in paged data?</summary><div><p>With RemoteMediator plus Room, update the database and the paged list updates automatically. For network-only paging, invalidate the source or overlay local state.</p></div></details>
+  <details><summary>Should I enable placeholders?</summary><div><p>Only if you know the total count and want stable scrollbar sizing. Most apps disable them.</p></div></details>
+  <details><summary>Is Paging overkill for 100 items?</summary><div><p>Usually yes. Load them at once into a LazyColumn. Paging shines with large or unbounded datasets.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Paging 3 gives you <strong>incremental loading, deduplication, load states and retry</strong> for the price of a <code>PagingSource</code>. Cache in the ViewModel, render with <code>LazyPagingItems</code> and stable keys, and add a <code>RemoteMediator</code> with Room for offline-first feeds.</p>
+<p>Next step: add user accounts with <a href="../firebase-authentication-android/index.html">Firebase Authentication in Android</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/libraries/architecture/paging/v3-overview" target="_blank" rel="noopener">Paging library overview</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/paging/v3-paged-data" target="_blank" rel="noopener">Load and display paged data</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/paging/v3-network-db" target="_blank" rel="noopener">Page from network and database (RemoteMediator)</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/paging/test" target="_blank" rel="noopener">Test your Paging implementation</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dpaging-3-pagination-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dpaging-3-pagination-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Networking, persistence and offline sync are where real apps get complicated. Practise building a data layer that handles slow networks, failures and caching, not just the happy path.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/lazycolumn-vs-column/index.html"><small>Jetpack Compose</small>LazyColumn vs Column: When to Use Each</a></li><li><a href="../../android/room-database-kotlin/index.html"><small>APIs, Databases, and Backend Integration</small>Room Database Tutorial with Kotlin</a></li><li><a href="../../android/offline-first-android-architecture/index.html"><small>APIs, Databases, and Backend Integration</small>Offline-First Android App Architecture</a></li><li><a href="../../android/retrofit-android-guide/index.html"><small>APIs, Databases, and Backend Integration</small>Retrofit in Android: Complete Guide</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/paging-3-pagination/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/paging-3-pagination/&amp;text=Pagination with Paging 3" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/paging-3-pagination/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#pieces">The pieces</a></li><li><a href="#setup">Setup</a></li><li><a href="#source">1. PagingSource</a></li><li><a href="#pager">2. Pager and ViewModel</a></li><li><a href="#compose">3. Compose UI with load states</a></li><li><a href="#mediator">4. Network + Room with RemoteMediator</a></li><li><a href="#testing">Testing</a></li><li><a href="#use-cases">Where Paging fits</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dpaging-3-pagination-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dpaging-3-pagination-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

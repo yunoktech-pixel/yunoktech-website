@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>remember vs rememberSaveable in Jetpack Compose | Yunok Tech</title>
+  <meta name="description" content="remember vs rememberSaveable explained: what survives recomposition, rotation and process death, keys, custom Savers, Parcelize, size limits and when to use a ViewModel instead.">
+  <meta name="keywords" content="remember vs remembersaveable, rememberSaveable compose, compose remember keys, compose saver, state survives rotation compose, process death compose, parcelize compose state">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/remember-vs-remembersaveable/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/remember-vs-remembersaveable/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="remember vs rememberSaveable in Jetpack Compose">
+  <meta property="og:description" content="remember vs rememberSaveable explained: what survives recomposition, rotation and process death, keys, custom Savers, Parcelize, size limits and when to use a ViewModel instead.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Jetpack Compose">
+  <meta name="twitter:title" content="remember vs rememberSaveable in Jetpack Compose">
+  <meta name="twitter:description" content="remember vs rememberSaveable explained: what survives recomposition, rotation and process death, keys, custom Savers, Parcelize, size limits and when to use a ViewModel instead.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "remember vs rememberSaveable", "description": "remember vs rememberSaveable explained: what survives recomposition, rotation and process death, keys, custom Savers, Parcelize, size limits and when to use a ViewModel instead.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Jetpack Compose", "keywords": "rememberSaveable compose, compose remember keys, compose saver, state survives rotation compose, process death compose, parcelize compose state", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/remember-vs-remembersaveable/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "remember vs rememberSaveable", "item": "https://yunoktech.com/android/remember-vs-remembersaveable/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#compose">Jetpack Compose</a></nav>
+    <span class="ad-chip">🎨 Jetpack Compose</span>
+    <h1 id="article-title">remember vs rememberSaveable</h1>
+    <p class="ad-lede">remember and rememberSaveable look almost identical, but they survive very different events. Pick the wrong one and your users lose what they typed when they rotate the phone, or when Android reclaims memory in the background.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#survival">What each one survives</a></li><li><a href="#how">How rememberSaveable works</a></li><li><a href="#parcelize">Custom types with Parcelize</a></li><li><a href="#saver">Custom Savers</a></li><li><a href="#keys">Keys: resetting remembered values</a></li><li><a href="#limits">Limits and when to use a ViewModel instead</a></li><li><a href="#test">How to test process death</a></li><li><a href="#use-cases">Choosing in practice</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A user types a long review, rotates the phone to see it better, and the text field is empty. Or they switch to their banking app to copy an OTP, come back, and the screen has reset. Both bugs come from choosing <code>remember</code> where <code>rememberSaveable</code> (or a ViewModel) was needed.</p>
+
+<h2 id="survival">What each one survives</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Event</th><th><code>remember</code></th><th><code>rememberSaveable</code></th><th>ViewModel</th><th>ViewModel + SavedStateHandle</th></tr></thead>
+  <tbody>
+    <tr><td>Recomposition</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Leaving composition (e.g. <code>if</code> hides it)</td><td>❌</td><td>❌ (unless in a saveable state holder, as in navigation)</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Configuration change (rotation, dark mode, locale)</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+    <tr><td>Process death (system kills app in background)</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+    <tr><td>User closes app from recents / back from root</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+  </tbody>
+</table>
+</div>
+<p>For data that must survive even the user closing the app, such as drafts or settings, persist it with Room or DataStore.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-rs-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-rs-t fig-rs-d">
+    <title id="fig-rs-t">Survival levels of Compose state</title>
+    <desc id="fig-rs-d">Nested boxes from smallest to largest lifetime: remember survives recomposition; rememberSaveable also survives configuration changes and process death via the saved instance state Bundle; Room or DataStore persists across app restarts.</desc>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="20" y="10" width="680" height="160" rx="16"/><text class="d-t" x="360" y="34" text-anchor="middle">Room / DataStore: survives app restarts</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="80" y="46" width="560" height="110" rx="14"/><text class="d-t" x="360" y="70" text-anchor="middle">rememberSaveable: + rotation + process death (Bundle)</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="200" y="86" width="320" height="56" rx="12"/><text class="d-t" x="360" y="119" text-anchor="middle">remember: recomposition only</text></g>
+  </svg>
+  <figcaption id="fig-rs-cap">Choose the smallest lifetime that still protects the user's work.</figcaption>
+</figure>
+
+<h2 id="how">How rememberSaveable works</h2>
+<p><code>rememberSaveable</code> stores its value in the <strong>saved instance state Bundle</strong>, the same mechanism Activities use. The value must therefore be saveable: primitives, Strings, and <code>Parcelable</code> or <code>Serializable</code> types, or you provide a <code>Saver</code>.</p>
+<figure class="code"><figcaption><span class="file">Common usages</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ReviewForm</span>() {
+    <span class="tk-k">var</span> text <span class="tk-k">by</span> rememberSaveable { mutableStateOf(<span class="tk-s">""</span>) }              <span class="tk-c">// String: saveable</span>
+    <span class="tk-k">var</span> rating <span class="tk-k">by</span> rememberSaveable { mutableIntStateOf(<span class="tk-n">0</span>) }          <span class="tk-c">// Int: saveable</span>
+    <span class="tk-k">var</span> showTips <span class="tk-k">by</span> remember { mutableStateOf(<span class="tk-k">true</span>) }                <span class="tk-c">// transient UI hint: remember is fine</span>
+    <span class="tk-c">// ...</span>
+}</code></pre></figure>
+
+<h2 id="parcelize">Custom types with Parcelize</h2>
+<figure class="code"><figcaption><span class="file">Parcelable state</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Parcelize</span>
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">DateRange</span>(<span class="tk-k">val</span> startEpochDay: <span class="tk-t">Long</span>, <span class="tk-k">val</span> endEpochDay: <span class="tk-t">Long</span>) : <span class="tk-t">Parcelable</span>
+
+<span class="tk-k">var</span> range <span class="tk-k">by</span> rememberSaveable { mutableStateOf(<span class="tk-t">DateRange</span>(<span class="tk-n">0</span>, <span class="tk-n">0</span>)) }</code></pre></figure>
+<p>This requires the <code>kotlin-parcelize</code> Gradle plugin.</p>
+
+<h2 id="saver">Custom Savers</h2>
+<figure class="code"><figcaption><span class="file">mapSaver / listSaver</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Filters</span>(<span class="tk-k">val</span> query: <span class="tk-t">String</span>, <span class="tk-k">val</span> onlyUnread: <span class="tk-t">Boolean</span>)
+
+<span class="tk-k">val</span> <span class="tk-t">FiltersSaver</span> = listSaver&lt;<span class="tk-t">Filters</span>, <span class="tk-t">Any</span>&gt;(
+    save = { listOf(it.query, it.onlyUnread) },
+    restore = { <span class="tk-t">Filters</span>(it[<span class="tk-n">0</span>] <span class="tk-k">as</span> <span class="tk-t">String</span>, it[<span class="tk-n">1</span>] <span class="tk-k">as</span> <span class="tk-t">Boolean</span>) },
+)
+
+<span class="tk-k">var</span> filters <span class="tk-k">by</span> rememberSaveable(stateSaver = <span class="tk-t">FiltersSaver</span>) { mutableStateOf(<span class="tk-t">Filters</span>(<span class="tk-s">""</span>, <span class="tk-k">false</span>)) }</code></pre></figure>
+
+<h2 id="keys">Keys: resetting remembered values</h2>
+<figure class="code"><figcaption><span class="file">remember with keys</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ProductScreen</span>(productId: <span class="tk-t">String</span>) {
+    <span class="tk-c">// Recreated when productId changes, otherwise reused</span>
+    <span class="tk-k">val</span> formatter = remember(productId) { <span class="tk-t">PriceFormatter</span>(productId) }
+    <span class="tk-c">// Saved selection resets when navigating to a different product</span>
+    <span class="tk-k">var</span> selectedSize <span class="tk-k">by</span> rememberSaveable(productId) { mutableStateOf&lt;<span class="tk-t">String</span>?&gt;(<span class="tk-k">null</span>) }
+}</code></pre></figure>
+
+<h2 id="limits">Limits and when to use a ViewModel instead</h2>
+<ul>
+  <li><strong>Bundle size is limited.</strong> Saving large lists or bitmaps can cause <code>TransactionTooLargeException</code>. Save IDs or small input, and reload data from the repository.</li>
+  <li><strong>Business logic doesn't belong in composables.</strong> If state needs loading, validation or saving, put it in a ViewModel, using <code>SavedStateHandle</code> for the parts that must survive process death.</li>
+  <li><strong>Don't save derived values.</strong> Save the inputs and recompute the rest.</li>
+</ul>
+
+<h2 id="test">How to test process death</h2>
+<ol class="steps">
+  <li>Run the app, type into the form, then press Home.</li>
+  <li>Run <code>adb shell am kill com.your.package</code> (it only kills background apps), or enable <em>Don't keep activities</em>.</li>
+  <li>Reopen the app from recents. Everything in <code>rememberSaveable</code> and <code>SavedStateHandle</code> should be restored.</li>
+</ol>
+
+<h2 id="use-cases">Choosing in practice</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Text the user typed</h3><p><code>rememberSaveable</code>, or <code>SavedStateHandle</code> in the ViewModel if the screen logic uses it.</p></div>
+  <div class="card usecase"><h3>Animation or tooltip flags</h3><p><code>remember</code>. Losing it on rotation is harmless.</p></div>
+  <div class="card usecase"><h3>Scroll position</h3><p><code>rememberLazyListState()</code> already uses a saver internally.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does rememberSaveable survive navigating away and back?</summary><div><p>Inside Navigation Compose or Navigation 3 destinations, saveable state is kept for back stack entries, so returning to a screen restores it. Outside such holders, leaving composition discards it.</p></div></details>
+  <details><summary>Is rememberSaveable slower?</summary><div><p>Only slightly: it registers with the saved-state registry. Use it where survival matters, not for every value.</p></div></details>
+  <details><summary>Can I rememberSaveable a ViewModel?</summary><div><p>No. ViewModels have their own lifecycle. Use <code>viewModel()</code> or <code>hiltViewModel()</code> instead.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><code>remember</code> survives <strong>recomposition</strong>. <code>rememberSaveable</code> also survives <strong>configuration changes and process death</strong>, via the Bundle. Use saveable state for user input, ViewModels with <code>SavedStateHandle</code> for screen logic, and Room or DataStore for anything that must outlive the session.</p>
+<p>Next step: run work at the right time with <a href="../compose-side-effects/index.html">Side Effects in Compose</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/develop/ui/compose/state-saving" target="_blank" rel="noopener">Save UI state in Compose</a></li><li><a href="https://developer.android.com/develop/ui/compose/state" target="_blank" rel="noopener">State and Jetpack Compose</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/saving-states" target="_blank" rel="noopener">Save UI states (overview)</a></li><li><a href="https://developer.android.com/kotlin/parcelize" target="_blank" rel="noopener">Parcelable implementation generator (Parcelize)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dremember-vs-remembersaveable-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dremember-vs-remembersaveable-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Jetpack Compose clicks once you build real screens with real state. Practise modern Android UI development on projects that go beyond toy examples.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/compose-state-management/index.html"><small>Jetpack Compose</small>State Management in Jetpack Compose</a></li><li><a href="../../android/compose-state-hoisting/index.html"><small>Jetpack Compose</small>State Hoisting Explained with Examples</a></li><li><a href="../../android/how-android-app-works-internally/index.html"><small>Android Development for Beginners</small>How an Android App Works Internally</a></li><li><a href="../../android/compose-side-effects/index.html"><small>Jetpack Compose</small>Side Effects in Compose: LaunchedEffect, SideEffect, and DisposableEffect</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/remember-vs-remembersaveable/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/remember-vs-remembersaveable/&amp;text=remember vs rememberSaveable" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/remember-vs-remembersaveable/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#survival">What each one survives</a></li><li><a href="#how">How rememberSaveable works</a></li><li><a href="#parcelize">Custom types with Parcelize</a></li><li><a href="#saver">Custom Savers</a></li><li><a href="#keys">Keys: resetting remembered values</a></li><li><a href="#limits">Limits and when to use a ViewModel instead</a></li><li><a href="#test">How to test process death</a></li><li><a href="#use-cases">Choosing in practice</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dremember-vs-remembersaveable-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dremember-vs-remembersaveable-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

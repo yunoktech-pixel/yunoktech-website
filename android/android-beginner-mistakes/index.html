@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Mistakes Beginners Make in Android Development | Yunok Tech</title>
+  <meta name="description" content="15 common Android beginner mistakes, from main-thread work and leaked Contexts to lost state, ignored errors, hard-coded strings and leaked API keys, with fixes in Kotlin.">
+  <meta name="keywords" content="android beginner mistakes, android development mistakes, android best practices beginners, networkonmainthreadexception, android memory leak context, configuration change state loss, android api key in code">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/android-beginner-mistakes/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/android-beginner-mistakes/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Common Mistakes Beginners Make in Android Development">
+  <meta property="og:description" content="15 common Android beginner mistakes, from main-thread work and leaked Contexts to lost state, ignored errors, hard-coded strings and leaked API keys, with fixes in Kotlin.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Development for Beginners">
+  <meta name="twitter:title" content="Common Mistakes Beginners Make in Android Development">
+  <meta name="twitter:description" content="15 common Android beginner mistakes, from main-thread work and leaked Contexts to lost state, ignored errors, hard-coded strings and leaked API keys, with fixes in Kotlin.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Common Mistakes Beginners Make in Android Development", "description": "15 common Android beginner mistakes, from main-thread work and leaked Contexts to lost state, ignored errors, hard-coded strings and leaked API keys, with fixes in Kotlin.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Beginner", "articleSection": "Android Development for Beginners", "keywords": "android development mistakes, android best practices beginners, networkonmainthreadexception, android memory leak context, configuration change state loss, android api key in code", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/android-beginner-mistakes/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Common Mistakes Beginners Make in Android Development", "item": "https://yunoktech.com/android/android-beginner-mistakes/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#beginners">Android Development for Beginners</a></nav>
+    <span class="ad-chip">🌱 Android Development for Beginners</span>
+    <h1 id="article-title">Common Mistakes Beginners Make in Android Development</h1>
+    <p class="ad-lede">Most beginner Android bugs come from the same handful of mistakes. Each one is easy to fix once you understand why Android behaves the way it does. Here are the most common, with the symptom, the cause and the corrected code.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>4 min</b> read</span>
+      <span>🎯 <b>Beginner</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#threading">Threading mistakes</a></li><li><a href="#lifecycle">Lifecycle and state mistakes</a></li><li><a href="#architecture">Architecture mistakes</a></li><li><a href="#data">Data and error-handling mistakes</a></li><li><a href="#quality">Security and quality mistakes</a></li><li><a href="#checklist">A quick self-review checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Every Android developer has shipped at least one of these: a screen that loses its data on rotation, a crash that only happens on slow networks, an API key committed to GitHub. They're not signs that you're bad at Android. They're the platform's sharp edges, and everyone cuts themselves once.</p>
+<p>This article collects the most common beginner mistakes, grouped by area. Each one has a <strong>symptom</strong> so you can recognise it, a <strong>cause</strong>, and a <strong>fix</strong> with Kotlin code.</p>
+
+<figure class="diagram" role="group" aria-labelledby="fig-m-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-m-t fig-m-d">
+    <title id="fig-m-t">Categories of common beginner mistakes</title>
+    <desc id="fig-m-d">Five categories: threading, lifecycle and state, architecture, data and errors, and security and quality.</desc>
+    <rect class="d-red" x="10" y="30" width="130" height="80" rx="12"/><text class="d-t" x="75" y="66" text-anchor="middle">Threading</text><text class="d-s" x="75" y="86" text-anchor="middle">main thread</text>
+    <rect class="d-amber" x="152" y="30" width="130" height="80" rx="12"/><text class="d-t" x="217" y="66" text-anchor="middle">Lifecycle</text><text class="d-s" x="217" y="86" text-anchor="middle">state loss, leaks</text>
+    <rect class="d-violet" x="294" y="30" width="130" height="80" rx="12"/><text class="d-t" x="359" y="66" text-anchor="middle">Architecture</text><text class="d-s" x="359" y="86" text-anchor="middle">logic in UI</text>
+    <rect class="d-blue" x="436" y="30" width="130" height="80" rx="12"/><text class="d-t" x="501" y="66" text-anchor="middle">Data &amp; errors</text><text class="d-s" x="501" y="86" text-anchor="middle">happy path only</text>
+    <rect class="d-green" x="578" y="30" width="130" height="80" rx="12"/><text class="d-t" x="643" y="66" text-anchor="middle">Security &amp; QA</text><text class="d-s" x="643" y="86" text-anchor="middle">keys, a11y, tests</text>
+  </svg>
+  <figcaption id="fig-m-cap">Almost every beginner bug falls into one of these five buckets.</figcaption>
+</figure>
+
+<h2 id="threading">Threading mistakes</h2>
+<h3 id="m1">1. Doing slow work on the main thread</h3>
+<p><strong>Symptom:</strong> frozen UI, "App isn't responding" dialogs, <code>NetworkOnMainThreadException</code>. <strong>Cause:</strong> network, database or file work on the UI thread. <strong>Fix:</strong> use coroutines with main-safe APIs (Retrofit and Room suspend functions), and <code>withContext(Dispatchers.IO)</code> for your own blocking code.</p>
+<figure class="code"><figcaption><span class="file">Fix</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> load() = viewModelScope.launch {
+    <span class="tk-k">val</span> articles = repository.fetchArticles()     <span class="tk-c">// suspend + main-safe</span>
+    _uiState.update { it.copy(articles = articles) }
+}</code></pre></figure>
+<h3 id="m2">2. Using GlobalScope or unmanaged threads</h3>
+<p><strong>Symptom:</strong> work continues after the user leaves, crashes when updating destroyed UI, leaks. <strong>Fix:</strong> launch in <code>viewModelScope</code> or <code>lifecycleScope</code> so work is cancelled automatically. See <a href="../kotlin-coroutines-flow-android/index.html">Coroutines and Flow Explained</a>.</p>
+
+<h2 id="lifecycle">Lifecycle and state mistakes</h2>
+<h3 id="m3">3. Losing state on rotation</h3>
+<p><strong>Symptom:</strong> typed text or loaded data disappears when the screen rotates or dark mode toggles. <strong>Cause:</strong> state stored in the Activity or in plain <code>remember</code>. <strong>Fix:</strong> screen state in a ViewModel, and UI-element state in <code>rememberSaveable</code>.</p>
+<h3 id="m4">4. Ignoring process death</h3>
+<p><strong>Symptom:</strong> after the app has been in the background for a while, it returns with an empty or broken screen. <strong>Fix:</strong> persist critical in-progress input with <code>SavedStateHandle</code>, and test with <em>Don't keep activities</em>. See <a href="../how-android-app-works-internally/index.html">How an Android App Works Internally</a>.</p>
+<h3 id="m5">5. Holding a Context or View in a ViewModel or singleton</h3>
+<p><strong>Symptom:</strong> memory leaks, and LeakCanary warnings about destroyed Activities. <strong>Fix:</strong> never store Activity contexts in long-lived objects. Use the application context if you really need one.</p>
+<figure class="code"><figcaption><span class="file">Bad vs good</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// ❌ Leaks the Activity after rotation</span>
+<span class="tk-k">class</span> <span class="tk-t">ProfileViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> activity: <span class="tk-t">Activity</span>) : <span class="tk-t">ViewModel</span>()
+
+<span class="tk-c">// ✅ Depend on what you need, not on the Activity</span>
+<span class="tk-k">class</span> <span class="tk-t">ProfileViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">ProfileRepository</span>) : <span class="tk-t">ViewModel</span>()</code></pre></figure>
+
+<h2 id="architecture">Architecture mistakes</h2>
+<h3 id="m6">6. Putting logic in composables or Activities</h3>
+<p><strong>Symptom:</strong> screens that are hard to test and change, and duplicated logic. <strong>Fix:</strong> keep composables focused on rendering state and emitting events. Validation, formatting rules and data loading belong in the ViewModel or below.</p>
+<h3 id="m7">7. Exposing mutable state</h3>
+<figure class="code"><figcaption><span class="file">Fix</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">private</span> <span class="tk-k">val</span> _uiState = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">UiState</span>())
+<span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">UiState</span>&gt; = _uiState.asStateFlow()   <span class="tk-c">// UI can read, not write</span></code></pre></figure>
+<h3 id="m8">8. Over-engineering too early</h3>
+<p><strong>Symptom:</strong> five modules and twenty interfaces for a two-screen app. <strong>Fix:</strong> start with ViewModel + repository, and add structure when real complexity appears. See <a href="../clean-architecture-android/index.html">Clean Architecture: Practical Lessons</a>.</p>
+
+<h2 id="data">Data and error-handling mistakes</h2>
+<h3 id="m9">9. Coding only the happy path</h3>
+<p><strong>Symptom:</strong> crashes or infinite spinners on slow or offline networks. <strong>Fix:</strong> model loading, empty, error and success explicitly, and offer retry.</p>
+<figure class="code"><figcaption><span class="file">Explicit screen states</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">sealed</span> <span class="tk-k">interface</span> <span class="tk-t">ArticlesUiState</span> {
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Loading</span> : <span class="tk-t">ArticlesUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">object</span> <span class="tk-t">Empty</span> : <span class="tk-t">ArticlesUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Success</span>(<span class="tk-k">val</span> items: <span class="tk-t">List</span>&lt;<span class="tk-t">Article</span>&gt;) : <span class="tk-t">ArticlesUiState</span>
+    <span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">Error</span>(<span class="tk-k">val</span> message: <span class="tk-t">String</span>) : <span class="tk-t">ArticlesUiState</span>
+}</code></pre></figure>
+<h3 id="m10">10. Using <code>!!</code> to silence the compiler</h3>
+<p><strong>Symptom:</strong> <code>NullPointerException</code> crashes. <strong>Fix:</strong> handle nullability with <code>?.</code>, <code>?:</code>, early returns, or better types. See <a href="../kotlin-null-safety/index.html">Kotlin Null Safety Explained</a>.</p>
+<h3 id="m11">11. Using Double for money</h3>
+<p><strong>Fix:</strong> use <code>BigDecimal</code> or integer minor units (paise or cents) for currency.</p>
+
+<h2 id="quality">Security and quality mistakes</h2>
+<h3 id="m12">12. Hard-coding API keys and secrets</h3>
+<p><strong>Symptom:</strong> keys leaked on GitHub or extracted from the APK, and unexpected bills. <strong>Fix:</strong> keep secrets on a server. Restrict any keys that must ship in the app. See <a href="../secure-api-keys-android/index.html">Secure API Keys in Android Apps</a>.</p>
+<h3 id="m13">13. Hard-coding text and sizes</h3>
+<p><strong>Fix:</strong> put user-facing text in <code>strings.xml</code> (via <code>stringResource</code>) for translation, use <code>sp</code> for text and <code>dp</code> for sizes, and test with large font scale.</p>
+<h3 id="m14">14. Ignoring accessibility</h3>
+<p><strong>Fix:</strong> give icons content descriptions, keep touch targets at least 48dp, ensure contrast, and try TalkBack once on every new screen.</p>
+<figure class="code"><figcaption><span class="file">Accessible icon button</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-t">IconButton</span>(onClick = onDelete) {
+    <span class="tk-t">Icon</span>(<span class="tk-t">Icons</span>.<span class="tk-t">Default</span>.<span class="tk-t">Delete</span>, contentDescription = stringResource(<span class="tk-t">R</span>.string.delete_note))
+}</code></pre></figure>
+<h3 id="m15">15. Skipping version control and tests</h3>
+<p><strong>Fix:</strong> commit small changes often, and write unit tests for ViewModels and pure logic first. They're cheap and catch regressions immediately.</p>
+
+<h2 id="checklist">A quick self-review checklist</h2>
+<ul>
+  <li>☐ No network, database or file work on the main thread</li>
+  <li>☐ All coroutines launched in a lifecycle-aware scope</li>
+  <li>☐ Screen survives rotation and process death</li>
+  <li>☐ No Activity, View or Context stored in a ViewModel</li>
+  <li>☐ Every data screen has loading, empty and error states</li>
+  <li>☐ No <code>!!</code> without a comment explaining why it's safe</li>
+  <li>☐ No secrets in source code</li>
+  <li>☐ Strings in resources; icons have content descriptions</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>How do I find these mistakes in my own code?</summary><div><p>Enable StrictMode in debug builds, add LeakCanary, turn on <em>Don't keep activities</em>, test on a slow network profile, and run Android Studio's lint (Analyze → Inspect Code).</p></div></details>
+  <details><summary>Are these mistakes only for beginners?</summary><div><p>No. Experienced developers make them under deadline pressure too. That's why checklists, code review and tests exist.</p></div></details>
+  <details><summary>Which mistake should I fix first?</summary><div><p>Anything that crashes or loses user data: main-thread work, state loss and missing error handling. Then security, then quality.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Beginner mistakes in Android follow predictable patterns: <strong>blocking the main thread, ignoring lifecycle and process death, putting logic in the UI, coding only the happy path, and leaking secrets</strong>. Each has a well-established fix, and once you've internalised them your apps become dramatically more reliable.</p>
+<p>Next step: run the checklist against your current project, then deepen your Kotlin with <a href="../kotlin-basics-android/index.html">Kotlin Basics Every Android Developer Should Know</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://developer.android.com/topic/architecture/recommendations" target="_blank" rel="noopener">Recommendations for Android architecture</a></li><li><a href="https://developer.android.com/topic/libraries/architecture/saving-states" target="_blank" rel="noopener">Save UI states</a></li><li><a href="https://developer.android.com/topic/performance/vitals/anr" target="_blank" rel="noopener">Keep your app responsive</a></li><li><a href="https://developer.android.com/guide/topics/resources/localization" target="_blank" rel="noopener">Localize your app</a></li><li><a href="https://developer.android.com/develop/ui/compose/accessibility" target="_blank" rel="noopener">Accessibility in Compose</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-beginner-mistakes-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-beginner-mistakes-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Reading a roadmap is the easy part. The real progress happens when you build a foundation step by step, with someone reviewing your code and answering the questions that come up along the way.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/build-first-android-app/index.html"><small>Android Development for Beginners</small>How to Build Your First Android App</a></li><li><a href="../../android/how-android-app-works-internally/index.html"><small>Android Development for Beginners</small>How an Android App Works Internally</a></li><li><a href="../../android/android-memory-leaks/index.html"><small>Testing, Debugging, and Performance</small>Android Memory Leaks: Causes and Solutions</a></li><li><a href="../../android/secure-api-keys-android/index.html"><small>Android Security and Privacy</small>Secure API Keys and Secrets in Android Apps</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/android-beginner-mistakes/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/android-beginner-mistakes/&amp;text=Common Mistakes Beginners Make in Android Development" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/android-beginner-mistakes/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#threading">Threading mistakes</a></li><li><a href="#lifecycle">Lifecycle and state mistakes</a></li><li><a href="#architecture">Architecture mistakes</a></li><li><a href="#data">Data and error-handling mistakes</a></li><li><a href="#quality">Security and quality mistakes</a></li><li><a href="#checklist">A quick self-review checklist</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-beginner-mistakes-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dandroid-beginner-mistakes-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!--meta
+{
+  "seo_title": "Subscription Billing in Android Apps (Play Billing)",
+  "description": "Implement subscriptions with Google Play Billing: products, base plans and offers, BillingClient flow, purchase verification on your server, acknowledgement, RTDN, entitlements and testing.",
+  "primary_keyword": "android subscription billing",
+  "keywords": ["google play billing library kotlin", "base plans offers", "acknowledge purchase", "real-time developer notifications", "purchase token verification", "license testing play billing"],
+  "lede": "Subscriptions turn an app into a business, and billing bugs turn paying users into angry ones. Google Play Billing handles payments, but entitlement, verification and lifecycle events are your job. Here's the architecture and the code that make subscriptions reliable.",
+  "date": "2026-10-15",
+  "cta": "publishing",
+  "related": ["android-monetization-ads-vs-iap", "play-integrity-api-explained", "prepare-android-app-production", "firebase-cloud-messaging-push-notifications"],
+  "refs": [
+    ["Integrate the Google Play Billing Library", "https://developer.android.com/google/play/billing/integrate"],
+    ["Subscriptions overview (base plans and offers)", "https://developer.android.com/google/play/billing/subscriptions"],
+    ["Fight fraud and abuse: verify purchases", "https://developer.android.com/google/play/billing/security"],
+    ["Real-time developer notifications", "https://developer.android.com/google/play/billing/getting-ready#configure-rtdn"],
+    ["Play Billing Library deprecation schedule", "https://developer.android.com/google/play/billing/deprecation-faq"]
+  ]
+}
+-->
+<p class="ad-lead">The happy path, where a user taps "Subscribe", pays and gets access, is a small part of subscription billing. The rest is renewals, failed payments and grace periods, upgrades, refunds, restores on new devices and fraud. A server-backed design handles all of them consistently.</p>
+
+<div class="note"><b>Keep the library current</b><p>Google deprecates older Play Billing Library versions on a published schedule. As of late 2026, new apps and updates can no longer use version 7 or older. Check the deprecation FAQ and use the latest version. API shapes change between major versions, so verify the code below against the reference docs for your version.</p></div>
+
+<h2 id="architecture">Architecture</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-bill-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-bill-t fig-bill-d">
+    <title id="fig-bill-t">Server-backed subscription architecture</title>
+    <desc id="fig-bill-d">The app queries product details and launches the purchase flow with BillingClient. On purchase, the app sends the purchase token to your backend. The backend verifies it with the Google Play Developer API, acknowledges it, and stores the entitlement. Google sends real-time developer notifications for renewals, cancellations and refunds; the backend updates entitlements, and the app reads entitlements from the backend.</desc>
+    <defs><marker id="blm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="80" width="170" height="70" rx="12"/><text class="d-t" x="105" y="108" text-anchor="middle">App</text><text class="d-s" x="105" y="128" text-anchor="middle">BillingClient</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="290" y="80" width="170" height="70" rx="12"/><text class="d-t" x="375" y="108" text-anchor="middle">Your backend</text><text class="d-s" x="375" y="128" text-anchor="middle">entitlements DB</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-amber" x="550" y="80" width="150" height="70" rx="12"/><text class="d-t" x="625" y="108" text-anchor="middle">Google Play</text><text class="d-s" x="625" y="128" text-anchor="middle">Developer API</text></g>
+    <path class="d-flow" d="M190 100 H286" marker-end="url(#blm)"/><text class="d-s" x="238" y="92" text-anchor="middle">purchase token</text>
+    <path class="d-flow" d="M460 100 H546" marker-end="url(#blm)"/><text class="d-s" x="503" y="92" text-anchor="middle">verify + ack</text>
+    <path class="d-flow" d="M550 140 H464" marker-end="url(#blm)"/><text class="d-s" x="507" y="162" text-anchor="middle">RTDN events</text>
+    <path class="d-flow" d="M290 130 H194" marker-end="url(#blm)"/><text class="d-s" x="242" y="150" text-anchor="middle">entitlements</text>
+    <path class="d-dash" d="M105 80 V40 H625 V76" marker-end="url(#blm)"/><text class="d-s" x="365" y="34" text-anchor="middle">purchase flow (Play UI)</text>
+  </svg>
+  <figcaption id="fig-bill-cap">The server is the source of truth for who has access. The app displays it.</figcaption>
+</figure>
+
+<h2 id="products">Products, base plans and offers</h2>
+<ul>
+  <li>A <strong>subscription</strong> product (for example <code>premium</code>) has one or more <strong>base plans</strong> (monthly, yearly; auto-renewing or prepaid).</li>
+  <li><strong>Offers</strong> add trials or introductory prices to a base plan, with eligibility rules.</li>
+  <li>Create them in Play Console → Monetize. The app queries them at runtime, so never hard-code prices.</li>
+</ul>
+
+<h2 id="client">Client flow</h2>
+<code-block lang="kotlin" file="BillingRepository.kt (simplified; verify APIs for your PBL version)">
+class BillingRepository(
+    context: Context,
+    private val backend: EntitlementApi,
+    private val scope: CoroutineScope,
+) : PurchasesUpdatedListener {
+
+    private val client = BillingClient.newBuilder(context)
+        .setListener(this)
+        .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+        .build()
+
+    suspend fun connect(): Boolean = suspendCancellableCoroutine { cont ->
+        client.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(result: BillingResult) {
+                if (cont.isActive) cont.resume(result.responseCode == BillingClient.BillingResponseCode.OK)
+            }
+            override fun onBillingServiceDisconnected() { /* reconnect on next call */ }
+        })
+    }
+
+    suspend fun premiumDetails(): ProductDetails? {
+        val params = QueryProductDetailsParams.newBuilder().setProductList(listOf(
+            QueryProductDetailsParams.Product.newBuilder()
+                .setProductId("premium").setProductType(BillingClient.ProductType.SUBS).build()
+        )).build()
+        return client.queryProductDetails(params).productDetailsList?.firstOrNull()   // billing-ktx suspend API
+    }
+
+    fun launch(activity: Activity, details: ProductDetails, offerToken: String) {
+        val flowParams = BillingFlowParams.newBuilder().setProductDetailsParamsList(listOf(
+            BillingFlowParams.ProductDetailsParams.newBuilder()
+                .setProductDetails(details).setOfferToken(offerToken).build()
+        )).build()
+        client.launchBillingFlow(activity, flowParams)
+    }
+
+    override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
+        if (result.responseCode != BillingClient.BillingResponseCode.OK) return   // cancelled / error → show message
+        purchases.orEmpty()
+            .filter { it.purchaseState == Purchase.PurchaseState.PURCHASED }
+            .forEach { purchase ->
+                // Server verifies with Google, acknowledges, and grants the entitlement.
+                scope.launch { backend.verifyAndGrant(purchase.purchaseToken, purchase.products) }
+            }
+    }
+}
+</code-block>
+<div class="warn"><b>Acknowledge within the deadline</b><p>Purchases not acknowledged within three days are refunded automatically. Acknowledge on the server after verification (or on the client with <code>acknowledgePurchase</code> if you have no backend).</p></div>
+
+<h2 id="server">Server responsibilities</h2>
+<ol class="steps">
+  <li><strong>Verify</strong> each purchase token with the Google Play Developer API (subscriptions v2 endpoint).</li>
+  <li><strong>Link</strong> the purchase to your user account (and guard against token reuse across accounts).</li>
+  <li><strong>Acknowledge</strong> the purchase.</li>
+  <li><strong>Store the entitlement</strong> with its expiry and state.</li>
+  <li><strong>Process RTDN</strong> (real-time developer notifications via Pub/Sub) for renewals, grace periods, account holds, cancellations and refunds, re-querying the API for the latest state.</li>
+</ol>
+
+<h2 id="states">Subscription states to handle in UI</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>State</th><th>User access</th><th>UI</th></tr></thead>
+  <tbody>
+    <tr><td>Active</td><td>Full</td><td>Normal premium experience</td></tr>
+    <tr><td>Cancelled (still in period)</td><td>Until expiry</td><td>"Your plan ends on …", resubscribe option</td></tr>
+    <tr><td>Grace period</td><td>Usually keep access</td><td>Ask to fix payment method</td></tr>
+    <tr><td>Account hold</td><td>Remove access</td><td>Explain and link to Play subscription centre</td></tr>
+    <tr><td>Expired / refunded</td><td>None</td><td>Offer to resubscribe</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li>Add <strong>license testers</strong> in Play Console, whose purchases use test payment methods.</li>
+  <li>Upload to a testing track: billing requires the app to be published on a track with matching signing.</li>
+  <li>Test renewals (accelerated for testers), cancellation, grace period and restore on a second device.</li>
+</ul>
+
+<h2 id="use-cases">Examples</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Content subscription</h3><p>Monthly and yearly base plans, a 7-day trial offer, and server-checked entitlements for premium content.</p></div>
+  <div class="card usecase"><h3>Remove ads (one-time)</h3><p>A one-time product, acknowledged and verified, with the entitlement cached locally and checked periodically.</p></div>
+  <div class="card usecase"><h3>Multi-platform account</h3><p>Entitlements stored per user on the server, so access works across the user's devices.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I skip the backend?</summary><div><p>For simple one-time unlocks you can verify and acknowledge on the device, but it's easier to defraud and harder to sync across devices. Subscriptions benefit greatly from a backend.</p></div></details>
+  <details><summary>How do users manage or cancel?</summary><div><p>Through the Play Store subscription centre. Provide a deep link from your app's settings.</p></div></details>
+  <details><summary>Should I use a subscription management service?</summary><div><p>Third-party services can handle verification, RTDN and analytics for you. Evaluate their cost and data handling against building it yourself.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Reliable subscriptions need <strong>Play Billing on the client</strong>, <strong>verification, acknowledgement and entitlements on your server</strong>, <strong>RTDN</strong> for lifecycle events, clear UI for every state, and thorough testing with license testers. Keep the Billing Library up to date with Google's schedule.</p>
+<p>Next step: keep subscribers happy and ratings high with <a href="../improve-android-app-ratings/index.html">How to Improve Android App Ratings and Reviews</a>.</p>

@@ -1,0 +1,123 @@
+<!--meta
+{
+  "seo_title": "How to Generate Jetpack Compose UI with AI",
+  "description": "Generate Jetpack Compose UI with AI tools from descriptions or design images, then make it production-ready: state hoisting, theming, previews, accessibility, performance and tests.",
+  "primary_keyword": "generate jetpack compose ui with ai",
+  "keywords": ["ai compose ui generator", "image to compose code", "gemini compose preview generation", "ai ui code android", "design to code android", "compose accessibility review"],
+  "lede": "AI tools can turn a screenshot or a description into Compose code in seconds. That's a great start, but rarely production-ready. This guide shows a workflow: generate, then systematically fix state, theming, accessibility and performance, with prompts that reduce rework.",
+  "date": "2026-10-15",
+  "cta": "tools",
+  "related": ["gemini-in-android-studio", "compose-state-hoisting", "material3-theming-dynamic-color", "verify-ai-generated-android-code"],
+  "refs": [
+    ["Gemini in Android Studio: generate UI from images", "https://developer.android.com/studio/gemini/overview"],
+    ["Compose previews", "https://developer.android.com/develop/ui/compose/tooling/previews"],
+    ["Accessibility in Compose", "https://developer.android.com/develop/ui/compose/accessibility"],
+    ["Material 3 in Compose", "https://developer.android.com/develop/ui/compose/designsystems/material3"]
+  ]
+}
+-->
+<p class="ad-lead">Building UI from a design mockup is repetitive: rows, columns, paddings, typography. AI is good at that first draft. It's weaker at the things that make UI production-quality: correct state ownership, your design tokens, accessibility, and behaviour on different screen sizes.</p>
+
+<h2 id="workflow">The workflow</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-gw-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-gw-t fig-gw-d">
+    <title id="fig-gw-t">AI-assisted Compose UI workflow</title>
+    <desc id="fig-gw-d">Start from a design image or description with project rules, generate a stateless composable draft with previews, then refactor for state hoisting and design tokens, check accessibility and adaptive layout, and finally add screenshot and UI tests.</desc>
+    <defs><marker id="gwm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M420 70 H440 M570 70 H590" marker-end="url(#gwm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Design</text><text class="d-s" x="70" y="84" text-anchor="middle">image + rules</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">Generate</text><text class="d-s" x="212" y="84" text-anchor="middle">draft + preview</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="126" height="60" rx="12"/><text class="d-t" x="357" y="66" text-anchor="middle">Refactor</text><text class="d-s" x="357" y="84" text-anchor="middle">state, tokens</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="444" y="40" width="126" height="60" rx="12"/><text class="d-t" x="507" y="66" text-anchor="middle">Check</text><text class="d-s" x="507" y="84" text-anchor="middle">a11y, adaptive</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="594" y="40" width="116" height="60" rx="12"/><text class="d-t" x="652" y="66" text-anchor="middle">Test</text><text class="d-s" x="652" y="84" text-anchor="middle">screenshots</text></g>
+  </svg>
+  <figcaption id="fig-gw-cap">Generation is step two of five. The remaining steps turn a picture into a component you can maintain.</figcaption>
+</figure>
+
+<h2 id="prompt">A prompt that produces better drafts</h2>
+<code-block lang="text" file="Prompt for generating a screen">
+Create a Jetpack Compose screen matching the attached design.
+Constraints:
+- Stateless composable `OrderSummaryContent(state: OrderSummaryUiState, onPay: () -> Unit, onEditAddress: () -> Unit, modifier: Modifier = Modifier)`.
+- Define `OrderSummaryUiState` as an immutable data class with only the fields the UI needs.
+- Use MaterialTheme colorScheme, typography and shapes only (no hard-coded colors or font sizes).
+- Use stringResource placeholders for user-facing text (list the string keys at the end).
+- Content descriptions for icons; touch targets at least 48dp.
+- Use LazyColumn for the item list with stable keys.
+- Add @Preview for light, dark and fontScale 1.5 with realistic sample data.
+Don't add ViewModels, navigation or networking.
+</code-block>
+
+<h2 id="before-after">Typical fixes after generation</h2>
+<code-block lang="kotlin" file="Before: typical AI draft (problems annotated)">
+@Composable
+fun OrderSummary() {
+    var items by remember { mutableStateOf(listOf("Mug", "T-shirt")) }      // ❌ state owned here, fake data
+    Column(Modifier.padding(16.dp).background(Color(0xFFF5F5F5))) {          // ❌ hard-coded color
+        Text("Order Summary", fontSize = 22.sp, fontWeight = FontWeight.Bold) // ❌ hard-coded typography
+        items.forEach { Text(it) }                                            // ❌ not lazy, no keys
+        Icon(Icons.Default.Edit, contentDescription = null,                    // ❌ no description, tiny target
+            modifier = Modifier.size(16.dp).clickable { })
+        Button(onClick = { }) { Text("Pay ₹1,298") }                          // ❌ action not hoisted
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="After: production-ready">
+data class OrderSummaryUiState(val items: List<OrderLineUi>, val totalText: String, val address: String)
+data class OrderLineUi(val id: String, val name: String, val priceText: String)
+
+@Composable
+fun OrderSummaryContent(
+    state: OrderSummaryUiState,
+    onPay: () -> Unit,
+    onEditAddress: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface).padding(16.dp)) {
+        Text(stringResource(R.string.order_summary_title), style = MaterialTheme.typography.headlineSmall)
+        LazyColumn(Modifier.weight(1f).padding(vertical = 8.dp)) {
+            items(state.items, key = { it.id }) { line ->
+                ListItem(headlineContent = { Text(line.name) }, trailingContent = { Text(line.priceText) })
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(state.address, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+            IconButton(onClick = onEditAddress) {                                   // 48dp target by default
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit_address))
+            }
+        }
+        Button(onClick = onPay, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.pay_amount, state.totalText))
+        }
+    }
+}
+</code-block>
+
+<h2 id="checklist">Review checklist for generated UI</h2>
+<ul>
+  <li>☐ Stateless: data in, events out; no fake data or local business state</li>
+  <li>☐ Theme tokens only: no hard-coded colours, sizes or fonts</li>
+  <li>☐ Strings in resources; formatted amounts from state</li>
+  <li>☐ Accessibility: content descriptions, 48dp targets, contrast, sensible reading order</li>
+  <li>☐ Lists are lazy with stable keys</li>
+  <li>☐ Works at large font scale, dark mode, small and wide screens</li>
+  <li>☐ Previews and screenshot tests added</li>
+</ul>
+
+<h2 id="use-cases">Where AI UI generation shines</h2>
+<div class="cards">
+  <div class="card usecase"><h3>First drafts from mockups</h3><p>Saves layout boilerplate, with you refining structure and tokens.</p></div>
+  <div class="card usecase"><h3>Preview generation</h3><p>Realistic preview data and multi-config previews for existing composables.</p></div>
+  <div class="card usecase"><h3>Variants</h3><p>Empty, loading and error states derived from an existing design.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can AI match my design system exactly?</summary><div><p>Only if it knows it. Provide your theme and components in context, or rules telling it to use <code>AppButton</code> and similar, then review.</p></div></details>
+  <details><summary>Is generated UI accessible?</summary><div><p>Often partially. Check with Android Studio's accessibility checks, TalkBack, and screenshot tests at large font scale.</p></div></details>
+  <details><summary>Should I generate whole screens or components?</summary><div><p>Components or single screens with clear boundaries. Large generations are harder to review and fix.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use AI to <strong>draft</strong> Compose UI quickly, then make it production-ready with <strong>state hoisting, theme tokens, string resources, accessibility, lazy lists and tests</strong>. Better prompts reduce the clean-up, but review is always required.</p>
+<p>Next step: apply the same discipline to logic in <a href="../ai-write-kotlin-responsibly/index.html">Using AI to Write Kotlin Code Responsibly</a>.</p>

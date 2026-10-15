@@ -1,0 +1,132 @@
+<!--meta
+{
+  "seo_title": "Build an AI-Powered Search Feature for Android",
+  "description": "Build AI-powered semantic search in Android: keyword vs semantic search, embeddings on a backend or on-device, hybrid ranking, query understanding with LLMs, Room FTS fallback and evaluation.",
+  "primary_keyword": "ai powered search android",
+  "keywords": ["semantic search android", "embeddings search mobile app", "hybrid search ranking", "room fts search", "natural language search app", "vector search android"],
+  "lede": "Keyword search fails when users don't use the exact words in your content: 'cheap phone for my mom' won't match 'budget smartphone with large text'. AI-powered search understands meaning. Here's how to build it for an Android app, from embeddings to hybrid ranking and graceful fallbacks.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["rag-android-apps", "room-database-kotlin", "secure-cloud-ai-api-android", "evaluate-ai-responses-hallucinations"],
+  "refs": [
+    ["Gemini API: embeddings", "https://ai.google.dev/gemini-api/docs/embeddings"],
+    ["Room full-text search (FTS)", "https://developer.android.com/training/data-storage/room/defining-data#fts"],
+    ["MediaPipe text embedder (on-device)", "https://ai.google.dev/edge/mediapipe/solutions/text/text_embedder"],
+    ["Firebase AI Logic", "https://firebase.google.com/docs/ai-logic"]
+  ]
+}
+-->
+<p class="ad-lead">Search is often the highest-intent feature in an app. Users who search know what they want. Semantic search matches by meaning rather than exact words, so it recovers queries that keyword search misses. Done carelessly, it also returns confident nonsense, so build it in layers.</p>
+
+<h2 id="types">Keyword vs semantic vs hybrid</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Approach</th><th>How</th><th>Good at</th><th>Weak at</th></tr></thead>
+  <tbody>
+    <tr><td>Keyword (FTS)</td><td>Match terms, rank by term frequency</td><td>Exact names, SKUs, codes; fast and offline</td><td>Synonyms, intent, typos</td></tr>
+    <tr><td>Semantic</td><td>Compare embedding vectors of query and items</td><td>Meaning, paraphrases, natural language</td><td>Exact identifiers; needs embeddings</td></tr>
+    <tr><td>Hybrid</td><td>Combine both scores</td><td>Best overall relevance</td><td>More complexity</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="embeddings">How semantic search works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-es-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-es-t fig-es-d">
+    <title id="fig-es-t">Semantic search with embeddings</title>
+    <desc id="fig-es-d">Offline, each catalogue item's text is turned into an embedding vector and stored in a vector index on the server. At query time, the user's query is embedded with the same model, the index finds the nearest item vectors by cosine similarity, results are optionally combined with keyword scores, and the top items are returned to the app.</desc>
+    <defs><marker id="esm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-s" x="20" y="22">Indexing (once / on change)</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="32" width="150" height="50" rx="10"/><text class="d-s" x="95" y="62" text-anchor="middle">items' text</text></g>
+    <path class="d-flow" d="M170 57 H210" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="214" y="32" width="150" height="50" rx="10"/><text class="d-s" x="289" y="62" text-anchor="middle">embedding model</text></g>
+    <path class="d-flow" d="M364 57 H404" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="408" y="32" width="150" height="50" rx="10"/><text class="d-s" x="483" y="62" text-anchor="middle">vector index</text></g>
+    <text class="d-s" x="20" y="122">Query time</text>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="20" y="132" width="150" height="50" rx="10"/><text class="d-s" x="95" y="162" text-anchor="middle">"phone for mom"</text></g>
+    <path class="d-flow" d="M170 157 H210" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:4"><rect class="d-violet" x="214" y="132" width="150" height="50" rx="10"/><text class="d-s" x="289" y="162" text-anchor="middle">same model</text></g>
+    <path class="d-flow" d="M364 157 H404 M483 132 V86" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:5"><rect class="d-green" x="408" y="132" width="150" height="50" rx="10"/><text class="d-s" x="483" y="162" text-anchor="middle">nearest neighbours</text></g>
+    <path class="d-flow" d="M558 157 H598" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:6"><rect class="d-dark" x="602" y="132" width="108" height="50" rx="10"/><text class="d-w" x="656" y="162" text-anchor="middle">top results</text></g>
+  </svg>
+  <figcaption id="fig-es-cap">Items and queries must be embedded by the same model. Vectors from different models aren't comparable.</figcaption>
+</figure>
+
+<h2 id="architecture">Where to run it</h2>
+<ul>
+  <li><strong>Server-side (most common):</strong> embed your catalogue with a cloud embedding model, store vectors in a vector-capable database, and expose <code>/search?q=</code>. The app stays simple, and the API key stays on the server.</li>
+  <li><strong>On-device:</strong> for private or offline data such as the user's own notes, use a small on-device text embedder (for example MediaPipe Text Embedder with LiteRT) and brute-force cosine similarity for a few thousand items.</li>
+</ul>
+
+<h2 id="on-device">On-device semantic search for personal notes</h2>
+<code-block lang="kotlin" file="NoteSemanticIndex.kt">
+/** Brute-force cosine search: fine for a few thousand notes. Vectors stored in Room as FloatArray blobs. */
+class NoteSemanticIndex(private val embedder: TextEmbedderWrapper, private val dao: NoteVectorDao) {
+
+    suspend fun index(note: Note) {
+        val vector = embedder.embed("${note.title}\n${note.body}")
+        dao.upsert(NoteVector(note.id, vector.normalized()))
+    }
+
+    suspend fun search(query: String, limit: Int = 10): List<String> = withContext(Dispatchers.Default) {
+        val q = embedder.embed(query).normalized()
+        dao.all()
+            .map { it.noteId to dot(q, it.vector) }       // cosine similarity of normalised vectors
+            .filter { it.second > 0.3f }                 // drop weak matches (tune on your data)
+            .sortedByDescending { it.second }
+            .take(limit)
+            .map { it.first }
+    }
+}
+
+fun FloatArray.normalized(): FloatArray {
+    val norm = kotlin.math.sqrt(sumOf { (it * it).toDouble() }).toFloat().coerceAtLeast(1e-6f)
+    return FloatArray(size) { this[it] / norm }
+}
+fun dot(a: FloatArray, b: FloatArray): Float { var s = 0f; for (i in a.indices) s += a[i] * b[i]; return s }
+</code-block>
+<p><code>TextEmbedderWrapper</code> wraps whichever on-device embedder you choose. Check the MediaPipe or LiteRT documentation for current setup.</p>
+
+<h2 id="hybrid">Hybrid ranking with keyword fallback</h2>
+<code-block lang="kotlin" file="HybridSearch.kt">
+suspend fun hybridSearch(query: String): List<String> = coroutineScope {
+    val keyword = async { dao.ftsSearch(query).map { it.id } }        // Room FTS, always available offline
+    val semantic = async { runCatching { semanticIndex.search(query) }.getOrDefault(emptyList()) }
+    // Reciprocal rank fusion: simple, robust way to merge ranked lists
+    val scores = mutableMapOf<String, Double>()
+    listOf(keyword.await(), semantic.await()).forEach { list ->
+        list.forEachIndexed { rank, id -> scores[id] = (scores[id] ?: 0.0) + 1.0 / (60 + rank) }
+    }
+    scores.entries.sortedByDescending { it.value }.map { it.key }
+}
+</code-block>
+
+<h2 id="query-understanding">LLMs for query understanding</h2>
+<p>An LLM can turn "red running shoes under 3000 for women" into structured filters (<code>category=shoes, color=red, maxPrice=3000, gender=women</code>) via structured output. Apply those filters in your own search system, rather than letting the LLM pick products from memory.</p>
+
+<h2 id="evaluate">Evaluating relevance</h2>
+<ul>
+  <li>Build a set of real queries with the results you expect.</li>
+  <li>Measure whether the right item appears in the top 3 or top 10, before and after changes.</li>
+  <li>Track zero-result rate and click-through in analytics.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Shopping</h3><p>Server-side hybrid search with LLM-parsed filters.</p></div>
+  <div class="card usecase"><h3>Help centre</h3><p>Semantic search over articles, the foundation of a RAG assistant.</p></div>
+  <div class="card usecase"><h3>Personal notes</h3><p>On-device embeddings, so private notes never leave the phone.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need a vector database?</summary><div><p>For a few thousand items, brute-force similarity is fine. For large catalogues, use a vector-capable database or search service on your backend.</p></div></details>
+  <details><summary>What happens when the embedding model changes?</summary><div><p>Re-embed everything with the new model. Vectors from different models can't be mixed.</p></div></details>
+  <details><summary>Is semantic search always better?</summary><div><p>No. Exact identifiers and names often work better with keyword search. That's why hybrid search is common.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI-powered search combines <strong>embeddings for meaning</strong>, <strong>keyword search for precision</strong>, and optionally <strong>LLM query understanding</strong> for filters. Run it server-side for shared catalogues, on-device for private data, keep an offline FTS fallback, and measure relevance with real queries.</p>
+<p>Next step: protect the AI endpoints behind these features with <a href="../secure-cloud-ai-api-android/index.html">Integrating Cloud AI APIs Securely</a>.</p>

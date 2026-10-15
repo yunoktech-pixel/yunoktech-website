@@ -1,0 +1,144 @@
+<!--meta
+{
+  "seo_title": "LazyColumn vs Column in Jetpack Compose: When to Use Each",
+  "description": "LazyColumn vs Column explained: how lazy lists compose only visible items, keys, contentType, headers, nested scrolling pitfalls, performance and when a plain Column is better.",
+  "primary_keyword": "lazycolumn vs column",
+  "keywords": ["compose lazycolumn", "column vs lazycolumn performance", "lazycolumn keys", "nested scroll compose", "verticalScroll column", "compose list performance"],
+  "lede": "Column lays out all of its children at once. LazyColumn composes only what's on screen. Choosing the right one, and using keys and contentType properly, is the difference between a smooth feed and a janky one.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["compose-performance-optimization", "paging-3-pagination", "compose-state-management", "composable-functions-explained"],
+  "refs": [
+    ["Lists and grids", "https://developer.android.com/develop/ui/compose/lists"],
+    ["Compose performance best practices", "https://developer.android.com/develop/ui/compose/performance/bestpractices"],
+    ["Scroll modifiers", "https://developer.android.com/develop/ui/compose/touch-input/pointer-input/scroll"]
+  ]
+}
+-->
+<p class="ad-lead">A new Compose developer builds a feed with <code>Column(Modifier.verticalScroll(...))</code> and <code>forEach</code>. It works with 20 items. With 2,000 it takes seconds to open and stutters while scrolling. The fix is one word, <code>Lazy</code>, plus a few details that matter more than they look.</p>
+
+<h2 id="difference">The core difference</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lz-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-lz-t fig-lz-d">
+    <title id="fig-lz-t">Column composes all items; LazyColumn composes only visible items</title>
+    <desc id="fig-lz-d">Left: a Column with verticalScroll composes and measures all 1000 items even though only 6 fit on screen. Right: a LazyColumn composes only the roughly 6 visible items plus a small buffer, and reuses item slots as the user scrolls.</desc>
+    <text class="d-t" x="170" y="20" text-anchor="middle">Column + verticalScroll</text>
+    <rect class="d-box" x="70" y="30" width="200" height="190" rx="10"/>
+    <rect class="d-red" x="80" y="40" width="180" height="20" rx="4"/><rect class="d-red" x="80" y="64" width="180" height="20" rx="4"/><rect class="d-red" x="80" y="88" width="180" height="20" rx="4"/><rect class="d-red" x="80" y="112" width="180" height="20" rx="4"/><rect class="d-red" x="80" y="136" width="180" height="20" rx="4"/><rect class="d-red" x="80" y="160" width="180" height="20" rx="4"/>
+    <text class="d-s" x="170" y="200" text-anchor="middle">…all 1,000 composed + measured</text>
+    <text class="d-t" x="530" y="20" text-anchor="middle">LazyColumn</text>
+    <rect class="d-box" x="430" y="30" width="200" height="190" rx="10"/>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="440" y="40" width="180" height="20" rx="4"/><rect class="d-green" x="440" y="64" width="180" height="20" rx="4"/><rect class="d-green" x="440" y="88" width="180" height="20" rx="4"/></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="440" y="112" width="180" height="20" rx="4"/><rect class="d-green" x="440" y="136" width="180" height="20" rx="4"/><rect class="d-green" x="440" y="160" width="180" height="20" rx="4"/></g>
+    <text class="d-s" x="530" y="200" text-anchor="middle">only visible (+ small buffer)</text>
+  </svg>
+  <figcaption id="fig-lz-cap">Lazy layouts do work proportional to what's visible, not to the size of the data.</figcaption>
+</figure>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Aspect</th><th><code>Column</code></th><th><code>LazyColumn</code></th></tr></thead>
+  <tbody>
+    <tr><td>Composes</td><td>All children immediately</td><td>Visible items (plus prefetch)</td></tr>
+    <tr><td>Scrolling</td><td>Needs <code>Modifier.verticalScroll</code></td><td>Built in</td></tr>
+    <tr><td>Good for</td><td>Small, fixed content: forms, detail pages, settings sections</td><td>Long or unbounded lists: feeds, search results, chats</td></tr>
+    <tr><td>API</td><td>Normal composable children</td><td>DSL: <code>item</code>, <code>items</code>, <code>stickyHeader</code></td></tr>
+    <tr><td>Scroll state</td><td><code>rememberScrollState()</code></td><td><code>rememberLazyListState()</code> (index-based)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="lazy-basics">LazyColumn done right</h2>
+<code-block lang="kotlin" file="ChatList.kt">
+@Composable
+fun ChatList(messages: List<ChatItem>, modifier: Modifier = Modifier) {
+    val listState = rememberLazyListState()
+    LazyColumn(
+        state = listState,
+        modifier = modifier,
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(
+            items = messages,
+            key = { it.id },                           // stable identity: correct reuse, animations, state
+            contentType = { it::class },               // reuse compositions between items of the same type
+        ) { item ->
+            when (item) {
+                is ChatItem.DateDivider -> DateDivider(item.date)
+                is ChatItem.Message -> MessageBubble(item, Modifier.animateItem())   // animate inserts/moves
+            }
+        }
+    }
+}
+</code-block>
+<ul>
+  <li><strong><code>key</code></strong>: without stable keys, inserting at the top shifts item state (such as an expanded card) to the wrong rows, and scroll position jumps. Use your item's ID.</li>
+  <li><strong><code>contentType</code></strong>: tells Compose which items share structure, so it can reuse work efficiently in mixed lists.</li>
+  <li><strong><code>Modifier.animateItem()</code></strong> animates insertions, removals and reordering.</li>
+</ul>
+
+<h2 id="column">When Column is the better choice</h2>
+<code-block lang="kotlin" file="A detail screen: Column is fine">
+@Composable
+fun ProductDetails(product: Product) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
+        ProductImage(product.imageUrl)
+        Text(product.name, style = MaterialTheme.typography.headlineSmall)
+        PriceTag(product.pricePaise)
+        Text(product.description)
+        SpecsTable(product.specs)          // a handful of rows
+    }
+}
+</code-block>
+<p>With a small, bounded number of children, a <code>Column</code> is simpler, and laziness adds overhead without benefit.</p>
+
+<h2 id="nesting">The nested scrolling trap</h2>
+<p>Putting a <code>LazyColumn</code> inside a <code>Column</code> with <code>verticalScroll</code> throws an error, because a lazy list can't be measured with infinite height. Don't nest them. Make the whole screen one <code>LazyColumn</code> and put the header content in <code>item { }</code> blocks:</p>
+<code-block lang="kotlin" file="One lazy list for the whole screen">
+LazyColumn {
+    item { ProfileHeader(user) }
+    item { StatsRow(user.stats) }
+    stickyHeader { SectionTitle("Posts") }
+    items(posts, key = { it.id }) { PostCard(it) }
+    if (isLoadingMore) item { LoadingRow() }
+}
+</code-block>
+<p>Horizontal lists inside a vertical <code>LazyColumn</code> (a <code>LazyRow</code> per section, like a store front) are fine and common.</p>
+
+<h2 id="state">Scroll state and actions</h2>
+<code-block lang="kotlin" file="Infinite scroll trigger">
+val shouldLoadMore by remember {
+    derivedStateOf {
+        val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+        last >= listState.layoutInfo.totalItemsCount - 5
+    }
+}
+LaunchedEffect(shouldLoadMore) { if (shouldLoadMore) onLoadMore() }
+</code-block>
+<p>For real paging from APIs or databases, prefer <a href="../paging-3-pagination/index.html">Paging 3</a>, which handles loading states, retries and caching.</p>
+
+<h2 id="perf">Performance tips</h2>
+<ul>
+  <li>Keep item composables cheap. Precompute formatted strings in the ViewModel.</li>
+  <li>Load images at the item's display size with an image library.</li>
+  <li>Avoid reading <code>listState</code> directly in the item builder. Wrap derived values in <code>derivedStateOf</code>.</li>
+  <li>Judge scrolling smoothness on release builds with Baseline Profiles. See <a href="../compose-performance-optimization/index.html">Compose Performance Optimization</a>.</li>
+</ul>
+
+<h2 id="use-cases">Choosing in practice</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Settings screen (15 rows)</h3><p>Either works. A Column is simpler. Choose LazyColumn if the rows come from data and may grow.</p></div>
+  <div class="card usecase"><h3>Product grid</h3><p><code>LazyVerticalGrid</code> or <code>LazyVerticalStaggeredGrid</code> with keys.</p></div>
+  <div class="card usecase"><h3>Chat</h3><p><code>LazyColumn(reverseLayout = true)</code> keeps the newest messages at the bottom, anchored as new ones arrive.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is LazyColumn the same as RecyclerView?</summary><div><p>Conceptually similar: both render only what's visible. LazyColumn needs no adapter or ViewHolder, and diffing is driven by keys.</p></div></details>
+  <details><summary>Why does my item's remembered state reset when scrolling?</summary><div><p>Items leaving the screen are disposed. Hoist important state into the item model or ViewModel, or use <code>rememberSaveable</code> with stable keys.</p></div></details>
+  <details><summary>Can I use LazyColumn inside a Scaffold?</summary><div><p>Yes. Pass the Scaffold's padding values to <code>contentPadding</code> so items aren't hidden behind bars.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Use <strong>Column</strong> for small, fixed content and <strong>LazyColumn</strong> for lists that can grow. Give lazy items stable <strong>keys</strong> and <strong>contentType</strong>, never nest a lazy list inside a scrolling Column, and keep item composables cheap.</p>
+<p>Next step: bring your lists to life with <a href="../compose-animations-beginners/index.html">Jetpack Compose Animations for Beginners</a>.</p>

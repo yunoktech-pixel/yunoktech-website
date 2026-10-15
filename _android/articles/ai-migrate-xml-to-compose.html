@@ -1,0 +1,112 @@
+<!--meta
+{
+  "seo_title": "AI-Assisted Migration from XML to Jetpack Compose",
+  "description": "Migrate XML layouts to Jetpack Compose with AI assistance: a screen-by-screen process, prompts, mapping Views to composables, preserving behaviour, interop, theming and visual regression tests.",
+  "primary_keyword": "migrate xml to compose ai",
+  "keywords": ["xml to compose conversion", "ai convert layout to compose", "compose migration strategy", "recyclerview to lazycolumn", "composeview interop", "visual regression migration"],
+  "lede": "Converting XML layouts to Compose is repetitive work that AI does quickly, and subtly wrong if unsupervised. Combined with a disciplined migration process and screenshot tests, AI can cut the effort of moving to Compose substantially.",
+  "date": "2026-10-15",
+  "cta": "compose",
+  "related": ["jetpack-compose-vs-xml", "compose-ui-screenshot-testing", "generate-compose-ui-with-ai", "migrate-legacy-android-modern-architecture"],
+  "refs": [
+    ["Migration strategy", "https://developer.android.com/develop/ui/compose/migrate/strategy"],
+    ["Migrate XML-based screens to Compose", "https://developer.android.com/develop/ui/compose/migrate/migration-scenarios/recycler-view"],
+    ["Interoperability APIs", "https://developer.android.com/develop/ui/compose/migrate/interoperability-apis"],
+    ["Compose screenshot testing", "https://developer.android.com/studio/preview/compose-screenshot-testing"]
+  ]
+}
+-->
+<p class="ad-lead">A typical XML screen involves a layout file, a Fragment with View Binding, a RecyclerView adapter, some custom styles and a few click listeners. Converting it to Compose is mostly mechanical, which suits AI, but behaviour hides in the details: focus handling, IME actions, accessibility, saved state.</p>
+
+<h2 id="process">A safe, repeatable process</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-xm-cap">
+  <svg viewBox="0 0 720 190" role="img" aria-labelledby="fig-xm-t fig-xm-d">
+    <title id="fig-xm-t">Screen-by-screen XML to Compose migration with AI</title>
+    <desc id="fig-xm-d">Capture baseline screenshots and behaviour of the XML screen; use AI to convert layout and adapter into a stateless composable driven by the existing ViewModel state; host it with ComposeView; compare screenshots and run UI tests; then remove the old XML and adapter.</desc>
+    <defs><marker id="xmm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#xmm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Baseline</text><text class="d-s" x="70" y="84" text-anchor="middle">screens + tests</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">AI convert</text><text class="d-s" x="212" y="84" text-anchor="middle">stateless UI</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Host</text><text class="d-s" x="352" y="84" text-anchor="middle">ComposeView</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Compare</text><text class="d-s" x="497" y="84" text-anchor="middle">visual + behaviour</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="584" y="40" width="126" height="60" rx="12"/><text class="d-t" x="647" y="66" text-anchor="middle">Delete old</text><text class="d-s" x="647" y="84" text-anchor="middle">XML + adapter</text></g>
+  </svg>
+  <figcaption id="fig-xm-cap">The ViewModel stays the same, which keeps the migration focused on UI and easy to review.</figcaption>
+</figure>
+
+<h2 id="prompt">Conversion prompt</h2>
+<code-block lang="text" file="Prompt">
+Convert this screen to Jetpack Compose.
+Inputs: fragment_orders.xml, item_order.xml, OrdersAdapter.kt, OrdersFragment.kt, OrdersUiState.kt.
+Requirements:
+- Stateless `OrdersContent(state: OrdersUiState, onOrderClick: (String) -> Unit, onRetry: () -> Unit)`.
+- RecyclerView → LazyColumn with key = order.id; preserve item layout, spacing and text styles
+  using our AppTheme (Material 3) tokens, not raw colors.
+- Preserve behaviour: empty state, error + retry, swipe-to-refresh, content descriptions.
+- List anything in the XML you could not map exactly (custom attrs, styles, animations).
+- Add previews for loading, empty, error and 3 items.
+Do not change OrdersViewModel.
+</code-block>
+
+<h2 id="mapping">View → Compose mapping reference</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>XML / View</th><th>Compose</th><th>Watch out for</th></tr></thead>
+  <tbody>
+    <tr><td>LinearLayout (vertical/horizontal)</td><td><code>Column</code> / <code>Row</code></td><td>Weights → <code>Modifier.weight</code></td></tr>
+    <tr><td>ConstraintLayout</td><td><code>Row</code>/<code>Column</code>/<code>Box</code>, or <code>ConstraintLayout</code> for Compose</td><td>Prefer simple layouts where possible</td></tr>
+    <tr><td>RecyclerView + Adapter</td><td><code>LazyColumn</code> / <code>LazyVerticalGrid</code></td><td>Stable keys; item decorations</td></tr>
+    <tr><td>EditText</td><td><code>TextField</code> / <code>OutlinedTextField</code></td><td>IME actions, input types, state hoisting</td></tr>
+    <tr><td>SwipeRefreshLayout</td><td><code>PullToRefreshBox</code> (Material 3)</td><td>Refresh state from ViewModel</td></tr>
+    <tr><td>visibility="gone"</td><td>Conditional composition (<code>if</code>)</td><td>Animations (<code>AnimatedVisibility</code>)</td></tr>
+    <tr><td>Custom View</td><td>Rewrite, or wrap with <code>AndroidView</code></td><td>Keep complex working Views wrapped at first</td></tr>
+    <tr><td>Styles/themes</td><td><code>MaterialTheme</code> tokens</td><td>Bridge the XML theme and Compose theme during migration</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="host">Hosting during migration</h2>
+<code-block lang="kotlin" file="OrdersFragment.kt (after)">
+class OrdersFragment : Fragment() {
+    private val viewModel: OrdersViewModel by viewModels()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                AppTheme {
+                    val state by viewModel.uiState.collectAsStateWithLifecycle()
+                    OrdersContent(state, onOrderClick = ::openOrder, onRetry = viewModel::retry)
+                }
+            }
+        }
+
+    private fun openOrder(id: String) { /* existing navigation */ }
+}
+</code-block>
+
+<h2 id="verify">Verifying equivalence</h2>
+<ul>
+  <li><strong>Screenshot tests</strong> of the old and new screens across states, dark mode and large fonts. See <a href="../compose-ui-screenshot-testing/index.html">Screenshot Testing</a>.</li>
+  <li><strong>UI tests</strong> for interactions: clicks, retry, refresh, text input.</li>
+  <li><strong>Accessibility checks</strong> with TalkBack: reading order and descriptions often change silently.</li>
+  <li><strong>Performance</strong> on a release build: lazy lists with keys, no heavy work in item composables.</li>
+</ul>
+
+<h2 id="use-cases">Prioritising screens</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Start with</h3><p>Leaf screens with simple state, such as settings and detail pages, to build team patterns.</p></div>
+  <div class="card usecase"><h3>Then</h3><p>List screens with adapters, where Compose removes the most code.</p></div>
+  <div class="card usecase"><h3>Later</h3><p>Complex custom Views and heavy animations. Wrap first, rewrite when valuable.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can AI convert a whole app at once?</summary><div><p>It can generate a lot of code, but reviewing and verifying it all at once is impractical. Screen-by-screen migration with tests is far safer.</p></div></details>
+  <details><summary>Should navigation move to Compose first?</summary><div><p>Usually last. Migrate screens inside existing Fragments, then move navigation once most screens are composables.</p></div></details>
+  <details><summary>Will the app size grow during migration?</summary><div><p>Temporarily, since both UI systems ship. It typically improves once View-based dependencies are removed.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Let AI do the <strong>mechanical conversion</strong> of layouts and adapters into stateless composables, while you keep the <strong>ViewModel unchanged</strong>, host with <code>ComposeView</code>, and prove equivalence with <strong>screenshots, UI tests and accessibility checks</strong>, one screen at a time.</p>
+<p>Next step: understand the more autonomous tools in <a href="../ai-agents-android-development/index.html">AI Agents in Android Development</a>.</p>

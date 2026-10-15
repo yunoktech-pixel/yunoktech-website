@@ -1,0 +1,165 @@
+<!--meta
+{
+  "seo_title": "Secure Token Storage and API Authentication (Android)",
+  "description": "Store auth tokens securely on Android: threat model, Android Keystore, encrypted DataStore with Tink, why EncryptedSharedPreferences is deprecated, token refresh, logout and backups.",
+  "primary_keyword": "secure token storage android",
+  "keywords": ["store jwt android securely", "android keystore token", "encryptedsharedpreferences deprecated", "datastore tink encryption", "refresh token android", "oauth tokens android"],
+  "lede": "Access and refresh tokens are the keys to a user's account. Stored carelessly in plain SharedPreferences, logs or backups, they can be stolen and replayed. Here's a practical, current approach to storing tokens and handling API authentication on Android.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["okhttp-interceptors", "android-keystore-explained", "encrypted-data-storage-android", "secure-api-keys-android"],
+  "refs": [
+    ["Android Keystore system", "https://developer.android.com/privacy-and-security/keystore"],
+    ["DataStore", "https://developer.android.com/topic/libraries/architecture/datastore"],
+    ["Tink cryptographic library", "https://developers.google.com/tink"],
+    ["Back up user data with Auto Backup", "https://developer.android.com/identity/data/autobackup"],
+    ["OWASP MASVS: Storage", "https://mas.owasp.org/MASVS/05-MASVS-STORAGE/"]
+  ]
+}
+-->
+<p class="ad-lead">On Android, your app's private storage is sandboxed from other apps. That's a strong baseline. But tokens can still leak through device backups, rooted or compromised devices, debug logs, or analytics. Defence in depth means encrypting secrets with keys the app can't export, and limiting what a stolen token can do.</p>
+
+<h2 id="threats">Threat model first</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Threat</th><th>Mitigation</th></tr></thead>
+  <tbody>
+    <tr><td>Other apps reading your files</td><td>App sandbox (default); never store tokens on shared storage</td></tr>
+    <tr><td>Tokens extracted from backups</td><td>Exclude token files from backup; encrypt with non-exportable Keystore keys</td></tr>
+    <tr><td>Rooted device or malware with root</td><td>Keystore-backed encryption raises the bar; short-lived access tokens limit damage</td></tr>
+    <tr><td>Leaks via logs, crash reports, analytics</td><td>Redact Authorization headers; never log tokens</td></tr>
+    <tr><td>Stolen refresh token</td><td>Server-side rotation and revocation; device binding where available</td></tr>
+  </tbody>
+</table>
+</div>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ts-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-ts-t fig-ts-d">
+    <title id="fig-ts-t">Envelope encryption of tokens with Android Keystore</title>
+    <desc id="fig-ts-d">A master key lives inside the Android Keystore, hardware-backed where available, and never leaves it. It encrypts a data-encryption keyset managed by Tink. The keyset encrypts tokens, and the ciphertext is stored in DataStore in app-private storage. The app decrypts tokens in memory when needed.</desc>
+    <defs><marker id="tsm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="20" y="60" width="170" height="80" rx="12"/><text class="d-w" x="105" y="92" text-anchor="middle">Android Keystore</text><text class="d-w" x="105" y="112" text-anchor="middle">master key (non-exportable)</text></g>
+    <path class="d-flow" d="M190 100 H246" marker-end="url(#tsm)"/><text class="d-s" x="218" y="92" text-anchor="middle">wraps</text>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="250" y="60" width="170" height="80" rx="12"/><text class="d-t" x="335" y="92" text-anchor="middle">Tink keyset</text><text class="d-s" x="335" y="112" text-anchor="middle">AES-GCM AEAD</text></g>
+    <path class="d-flow" d="M420 100 H476" marker-end="url(#tsm)"/><text class="d-s" x="448" y="92" text-anchor="middle">encrypts</text>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="480" y="60" width="220" height="80" rx="12"/><text class="d-t" x="590" y="92" text-anchor="middle">DataStore file</text><text class="d-s" x="590" y="112" text-anchor="middle">ciphertext only, no backup</text></g>
+  </svg>
+  <figcaption id="fig-ts-cap">Envelope encryption: even if the file is copied off the device, it's useless without the Keystore key that never leaves the phone.</figcaption>
+</figure>
+
+<h2 id="deprecated">What about EncryptedSharedPreferences?</h2>
+<p>For years, Jetpack Security's <code>EncryptedSharedPreferences</code> was the standard answer. The <code>androidx.security:security-crypto</code> library has since been <strong>deprecated</strong>. It still works in existing apps, but new code should use an alternative, typically <strong>DataStore with Tink-based encryption</strong> and a Keystore-wrapped key, and existing apps should plan a migration.</p>
+
+<h2 id="implementation">Implementation: encrypted token store</h2>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation("androidx.datastore:datastore:<version>")
+    implementation("com.google.crypto.tink:tink-android:<version>")
+}
+</code-block>
+<code-block lang="kotlin" file="TokenCrypto.kt">
+/** AEAD backed by a Tink keyset that is itself encrypted with an Android Keystore master key. */
+object TokenCrypto {
+    private const val KEYSET_NAME = "token_keyset"
+    private const val PREF_FILE = "token_keyset_prefs"
+    private const val MASTER_KEY_URI = "android-keystore://token_master_key"
+
+    fun aead(context: Context): Aead {
+        AeadConfig.register()
+        return AndroidKeysetManager.Builder()
+            .withSharedPref(context, KEYSET_NAME, PREF_FILE)       // stores the ENCRYPTED keyset
+            .withKeyTemplate(KeyTemplates.get("AES256_GCM"))
+            .withMasterKeyUri(MASTER_KEY_URI)                      // Keystore key wraps the keyset
+            .build()
+            .keysetHandle
+            .getPrimitive(RegistryConfiguration.get(), Aead::class.java)
+    }
+}
+</code-block>
+<code-block lang="kotlin" file="TokenStore.kt">
+@Serializable
+data class AuthTokens(val accessToken: String, val refreshToken: String, val expiresAtEpochSec: Long)
+
+class EncryptedTokensSerializer(private val aead: Aead) : Serializer<AuthTokens?> {
+    override val defaultValue: AuthTokens? = null
+    private val associatedData = "auth_tokens".toByteArray()
+
+    override suspend fun readFrom(input: InputStream): AuthTokens? {
+        val bytes = input.readBytes()
+        if (bytes.isEmpty()) return null
+        return runCatching {
+            Json.decodeFromString<AuthTokens>(aead.decrypt(bytes, associatedData).decodeToString())
+        }.getOrNull()                                       // undecryptable (key lost) → treat as signed out
+    }
+
+    override suspend fun writeTo(t: AuthTokens?, output: OutputStream) {
+        if (t == null) return                               // empty file = no tokens
+        output.write(aead.encrypt(Json.encodeToString(t).encodeToByteArray(), associatedData))
+    }
+}
+
+class TokenStore(context: Context) {
+    private val store = DataStoreFactory.create(
+        serializer = EncryptedTokensSerializer(TokenCrypto.aead(context)),
+        produceFile = { File(context.filesDir, "datastore/auth_tokens.enc") },
+    )
+    @Volatile private var cached: AuthTokens? = null       // fast synchronous reads for interceptors
+
+    val tokens: Flow<AuthTokens?> = store.data.onEach { cached = it }
+
+    fun accessTokenBlocking(): String? = cached?.accessToken
+    suspend fun save(tokens: AuthTokens) { store.updateData { tokens } }
+    suspend fun clear() { store.updateData { null } }
+}
+</code-block>
+<p>AndroidX has also introduced a dedicated DataStore + Tink integration artifact. Check its status (it was alpha at the time of writing) before adopting it instead of a custom serializer. Initialise the cache at startup, for example by collecting <code>tokens</code> in an application scope, before the first authenticated request.</p>
+
+<h2 id="backup">Exclude secrets from backup</h2>
+<code-block lang="xml" file="res/xml/data_extraction_rules.xml (Android 12+)">
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/auth_tokens.enc" />
+        <exclude domain="sharedpref" path="token_keyset_prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/auth_tokens.enc" />
+        <exclude domain="sharedpref" path="token_keyset_prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>
+</code-block>
+<p>Reference it with <code>android:dataExtractionRules</code> in the manifest, and provide equivalent <code>fullBackupContent</code> rules for Android 11 and lower. Keystore keys aren't backed up, so restored ciphertext would be undecryptable anyway, but excluding it avoids confusing states.</p>
+
+<h2 id="lifecycle">Token lifecycle best practices</h2>
+<ul>
+  <li><strong>Short-lived access tokens</strong> (minutes), plus a <strong>refresh token</strong> with server-side rotation: each refresh issues a new refresh token and invalidates the old one.</li>
+  <li><strong>Refresh in one place</strong>: an OkHttp <code>Authenticator</code>. See <a href="../okhttp-interceptors/index.html">OkHttp Interceptors</a>.</li>
+  <li><strong>Logout clears everything</strong>: tokens, cached user data, and a server-side revocation call.</li>
+  <li><strong>Treat decryption failure as signed out</strong>. Keys can be invalidated, for example after some device security changes.</li>
+</ul>
+
+<h2 id="use-cases">Variations</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Banking-grade apps</h3><p>Add Keystore keys requiring user authentication (biometric) for high-risk operations, plus Play Integrity checks on the server.</p></div>
+  <div class="card usecase"><h3>Firebase Auth</h3><p>Firebase manages its own session storage. Request fresh ID tokens via the SDK rather than storing them yourself.</p></div>
+  <div class="card usecase"><h3>OAuth / OpenID Connect</h3><p>Use AppAuth with PKCE in a Custom Tab for the login flow, then store the resulting tokens as above.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Plain SharedPreferences or DataStore for tokens.</li>
+  <li>Hard-coded encryption keys in the APK, which aren't secret.</li>
+  <li>Logging tokens or full request headers.</li>
+  <li>Long-lived access tokens with no rotation.</li>
+  <li>Storing passwords on the device instead of tokens.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is the app sandbox not enough?</summary><div><p>It protects against other apps on a healthy device. Encryption adds protection for backups, device transfers and some compromised-device scenarios.</p></div></details>
+  <details><summary>Can a rooted device still steal tokens?</summary><div><p>A sufficiently privileged attacker can read memory while the app runs. Encryption raises the cost, and short-lived tokens plus server-side checks limit the damage.</p></div></details>
+  <details><summary>Should I store tokens in the Keystore directly?</summary><div><p>The Keystore stores keys, not arbitrary data. Store encrypted tokens elsewhere, using a Keystore key for encryption.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Store tokens <strong>encrypted with a non-exportable Android Keystore key</strong> (for example DataStore plus Tink), <strong>exclude them from backups</strong>, keep access tokens <strong>short-lived with rotating refresh tokens</strong>, refresh in one place, and never log them. Migrate away from the deprecated EncryptedSharedPreferences.</p>
+<p>Next step: protect secrets beyond tokens in <a href="../secure-api-keys-android/index.html">Secure API Keys and Secrets in Android Apps</a>.</p>

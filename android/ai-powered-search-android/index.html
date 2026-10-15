@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an AI-Powered Search Feature for Android | Yunok Tech</title>
+  <meta name="description" content="Build AI-powered semantic search in Android: keyword vs semantic search, embeddings on a backend or on-device, hybrid ranking, query understanding with LLMs, Room FTS fallback and evaluation.">
+  <meta name="keywords" content="ai powered search android, semantic search android, embeddings search mobile app, hybrid search ranking, room fts search, natural language search app, vector search android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-powered-search-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-powered-search-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Build an AI-Powered Search Feature for Android">
+  <meta property="og:description" content="Build AI-powered semantic search in Android: keyword vs semantic search, embeddings on a backend or on-device, hybrid ranking, query understanding with LLMs, Room FTS fallback and evaluation.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Build an AI-Powered Search Feature for Android">
+  <meta name="twitter:description" content="Build AI-powered semantic search in Android: keyword vs semantic search, embeddings on a backend or on-device, hybrid ranking, query understanding with LLMs, Room FTS fallback and evaluation.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Build an AI-Powered Search Feature for Android", "description": "Build AI-powered semantic search in Android: keyword vs semantic search, embeddings on a backend or on-device, hybrid ranking, query understanding with LLMs, Room FTS fallback and evaluation.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "semantic search android, embeddings search mobile app, hybrid search ranking, room fts search, natural language search app, vector search android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-powered-search-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Build an AI-Powered Search Feature for Android", "item": "https://yunoktech.com/android/ai-powered-search-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Build an AI-Powered Search Feature for Android</h1>
+    <p class="ad-lede">Keyword search fails when users don't use the exact words in your content: 'cheap phone for my mom' won't match 'budget smartphone with large text'. AI-powered search understands meaning. Here's how to build it for an Android app, from embeddings to hybrid ranking and graceful fallbacks.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#types">Keyword vs semantic vs hybrid</a></li><li><a href="#embeddings">How semantic search works</a></li><li><a href="#architecture">Where to run it</a></li><li><a href="#on-device">On-device semantic search for personal notes</a></li><li><a href="#hybrid">Hybrid ranking with keyword fallback</a></li><li><a href="#query-understanding">LLMs for query understanding</a></li><li><a href="#evaluate">Evaluating relevance</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Search is often the highest-intent feature in an app. Users who search know what they want. Semantic search matches by meaning rather than exact words, so it recovers queries that keyword search misses. Done carelessly, it also returns confident nonsense, so build it in layers.</p>
+
+<h2 id="types">Keyword vs semantic vs hybrid</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Approach</th><th>How</th><th>Good at</th><th>Weak at</th></tr></thead>
+  <tbody>
+    <tr><td>Keyword (FTS)</td><td>Match terms, rank by term frequency</td><td>Exact names, SKUs, codes; fast and offline</td><td>Synonyms, intent, typos</td></tr>
+    <tr><td>Semantic</td><td>Compare embedding vectors of query and items</td><td>Meaning, paraphrases, natural language</td><td>Exact identifiers; needs embeddings</td></tr>
+    <tr><td>Hybrid</td><td>Combine both scores</td><td>Best overall relevance</td><td>More complexity</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="embeddings">How semantic search works</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-es-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-es-t fig-es-d">
+    <title id="fig-es-t">Semantic search with embeddings</title>
+    <desc id="fig-es-d">Offline, each catalogue item's text is turned into an embedding vector and stored in a vector index on the server. At query time, the user's query is embedded with the same model, the index finds the nearest item vectors by cosine similarity, results are optionally combined with keyword scores, and the top items are returned to the app.</desc>
+    <defs><marker id="esm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <text class="d-s" x="20" y="22">Indexing (once / on change)</text>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="20" y="32" width="150" height="50" rx="10"/><text class="d-s" x="95" y="62" text-anchor="middle">items' text</text></g>
+    <path class="d-flow" d="M170 57 H210" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="214" y="32" width="150" height="50" rx="10"/><text class="d-s" x="289" y="62" text-anchor="middle">embedding model</text></g>
+    <path class="d-flow" d="M364 57 H404" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="408" y="32" width="150" height="50" rx="10"/><text class="d-s" x="483" y="62" text-anchor="middle">vector index</text></g>
+    <text class="d-s" x="20" y="122">Query time</text>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="20" y="132" width="150" height="50" rx="10"/><text class="d-s" x="95" y="162" text-anchor="middle">"phone for mom"</text></g>
+    <path class="d-flow" d="M170 157 H210" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:4"><rect class="d-violet" x="214" y="132" width="150" height="50" rx="10"/><text class="d-s" x="289" y="162" text-anchor="middle">same model</text></g>
+    <path class="d-flow" d="M364 157 H404 M483 132 V86" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:5"><rect class="d-green" x="408" y="132" width="150" height="50" rx="10"/><text class="d-s" x="483" y="162" text-anchor="middle">nearest neighbours</text></g>
+    <path class="d-flow" d="M558 157 H598" marker-end="url(#esm)"/>
+    <g class="d-step" style="--i:6"><rect class="d-dark" x="602" y="132" width="108" height="50" rx="10"/><text class="d-w" x="656" y="162" text-anchor="middle">top results</text></g>
+  </svg>
+  <figcaption id="fig-es-cap">Items and queries must be embedded by the same model. Vectors from different models aren't comparable.</figcaption>
+</figure>
+
+<h2 id="architecture">Where to run it</h2>
+<ul>
+  <li><strong>Server-side (most common):</strong> embed your catalogue with a cloud embedding model, store vectors in a vector-capable database, and expose <code>/search?q=</code>. The app stays simple, and the API key stays on the server.</li>
+  <li><strong>On-device:</strong> for private or offline data such as the user's own notes, use a small on-device text embedder (for example MediaPipe Text Embedder with LiteRT) and brute-force cosine similarity for a few thousand items.</li>
+</ul>
+
+<h2 id="on-device">On-device semantic search for personal notes</h2>
+<figure class="code"><figcaption><span class="file">NoteSemanticIndex.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">/** Brute-force cosine search: fine for a few thousand notes. Vectors stored in Room as FloatArray blobs. */</span>
+<span class="tk-k">class</span> <span class="tk-t">NoteSemanticIndex</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> embedder: <span class="tk-t">TextEmbedderWrapper</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> dao: <span class="tk-t">NoteVectorDao</span>) {
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> index(note: <span class="tk-t">Note</span>) {
+        <span class="tk-k">val</span> vector = embedder.embed(<span class="tk-s">"${note.title}\n${note.body}"</span>)
+        dao.upsert(<span class="tk-t">NoteVector</span>(note.id, vector.normalized()))
+    }
+
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> search(query: <span class="tk-t">String</span>, limit: <span class="tk-t">Int</span> = <span class="tk-n">10</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; = withContext(<span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>) {
+        <span class="tk-k">val</span> q = embedder.embed(query).normalized()
+        dao.all()
+            .map { it.noteId to dot(q, it.vector) }       <span class="tk-c">// cosine similarity of normalised vectors</span>
+            .filter { it.second &gt; <span class="tk-n">0.3f</span> }                 <span class="tk-c">// drop weak matches (tune on your data)</span>
+            .sortedByDescending { it.second }
+            .take(limit)
+            .map { it.first }
+    }
+}
+
+<span class="tk-k">fun</span> <span class="tk-t">FloatArray</span>.normalized(): <span class="tk-t">FloatArray</span> {
+    <span class="tk-k">val</span> norm = kotlin.math.sqrt(sumOf { (it * it).toDouble() }).toFloat().coerceAtLeast(1e-<span class="tk-n">6f</span>)
+    <span class="tk-k">return</span> <span class="tk-t">FloatArray</span>(size) { <span class="tk-k">this</span>[it] / norm }
+}
+<span class="tk-k">fun</span> dot(a: <span class="tk-t">FloatArray</span>, b: <span class="tk-t">FloatArray</span>): <span class="tk-t">Float</span> { <span class="tk-k">var</span> s = <span class="tk-n">0f</span>; <span class="tk-k">for</span> (i <span class="tk-k">in</span> a.indices) s += a[i] * b[i]; <span class="tk-k">return</span> s }</code></pre></figure>
+<p><code>TextEmbedderWrapper</code> wraps whichever on-device embedder you choose. Check the MediaPipe or LiteRT documentation for current setup.</p>
+
+<h2 id="hybrid">Hybrid ranking with keyword fallback</h2>
+<figure class="code"><figcaption><span class="file">HybridSearch.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> hybridSearch(query: <span class="tk-t">String</span>): <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt; = coroutineScope {
+    <span class="tk-k">val</span> keyword = async { dao.ftsSearch(query).map { it.id } }        <span class="tk-c">// Room FTS, always available offline</span>
+    <span class="tk-k">val</span> semantic = async { runCatching { semanticIndex.search(query) }.getOrDefault(emptyList()) }
+    <span class="tk-c">// Reciprocal rank fusion: simple, robust way to merge ranked lists</span>
+    <span class="tk-k">val</span> scores = mutableMapOf&lt;<span class="tk-t">String</span>, <span class="tk-t">Double</span>&gt;()
+    listOf(keyword.await(), semantic.await()).forEach { list -&gt;
+        list.forEachIndexed { rank, id -&gt; scores[id] = (scores[id] ?: <span class="tk-n">0.0</span>) + <span class="tk-n">1.0</span> / (<span class="tk-n">60</span> + rank) }
+    }
+    scores.entries.sortedByDescending { it.<span class="tk-k">value</span> }.map { it.key }
+}</code></pre></figure>
+
+<h2 id="query-understanding">LLMs for query understanding</h2>
+<p>An LLM can turn "red running shoes under 3000 for women" into structured filters (<code>category=shoes, color=red, maxPrice=3000, gender=women</code>) via structured output. Apply those filters in your own search system, rather than letting the LLM pick products from memory.</p>
+
+<h2 id="evaluate">Evaluating relevance</h2>
+<ul>
+  <li>Build a set of real queries with the results you expect.</li>
+  <li>Measure whether the right item appears in the top 3 or top 10, before and after changes.</li>
+  <li>Track zero-result rate and click-through in analytics.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Shopping</h3><p>Server-side hybrid search with LLM-parsed filters.</p></div>
+  <div class="card usecase"><h3>Help centre</h3><p>Semantic search over articles, the foundation of a RAG assistant.</p></div>
+  <div class="card usecase"><h3>Personal notes</h3><p>On-device embeddings, so private notes never leave the phone.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Do I need a vector database?</summary><div><p>For a few thousand items, brute-force similarity is fine. For large catalogues, use a vector-capable database or search service on your backend.</p></div></details>
+  <details><summary>What happens when the embedding model changes?</summary><div><p>Re-embed everything with the new model. Vectors from different models can't be mixed.</p></div></details>
+  <details><summary>Is semantic search always better?</summary><div><p>No. Exact identifiers and names often work better with keyword search. That's why hybrid search is common.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>AI-powered search combines <strong>embeddings for meaning</strong>, <strong>keyword search for precision</strong>, and optionally <strong>LLM query understanding</strong> for filters. Run it server-side for shared catalogues, on-device for private data, keep an offline FTS fallback, and measure relevance with real queries.</p>
+<p>Next step: protect the AI endpoints behind these features with <a href="../secure-cloud-ai-api-android/index.html">Integrating Cloud AI APIs Securely</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://ai.google.dev/gemini-api/docs/embeddings" target="_blank" rel="noopener">Gemini API: embeddings</a></li><li><a href="https://developer.android.com/training/data-storage/room/defining-data#fts" target="_blank" rel="noopener">Room full-text search (FTS)</a></li><li><a href="https://ai.google.dev/edge/mediapipe/solutions/text/text_embedder" target="_blank" rel="noopener">MediaPipe text embedder (on-device)</a></li><li><a href="https://firebase.google.com/docs/ai-logic" target="_blank" rel="noopener">Firebase AI Logic</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-powered-search-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-powered-search-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/rag-android-apps/index.html"><small>Android AI and Generative AI</small>RAG for Android Apps: Connecting AI to Your Own Data</a></li><li><a href="../../android/room-database-kotlin/index.html"><small>APIs, Databases, and Backend Integration</small>Room Database Tutorial with Kotlin</a></li><li><a href="../../android/secure-cloud-ai-api-android/index.html"><small>Android AI and Generative AI</small>Integrating Cloud AI APIs Securely in Android</a></li><li><a href="../../android/evaluate-ai-responses-hallucinations/index.html"><small>Android AI and Generative AI</small>Evaluating AI Responses and Reducing Hallucinations</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-powered-search-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-powered-search-android/&amp;text=Build an AI-Powered Search Feature for Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-powered-search-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#types">Keyword vs semantic vs hybrid</a></li><li><a href="#embeddings">How semantic search works</a></li><li><a href="#architecture">Where to run it</a></li><li><a href="#on-device">On-device semantic search for personal notes</a></li><li><a href="#hybrid">Hybrid ranking with keyword fallback</a></li><li><a href="#query-understanding">LLMs for query understanding</a></li><li><a href="#evaluate">Evaluating relevance</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-powered-search-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-powered-search-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

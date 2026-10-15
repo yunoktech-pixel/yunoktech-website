@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an AI Chatbot with Kotlin and Jetpack Compose | Yunok Tech</title>
+  <meta name="description" content="Build a streaming AI chatbot in Android with Kotlin, Jetpack Compose and Gemini via Firebase AI Logic: chat history, streaming bubbles, stop, retry, trimming and safety.">
+  <meta name="keywords" content="ai chatbot jetpack compose, android chatbot kotlin, gemini chatbot android, streaming chat compose, firebase ai logic chat, sendMessageStream kotlin, chat ui jetpack compose, llm chat app android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/ai-chatbot-jetpack-compose/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/ai-chatbot-jetpack-compose/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Build an AI Chatbot with Kotlin and Jetpack Compose">
+  <meta property="og:description" content="Build a streaming AI chatbot in Android with Kotlin, Jetpack Compose and Gemini via Firebase AI Logic: chat history, streaming bubbles, stop, retry, trimming and safety.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-14">
+  <meta property="article:modified_time" content="2026-10-14">
+  <meta property="article:section" content="Android AI and Generative AI">
+  <meta name="twitter:title" content="Build an AI Chatbot with Kotlin and Jetpack Compose">
+  <meta name="twitter:description" content="Build a streaming AI chatbot in Android with Kotlin, Jetpack Compose and Gemini via Firebase AI Logic: chat history, streaming bubbles, stop, retry, trimming and safety.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Build an AI Chatbot Using Kotlin and Jetpack Compose", "description": "Build a streaming AI chatbot in Android with Kotlin, Jetpack Compose and Gemini via Firebase AI Logic: chat history, streaming bubbles, stop, retry, trimming and safety.", "datePublished": "2026-10-14", "dateModified": "2026-10-14", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android AI and Generative AI", "keywords": "android chatbot kotlin, gemini chatbot android, streaming chat compose, firebase ai logic chat, sendMessageStream kotlin, chat ui jetpack compose, llm chat app android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/ai-chatbot-jetpack-compose/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Build an AI Chatbot Using Kotlin and Jetpack Compose", "item": "https://yunoktech.com/android/ai-chatbot-jetpack-compose/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai">Android AI and Generative AI</a></nav>
+    <span class="ad-chip">🤖 Android AI and Generative AI</span>
+    <h1 id="article-title">Build an AI Chatbot Using Kotlin and Jetpack Compose</h1>
+    <p class="ad-lede">A complete, working chatbot project: a clean data model, a repository around Gemini's chat API, a ViewModel that streams tokens into message bubbles, a polished Compose UI with stop and retry, and the production details (history limits, safety, cost) that tutorials usually skip.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-14">Oct 14, 2026</time></b></span>
+      <span>⏱ <b>4 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#what-we-build">What we&#x27;ll build</a></li><li><a href="#project-structure">Project structure</a></li><li><a href="#model">Step 1: The message model</a></li><li><a href="#repository">Step 2: The repository</a></li><li><a href="#viewmodel">Step 3: The ViewModel</a></li><li><a href="#ui">Step 4: The Compose UI</a></li><li><a href="#test">Step 5: Test the ViewModel with a fake repository</a></li><li><a href="#production">Production checklist</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">A chatbot looks simple: a text box and a list of bubbles. The hard parts are hidden. Streaming text into a bubble without janking the list, keeping conversation context without sending an ever-growing history, letting users stop a runaway answer, and failing gracefully on a flaky mobile connection.</p>
+<p>In this project you'll build an AI chat assistant for a fictional "Android Study Buddy" app, using Kotlin, Jetpack Compose and Gemini through Firebase AI Logic. It assumes you've completed the setup from <a href="../gemini-api-android-kotlin/index.html">Gemini API Integration in Android Using Kotlin</a> (Firebase project, <code>firebase-ai</code> dependency, App Check).</p>
+
+<h2 id="what-we-build">What we'll build</h2>
+<ul>
+  <li>A conversation screen with user and assistant bubbles, auto-scroll, and an "AI-generated" label.</li>
+  <li>Token-by-token streaming of the assistant's reply, with a <strong>Stop</strong> button.</li>
+  <li>Error bubbles with <strong>Retry</strong> that resends the failed message.</li>
+  <li>A system instruction that keeps the assistant on-topic, and history trimming to control cost.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-chat-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-chat-title fig-chat-desc">
+    <title id="fig-chat-title">Chat message lifecycle from send to streamed reply</title>
+    <desc id="fig-chat-desc">The user sends a message. The ViewModel appends a user bubble and an empty assistant bubble marked streaming, then calls the repository. The repository sends recent history plus the new message to Gemini with sendMessageStream. Each streamed chunk is appended to the assistant bubble. When the stream completes, the bubble is marked done; on error it is marked failed with retry.</desc>
+    <defs><marker id="h1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M118 60 H146 M290 60 H318 M474 60 H502" marker-end="url(#h1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="30" width="108" height="60" rx="12"/><text class="d-t" x="64" y="56" text-anchor="middle">User taps</text><text class="d-t" x="64" y="74" text-anchor="middle">Send</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="150" y="22" width="140" height="76" rx="12"/><text class="d-t" x="220" y="46" text-anchor="middle">ViewModel</text><text class="d-s" x="220" y="66" text-anchor="middle">+ user bubble</text><text class="d-s" x="220" y="84" text-anchor="middle">+ empty AI bubble</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-box" x="322" y="22" width="152" height="76" rx="12"/><text class="d-t" x="398" y="46" text-anchor="middle">ChatRepository</text><text class="d-s" x="398" y="66" text-anchor="middle">trimmed history</text><text class="d-s" x="398" y="84" text-anchor="middle">sendMessageStream()</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="506" y="30" width="200" height="60" rx="12"/><text class="d-t" x="606" y="56" text-anchor="middle">Gemini (cloud)</text><text class="d-s" x="606" y="74" text-anchor="middle">streams chunks</text></g>
+    <path class="d-dash" d="M606 90 V150 H220 V102" marker-end="url(#h1)"/>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="250" y="132" width="270" height="36" rx="10"/><text class="d-s" x="385" y="155" text-anchor="middle">each chunk → append to AI bubble → recompose</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-green" x="150" y="184" width="170" height="36" rx="10"/><text class="d-s" x="235" y="207" text-anchor="middle">complete → status DONE</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-red" x="340" y="184" width="200" height="36" rx="10"/><text class="d-s" x="440" y="207" text-anchor="middle">error → FAILED + Retry</text></g>
+    <circle class="d-dot" r="6" style="offset-path:path('M118 60 H506');--dur:2s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M606 90 V150 H220 V102');--dur:1.6s;--delay:1.8s"/>
+  </svg>
+  <figcaption id="fig-chat-cap">The assistant bubble exists before the first token arrives, so the UI can show a typing indicator and then fill the same bubble in place.</figcaption>
+</figure>
+
+<h2 id="project-structure">Project structure</h2>
+<figure class="code"><figcaption><span class="file">Files we&#x27;ll create</span><span class="lang">Text</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-text">app/src/main/java/com/example/studybuddy/chat/
+├── ChatMessage.kt        ← UI/domain model
+├── ChatRepository.kt     ← wraps Firebase AI Logic chat, trims history
+├── ChatViewModel.kt      ← state, streaming, stop, retry
+└── ChatScreen.kt         ← Compose UI: list, bubbles, input bar</code></pre></figure>
+
+<h2 id="model">Step 1: The message model</h2>
+<figure class="code"><figcaption><span class="file">ChatMessage.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> java.util.<span class="tk-t">UUID</span>
+
+<span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">Author</span> { <span class="tk-t">USER</span>, <span class="tk-t">ASSISTANT</span> }
+<span class="tk-k">enum</span> <span class="tk-k">class</span> <span class="tk-t">Status</span> { <span class="tk-t">STREAMING</span>, <span class="tk-t">DONE</span>, <span class="tk-t">FAILED</span> }
+
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ChatMessage</span>(
+    <span class="tk-k">val</span> id: <span class="tk-t">String</span> = <span class="tk-t">UUID</span>.randomUUID().toString(),
+    <span class="tk-k">val</span> author: <span class="tk-t">Author</span>,
+    <span class="tk-k">val</span> text: <span class="tk-t">String</span>,
+    <span class="tk-k">val</span> status: <span class="tk-t">Status</span> = <span class="tk-t">Status</span>.<span class="tk-t">DONE</span>,
+)
+
+<span class="tk-k">data</span> <span class="tk-k">class</span> <span class="tk-t">ChatUiState</span>(
+    <span class="tk-k">val</span> messages: <span class="tk-t">List</span>&lt;<span class="tk-t">ChatMessage</span>&gt; = emptyList(),
+    <span class="tk-k">val</span> input: <span class="tk-t">String</span> = <span class="tk-s">""</span>,
+) {
+    <span class="tk-k">val</span> isResponding: <span class="tk-t">Boolean</span> <span class="tk-k">get</span>() = messages.lastOrNull()?.status == <span class="tk-t">Status</span>.<span class="tk-t">STREAMING</span>
+}</code></pre></figure>
+<p>Messages are immutable, and every message has a stable <code>id</code>. That id becomes the <code>LazyColumn</code> key, so Compose can update the streaming bubble in place instead of rebuilding the list.</p>
+
+<h2 id="repository">Step 2: The repository</h2>
+<p>Gemini's chat API keeps conversation context by resending history with each turn, and every resent token is billed as input. Instead of holding one ever-growing chat session, the repository rebuilds a chat from the <em>last N completed messages</em> on every send. It's simple, predictable and cheap.</p>
+<figure class="code"><figcaption><span class="file">ChatRepository.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">import</span> com.google.firebase.<span class="tk-t">Firebase</span>
+<span class="tk-k">import</span> com.google.firebase.ai.ai
+<span class="tk-k">import</span> com.google.firebase.ai.type.<span class="tk-t">GenerativeBackend</span>
+<span class="tk-k">import</span> com.google.firebase.ai.type.content
+<span class="tk-k">import</span> com.google.firebase.ai.type.generationConfig
+<span class="tk-k">import</span> kotlinx.coroutines.flow.<span class="tk-t">Flow</span>
+<span class="tk-k">import</span> kotlinx.coroutines.flow.mapNotNull
+
+<span class="tk-k">interface</span> <span class="tk-t">ChatRepository</span> {
+    <span class="tk-c">/** Streams the assistant's reply to [message], given previous completed turns. */</span>
+    <span class="tk-k">fun</span> reply(history: <span class="tk-t">List</span>&lt;<span class="tk-t">ChatMessage</span>&gt;, message: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt;
+}
+
+<span class="tk-k">class</span> <span class="tk-t">GeminiChatRepository</span>(
+    modelName: <span class="tk-t">String</span> = <span class="tk-s">"gemini-3.8-flash"</span>,      <span class="tk-c">// keep in remote config in production</span>
+    <span class="tk-k">private</span> <span class="tk-k">val</span> maxHistoryMessages: <span class="tk-t">Int</span> = <span class="tk-n">12</span>,    <span class="tk-c">// ~6 user/assistant exchanges</span>
+) : <span class="tk-t">ChatRepository</span> {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> model = <span class="tk-t">Firebase</span>.ai(backend = <span class="tk-t">GenerativeBackend</span>.googleAI()).generativeModel(
+        modelName = modelName,
+        generationConfig = generationConfig {
+            temperature = <span class="tk-n">0.6f</span>
+            maxOutputTokens = <span class="tk-n">1024</span>
+        },
+        systemInstruction = content {
+            text(
+                <span class="tk-s">"""
+                You are Study Buddy, a friendly tutor for Android development with Kotlin and Jetpack Compose.
+                - Keep answers under 200 words unless the user asks for more detail.
+                - Use short Kotlin snippets when they help; say when code is untested.
+                - If a question is unrelated to programming, politely steer back to Android topics.
+                - If you are not sure, say so instead of guessing.
+                """</span>.trimIndent()
+            )
+        },
+    )
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> reply(history: <span class="tk-t">List</span>&lt;<span class="tk-t">ChatMessage</span>&gt;, message: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt; {
+        <span class="tk-k">val</span> recent = history
+            .filter { it.status == <span class="tk-t">Status</span>.<span class="tk-t">DONE</span> &amp;&amp; it.text.isNotBlank() }   <span class="tk-c">// skip failed/partial turns</span>
+            .takeLast(maxHistoryMessages)
+            .map { msg -&gt;
+                content(role = <span class="tk-k">if</span> (msg.author == <span class="tk-t">Author</span>.<span class="tk-t">USER</span>) <span class="tk-s">"user"</span> <span class="tk-k">else</span> <span class="tk-s">"model"</span>) { text(msg.text) }
+            }
+        <span class="tk-k">val</span> chat = model.startChat(history = recent)
+        <span class="tk-k">return</span> chat.sendMessageStream(message).mapNotNull { it.text }
+    }
+}</code></pre></figure>
+<div class="tip"><b>Why filter failed turns?</b>
+<p>If a reply failed halfway, sending that partial text back as "what the model said" confuses the next answer. Only completed exchanges become context.</p></div>
+
+<h2 id="viewmodel">Step 3: The ViewModel</h2>
+<figure class="code"><figcaption><span class="file">ChatViewModel.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ChatViewModel</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> repository: <span class="tk-t">ChatRepository</span>) : <span class="tk-t">ViewModel</span>() {
+
+    <span class="tk-k">private</span> <span class="tk-k">val</span> _uiState = <span class="tk-t">MutableStateFlow</span>(<span class="tk-t">ChatUiState</span>())
+    <span class="tk-k">val</span> uiState: <span class="tk-t">StateFlow</span>&lt;<span class="tk-t">ChatUiState</span>&gt; = _uiState.asStateFlow()
+
+    <span class="tk-k">private</span> <span class="tk-k">var</span> replyJob: <span class="tk-t">Job</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-k">fun</span> onInputChange(text: <span class="tk-t">String</span>) = _uiState.update { it.copy(input = text.take(<span class="tk-n">2_000</span>)) }
+
+    <span class="tk-k">fun</span> send() {
+        <span class="tk-k">val</span> text = _uiState.<span class="tk-k">value</span>.input.trim()
+        <span class="tk-k">if</span> (text.isEmpty() || _uiState.<span class="tk-k">value</span>.isResponding) <span class="tk-k">return</span>
+        _uiState.update { it.copy(input = <span class="tk-s">""</span>) }
+        startReply(userText = text, appendUser = <span class="tk-k">true</span>)
+    }
+
+    <span class="tk-c">/** Re-sends the user message that preceded a failed assistant reply. */</span>
+    <span class="tk-k">fun</span> retry(failedId: <span class="tk-t">String</span>) {
+        <span class="tk-k">val</span> messages = _uiState.<span class="tk-k">value</span>.messages
+        <span class="tk-k">val</span> index = messages.indexOfFirst { it.id == failedId }
+        <span class="tk-k">val</span> userText = messages.getOrNull(index - <span class="tk-n">1</span>)?.takeIf { it.author == <span class="tk-t">Author</span>.<span class="tk-t">USER</span> }?.text ?: <span class="tk-k">return</span>
+        _uiState.update { it.copy(messages = messages.filterNot { m -&gt; m.id == failedId }) }
+        startReply(userText = userText, appendUser = <span class="tk-k">false</span>)
+    }
+
+    <span class="tk-k">fun</span> stop() { replyJob?.cancel() }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> startReply(userText: <span class="tk-t">String</span>, appendUser: <span class="tk-t">Boolean</span>) {
+        <span class="tk-k">val</span> history = _uiState.<span class="tk-k">value</span>.messages.let { <span class="tk-k">if</span> (appendUser) it <span class="tk-k">else</span> it.dropLast(<span class="tk-n">1</span>) }
+        <span class="tk-k">val</span> assistant = <span class="tk-t">ChatMessage</span>(author = <span class="tk-t">Author</span>.<span class="tk-t">ASSISTANT</span>, text = <span class="tk-s">""</span>, status = <span class="tk-t">Status</span>.<span class="tk-t">STREAMING</span>)
+        _uiState.update { state -&gt;
+            <span class="tk-k">val</span> withUser = <span class="tk-k">if</span> (appendUser) state.messages + <span class="tk-t">ChatMessage</span>(author = <span class="tk-t">Author</span>.<span class="tk-t">USER</span>, text = userText) <span class="tk-k">else</span> state.messages
+            state.copy(messages = withUser + assistant)
+        }
+
+        replyJob = viewModelScope.launch {
+            <span class="tk-k">try</span> {
+                repository.reply(history, userText).collect { chunk -&gt;
+                    updateMessage(assistant.id) { it.copy(text = it.text + chunk) }
+                }
+                updateMessage(assistant.id) { it.copy(status = <span class="tk-t">Status</span>.<span class="tk-t">DONE</span>) }
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">CancellationException</span>) {
+                <span class="tk-c">// Stopped by the user: keep what we have, mark as done.</span>
+                updateMessage(assistant.id) { it.copy(status = <span class="tk-t">Status</span>.<span class="tk-t">DONE</span>, text = it.text.ifBlank { <span class="tk-s">"(stopped)"</span> }) }
+                <span class="tk-k">throw</span> e
+            } <span class="tk-k">catch</span> (e: <span class="tk-t">Exception</span>) {
+                updateMessage(assistant.id) { it.copy(status = <span class="tk-t">Status</span>.<span class="tk-t">FAILED</span>, text = e.toChatError()) }
+            }
+        }
+    }
+
+    <span class="tk-k">private</span> <span class="tk-k">fun</span> updateMessage(id: <span class="tk-t">String</span>, transform: (<span class="tk-t">ChatMessage</span>) -&gt; <span class="tk-t">ChatMessage</span>) =
+        _uiState.update { state -&gt; state.copy(messages = state.messages.map { <span class="tk-k">if</span> (it.id == id) transform(it) <span class="tk-k">else</span> it }) }
+}
+
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">Throwable</span>.toChatError(): <span class="tk-t">String</span> = <span class="tk-k">when</span> (<span class="tk-k">this</span>) {
+    <span class="tk-k">is</span> java.io.<span class="tk-t">IOException</span> -&gt; <span class="tk-s">"You're offline. Check your connection."</span>
+    <span class="tk-k">else</span> -&gt; <span class="tk-s">"Study Buddy couldn't answer that. Tap retry."</span>
+}</code></pre></figure>
+<p>The streaming logic never touches the UI. It only updates one message by id. Because <code>retry</code> removes the failed bubble and reuses the preceding user text, the history stays clean.</p>
+
+<h2 id="ui">Step 4: The Compose UI</h2>
+<figure class="code"><figcaption><span class="file">ChatScreen.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-a">@OptIn</span>(<span class="tk-t">ExperimentalMaterial3Api</span>::<span class="tk-k">class</span>)
+<span class="tk-a">@Composable</span>
+<span class="tk-k">fun</span> <span class="tk-t">ChatScreen</span>(viewModel: <span class="tk-t">ChatViewModel</span>) {
+    <span class="tk-k">val</span> state <span class="tk-k">by</span> viewModel.uiState.collectAsStateWithLifecycle()
+    <span class="tk-k">val</span> listState = rememberLazyListState()
+
+    <span class="tk-c">// Keep the newest message visible as it grows.</span>
+    <span class="tk-k">val</span> lastText = state.messages.lastOrNull()?.text
+    <span class="tk-t">LaunchedEffect</span>(state.messages.size, lastText) {
+        <span class="tk-k">if</span> (state.messages.isNotEmpty()) listState.animateScrollToItem(state.messages.lastIndex)
+    }
+
+    <span class="tk-t">Scaffold</span>(
+        topBar = { <span class="tk-t">TopAppBar</span>(title = { <span class="tk-t">Text</span>(<span class="tk-s">"Study Buddy"</span>) }) },
+        bottomBar = {
+            <span class="tk-t">ChatInputBar</span>(
+                text = state.input,
+                isResponding = state.isResponding,
+                onTextChange = viewModel::onInputChange,
+                onSend = viewModel::send,
+                onStop = viewModel::stop,
+            )
+        },
+    ) { padding -&gt;
+        <span class="tk-k">if</span> (state.messages.isEmpty()) {
+            <span class="tk-t">Box</span>(<span class="tk-t">Modifier</span>.fillMaxSize().padding(padding), contentAlignment = <span class="tk-t">Alignment</span>.<span class="tk-t">Center</span>) {
+                <span class="tk-t">Text</span>(<span class="tk-s">"Ask anything about Kotlin or Compose."</span>, style = <span class="tk-t">MaterialTheme</span>.typography.bodyLarge)
+            }
+        } <span class="tk-k">else</span> {
+            <span class="tk-t">LazyColumn</span>(
+                state = listState,
+                contentPadding = <span class="tk-t">PaddingValues</span>(<span class="tk-n">12</span>.dp),
+                verticalArrangement = <span class="tk-t">Arrangement</span>.spacedBy(<span class="tk-n">8</span>.dp),
+                modifier = <span class="tk-t">Modifier</span>.fillMaxSize().padding(padding),
+            ) {
+                items(state.messages, key = { it.id }) { message -&gt;
+                    <span class="tk-t">MessageBubble</span>(message = message, onRetry = { viewModel.retry(message.id) })
+                }
+            }
+        }
+    }
+}
+
+<span class="tk-a">@Composable</span>
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">MessageBubble</span>(message: <span class="tk-t">ChatMessage</span>, onRetry: () -&gt; <span class="tk-t">Unit</span>) {
+    <span class="tk-k">val</span> isUser = message.author == <span class="tk-t">Author</span>.<span class="tk-t">USER</span>
+    <span class="tk-t">Column</span>(
+        horizontalAlignment = <span class="tk-k">if</span> (isUser) <span class="tk-t">Alignment</span>.<span class="tk-t">End</span> <span class="tk-k">else</span> <span class="tk-t">Alignment</span>.<span class="tk-t">Start</span>,
+        modifier = <span class="tk-t">Modifier</span>.fillMaxWidth(),
+    ) {
+        <span class="tk-t">Surface</span>(
+            color = <span class="tk-k">when</span> {
+                message.status == <span class="tk-t">Status</span>.<span class="tk-t">FAILED</span> -&gt; <span class="tk-t">MaterialTheme</span>.colorScheme.errorContainer
+                isUser -&gt; <span class="tk-t">MaterialTheme</span>.colorScheme.primaryContainer
+                <span class="tk-k">else</span> -&gt; <span class="tk-t">MaterialTheme</span>.colorScheme.surfaceVariant
+            },
+            shape = <span class="tk-t">RoundedCornerShape</span>(
+                topStart = <span class="tk-n">16</span>.dp, topEnd = <span class="tk-n">16</span>.dp,
+                bottomStart = <span class="tk-k">if</span> (isUser) <span class="tk-n">16</span>.dp <span class="tk-k">else</span> <span class="tk-n">4</span>.dp,
+                bottomEnd = <span class="tk-k">if</span> (isUser) <span class="tk-n">4</span>.dp <span class="tk-k">else</span> <span class="tk-n">16</span>.dp,
+            ),
+            modifier = <span class="tk-t">Modifier</span>.widthIn(max = <span class="tk-n">320</span>.dp),
+        ) {
+            <span class="tk-t">Column</span>(<span class="tk-t">Modifier</span>.padding(<span class="tk-n">12</span>.dp)) {
+                <span class="tk-k">if</span> (message.status == <span class="tk-t">Status</span>.<span class="tk-t">STREAMING</span> &amp;&amp; message.text.isEmpty()) {
+                    <span class="tk-t">Text</span>(<span class="tk-s">"Thinking…"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.bodyMedium)
+                } <span class="tk-k">else</span> {
+                    <span class="tk-t">SelectionContainer</span> { <span class="tk-t">Text</span>(message.text, style = <span class="tk-t">MaterialTheme</span>.typography.bodyLarge) }
+                }
+            }
+        }
+        <span class="tk-k">if</span> (!isUser) {
+            <span class="tk-t">Row</span>(verticalAlignment = <span class="tk-t">Alignment</span>.<span class="tk-t">CenterVertically</span>) {
+                <span class="tk-t">Text</span>(<span class="tk-s">"AI-generated"</span>, style = <span class="tk-t">MaterialTheme</span>.typography.labelSmall,
+                    modifier = <span class="tk-t">Modifier</span>.padding(start = <span class="tk-n">4</span>.dp, top = <span class="tk-n">2</span>.dp))
+                <span class="tk-k">if</span> (message.status == <span class="tk-t">Status</span>.<span class="tk-t">FAILED</span>) <span class="tk-t">TextButton</span>(onClick = onRetry) { <span class="tk-t">Text</span>(<span class="tk-s">"Retry"</span>) }
+            }
+        }
+    }
+}
+
+<span class="tk-a">@Composable</span>
+<span class="tk-k">private</span> <span class="tk-k">fun</span> <span class="tk-t">ChatInputBar</span>(
+    text: <span class="tk-t">String</span>,
+    isResponding: <span class="tk-t">Boolean</span>,
+    onTextChange: (<span class="tk-t">String</span>) -&gt; <span class="tk-t">Unit</span>,
+    onSend: () -&gt; <span class="tk-t">Unit</span>,
+    onStop: () -&gt; <span class="tk-t">Unit</span>,
+) {
+    <span class="tk-t">Surface</span>(tonalElevation = <span class="tk-n">3</span>.dp) {
+        <span class="tk-t">Row</span>(
+            verticalAlignment = <span class="tk-t">Alignment</span>.<span class="tk-t">CenterVertically</span>,
+            modifier = <span class="tk-t">Modifier</span>.fillMaxWidth().navigationBarsPadding().imePadding().padding(<span class="tk-n">8</span>.dp),
+        ) {
+            <span class="tk-t">OutlinedTextField</span>(
+                <span class="tk-k">value</span> = text,
+                onValueChange = onTextChange,
+                placeholder = { <span class="tk-t">Text</span>(<span class="tk-s">"Message Study Buddy"</span>) },
+                maxLines = <span class="tk-n">4</span>,
+                modifier = <span class="tk-t">Modifier</span>.weight(<span class="tk-n">1f</span>),
+            )
+            <span class="tk-t">Spacer</span>(<span class="tk-t">Modifier</span>.width(<span class="tk-n">8</span>.dp))
+            <span class="tk-k">if</span> (isResponding) {
+                <span class="tk-t">FilledTonalButton</span>(onClick = onStop) { <span class="tk-t">Text</span>(<span class="tk-s">"Stop"</span>) }
+            } <span class="tk-k">else</span> {
+                <span class="tk-t">Button</span>(onClick = onSend, enabled = text.isNotBlank()) { <span class="tk-t">Text</span>(<span class="tk-s">"Send"</span>) }
+            }
+        }
+    }
+}</code></pre></figure>
+<div class="note"><b>Wiring it up</b>
+<p>Create the ViewModel with your DI framework (for example Hilt), or a <code>viewModel { ChatViewModel(GeminiChatRepository()) }</code> initializer, and call <code>ChatScreen(viewModel)</code> from your <code>setContent</code> or navigation graph. In the Activity, enable edge-to-edge so <code>imePadding()</code> moves the input bar above the keyboard.</p></div>
+
+<h2 id="test">Step 5: Test the ViewModel with a fake repository</h2>
+<figure class="code"><figcaption><span class="file">ChatViewModelTest.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">ChatViewModelTest</span> {
+    <span class="tk-a">@get</span>:<span class="tk-t">Rule</span> <span class="tk-k">val</span> mainRule = <span class="tk-t">MainDispatcherRule</span>()   <span class="tk-c">// sets Dispatchers.Main to a test dispatcher</span>
+
+    <span class="tk-k">private</span> <span class="tk-k">class</span> <span class="tk-t">FakeRepo</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> chunks: <span class="tk-t">List</span>&lt;<span class="tk-t">String</span>&gt;, <span class="tk-k">private</span> <span class="tk-k">val</span> fail: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>) : <span class="tk-t">ChatRepository</span> {
+        <span class="tk-k">override</span> <span class="tk-k">fun</span> reply(history: <span class="tk-t">List</span>&lt;<span class="tk-t">ChatMessage</span>&gt;, message: <span class="tk-t">String</span>) = flow {
+            chunks.forEach { emit(it) }
+            <span class="tk-k">if</span> (fail) <span class="tk-k">throw</span> java.io.<span class="tk-t">IOException</span>(<span class="tk-s">"offline"</span>)
+        }
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `streamed chunks are joined into one assistant message`() = runTest {
+        <span class="tk-k">val</span> vm = <span class="tk-t">ChatViewModel</span>(<span class="tk-t">FakeRepo</span>(listOf(<span class="tk-s">"Hel"</span>, <span class="tk-s">"lo!"</span>)))
+        vm.onInputChange(<span class="tk-s">"Hi"</span>)
+        vm.send()
+        advanceUntilIdle()
+        <span class="tk-k">val</span> last = vm.uiState.<span class="tk-k">value</span>.messages.last()
+        assertEquals(<span class="tk-s">"Hello!"</span>, last.text)
+        assertEquals(<span class="tk-t">Status</span>.<span class="tk-t">DONE</span>, last.status)
+    }
+
+    <span class="tk-a">@Test</span>
+    <span class="tk-k">fun</span> `network failure marks the reply <span class="tk-k">as</span> failed`() = runTest {
+        <span class="tk-k">val</span> vm = <span class="tk-t">ChatViewModel</span>(<span class="tk-t">FakeRepo</span>(emptyList(), fail = <span class="tk-k">true</span>))
+        vm.onInputChange(<span class="tk-s">"Hi"</span>)
+        vm.send()
+        advanceUntilIdle()
+        assertEquals(<span class="tk-t">Status</span>.<span class="tk-t">FAILED</span>, vm.uiState.<span class="tk-k">value</span>.messages.last().status)
+    }
+}</code></pre></figure>
+<p>The <code>MainDispatcherRule</code> is shown in <a href="../kotlin-coroutines-flow-android/index.html">Kotlin Coroutines and Flow Explained</a>.</p>
+
+<h2 id="production">Production checklist</h2>
+<div class="cards">
+  <div class="card"><h4>Cost control</h4><ul><li>History limited to recent turns</li><li><code>maxOutputTokens</code> set</li><li>Input length capped</li><li>Per-user daily limits (needs a backend or App Check + server rules)</li></ul></div>
+  <div class="card"><h4>Safety &amp; trust</h4><ul><li>System instruction keeps scope narrow</li><li>Replies labelled AI-generated</li><li>No actions taken from model output without user confirmation</li><li>A way for users to report bad answers</li></ul></div>
+  <div class="card"><h4>Privacy</h4><ul><li>Tell users messages go to a cloud AI service</li><li>Data safety form updated</li><li>Don't log full conversations to analytics</li><li>Offer "Clear conversation"</li></ul></div>
+  <div class="card"><h4>UX polish</h4><ul><li>Stop button while streaming</li><li>Retry on failure</li><li>Text selectable for copying</li><li>Persist conversations in Room if users expect them later</li></ul></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>List jumps or flickers while streaming.</strong> Make sure items have stable keys (<code>key = { it.id }</code>) and that you update the message in place rather than creating a new id.</li>
+  <li><strong>The assistant "forgets" earlier context.</strong> That's expected beyond <code>maxHistoryMessages</code>. Raise it carefully, or summarise older turns into a single context message.</li>
+  <li><strong>Replies stop mid-sentence.</strong> <code>maxOutputTokens</code> is too low, or safety filtering ended the response. Inspect the finish reason in debug builds.</li>
+  <li><strong>Requests fail only in release builds.</strong> Usually App Check. Register your release SHA-256 fingerprint and check Play Integrity setup.</li>
+  <li><strong>Keyboard covers the input.</strong> Enable edge-to-edge and use <code>imePadding()</code> on the input bar.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can this chatbot work offline?</summary><div><p>Not with a cloud model. On-device Gemini Nano is currently suited to single-turn tasks rather than full multi-turn chat. See <a href="../cloud-ai-vs-on-device-ai-android/index.html">Cloud AI vs On-Device AI</a> for hybrid options.</p></div></details>
+  <details><summary>How do I make it answer from my own content?</summary><div><p>Retrieve relevant passages from your content (usually on a backend with embeddings) and include them in the prompt. This is called retrieval-augmented generation (RAG).</p></div></details>
+  <details><summary>Should I render Markdown in replies?</summary><div><p>Models often reply with Markdown. Rendering it improves readability, but parsing on every streamed chunk can be expensive. Throttle updates or render only once the message is complete.</p></div></details>
+  <details><summary>Can I use OpenAI or another provider instead?</summary><div><p>Yes. Implement <code>ChatRepository</code> against your own backend that calls the other provider. The ViewModel and UI don't change, which is the point of the interface.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>You've built a chatbot with the pieces that matter in production: <strong>immutable messages with stable ids, a repository that controls history and cost, a ViewModel that streams safely with stop and retry, and a Compose UI that stays smooth while text arrives</strong>. Because the AI provider sits behind <code>ChatRepository</code>, you can swap models, add a backend or introduce on-device features without rewriting the screen.</p>
+<p>Next step: persist conversations with Room and add a "New chat" action. To speed up building the UI itself, see <a href="../gemini-in-android-studio/index.html">How to Use Gemini in Android Studio</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://firebase.google.com/docs/ai-logic/chat?platform=android" target="_blank" rel="noopener">Firebase AI Logic: multi-turn chat (Android)</a></li><li><a href="https://firebase.google.com/docs/ai-logic/get-started?platform=android" target="_blank" rel="noopener">Firebase AI Logic: Get started</a></li><li><a href="https://firebase.google.com/docs/ai-logic/app-check" target="_blank" rel="noopener">App Check for Firebase AI Logic</a></li><li><a href="https://developer.android.com/develop/ui/compose/lists" target="_blank" rel="noopener">Lists and grids in Compose</a></li><li><a href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener">Gemini models</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-chatbot-jetpack-compose-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-chatbot-jetpack-compose-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/gemini-api-android-kotlin/index.html"><small>Android AI and Generative AI</small>Gemini API Integration in Android Using Kotlin</a></li><li><a href="../../android/mvi-vs-mvvm-android/index.html"><small>Android Architecture and Clean Code</small>MVVM vs MVI: Which Android Architecture Should You Use?</a></li><li><a href="../../android/cloud-ai-vs-on-device-ai-android/index.html"><small>Android AI and Generative AI</small>Cloud AI vs On-Device AI for Android</a></li><li><a href="../../android/choose-ai-model-android-app/index.html"><small>Android AI and Generative AI</small>How to Choose the Right AI Model for an Android App</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/ai-chatbot-jetpack-compose/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/ai-chatbot-jetpack-compose/&amp;text=Build an AI Chatbot Using Kotlin and Jetpack Compose" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/ai-chatbot-jetpack-compose/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#what-we-build">What we&#x27;ll build</a></li><li><a href="#project-structure">Project structure</a></li><li><a href="#model">Step 1: The message model</a></li><li><a href="#repository">Step 2: The repository</a></li><li><a href="#viewmodel">Step 3: The ViewModel</a></li><li><a href="#ui">Step 4: The Compose UI</a></li><li><a href="#test">Step 5: Test the ViewModel with a fake repository</a></li><li><a href="#production">Production checklist</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-chatbot-jetpack-compose-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dai-chatbot-jetpack-compose-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

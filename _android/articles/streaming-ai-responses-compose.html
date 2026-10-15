@@ -1,0 +1,166 @@
+<!--meta
+{
+  "seo_title": "Streaming AI Responses in Jetpack Compose (Kotlin)",
+  "description": "Render streaming LLM responses in Jetpack Compose: UI state for streaming, appending chunks efficiently, auto-scroll, stop and retry, cancellation, markdown rendering, accessibility and testing.",
+  "primary_keyword": "streaming ai responses compose",
+  "keywords": ["stream llm response android", "gemini generatecontentstream compose", "chat ui auto scroll compose", "cancel ai generation kotlin", "typing effect compose", "flow streaming viewmodel"],
+  "lede": "Streaming makes AI feel fast: users see the first words in a fraction of a second instead of waiting for the full answer. Doing it well in Compose means modelling streaming state, appending efficiently, auto-scrolling politely, and letting users stop.",
+  "date": "2026-10-15",
+  "cta": "ai",
+  "related": ["ai-chatbot-jetpack-compose", "gemini-api-android-kotlin", "openai-api-android-patterns", "viewmodel-stateflow-ui-state"],
+  "refs": [
+    ["Firebase AI Logic: stream responses", "https://firebase.google.com/docs/ai-logic/generate-text"],
+    ["StateFlow and SharedFlow", "https://developer.android.com/kotlin/flow/stateflow-and-sharedflow"],
+    ["Lists in Compose", "https://developer.android.com/develop/ui/compose/lists"],
+    ["Semantics: live regions", "https://developer.android.com/develop/ui/compose/accessibility/semantics"]
+  ]
+}
+-->
+<p class="ad-lead">A streamed response is a Flow of text chunks. The ViewModel accumulates them into UI state, and Compose renders the growing text. The details make the difference: what happens when users stop, rotate, scroll up or hit an error halfway.</p>
+
+<h2 id="states">Streaming states</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-str-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-str-t fig-str-d">
+    <title id="fig-str-t">State machine for a streamed response</title>
+    <desc id="fig-str-d">Idle moves to Waiting when the user sends. Waiting moves to Streaming when the first chunk arrives. Streaming moves to Done when the stream completes, Stopped when the user cancels, or Failed on error. Failed and Stopped can retry, returning to Waiting.</desc>
+    <defs><marker id="strm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M120 80 H156 M270 80 H306 M440 60 H516 M440 80 H516 M440 100 H516" marker-end="url(#strm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-box" x="20" y="55" width="100" height="50" rx="12"/><text class="d-t" x="70" y="85" text-anchor="middle">Idle</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="160" y="55" width="110" height="50" rx="12"/><text class="d-t" x="215" y="85" text-anchor="middle">Waiting</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="310" y="50" width="130" height="60" rx="12"/><text class="d-t" x="375" y="85" text-anchor="middle">Streaming</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="520" y="20" width="180" height="36" rx="10"/><text class="d-s" x="610" y="43" text-anchor="middle">Done</text>
+    <rect class="d-violet" x="520" y="62" width="180" height="36" rx="10"/><text class="d-s" x="610" y="85" text-anchor="middle">Stopped (partial kept)</text>
+    <rect class="d-red" x="520" y="104" width="180" height="36" rx="10"/><text class="d-s" x="610" y="127" text-anchor="middle">Failed (partial + retry)</text></g>
+    <text class="d-s" x="360" y="180" text-anchor="middle">Show "Stop" while Waiting/Streaming; "Retry" after Stopped/Failed.</text>
+  </svg>
+  <figcaption id="fig-str-cap">Model every state explicitly, including partial results.</figcaption>
+</figure>
+
+<h2 id="viewmodel">ViewModel: accumulate and cancel</h2>
+<code-block lang="kotlin" file="StreamingViewModel.kt">
+sealed interface ReplyState {
+    data object Idle : ReplyState
+    data object Waiting : ReplyState
+    data class Streaming(val text: String) : ReplyState
+    data class Done(val text: String) : ReplyState
+    data class Stopped(val text: String) : ReplyState
+    data class Failed(val partial: String, val message: String) : ReplyState
+}
+
+class StreamingViewModel(private val ai: TextStreamer) : ViewModel() {   // TextStreamer: (String) -> Flow<String>
+    private val _state = MutableStateFlow<ReplyState>(ReplyState.Idle)
+    val state: StateFlow<ReplyState> = _state.asStateFlow()
+
+    private var job: Job? = null
+    private var lastPrompt = ""
+
+    fun send(prompt: String) {
+        lastPrompt = prompt
+        job?.cancel()
+        _state.value = ReplyState.Waiting
+        job = viewModelScope.launch {
+            val buffer = StringBuilder()
+            try {
+                ai.stream(prompt).collect { chunk ->
+                    buffer.append(chunk)
+                    _state.value = ReplyState.Streaming(buffer.toString())
+                }
+                _state.value = ReplyState.Done(buffer.toString())
+            } catch (e: CancellationException) {
+                _state.value = ReplyState.Stopped(buffer.toString())
+                throw e                                           // always rethrow cancellation
+            } catch (e: Exception) {
+                _state.value = ReplyState.Failed(buffer.toString(), "Response interrupted")
+            }
+        }
+    }
+
+    fun stop() { job?.cancel() }                // cancels the Flow, which cancels the network call
+    fun retry() = send(lastPrompt)
+}
+</code-block>
+<div class="callout tip"><b>Cancellation saves money</b><p>Cancelling the collecting coroutine cancels the underlying HTTP stream, so the provider stops generating (and billing) tokens. Make sure your client implementation propagates cancellation.</p></div>
+
+<h2 id="ui">Compose UI</h2>
+<code-block lang="kotlin" file="ReplyCard.kt">
+@Composable
+fun ReplyCard(state: ReplyState, onStop: () -> Unit, onRetry: () -> Unit) {
+    val text = when (state) {
+        is ReplyState.Streaming -> state.text
+        is ReplyState.Done -> state.text
+        is ReplyState.Stopped -> state.text
+        is ReplyState.Failed -> state.partial
+        else -> ""
+    }
+    Column(Modifier.fillMaxWidth().padding(16.dp)) {
+        when (state) {
+            ReplyState.Waiting -> LinearProgressIndicator(Modifier.fillMaxWidth())
+            else -> Text(
+                text = text,
+                modifier = Modifier.semantics {
+                    // Announce once when complete rather than on every chunk
+                    if (state is ReplyState.Done) liveRegion = LiveRegionMode.Polite
+                },
+            )
+        }
+        Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (state is ReplyState.Waiting || state is ReplyState.Streaming)
+                OutlinedButton(onClick = onStop) { Text("Stop") }
+            if (state is ReplyState.Failed || state is ReplyState.Stopped)
+                TextButton(onClick = onRetry) { Text("Retry") }
+        }
+        if (state is ReplyState.Failed) Text(state.message, color = MaterialTheme.colorScheme.error)
+    }
+}
+</code-block>
+
+<h2 id="scroll">Auto-scroll politely</h2>
+<p>In a chat list, follow the stream only if the user is already at the bottom. Don't yank them back while they're reading earlier messages:</p>
+<code-block lang="kotlin" file="Follow the stream">
+val listState = rememberLazyListState()
+val atBottom by remember {
+    derivedStateOf {
+        val last = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+        last == null || last.index >= listState.layoutInfo.totalItemsCount - 1
+    }
+}
+LaunchedEffect(lastMessageText.length) {
+    if (atBottom && messages.isNotEmpty()) listState.scrollToItem(messages.lastIndex, Int.MAX_VALUE / 2)
+}
+</code-block>
+
+<h2 id="performance">Performance tips</h2>
+<ul>
+  <li>Chunks can arrive many times per second. If rendering markdown is expensive, throttle updates (for example with <code>sample(50)</code>) or render plain text while streaming and format when done.</li>
+  <li>Use a <code>StringBuilder</code> in the ViewModel, not repeated string concatenation in composables.</li>
+  <li>Give list items stable keys.</li>
+</ul>
+
+<h2 id="markdown">Markdown and partial content</h2>
+<p>Models often emit markdown. Partial markdown (an unclosed code block) can render oddly mid-stream. Options: render plain text while streaming and markdown on Done, or use a renderer tolerant of incomplete input. Never render model output as HTML in a WebView without sanitisation.</p>
+
+<h2 id="testing">Testing</h2>
+<code-block lang="kotlin" file="StreamingViewModelTest.kt">
+@Test
+fun stop_keepsPartialText() = runTest {
+    val chunks = Channel<String>()
+    val vm = StreamingViewModel(TextStreamer { chunks.consumeAsFlow() })
+    vm.send("hi")
+    chunks.send("Hel"); chunks.send("lo")
+    runCurrent()
+    vm.stop()
+    runCurrent()
+    assertEquals(ReplyState.Stopped("Hello"), vm.state.value)
+}
+</code-block>
+<p>Set the Main dispatcher to a test dispatcher in tests (for example with a <code>MainDispatcherRule</code>). See <a href="../testing-viewmodels-coroutines-flow/index.html">Testing ViewModels</a>.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I add a fake typing animation?</summary><div><p>Real streaming already looks like typing. Artificial delays slow users down. Show text as it arrives.</p></div></details>
+  <details><summary>What survives rotation?</summary><div><p>The ViewModel keeps collecting across configuration changes, so the stream continues. Process death loses it; persist completed messages.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Stream AI responses by <strong>accumulating chunks in a ViewModel</strong>, modelling <strong>waiting, streaming, done, stopped and failed</strong> states, supporting <strong>Stop</strong> through cancellation, auto-scrolling only when users are at the bottom, and keeping rendering efficient.</p>
+<p>Next step: build a complete project with <a href="../ai-document-summarizer-android/index.html">an AI Document Summarizer</a>.</p>

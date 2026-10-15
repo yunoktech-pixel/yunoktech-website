@@ -1,0 +1,177 @@
+<!--meta
+{
+  "seo_title": "Firebase Authentication in Android (Kotlin Guide)",
+  "description": "Add Firebase Authentication to Android with Kotlin: email/password, Google sign-in via Credential Manager, auth state as Flow, ID tokens for your backend, security rules and errors.",
+  "primary_keyword": "firebase authentication android",
+  "keywords": ["firebase auth kotlin", "google sign in credential manager", "firebase email password android", "firebase id token backend", "authstate flow kotlin", "firebase auth compose"],
+  "lede": "Firebase Authentication gives Android apps secure sign-in without building an auth backend: email and password, Google, phone and more. This guide implements email and Google sign-in with modern APIs, exposes auth state as a Flow, and connects it securely to your own server.",
+  "date": "2026-10-15",
+  "cta": "data",
+  "related": ["secure-token-storage-android", "firebase-cloud-messaging-push-notifications", "android-app-security-best-practices", "biometric-authentication-android"],
+  "refs": [
+    ["Firebase Authentication on Android", "https://firebase.google.com/docs/auth/android/start"],
+    ["Authenticate with Google on Android (Credential Manager)", "https://firebase.google.com/docs/auth/android/google-signin"],
+    ["Credential Manager", "https://developer.android.com/identity/sign-in/credential-manager"],
+    ["Verify ID tokens on your backend", "https://firebase.google.com/docs/auth/admin/verify-id-tokens"]
+  ]
+}
+-->
+<p class="ad-lead">Rolling your own authentication means hashing passwords, securing reset flows, rate-limiting attacks and managing sessions, all of which are easy to get dangerously wrong. Firebase Authentication handles these as a managed service, while your app focuses on the sign-in experience.</p>
+
+<h2 id="flow">How it fits together</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-fa-cap">
+  <svg viewBox="0 0 720 200" role="img" aria-labelledby="fig-fa-t fig-fa-d">
+    <title id="fig-fa-t">Firebase Authentication sign-in and backend verification</title>
+    <desc id="fig-fa-d">The app gets credentials from the user, via email and password or Google through Credential Manager, and signs in with Firebase Auth. Firebase returns a user and an ID token. The app sends the ID token to your backend, which verifies it with the Firebase Admin SDK before serving data.</desc>
+    <defs><marker id="fam" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M150 70 H186 M346 70 H382 M532 70 H568" marker-end="url(#fam)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="10" y="40" width="140" height="60" rx="12"/><text class="d-t" x="80" y="64" text-anchor="middle">Credentials</text><text class="d-s" x="80" y="82" text-anchor="middle">email · Google</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-amber" x="190" y="40" width="156" height="60" rx="12"/><text class="d-t" x="268" y="64" text-anchor="middle">Firebase Auth</text><text class="d-s" x="268" y="82" text-anchor="middle">user + ID token</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="386" y="40" width="146" height="60" rx="12"/><text class="d-t" x="459" y="64" text-anchor="middle">Your app</text><text class="d-s" x="459" y="82" text-anchor="middle">Bearer ID token</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="572" y="40" width="138" height="60" rx="12"/><text class="d-t" x="641" y="64" text-anchor="middle">Your backend</text><text class="d-s" x="641" y="82" text-anchor="middle">verifies token</text></g>
+    <text class="d-s" x="360" y="140" text-anchor="middle">Never trust a user ID sent by the client. Verify the signed ID token on the server.</text>
+  </svg>
+  <figcaption id="fig-fa-cap">Firebase proves who the user is. Your backend checks that proof on every request.</figcaption>
+</figure>
+
+<h2 id="setup">Setup</h2>
+<ol class="steps">
+  <li>Create a Firebase project, register your Android app, and add <code>google-services.json</code>.</li>
+  <li>Enable the providers you need (Email/Password, Google) in <strong>Authentication → Sign-in method</strong>.</li>
+  <li>For Google sign-in, add your app's <strong>SHA-1 and SHA-256</strong> fingerprints (debug and release, plus Play App Signing) in project settings.</li>
+</ol>
+<code-block lang="kts" file="app/build.gradle.kts">
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:<latest>"))
+    implementation("com.google.firebase:firebase-auth")
+    // Google sign-in through Credential Manager
+    implementation("androidx.credentials:credentials:<version>")
+    implementation("androidx.credentials:credentials-play-services-auth:<version>")
+    implementation("com.google.android.libraries.identity.googleid:googleid:<version>")
+}
+</code-block>
+
+<h2 id="repository">An AuthRepository</h2>
+<code-block lang="kotlin" file="AuthRepository.kt">
+class AuthRepository(private val auth: FirebaseAuth = Firebase.auth) {
+
+    /** Emits the current user (or null) and every change. */
+    val currentUser: Flow<FirebaseUser?> = callbackFlow {
+        val listener = FirebaseAuth.AuthStateListener { trySend(it.currentUser) }
+        auth.addAuthStateListener(listener)
+        awaitClose { auth.removeAuthStateListener(listener) }
+    }
+
+    suspend fun signIn(email: String, password: String): FirebaseUser =
+        auth.signInWithEmailAndPassword(email.trim(), password).await().user!!
+
+    suspend fun register(email: String, password: String): FirebaseUser {
+        val user = auth.createUserWithEmailAndPassword(email.trim(), password).await().user!!
+        user.sendEmailVerification().await()
+        return user
+    }
+
+    suspend fun sendPasswordReset(email: String) { auth.sendPasswordResetEmail(email.trim()).await() }
+
+    suspend fun signInWithGoogleIdToken(idToken: String): FirebaseUser =
+        auth.signInWithCredential(GoogleAuthProvider.getCredential(idToken, null)).await().user!!
+
+    /** Fresh ID token for calls to your own backend. */
+    suspend fun idToken(forceRefresh: Boolean = false): String? =
+        auth.currentUser?.getIdToken(forceRefresh)?.await()?.token
+
+    fun signOut() = auth.signOut()
+}
+</code-block>
+<p><code>await()</code> comes from <code>kotlinx-coroutines-play-services</code>. On success, Firebase returns a non-null user, which is why <code>!!</code> is acceptable here.</p>
+
+<h2 id="google">Google sign-in with Credential Manager</h2>
+<code-block lang="kotlin" file="GoogleSignIn.kt">
+suspend fun requestGoogleIdToken(activity: Activity, webClientId: String): String? {
+    val credentialManager = CredentialManager.create(activity)
+    val option = GetGoogleIdOption.Builder()
+        .setServerClientId(webClientId)              // "Web client" ID from your Firebase/Google Cloud project
+        .setFilterByAuthorizedAccounts(false)        // show all Google accounts on the device
+        .build()
+    val request = GetCredentialRequest.Builder().addCredentialOption(option).build()
+
+    return try {
+        val credential = credentialManager.getCredential(activity, request).credential
+        if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            GoogleIdTokenCredential.createFrom(credential.data).idToken
+        } else null
+    } catch (e: GetCredentialCancellationException) {
+        null                                          // user dismissed the sheet
+    } catch (e: GetCredentialException) {
+        null                                          // no accounts, misconfiguration, etc.
+    }
+}
+// val token = requestGoogleIdToken(activity, getString(R.string.default_web_client_id))
+// token?.let { authRepository.signInWithGoogleIdToken(it) }
+</code-block>
+
+<h2 id="ui">Routing by auth state</h2>
+<code-block lang="kotlin" file="AppRoot.kt">
+@Composable
+fun AppRoot(authRepository: AuthRepository) {
+    val user by authRepository.currentUser.collectAsStateWithLifecycle(initialValue = null)
+    if (user == null) SignInFlow() else MainApp()
+}
+</code-block>
+<p>In production, distinguish "unknown, still loading" from "signed out" to avoid a flash of the sign-in screen at startup.</p>
+
+<h2 id="backend">Calling your own backend securely</h2>
+<code-block lang="kotlin" file="Attach the Firebase ID token">
+class FirebaseTokenInterceptor(private val auth: FirebaseAuth) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        // getIdToken may refresh over the network; Tasks.await blocks this OkHttp thread (not main).
+        val token = auth.currentUser?.let { Tasks.await(it.getIdToken(false)).token }
+        val request = chain.request().newBuilder().apply {
+            if (token != null) header("Authorization", "Bearer $token")
+        }.build()
+        return chain.proceed(request)
+    }
+}
+</code-block>
+<p>Your server must <strong>verify the ID token</strong> with the Firebase Admin SDK and use the verified UID, never a user ID sent in the request body. If you use Firestore or Realtime Database, protect data with Security Rules based on <code>request.auth</code>.</p>
+
+<h2 id="errors">Errors and UX</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Exception</th><th>Meaning</th><th>Message</th></tr></thead>
+  <tbody>
+    <tr><td><code>FirebaseAuthInvalidCredentialsException</code></td><td>Wrong password or malformed email</td><td>"Email or password is incorrect"</td></tr>
+    <tr><td><code>FirebaseAuthInvalidUserException</code></td><td>User disabled or deleted</td><td>"This account isn't available"</td></tr>
+    <tr><td><code>FirebaseAuthUserCollisionException</code></td><td>Email already registered</td><td>"An account already exists. Try signing in."</td></tr>
+    <tr><td><code>FirebaseAuthWeakPasswordException</code></td><td>Password too weak</td><td>Show the reason from the exception</td></tr>
+    <tr><td><code>FirebaseNetworkException</code></td><td>No connectivity</td><td>"You're offline"</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Depending on your project's settings, Firebase may return a generic invalid-credential error instead of revealing whether an email exists. Design messages that work either way.</p>
+
+<h2 id="use-cases">Common setups</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Consumer app</h3><p>Google sign-in as the primary option, email as a fallback, and optional anonymous auth to let users try first and link later.</p></div>
+  <div class="card usecase"><h3>App with its own API</h3><p>Firebase for identity, your backend verifying ID tokens and storing app data.</p></div>
+  <div class="card usecase"><h3>Sensitive actions</h3><p>Re-authenticate before changing email or deleting an account, and consider biometrics for local unlock.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Missing release or Play App Signing SHA fingerprints, so Google sign-in works in debug but fails in production.</li>
+  <li>Trusting client-provided user IDs on the server.</li>
+  <li>Storing passwords locally.</li>
+  <li>Not offering account deletion. Google Play requires apps that allow account creation to provide account deletion.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does Firebase Auth keep users signed in?</summary><div><p>Yes. Sessions persist across app restarts until the user signs out or the session is revoked. ID tokens refresh automatically.</p></div></details>
+  <details><summary>Should I use the old Google Sign-In SDK?</summary><div><p>Google recommends Credential Manager for new implementations of Sign in with Google on Android.</p></div></details>
+  <details><summary>Is Firebase Auth free?</summary><div><p>Many providers have a generous free tier, but some features (such as phone authentication and enterprise features) have usage-based pricing. Check current Firebase pricing.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Firebase Authentication provides <strong>managed, secure identity</strong>. Expose auth state as a Flow, use <strong>Credential Manager</strong> for Google sign-in, send <strong>ID tokens</strong> to your backend and verify them server-side, and map auth errors to clear messages.</p>
+<p>Next step: reach users with <a href="../firebase-cloud-messaging-push-notifications/index.html">Firebase Cloud Messaging and Push Notifications</a>.</p>

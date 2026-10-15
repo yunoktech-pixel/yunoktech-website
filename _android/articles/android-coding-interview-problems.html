@@ -1,0 +1,177 @@
+<!--meta
+{
+  "seo_title": "Real-World Android Coding Interview Problems (Kotlin)",
+  "description": "Practise realistic Android coding interview problems in Kotlin: search with debounce, paginated list, offline cache, LRU cache, rate limiter and image grid, with solutions and evaluation tips.",
+  "primary_keyword": "android coding interview problems",
+  "keywords": ["android live coding interview", "kotlin coding interview", "android take home assignment", "debounce search kotlin interview", "lru cache kotlin", "android machine coding round"],
+  "lede": "Many Android coding rounds aren't abstract puzzles. They ask you to build a small, realistic feature well, under time pressure. Here are common problem types, with Kotlin solutions and what interviewers evaluate.",
+  "date": "2026-10-15",
+  "cta": "career",
+  "related": ["android-interview-questions", "coroutines-flow-interview-questions", "senior-android-developer-interview", "kotlin-collections-functional"],
+  "refs": [
+    ["Kotlin collections", "https://kotlinlang.org/docs/collections-overview.html"],
+    ["Coroutines guide", "https://kotlinlang.org/docs/coroutines-guide.html"],
+    ["Testing coroutines on Android", "https://developer.android.com/kotlin/coroutines/test"]
+  ]
+}
+-->
+<p class="ad-lead">In a machine-coding or take-home round, a working feature is the minimum. What earns a strong signal is clean structure, correct state handling, error and edge cases, and a few meaningful tests, all explained clearly.</p>
+
+<h2 id="evaluate">What interviewers evaluate</h2>
+<figure class="diagram" role="group" aria-labelledby="fig-ce-cap">
+  <svg viewBox="0 0 720 160" role="img" aria-labelledby="fig-ce-t fig-ce-d">
+    <title id="fig-ce-t">Coding round evaluation criteria</title>
+    <desc id="fig-ce-d">Correctness, structure and readability, state and lifecycle handling, edge cases and errors, testing, and communication about trade-offs.</desc>
+    <rect class="d-green" x="10" y="30" width="108" height="100" rx="10"/><text class="d-s" x="64" y="84" text-anchor="middle">Correctness</text>
+    <rect class="d-blue" x="128" y="30" width="108" height="100" rx="10"/><text class="d-s" x="182" y="84" text-anchor="middle">Structure</text>
+    <rect class="d-violet" x="246" y="30" width="108" height="100" rx="10"/><text class="d-s" x="300" y="84" text-anchor="middle">State/lifecycle</text>
+    <rect class="d-amber" x="364" y="30" width="108" height="100" rx="10"/><text class="d-s" x="418" y="84" text-anchor="middle">Edge cases</text>
+    <rect class="d-red" x="482" y="30" width="108" height="100" rx="10"/><text class="d-s" x="536" y="84" text-anchor="middle">Tests</text>
+    <rect class="d-box" x="600" y="30" width="110" height="100" rx="10"/><text class="d-s" x="655" y="84" text-anchor="middle">Communication</text>
+  </svg>
+  <figcaption id="fig-ce-cap">Talk while you code: state assumptions, mention what you'd do with more time.</figcaption>
+</figure>
+
+<h2 id="p1">Problem 1: Search with debounce and cancellation</h2>
+<p><em>Build a search ViewModel that waits 300 ms after typing stops, ignores blank queries, cancels outdated searches, and exposes loading, results and error states.</em></p>
+<code-block lang="kotlin" file="SearchViewModel.kt">
+sealed interface SearchState {
+    data object Idle : SearchState
+    data object Loading : SearchState
+    data class Results(val items: List<String>) : SearchState
+    data class Error(val message: String) : SearchState
+}
+
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+class SearchViewModel(private val api: suspend (String) -> List<String>) : ViewModel() {
+    private val query = MutableStateFlow("")
+
+    val state: StateFlow<SearchState> = query
+        .map(String::trim)
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { q ->
+            if (q.isEmpty()) flowOf(SearchState.Idle)
+            else flow<SearchState> {
+                emit(SearchState.Loading)
+                emit(SearchState.Results(api(q)))
+            }.catch { emit(SearchState.Error("Search failed")) }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SearchState.Idle)
+
+    fun onQueryChange(q: String) { query.value = q }
+}
+</code-block>
+<p><strong>Discuss:</strong> why <code>flatMapLatest</code> (cancels stale requests), why <code>distinctUntilChanged</code>, and how you'd test it with virtual time.</p>
+
+<h2 id="p2">Problem 2: LRU cache</h2>
+<p><em>Implement a fixed-capacity least-recently-used cache with O(1) get and put.</em></p>
+<code-block lang="kotlin" file="LruCache.kt">
+class LruCache<K, V>(private val capacity: Int) {
+    init { require(capacity > 0) }
+    // accessOrder = true: iteration order is least → most recently accessed
+    private val map = object : LinkedHashMap<K, V>(capacity, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<K, V>?) = size > capacity
+    }
+
+    @Synchronized fun get(key: K): V? = map[key]
+    @Synchronized fun put(key: K, value: V) { map[key] = value }
+    @Synchronized fun size(): Int = map.size
+}
+</code-block>
+<p><strong>Discuss:</strong> thread safety, why <code>LinkedHashMap</code> with access order works, and Android's built-in <code>LruCache</code> with size-of for bitmaps.</p>
+
+<h2 id="p3">Problem 3: Rate limiter (token bucket)</h2>
+<code-block lang="kotlin" file="TokenBucket.kt">
+class TokenBucket(
+    private val capacity: Int,
+    private val refillPerSecond: Double,
+    private val now: () -> Long = System::nanoTime,
+) {
+    private var tokens = capacity.toDouble()
+    private var last = now()
+
+    @Synchronized
+    fun tryAcquire(): Boolean {
+        val t = now()
+        tokens = minOf(capacity.toDouble(), tokens + (t - last) / 1e9 * refillPerSecond)
+        last = t
+        return if (tokens >= 1) { tokens -= 1; true } else false
+    }
+}
+// Use: limit AI or API calls per user action burst; inject `now` for deterministic tests.
+</code-block>
+
+<h2 id="p4">Problem 4: Paginated list with error and retry (feature task)</h2>
+<p><em>Show a list from a paged API, load more near the end, show a footer spinner or retry, and keep state across rotation.</em> Approach: Paging 3 if allowed (explain the choice), otherwise a manual pager:</p>
+<code-block lang="kotlin" file="Manual pager state">
+data class ListState(
+    val items: List<Item> = emptyList(),
+    val nextPage: Int? = 1,
+    val loadingMore: Boolean = false,
+    val error: String? = null,
+)
+
+fun loadMore() {
+    val s = _state.value
+    if (s.loadingMore || s.nextPage == null) return            // guard duplicate and end-of-list loads
+    _state.update { it.copy(loadingMore = true, error = null) }
+    viewModelScope.launch {
+        _state.update { cur ->
+            try {
+                val page = api.page(s.nextPage)
+                cur.copy(items = cur.items + page.items, nextPage = page.next, loadingMore = false)
+            } catch (e: IOException) {
+                cur.copy(loadingMore = false, error = "Couldn't load more")
+            }
+        }
+    }
+}
+</code-block>
+<p>Note: calling a suspend function inside <code>update { }</code> isn't allowed, because the lambda isn't suspending. In the interview, fetch first, then <code>update</code>. Spotting this kind of detail is exactly what interviewers watch for.</p>
+<code-block lang="kotlin" file="Corrected">
+viewModelScope.launch {
+    val result = runCatching { api.page(s.nextPage) }
+    _state.update { cur ->
+        result.fold(
+            onSuccess = { page -> cur.copy(items = cur.items + page.items, nextPage = page.next, loadingMore = false) },
+            onFailure = { cur.copy(loadingMore = false, error = "Couldn't load more") },
+        )
+    }
+}
+</code-block>
+
+<h2 id="p5">Problem 5: Group and summarise transactions</h2>
+<code-block lang="kotlin" file="Collections problem">
+data class Txn(val category: String, val amountPaise: Long, val date: LocalDate)
+
+/** Top N categories by spend in a month, with totals. */
+fun topCategories(txns: List<Txn>, month: YearMonth, n: Int): List<Pair<String, Long>> =
+    txns.asSequence()
+        .filter { YearMonth.from(it.date) == month }
+        .groupingBy { it.category }
+        .fold(0L) { acc, t -> acc + t.amountPaise }
+        .entries
+        .sortedByDescending { it.value }
+        .take(n)
+        .map { it.key to it.value }
+</code-block>
+
+<h2 id="tips">Tips for the round</h2>
+<ol class="steps">
+  <li>Clarify requirements and constraints before coding.</li>
+  <li>Start with the data model and state, then logic, then UI.</li>
+  <li>Handle loading, empty and error states, and rotation.</li>
+  <li>Add one or two focused tests if time allows.</li>
+  <li>Summarise trade-offs and next steps at the end.</li>
+</ol>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should I use libraries in a take-home?</summary><div><p>Use standard ones (Retrofit, Room, Compose), unless told otherwise, and explain why. Avoid exotic dependencies.</p></div></details>
+  <details><summary>DS&amp;A or Android tasks?</summary><div><p>Companies differ. Product companies often include both. Practise common algorithm patterns in Kotlin as well as feature tasks.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android coding rounds reward <strong>correct, well-structured, state-aware code</strong> with <strong>edge cases, a few tests and clear communication</strong>. Practise realistic features (debounced search, pagination, caching) and classic Kotlin collection problems.</p>
+<p>Next step: prepare for legacy-code questions with <a href="../java-to-kotlin-migration-interview/index.html">Java to Kotlin Migration Interview Questions</a>.</p>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kotlin Extension and Higher-Order Functions Explained | Yunok Tech</title>
+  <meta name="description" content="Kotlin extension functions and higher-order functions for Android: syntax, how they compile, lambdas with receivers, inline functions, Compose modifiers and when not to use them.">
+  <meta name="keywords" content="kotlin extension functions, kotlin higher order functions, lambda with receiver kotlin, inline function kotlin, kotlin dsl android, compose modifier extension, function types kotlin">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/kotlin-extension-higher-order-functions/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/kotlin-extension-higher-order-functions/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Kotlin Extension and Higher-Order Functions Explained">
+  <meta property="og:description" content="Kotlin extension functions and higher-order functions for Android: syntax, how they compile, lambdas with receivers, inline functions, Compose modifiers and when not to use them.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Kotlin Programming">
+  <meta name="twitter:title" content="Kotlin Extension and Higher-Order Functions Explained">
+  <meta name="twitter:description" content="Kotlin extension functions and higher-order functions for Android: syntax, how they compile, lambdas with receivers, inline functions, Compose modifiers and when not to use them.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Extension Functions and Higher-Order Functions", "description": "Kotlin extension functions and higher-order functions for Android: syntax, how they compile, lambdas with receivers, inline functions, Compose modifiers and when not to use them.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Kotlin Programming", "keywords": "kotlin higher order functions, lambda with receiver kotlin, inline function kotlin, kotlin dsl android, compose modifier extension, function types kotlin", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/kotlin-extension-higher-order-functions/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Extension Functions and Higher-Order Functions", "item": "https://yunoktech.com/android/kotlin-extension-higher-order-functions/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#kotlin">Kotlin Programming</a></nav>
+    <span class="ad-chip">🟣 Kotlin Programming</span>
+    <h1 id="article-title">Extension Functions and Higher-Order Functions</h1>
+    <p class="ad-lede">Extension functions let you add behaviour to classes you don't own. Higher-order functions let you pass behaviour around as values. Together they power Jetpack Compose, Kotlin DSLs and most idiomatic Android code. Here's how they work and how to use them without making code harder to read.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#extensions">Extension functions</a></li><li><a href="#hof">Higher-order functions</a></li><li><a href="#receiver">Lambdas with receivers: the secret behind DSLs</a></li><li><a href="#compose-modifiers">Custom Compose modifiers as extensions</a></li><li><a href="#inline">inline, noinline and crossinline</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">When not to use them</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">Java codebases tend to accumulate <code>StringUtils</code>, <code>ViewUtils</code> and <code>DateUtils</code> classes full of static helpers. Kotlin lets you attach those helpers directly to the types they work on, and pass behaviour as easily as data. Used well, this makes Android code read almost like prose.</p>
+
+<h2 id="extensions">Extension functions</h2>
+<figure class="code"><figcaption><span class="file">Extensions.kt</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-c">// Adds a function to String without inheritance or wrappers</span>
+<span class="tk-k">fun</span> <span class="tk-t">String</span>.isValidEmail(): <span class="tk-t">Boolean</span> =
+    android.util.<span class="tk-t">Patterns</span>.<span class="tk-t">EMAIL_ADDRESS</span>.matcher(<span class="tk-k">this</span>).matches()
+
+<span class="tk-c">// Extension on a nullable type: safe to call on null</span>
+<span class="tk-k">fun</span> <span class="tk-t">String</span>?.orDash(): <span class="tk-t">String</span> = <span class="tk-k">if</span> (isNullOrBlank()) <span class="tk-s">"—"</span> <span class="tk-k">else</span> <span class="tk-k">this</span>
+
+<span class="tk-c">// Extension property</span>
+<span class="tk-k">val</span> <span class="tk-t">Int</span>.dpToPx: <span class="tk-t">Int</span> <span class="tk-k">get</span>() = (<span class="tk-k">this</span> * <span class="tk-t">Resources</span>.getSystem().displayMetrics.density).toInt()
+
+<span class="tk-c">// Usage reads naturally</span>
+<span class="tk-k">if</span> (email.isValidEmail()) submit()
+<span class="tk-t">Text</span>(user.nickname.orDash())</code></pre></figure>
+
+<h3 id="compiled">What they compile to</h3>
+<p>An extension is a <strong>static function</strong> whose first parameter is the receiver. <code>"a@b.com".isValidEmail()</code> compiles to roughly <code>ExtensionsKt.isValidEmail("a@b.com")</code>. Consequences:</p>
+<ul>
+  <li>Extensions are <strong>resolved statically</strong>, from the declared type and not the runtime type, so they don't override member functions.</li>
+  <li>They <strong>can't access private members</strong> of the class.</li>
+  <li>A member function always wins over an extension with the same signature.</li>
+</ul>
+
+<h2 id="hof">Higher-order functions</h2>
+<p>A higher-order function takes a function as a parameter or returns one. Function types look like <code>(Int) -&gt; String</code> or <code>suspend () -&gt; Unit</code>.</p>
+<figure class="code"><figcaption><span class="file">A reusable retry helper</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">suspend</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; retry(
+    times: <span class="tk-t">Int</span> = <span class="tk-n">3</span>,
+    initialDelayMs: <span class="tk-t">Long</span> = <span class="tk-n">500</span>,
+    block: <span class="tk-k">suspend</span> () -&gt; <span class="tk-t">T</span>,          <span class="tk-c">// behaviour passed in as a parameter</span>
+): <span class="tk-t">T</span> {
+    <span class="tk-k">var</span> delayMs = initialDelayMs
+    repeat(times - <span class="tk-n">1</span>) {
+        <span class="tk-k">try</span> {
+            <span class="tk-k">return</span> block()
+        } <span class="tk-k">catch</span> (e: <span class="tk-t">IOException</span>) {
+            delay(delayMs)
+            delayMs *= <span class="tk-n">2</span>              <span class="tk-c">// exponential backoff</span>
+        }
+    }
+    <span class="tk-k">return</span> block()                     <span class="tk-c">// last attempt: let the exception propagate</span>
+}
+
+<span class="tk-c">// Usage</span>
+<span class="tk-k">val</span> articles = retry { api.getArticles() }</code></pre></figure>
+
+<figure class="diagram" role="group" aria-labelledby="fig-h-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-h-t fig-h-d">
+    <title id="fig-h-t">Extension function, higher-order function and lambda with receiver</title>
+    <desc id="fig-h-d">Three boxes compare forms. Extension: fun String.isValidEmail() is called as email.isValidEmail(). Higher-order: fun retry(block: () -> T) is called with a lambda. Lambda with receiver: T.() -> Unit, used by apply and Compose scopes, so this refers to the receiver.</desc>
+    <rect class="d-blue" x="10" y="20" width="220" height="110" rx="12"/><text class="d-t" x="120" y="46" text-anchor="middle">Extension</text><text class="d-s" x="120" y="72" text-anchor="middle">fun String.isValidEmail()</text><text class="d-s" x="120" y="96" text-anchor="middle">email.isValidEmail()</text>
+    <rect class="d-violet" x="250" y="20" width="220" height="110" rx="12"/><text class="d-t" x="360" y="46" text-anchor="middle">Higher-order</text><text class="d-s" x="360" y="72" text-anchor="middle">fun retry(block: () -&gt; T)</text><text class="d-s" x="360" y="96" text-anchor="middle">retry { api.load() }</text>
+    <rect class="d-green" x="490" y="20" width="220" height="110" rx="12"/><text class="d-t" x="600" y="46" text-anchor="middle">Lambda with receiver</text><text class="d-s" x="600" y="72" text-anchor="middle">block: T.() -&gt; Unit</text><text class="d-s" x="600" y="96" text-anchor="middle">apply { }, Column { }</text>
+  </svg>
+  <figcaption id="fig-h-cap">The three ideas combine into Kotlin DSLs, including Gradle Kotlin DSL and Compose's layout scopes.</figcaption>
+</figure>
+
+<h2 id="receiver">Lambdas with receivers: the secret behind DSLs</h2>
+<p>A function type with a receiver, <code>T.() -&gt; Unit</code>, lets the lambda body call the receiver's members as if it were inside the class. That's how <code>apply</code>, <code>buildString</code>, Gradle's <code>android { }</code> block and Compose's <code>RowScope</code> work.</p>
+<figure class="code"><figcaption><span class="file">A tiny notification DSL</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">NotificationSpec</span> {
+    <span class="tk-k">var</span> title = <span class="tk-s">""</span>
+    <span class="tk-k">var</span> body = <span class="tk-s">""</span>
+    <span class="tk-k">var</span> channelId = <span class="tk-s">"general"</span>
+}
+
+<span class="tk-k">fun</span> <span class="tk-t">Context</span>.notification(build: <span class="tk-t">NotificationSpec</span>.() -&gt; <span class="tk-t">Unit</span>): <span class="tk-t">Notification</span> {
+    <span class="tk-k">val</span> spec = <span class="tk-t">NotificationSpec</span>().apply(build)
+    <span class="tk-k">return</span> <span class="tk-t">NotificationCompat</span>.<span class="tk-t">Builder</span>(<span class="tk-k">this</span>, spec.channelId)
+        .setSmallIcon(<span class="tk-t">R</span>.drawable.ic_stat_notify)
+        .setContentTitle(spec.title)
+        .setContentText(spec.body)
+        .build()
+}
+
+<span class="tk-c">// Usage</span>
+<span class="tk-k">val</span> n = context.notification {
+    title = <span class="tk-s">"Order shipped"</span>
+    body = <span class="tk-s">"Your parcel arrives tomorrow"</span>
+    channelId = <span class="tk-s">"orders"</span>
+}</code></pre></figure>
+<p>In Compose, <code>Modifier.weight()</code> and <code>Modifier.align()</code> are only available inside <code>RowScope</code> or <code>ColumnScope</code>, because they're extensions defined on those scope receivers. The compiler stops you using <code>weight</code> where it makes no sense.</p>
+
+<h2 id="compose-modifiers">Custom Compose modifiers as extensions</h2>
+<figure class="code"><figcaption><span class="file">Reusable modifier</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> <span class="tk-t">Modifier</span>.cardSurface(): <span class="tk-t">Modifier</span> = <span class="tk-k">this</span>
+    .clip(<span class="tk-t">RoundedCornerShape</span>(<span class="tk-n">16</span>.dp))
+    .background(<span class="tk-t">MaterialTheme</span>.colorScheme.surfaceVariant)  <span class="tk-c">// ⚠ not allowed: not @Composable</span></code></pre></figure>
+<p>That version doesn't compile, because <code>MaterialTheme</code> must be read in a composable. Pass the colour in instead:</p>
+<figure class="code"><figcaption><span class="file">Correct version</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">fun</span> <span class="tk-t">Modifier</span>.cardSurface(color: <span class="tk-t">Color</span>, radius: <span class="tk-t">Dp</span> = <span class="tk-n">16</span>.dp): <span class="tk-t">Modifier</span> = <span class="tk-k">this</span>
+    .clip(<span class="tk-t">RoundedCornerShape</span>(radius))
+    .background(color)
+    .padding(<span class="tk-n">16</span>.dp)
+
+<span class="tk-c">// Usage: Box(Modifier.cardSurface(MaterialTheme.colorScheme.surfaceVariant)) { ... }</span></code></pre></figure>
+
+<h2 id="inline">inline, noinline and crossinline</h2>
+<p>Every lambda passed to a normal function can allocate an object. <code>inline</code> copies the function body and the lambda into the call site, so there's no allocation, and <code>return</code> inside the lambda returns from the enclosing function (a non-local return). The standard library's <code>map</code>, <code>filter</code> and <code>let</code> are inline for this reason.</p>
+<figure class="code"><figcaption><span class="file">Measuring time with an inline helper</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">inline</span> <span class="tk-k">fun</span> &lt;<span class="tk-t">T</span>&gt; measured(tag: <span class="tk-t">String</span>, block: () -&gt; <span class="tk-t">T</span>): <span class="tk-t">T</span> {
+    <span class="tk-k">val</span> start = <span class="tk-t">SystemClock</span>.elapsedRealtime()
+    <span class="tk-k">return</span> block().also { <span class="tk-t">Log</span>.d(tag, <span class="tk-s">"took ${SystemClock.elapsedRealtime() - start} ms"</span>) }
+}</code></pre></figure>
+<ul>
+  <li><code>noinline</code>: a lambda parameter that must be stored or passed on, not inlined.</li>
+  <li><code>crossinline</code>: a lambda called from another context (for example inside a Runnable), where non-local return isn't allowed.</li>
+  <li>Inline only small functions that take lambdas. Inlining large bodies bloats bytecode.</li>
+</ul>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Android KTX</h3><p>Google's KTX libraries are mostly extensions, such as <code>sharedPreferences.edit { }</code>, <code>view.isVisible</code> and <code>bundleOf()</code>, that make platform APIs idiomatic.</p></div>
+  <div class="card usecase"><h3>Mapping layers</h3><p><code>fun UserDto.toDomain()</code> keeps conversions next to the types without polluting the models.</p></div>
+  <div class="card usecase"><h3>Event handlers in Compose</h3><p>Composables accept <code>onClick: () -&gt; Unit</code>, making them stateless and reusable.</p></div>
+</div>
+
+<h2 id="mistakes">When not to use them</h2>
+<ul>
+  <li><strong>Extensions on very general types</strong> (<code>Any</code>, <code>String</code>) for domain-specific logic. <code>String.toInvoiceNumber()</code> pollutes autocomplete everywhere. Prefer a function on a domain type.</li>
+  <li><strong>Hiding important behaviour</strong> in extensions far from the class, so readers can't find it.</li>
+  <li><strong>Deeply nested lambdas</strong> that obscure control flow.</li>
+  <li><strong>Unstable lambdas in Compose</strong>: creating new lambda instances that capture changing values can affect skipping. Usually fine, but measure on hot paths.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can extensions be private or scoped?</summary><div><p>Yes. Make them <code>private</code> to a file, <code>internal</code> to a module, or declare them inside a class so they're only available there.</p></div></details>
+  <details><summary>Are extension functions slower?</summary><div><p>No. They compile to ordinary static calls.</p></div></details>
+  <details><summary>What's the difference between a lambda and an anonymous function?</summary><div><p>They're nearly equivalent. Anonymous functions (<code>fun(x: Int): Int { … }</code>) allow explicit return types and local <code>return</code> semantics.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Extensions</strong> add behaviour to existing types as static functions. <strong>Higher-order functions</strong> pass behaviour as values. <strong>Lambdas with receivers</strong> combine both into DSLs like Compose and Gradle. Use them to make APIs read naturally, scope them tightly, and inline small lambda-taking helpers.</p>
+<p>Next step: write type-safe reusable code with <a href="../kotlin-generics-reified/index.html">Kotlin Generics and Reified Types</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/extensions.html" target="_blank" rel="noopener">Extensions (Kotlin docs)</a></li><li><a href="https://kotlinlang.org/docs/lambdas.html" target="_blank" rel="noopener">Higher-order functions and lambdas</a></li><li><a href="https://kotlinlang.org/docs/inline-functions.html" target="_blank" rel="noopener">Inline functions</a></li><li><a href="https://kotlinlang.org/docs/type-safe-builders.html" target="_blank" rel="noopener">Type-safe builders</a></li><li><a href="https://developer.android.com/kotlin/ktx" target="_blank" rel="noopener">Android KTX</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-extension-higher-order-functions-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-extension-higher-order-functions-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-collections-functional/index.html"><small>Kotlin Programming</small>Kotlin Collections and Functional Programming</a></li><li><a href="../../android/kotlin-generics-reified/index.html"><small>Kotlin Programming</small>Kotlin Generics and Reified Types</a></li><li><a href="../../android/kotlin-basics-android/index.html"><small>Kotlin Programming</small>Kotlin Basics Every Android Developer Should Know</a></li><li><a href="../../android/composable-functions-explained/index.html"><small>Jetpack Compose</small>Composable Functions Explained</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/kotlin-extension-higher-order-functions/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/kotlin-extension-higher-order-functions/&amp;text=Extension Functions and Higher-Order Functions" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/kotlin-extension-higher-order-functions/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#extensions">Extension functions</a></li><li><a href="#hof">Higher-order functions</a></li><li><a href="#receiver">Lambdas with receivers: the secret behind DSLs</a></li><li><a href="#compose-modifiers">Custom Compose modifiers as extensions</a></li><li><a href="#inline">inline, noinline and crossinline</a></li><li><a href="#use-cases">Real-world uses</a></li><li><a href="#mistakes">When not to use them</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-extension-higher-order-functions-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dkotlin-extension-higher-order-functions-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

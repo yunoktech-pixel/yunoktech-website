@@ -1,0 +1,118 @@
+<!--meta
+{
+  "seo_title": "Android Auto and Android Automotive OS Development",
+  "description": "Build car apps for Android Auto and Android Automotive OS: supported app categories, Media3 media apps, messaging, the Car App Library templates for navigation, POI and more, driver distraction rules, and testing.",
+  "primary_keyword": "android automotive development",
+  "keywords": ["android auto app development", "car app library templates", "android automotive os apps", "media app android auto", "desktop head unit", "driver distraction guidelines"],
+  "lede": "In the car, safety comes first. You don't design free-form UI; you supply data and actions to templates the system renders safely. Here's how Android Auto and Android Automotive OS differ, which app categories are supported, and how to build for them.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["wear-os-app-development", "large-screen-foldable-android", "android-app-components", "publish-android-app-google-play"],
+  "refs": [
+    ["Android for Cars overview", "https://developer.android.com/training/cars"],
+    ["Car App Library", "https://developer.android.com/training/cars/apps"],
+    ["Build media apps for cars", "https://developer.android.com/training/cars/media"],
+    ["Test Android apps for cars", "https://developer.android.com/training/cars/testing"],
+    ["Car app quality guidelines", "https://developer.android.com/docs/quality-guidelines/car-app-quality"]
+  ]
+}
+-->
+<p class="ad-lead">There are two car platforms. <strong>Android Auto</strong> projects your phone app onto the car's display. <strong>Android Automotive OS</strong> is Android running on the car itself, with apps installed directly. The same app architecture can target both.</p>
+
+<h2 id="platforms">Two platforms, shared app models</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-car-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-car-t fig-car-d">
+    <title id="fig-car-t">Android Auto versus Android Automotive OS</title>
+    <desc id="fig-car-d">With Android Auto, the app runs on the phone and the car display shows it. With Android Automotive OS, the app runs on the car's built-in Android system. Both use the same media and Car App Library models, and the system renders templates.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="20" y="20" width="320" height="120" rx="14"/><text class="d-t" x="180" y="50" text-anchor="middle">Android Auto</text><text class="d-s" x="180" y="78" text-anchor="middle">app runs on the phone</text><text class="d-s" x="180" y="100" text-anchor="middle">projected to car display</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="380" y="20" width="320" height="120" rx="14"/><text class="d-t" x="540" y="50" text-anchor="middle">Android Automotive OS</text><text class="d-s" x="540" y="78" text-anchor="middle">app runs on the car</text><text class="d-s" x="540" y="100" text-anchor="middle">installed from Play in the car</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="20" y="158" width="680" height="46" rx="12"/><text class="d-t" x="360" y="186" text-anchor="middle">Shared: Media (MediaSession) · messaging · Car App Library templates</text></g>
+  </svg>
+  <figcaption id="fig-car-cap">You supply content; the platform renders driver-safe UI.</figcaption>
+</figure>
+
+<h2 id="categories">Supported app categories</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Category</th><th>How you build it</th></tr></thead>
+  <tbody>
+    <tr><td>Media (music, podcasts, audiobooks)</td><td>A <code>MediaLibraryService</code> with Media3; the system builds the UI</td></tr>
+    <tr><td>Messaging</td><td>Notifications with MessagingStyle and reply/mark-read actions</td></tr>
+    <tr><td>Navigation, POI (parking, charging), IoT, weather and more</td><td>Car App Library templates</td></tr>
+    <tr><td>Video, games, browsers</td><td>Only in specific contexts on Automotive OS (for example while parked). Check the current docs.</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Supported categories expand over time, so check the official overview before planning.</p>
+
+<h2 id="media">Media apps with Media3</h2>
+<code-block lang="kotlin" file="PlaybackService.kt">
+class PlaybackService : MediaLibraryService() {
+    private var session: MediaLibrarySession? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        val player = ExoPlayer.Builder(this).build()
+        session = MediaLibrarySession.Builder(this, player, LibraryCallback()).build()
+    }
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo) = session
+
+    override fun onDestroy() {
+        session?.run { player.release(); release() }
+        session = null
+        super.onDestroy()
+    }
+}
+// LibraryCallback returns the browsable tree: root → categories → playable items.
+</code-block>
+<p>The same service powers your phone notification, Wear OS, Android Auto and Automotive OS media UIs.</p>
+
+<h2 id="templates">Car App Library templates</h2>
+<code-block lang="kotlin" file="Car App Library screen">
+class ChargersScreen(carContext: CarContext) : Screen(carContext) {
+    override fun onGetTemplate(): Template {
+        val list = ItemList.Builder()
+            .addItem(Row.Builder().setTitle("Station A").addText("2 km · 4 free").build())
+            .addItem(Row.Builder().setTitle("Station B").addText("5 km · 1 free").build())
+            .build()
+        return ListTemplate.Builder()
+            .setTitle("Nearby chargers")
+            .setSingleList(list)
+            .build()
+    }
+}
+// Declared via a CarAppService with a category in the manifest.
+</code-block>
+<p>Templates enforce limits on list length, text and steps while driving. These limits are part of driver distraction safeguards.</p>
+
+<h2 id="safety">Driver distraction and quality</h2>
+<ul>
+  <li>Follow the car app quality guidelines. Apps are reviewed against them.</li>
+  <li>Keep tasks short, minimise text, and support voice where possible.</li>
+  <li>Don't show video or complex UI while driving.</li>
+</ul>
+
+<h2 id="testing">Testing</h2>
+<ul>
+  <li><strong>Android Auto:</strong> the Desktop Head Unit (DHU) simulates the car screen on your computer.</li>
+  <li><strong>Android Automotive OS:</strong> Automotive emulator system images in Android Studio.</li>
+  <li>Test day and night modes, different screen sizes, and touch vs rotary input.</li>
+</ul>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Podcast app</h3><p>One Media3 service, available on phone, car and watch.</p></div>
+  <div class="card usecase"><h3>EV charging</h3><p>POI templates listing nearby chargers with navigation hand-off.</p></div>
+  <div class="card usecase"><h3>Messaging</h3><p>Notifications read aloud with voice reply.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Can I build a custom UI for the car?</summary><div><p>For most categories, no. You use templates or system media UI. Some Automotive OS app types allow more, mainly while parked.</p></div></details>
+  <details><summary>Is one APK enough for phone and Auto?</summary><div><p>For Android Auto, yes: car support lives in your phone app. Automotive OS needs a build targeting the automotive form factor, often a separate module.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Car apps supply <strong>content and actions</strong>: media through <strong>Media3</strong>, messaging through notifications, and other categories through <strong>Car App Library templates</strong>, with driver safety guidelines and DHU and emulator testing.</p>
+<p>Next step: adapt to big screens with <a href="../large-screen-foldable-android/index.html">Large Screens and Foldables</a>.</p>

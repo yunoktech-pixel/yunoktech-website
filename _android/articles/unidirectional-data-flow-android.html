@@ -1,0 +1,115 @@
+<!--meta
+{
+  "seo_title": "Unidirectional Data Flow (UDF) in Android Explained",
+  "description": "Unidirectional data flow in Android: state down, events up, single source of truth, how UDF works across Compose, ViewModel and data layers, with code, benefits and pitfalls.",
+  "primary_keyword": "unidirectional data flow android",
+  "keywords": ["udf android", "state down events up", "single source of truth android", "compose unidirectional data flow", "android architecture principles", "predictable state android"],
+  "lede": "Unidirectional data flow is the principle underneath MVVM, MVI and Compose state hoisting: state flows one way, events flow the other, and each piece of data has exactly one owner. Understand UDF once and every Android architecture pattern makes more sense.",
+  "date": "2026-10-15",
+  "cta": "architecture",
+  "related": ["viewmodel-stateflow-ui-state", "compose-state-hoisting", "mvi-vs-mvvm-android", "mvvm-architecture-android"],
+  "refs": [
+    ["Guide to app architecture: unidirectional data flow", "https://developer.android.com/topic/architecture#unidirectional-data-flow"],
+    ["UI layer", "https://developer.android.com/topic/architecture/ui-layer"],
+    ["Architecting your Compose UI", "https://developer.android.com/develop/ui/compose/architecture"]
+  ]
+}
+-->
+<p class="ad-lead">In a bidirectional design, a text field updates a variable, the variable updates a label, the label's listener updates another variable... and nobody can say which value is "correct" when they disagree. Unidirectional data flow (UDF) removes that ambiguity with one rule: <strong>state flows down, events flow up</strong>.</p>
+
+<h2 id="definition">The rule</h2>
+<ul>
+  <li><strong>State</strong> is owned by a single source of truth and flows <em>down</em> to consumers, which can only read it.</li>
+  <li><strong>Events</strong> (user actions, system callbacks) flow <em>up</em> to the owner, which decides how state changes.</li>
+  <li>The owner produces a <strong>new immutable state</strong>, which flows down again.</li>
+</ul>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-udf2-cap">
+  <svg viewBox="0 0 720 260" role="img" aria-labelledby="fig-udf2-t fig-udf2-d">
+    <title id="fig-udf2-t">Unidirectional data flow across the app layers</title>
+    <desc id="fig-udf2-d">A loop: the data layer exposes data to the ViewModel; the ViewModel produces UI state to the screen; the screen passes state to components; a user tap in a component sends an event up to the screen, then to the ViewModel, which may write to the data layer; new data flows down again.</desc>
+    <defs><marker id="u2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="260" y="10" width="200" height="44" rx="12"/><text class="d-t" x="360" y="37" text-anchor="middle">Data layer</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="260" y="80" width="200" height="44" rx="12"/><text class="d-t" x="360" y="107" text-anchor="middle">ViewModel</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-blue" x="260" y="150" width="200" height="44" rx="12"/><text class="d-t" x="360" y="177" text-anchor="middle">Screen composable</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="260" y="210" width="200" height="40" rx="12"/><text class="d-t" x="360" y="235" text-anchor="middle">Component (button)</text></g>
+    <path class="d-flow" d="M300 54 V78 M300 124 V148 M300 194 V208" marker-end="url(#u2)"/><text class="d-s" x="200" y="140" text-anchor="middle">state ↓</text>
+    <path class="d-flow" d="M420 208 V196 M420 148 V126 M420 78 V56" marker-end="url(#u2)"/><text class="d-s" x="520" y="140" text-anchor="middle">events ↑</text>
+    <circle class="d-dot" r="6" style="offset-path:path('M300 54 V208');--dur:2s"/>
+    <circle class="d-dot alt" r="6" style="offset-path:path('M420 208 V56');--dur:2s;--delay:1.2s"/>
+  </svg>
+  <figcaption id="fig-udf2-cap">The same shape repeats at every level: data layer to ViewModel, ViewModel to screen, screen to component.</figcaption>
+</figure>
+
+<h2 id="example">UDF end to end</h2>
+<code-block lang="kotlin" file="Like button: one source of truth">
+// Data layer owns the truth
+class PostRepository @Inject constructor(private val dao: PostDao, private val api: PostApi) {
+    fun observePost(id: String): Flow<Post> = dao.observe(id).map { it.toDomain() }
+    suspend fun setLiked(id: String, liked: Boolean) {
+        dao.setLiked(id, liked)               // optimistic local update
+        runCatching { api.setLiked(id, liked) }.onFailure { dao.setLiked(id, !liked); throw it }
+    }
+}
+
+// ViewModel turns data into UI state and handles events
+class PostViewModel(private val repo: PostRepository, postId: String) : ViewModel() {
+    private val id = postId
+    val uiState = repo.observePost(id)
+        .map { PostUiState(title = it.title, liked = it.liked, likeCount = it.likeCount) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PostUiState())
+
+    fun onLikeClick() = viewModelScope.launch {
+        runCatching { repo.setLiked(id, !uiState.value.liked) }
+    }
+}
+
+// UI renders state and emits events; it never flips `liked` itself
+@Composable
+fun LikeButton(liked: Boolean, count: Int, onClick: () -> Unit) {
+    TextButton(onClick = onClick) {
+        Icon(if (liked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = null)
+        Text(" $count")
+    }
+}
+</code-block>
+<p>Even the optimistic update goes through the database, so every screen showing this post agrees.</p>
+
+<h2 id="benefits">Benefits</h2>
+<ul>
+  <li><strong>Consistency:</strong> one owner per piece of data means no conflicting copies.</li>
+  <li><strong>Predictability:</strong> state changes happen in known places, so bugs are easier to trace.</li>
+  <li><strong>Testability:</strong> feed events in, assert state out.</li>
+  <li><strong>Survives configuration changes</strong>, because state lives in ViewModels and repositories rather than Views.</li>
+</ul>
+
+<h2 id="violations">Common UDF violations</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Violation</th><th>Symptom</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>UI mutates shared state directly (public <code>MutableStateFlow</code>)</td><td>State changes from unexpected places</td><td>Expose read-only <code>StateFlow</code>; mutate via ViewModel functions</td></tr>
+    <tr><td>Local copy of ViewModel state in a composable</td><td>UI and ViewModel disagree</td><td>Read directly from state; hoist instead of copying</td></tr>
+    <tr><td>Two ViewModels both caching the same data</td><td>Screens show different values</td><td>Move the truth to the data layer and observe it</td></tr>
+    <tr><td>Child components calling repositories</td><td>Hidden data flows, hard tests</td><td>Events up to the screen's ViewModel</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="use-cases">UDF at different scales</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Component level</h3><p>State hoisting: <code>value</code> plus <code>onValueChange</code>. See <a href="../compose-state-hoisting/index.html">State Hoisting</a>.</p></div>
+  <div class="card usecase"><h3>Screen level</h3><p>ViewModel exposes UiState, and the screen calls functions. See <a href="../viewmodel-stateflow-ui-state/index.html">ViewModel and StateFlow</a>.</p></div>
+  <div class="card usecase"><h3>App level</h3><p>The database as source of truth, with network sync writing into it. See <a href="../offline-first-android-architecture/index.html">Offline-First</a>.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is UDF the same as MVI?</summary><div><p>MVI is a strict form of UDF that formalises events as intents and changes as a reducer. MVVM with a single immutable state is also UDF.</p></div></details>
+  <details><summary>Doesn't UDF add latency for text input?</summary><div><p>Not noticeably when state updates are synchronous on the main thread, as with <code>MutableStateFlow.update</code> or Compose state. Avoid asynchronous round-trips for every keystroke.</p></div></details>
+  <details><summary>Where do one-off events fit?</summary><div><p>Model them as state that the UI consumes and clears, so they still follow the unidirectional loop.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>UDF is a simple discipline: <strong>one owner per piece of state, state down as immutable values, events up as function calls</strong>. Apply it at component, screen and app level and your Android code becomes predictable, consistent and testable.</p>
+<p>Next step: scale the codebase physically with <a href="../multi-module-architecture-android/index.html">Multi-Module Architecture in Android</a>.</p>

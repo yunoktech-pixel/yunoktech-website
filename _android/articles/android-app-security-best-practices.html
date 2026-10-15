@@ -1,0 +1,142 @@
+<!--meta
+{
+  "seo_title": "Android App Security Best Practices (2026 Checklist)",
+  "description": "Android app security best practices: threat modelling, secure network config, data storage, secrets, components and intents, WebViews, authentication, dependencies, integrity checks and releases.",
+  "primary_keyword": "android app security best practices",
+  "keywords": ["android security checklist", "secure android app development", "network security config", "exported components security", "webview security android", "owasp masvs android"],
+  "lede": "Most Android security incidents come from a handful of repeat mistakes: secrets in the APK, sensitive data in logs or plain storage, exported components, unsafe WebViews, and trusting the client. This guide organises Android security into practical layers, with code for each.",
+  "date": "2026-10-15",
+  "cta": "security",
+  "related": ["common-android-security-vulnerabilities", "secure-api-keys-android", "encrypted-data-storage-android", "play-integrity-api-explained"],
+  "refs": [
+    ["Android security best practices", "https://developer.android.com/privacy-and-security/security-best-practices"],
+    ["Network security configuration", "https://developer.android.com/privacy-and-security/security-config"],
+    ["OWASP MASVS", "https://mas.owasp.org/MASVS/"],
+    ["App security improvement program / risks", "https://developer.android.com/privacy-and-security/risks"]
+  ]
+}
+-->
+<p class="ad-lead">Android gives every app a strong sandbox, but the sandbox can't protect you from your own design decisions. Security has to be built into how you store data, talk to servers, expose components and handle authentication, and it has to assume the device and the APK can be inspected by an attacker.</p>
+
+<h2 id="layers">Security layers</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-sl-cap">
+  <svg viewBox="0 0 720 230" role="img" aria-labelledby="fig-sl-t fig-sl-d">
+    <title id="fig-sl-t">Layers of Android app security</title>
+    <desc id="fig-sl-d">Concentric layers from the server outward: the server enforces authorization and validation; the network is protected with TLS and network security config; on-device storage uses the sandbox and Keystore-backed encryption; app components restrict exports and validate intents; the UI and WebViews avoid leaking data; and the release pipeline uses R8, signing and dependency hygiene.</desc>
+    <g class="d-step" style="--i:5"><rect class="d-box" x="20" y="10" width="680" height="210" rx="18"/><text class="d-s" x="360" y="30" text-anchor="middle">Release: R8, signing, dependency updates, integrity checks</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-amber" x="60" y="40" width="600" height="170" rx="16"/><text class="d-s" x="360" y="60" text-anchor="middle">UI &amp; WebView: no sensitive data in logs/screenshots, safe WebView settings</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-blue" x="100" y="70" width="520" height="130" rx="14"/><text class="d-s" x="360" y="90" text-anchor="middle">Components: minimal exports, validated intents, permissions</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="140" y="100" width="440" height="90" rx="12"/><text class="d-s" x="360" y="120" text-anchor="middle">Storage: sandbox + Keystore-backed encryption, no secrets</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-green" x="180" y="130" width="360" height="50" rx="10"/><text class="d-s" x="360" y="152" text-anchor="middle">Network: TLS only, network security config</text></g>
+    <g class="d-step" style="--i:0"><rect class="d-dark" x="250" y="168" width="220" height="24" rx="6"/><text class="d-w" x="360" y="185" text-anchor="middle">Server: the real authority</text></g>
+  </svg>
+  <figcaption id="fig-sl-cap">The server is the final authority. Everything on the device can be observed or modified by a determined attacker.</figcaption>
+</figure>
+
+<h2 id="principles">Core principles</h2>
+<ul>
+  <li><strong>Never trust the client.</strong> Enforce authorisation, prices, limits and business rules on the server.</li>
+  <li><strong>Minimise data:</strong> collect, store and log only what you need.</li>
+  <li><strong>Least privilege:</strong> request minimal permissions, and export minimal components.</li>
+  <li><strong>Defence in depth:</strong> combine controls, because each one can fail.</li>
+</ul>
+
+<h2 id="network">Network security</h2>
+<code-block lang="xml" file="res/xml/network_security_config.xml">
+<network-security-config>
+    <!-- Disallow cleartext HTTP everywhere (default for targetSdk 28+, made explicit here) -->
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Allow user-installed CAs only in debug builds, e.g. for proxy debugging -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
+</code-block>
+<code-block lang="xml" file="AndroidManifest.xml">
+<application android:networkSecurityConfig="@xml/network_security_config" ... >
+</code-block>
+<p>Never ship a custom <code>TrustManager</code> that accepts all certificates or a <code>HostnameVerifier</code> that returns <code>true</code>. Consider certificate pinning only with a rotation plan. See <a href="../certificate-pinning-android/index.html">Certificate Pinning</a>.</p>
+
+<h2 id="storage">Data storage</h2>
+<ul>
+  <li>Keep sensitive data in <strong>app-private storage</strong>, never on shared external storage.</li>
+  <li>Encrypt secrets and sensitive data with <strong>Keystore-backed keys</strong>. See <a href="../encrypted-data-storage-android/index.html">Encrypted Data Storage</a> and <a href="../secure-token-storage-android/index.html">Secure Token Storage</a>.</li>
+  <li>Exclude sensitive files from backups.</li>
+  <li>Clear user data on logout.</li>
+</ul>
+
+<h2 id="secrets">Secrets</h2>
+<p>Anything in the APK is extractable, including BuildConfig fields, resources, native libraries and obfuscated strings. Keep real secrets on servers and use short-lived, scoped tokens. See <a href="../secure-api-keys-android/index.html">Secure API Keys and Secrets</a>.</p>
+
+<h2 id="components">Components and intents</h2>
+<code-block lang="xml" file="Export only what must be public">
+<activity android:name=".internal.DebugMenuActivity" android:exported="false" />
+
+<receiver android:name=".SyncReceiver" android:exported="false" />
+
+<!-- Public deep-link entry: exported, but validate all incoming data -->
+<activity android:name=".DeepLinkActivity" android:exported="true">
+    <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https" android:host="yunoktech.com" android:pathPrefix="/orders/" />
+    </intent-filter>
+</activity>
+</code-block>
+<code-block lang="kotlin" file="Validate incoming deep link data">
+val orderId = intent.data?.lastPathSegment
+    ?.takeIf { it.matches(Regex("^[A-Z0-9]{4,20}$")) }   // allow-list format
+    ?: return finish()
+// Then load the order through the authenticated API, which enforces ownership server-side.
+</code-block>
+<ul>
+  <li>Use <code>PendingIntent.FLAG_IMMUTABLE</code> unless mutability is required.</li>
+  <li>Use explicit intents for internal communication.</li>
+  <li>Protect custom permissions with <code>signature</code> protection level when sharing between your own apps.</li>
+</ul>
+
+<h2 id="webview">WebViews</h2>
+<ul>
+  <li>Keep JavaScript disabled unless needed. Never enable file access from file URLs.</li>
+  <li>Load only your own trusted HTTPS content, and restrict navigation to allowed hosts.</li>
+  <li>Avoid <code>addJavascriptInterface</code> with untrusted content. Prefer <code>WebViewCompat.addWebMessageListener</code> with origin allow-lists.</li>
+</ul>
+
+<h2 id="ui">UI and logs</h2>
+<code-block lang="kotlin" file="Protect sensitive screens">
+// Prevent screenshots and recent-apps thumbnails on screens showing sensitive data
+window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+</code-block>
+<ul>
+  <li>Never log tokens, OTPs, personal data or full API responses in release builds.</li>
+  <li>Mark password fields correctly (<code>KeyboardType.Password</code> or the password input type) so keyboards don't learn them.</li>
+</ul>
+
+<h2 id="release">Release and supply chain</h2>
+<ul>
+  <li>Enable R8 (it raises the effort of reverse engineering, but isn't a security boundary).</li>
+  <li>Use Play App Signing, and protect upload keys. See <a href="../android-app-signing-upload-keys/index.html">App Signing</a>.</li>
+  <li>Keep dependencies updated, remove unused SDKs, and review SDK data collection.</li>
+  <li>Use <a href="../play-integrity-api-explained/index.html">Play Integrity</a> on the server for high-value actions.</li>
+</ul>
+
+<h2 id="use-cases">Priorities by app type</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Content app</h3><p>TLS, minimal permissions, no secrets in the APK, safe WebViews.</p></div>
+  <div class="card usecase"><h3>Commerce app</h3><p>Plus server-side price and order validation, secure tokens, and Play Integrity for checkout.</p></div>
+  <div class="card usecase"><h3>Finance or health app</h3><p>Plus encrypted storage, FLAG_SECURE, biometrics for sensitive actions, strict logging, and regular security testing (MASVS).</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Does obfuscation make my app secure?</summary><div><p>No. It slows reverse engineering. Security comes from server-side enforcement, proper storage and not shipping secrets.</p></div></details>
+  <details><summary>Should I detect rooted devices?</summary><div><p>Client-side root detection is easily bypassed. Prefer server-side Play Integrity verdicts for risk decisions, and don't break the app for legitimate users without reason.</p></div></details>
+  <details><summary>Where can I find a complete checklist?</summary><div><p>OWASP's Mobile Application Security Verification Standard (MASVS) and testing guide are comprehensive references.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Android security is layered: <strong>server-side authority</strong>, <strong>TLS-only networking</strong>, <strong>sandboxed and encrypted storage</strong>, <strong>minimal exported components with validated input</strong>, <strong>safe WebViews and logging</strong>, and a <strong>secure release pipeline</strong>. Fix the common mistakes first, then deepen for higher-risk apps.</p>
+<p>Next step: understand the foundation of on-device cryptography in <a href="../android-keystore-explained/index.html">Android Keystore Explained</a>.</p>

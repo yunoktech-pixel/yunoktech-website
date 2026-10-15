@@ -1,0 +1,152 @@
+<!--meta
+{
+  "seo_title": "Kotlin Delegation and Property Delegates Explained",
+  "description": "Kotlin delegation for Android: class delegation with by, lazy, observable, vetoable, map delegates, custom ReadWriteProperty, by viewModels(), and Compose's by remember.",
+  "primary_keyword": "kotlin delegation",
+  "keywords": ["kotlin property delegates", "by lazy kotlin", "by viewModels android", "kotlin class delegation", "ReadWriteProperty custom delegate", "compose by remember"],
+  "lede": "Every time you write by viewModels(), by lazy or var x by remember { }, you're using Kotlin delegation. Understanding how delegates work lets you remove boilerplate, prefer composition over inheritance, and write your own reusable property behaviours.",
+  "date": "2026-10-15",
+  "cta": "kotlin",
+  "related": ["kotlin-generics-reified", "kotlin-extension-higher-order-functions", "remember-vs-remembersaveable", "solid-principles-android"],
+  "refs": [
+    ["Delegation (Kotlin docs)", "https://kotlinlang.org/docs/delegation.html"],
+    ["Delegated properties", "https://kotlinlang.org/docs/delegated-properties.html"],
+    ["ViewModel: by viewModels()", "https://developer.android.com/topic/libraries/architecture/viewmodel"],
+    ["State in Compose", "https://developer.android.com/develop/ui/compose/state"]
+  ]
+}
+-->
+<p class="ad-lead">Kotlin's <code>by</code> keyword shows up everywhere in Android code: <code>private val vm: MainViewModel by viewModels()</code>, <code>val db by lazy { … }</code>, <code>var count by remember { mutableIntStateOf(0) }</code>. They look like magic, but they're one simple language feature applied in two ways: <strong>class delegation</strong> and <strong>property delegation</strong>.</p>
+
+<h2 id="class-delegation">Class delegation: composition without boilerplate</h2>
+<p>"Prefer composition over inheritance" usually means writing many forwarding methods. Kotlin generates them for you:</p>
+<code-block lang="kotlin" file="Decorating a repository with logging">
+interface ArticleRepository {
+    suspend fun getArticles(): List<Article>
+    suspend fun getArticle(id: String): Article
+    suspend fun bookmark(id: String)
+}
+
+// Delegates every method to `real`, overriding only what it needs.
+class LoggingArticleRepository(
+    private val real: ArticleRepository,
+) : ArticleRepository by real {
+    override suspend fun bookmark(id: String) {
+        Log.d("Repo", "bookmark($id)")
+        real.bookmark(id)
+    }
+}
+</code-block>
+<p>This is the <strong>Decorator pattern</strong> in a few lines: caching, logging and metrics layers can wrap any implementation without inheritance.</p>
+
+<h2 id="property-delegation">Property delegation: how by works</h2>
+<p>For <code>val x by D</code>, the compiler routes reads of <code>x</code> to <code>D.getValue(thisRef, property)</code>, and for <code>var</code>, writes to <code>D.setValue(...)</code>.</p>
+<figure class="diagram" role="group" aria-labelledby="fig-d-cap">
+  <svg viewBox="0 0 720 150" role="img" aria-labelledby="fig-d-t fig-d-d">
+    <title id="fig-d-t">How a delegated property works</title>
+    <desc id="fig-d-d">Reading the property calls the delegate's getValue function; writing calls setValue. The delegate object stores or computes the value.</desc>
+    <defs><marker id="dg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <rect class="d-blue" x="20" y="45" width="190" height="60" rx="12"/><text class="d-t" x="115" y="72" text-anchor="middle">var token by Pref()</text><text class="d-s" x="115" y="92" text-anchor="middle">your property</text>
+    <path class="d-flow" d="M210 62 H330" marker-end="url(#dg)"/><text class="d-s" x="270" y="54" text-anchor="middle">read → getValue()</text>
+    <path class="d-flow" d="M210 92 H330" marker-end="url(#dg)"/><text class="d-s" x="270" y="114" text-anchor="middle">write → setValue()</text>
+    <rect class="d-violet" x="334" y="45" width="170" height="60" rx="12"/><text class="d-t" x="419" y="72" text-anchor="middle">Delegate object</text><text class="d-s" x="419" y="92" text-anchor="middle">holds the logic</text>
+    <path class="d-line" d="M504 75 H560"/>
+    <rect class="d-green" x="564" y="45" width="140" height="60" rx="12"/><text class="d-t" x="634" y="72" text-anchor="middle">Storage</text><text class="d-s" x="634" y="92" text-anchor="middle">memory, prefs, state</text>
+  </svg>
+  <figcaption id="fig-d-cap">The property looks ordinary to callers. The delegate decides where the value lives and what happens on access.</figcaption>
+</figure>
+
+<h2 id="builtin">Built-in delegates you'll use</h2>
+<h3 id="lazy">lazy</h3>
+<code-block lang="kotlin" file="Expensive objects created on first use">
+class ReportExporter(private val context: Context) {
+    private val pdfRenderer by lazy { PdfDocumentRenderer(context) }   // created only if export is used
+}
+</code-block>
+<p><code>lazy</code> is thread-safe by default (<code>SYNCHRONIZED</code>). Use <code>lazy(LazyThreadSafetyMode.NONE)</code> for values only touched from the main thread, to avoid locking overhead.</p>
+<h3 id="observable">observable and vetoable</h3>
+<code-block lang="kotlin" file="React to changes">
+var volume: Int by Delegates.vetoable(50) { _, _, new -> new in 0..100 }   // reject invalid values
+
+var theme: Theme by Delegates.observable(Theme.SYSTEM) { _, old, new ->
+    if (old != new) analytics.log("theme_changed", new.name)
+}
+</code-block>
+<h3 id="map">Map-backed properties</h3>
+<code-block lang="kotlin" file="Read properties from a map">
+class FeatureFlags(values: Map<String, Any?>) {
+    val newCheckout: Boolean by values
+    val maxUploadMb: Int by values
+}
+</code-block>
+
+<h2 id="android">Android and Compose delegates</h2>
+<code-block lang="kotlin" file="ViewModels">
+class ProfileActivity : ComponentActivity() {
+    private val viewModel: ProfileViewModel by viewModels()          // scoped to this Activity
+}
+
+class OrdersFragment : Fragment() {
+    private val shared: CartViewModel by activityViewModels()        // shared with the host Activity
+}
+</code-block>
+<code-block lang="kotlin" file="Compose state">
+@Composable
+fun SearchBox() {
+    // MutableState has getValue/setValue operators, so `by` gives a plain-looking variable.
+    var query by rememberSaveable { mutableStateOf("") }
+    TextField(value = query, onValueChange = { query = it })
+}
+</code-block>
+<p>Without <code>by</code>, you'd write <code>query.value</code> everywhere. The delegate also makes Compose track reads correctly, so reading <code>query</code> subscribes the composable to changes.</p>
+
+<h2 id="custom">Writing your own delegate</h2>
+<code-block lang="kotlin" file="A trimmed, length-limited string property">
+class Trimmed(private val maxLength: Int) : ReadWriteProperty<Any?, String> {
+    private var value = ""
+    override fun getValue(thisRef: Any?, property: KProperty<*>): String = value
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+        this.value = value.trim().take(maxLength)
+    }
+}
+
+class ProfileForm {
+    var displayName: String by Trimmed(maxLength = 40)
+    var bio: String by Trimmed(maxLength = 160)
+}
+</code-block>
+<code-block lang="kotlin" file="Fragment argument delegate (lightweight)">
+fun <T> Fragment.argument(key: String): ReadOnlyProperty<Fragment, T> =
+    ReadOnlyProperty { thisRef, _ ->
+        @Suppress("UNCHECKED_CAST")
+        requireNotNull(thisRef.arguments?.get(key) as T?) { "Missing argument '$key'" }
+    }
+
+// class DetailFragment : Fragment() { private val itemId: String by argument("itemId") }
+</code-block>
+
+<h2 id="use-cases">Real-world uses</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Caching decorator</h3><p>Class delegation wraps a network repository with an in-memory cache, overriding only the read methods.</p></div>
+  <div class="card usecase"><h3>Lazy SDK clients</h3><p><code>by lazy</code> defers creating expensive clients until first use, helping startup time.</p></div>
+  <div class="card usecase"><h3>Validated settings</h3><p>A custom delegate enforces ranges or trimming wherever a property is assigned.</p></div>
+</div>
+
+<h2 id="mistakes">Common mistakes</h2>
+<ul>
+  <li>Using <code>by lazy</code> for values that depend on a Context or View that may be replaced, such as Fragment views, which leaks old instances.</li>
+  <li>Forgetting the imports <code>androidx.compose.runtime.getValue</code> and <code>setValue</code>. Without them, <code>by remember</code> doesn't compile.</li>
+  <li>Hiding heavy work (I/O) inside <code>getValue</code>, where it's invisible to readers and may run on the main thread.</li>
+  <li>Class delegation to a mutable reference: <code>by real</code> captures the object at construction, so reassigning a <code>var</code> later doesn't change the delegate.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is <code>by lazy</code> the same as <code>lateinit</code>?</summary><div><p>No. <code>lazy</code> is for <code>val</code>s computed on first access. <code>lateinit</code> is for <code>var</code>s assigned later from outside. See <a href="../kotlin-null-safety/index.html">Kotlin Null Safety</a>.</p></div></details>
+  <details><summary>Does delegation have a performance cost?</summary><div><p>A small one: an extra object and an indirect call. It's negligible for typical use. The compiler can also optimise some cases.</p></div></details>
+  <details><summary>Can interfaces with default methods be delegated?</summary><div><p>Yes. Delegation forwards all interface members, including those with default implementations, to the delegate.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>Class delegation</strong> gives you composition and decorators without boilerplate. <strong>Property delegation</strong> moves storage and access logic into reusable objects, from <code>lazy</code> and <code>viewModels()</code> to Compose's <code>by remember</code>. Once you see the <code>getValue</code>/<code>setValue</code> mechanism, these idioms stop being magic.</p>
+<p>Next step: decide how far Kotlin can take your codebase with <a href="../kotlin-multiplatform-vs-native-android/index.html">Kotlin Multiplatform vs Native Android</a>.</p>

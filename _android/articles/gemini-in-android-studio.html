@@ -1,0 +1,187 @@
+<!--meta
+{
+  "seo_title": "How to Use Gemini in Android Studio: Practical Guide",
+  "description": "Use Gemini in Android Studio effectively: chat, code completion, Agent Mode, AGENTS.md, unit tests, Compose previews, crash analysis, privacy controls and prompts that work.",
+  "primary_keyword": "gemini in android studio",
+  "keywords": ["android studio ai assistant", "gemini agent mode android studio", "agents.md android studio", "aiexclude", "ai code completion android", "generate unit tests android studio", "app quality insights gemini"],
+  "intent": "How-to / tool guide",
+  "lede": "Gemini in Android Studio can explain a stack trace, draft a Compose preview, write a unit test or run a multi-step change in Agent Mode. It can also confidently produce wrong code. This guide shows the features that save real time, how to prompt them, and how to keep your code and data under control.",
+  "date": "2026-10-14",
+  "cta": "tools",
+  "related": ["ai-in-android-development", "android-developer-roadmap-beginners", "ai-chatbot-jetpack-compose", "kotlin-coroutines-flow-android"],
+  "refs": [
+    ["Gemini in Android Studio overview", "https://developer.android.com/studio/gemini/overview"],
+    ["Agent Mode", "https://developer.android.com/studio/gemini/agent-mode"],
+    ["Configure context sharing with .aiexclude", "https://developer.android.com/studio/gemini/aiexclude"],
+    ["Data and privacy for Gemini in Android Studio", "https://developer.android.com/studio/gemini/data-and-privacy"],
+    ["Generate unit tests", "https://developer.android.com/studio/gemini/generate-unit-tests"],
+    ["App Quality Insights", "https://developer.android.com/studio/debug/app-quality-insights"]
+  ]
+}
+-->
+<p class="ad-lead">Android Studio now ships with an AI assistant built specifically for Android development. It understands Gradle errors, Compose and Logcat, and it can act across your project in Agent Mode. Used well, it removes a lot of friction. Used carelessly, it adds subtle bugs faster than you can review them.</p>
+<p>This guide is for Android developers at any level who want to get practical value from <strong>Gemini in Android Studio</strong>. It covers the main features, where each one helps most, prompts that produce better results, project rules with <code>AGENTS.md</code>, privacy controls with <code>.aiexclude</code>, and a verification habit that keeps AI-written code safe to ship.</p>
+
+<div class="note"><b>Feature availability changes quickly</b>
+<p>Google states that Gemini in Android Studio is available in the latest stable version of Android Studio and in major versions released in the previous 10 months. Feature names and menus below follow the official documentation at the time of writing. Check the overview page for what your version includes.</p></div>
+
+<h2 id="setup">Getting started</h2>
+<ol class="steps">
+  <li><strong>Update Android Studio</strong> to the latest stable release.</li>
+  <li><strong>Open the Gemini tool window</strong> (View → Tool Windows → Gemini) and sign in with your Google account.</li>
+  <li><strong>Review the data-sharing settings</strong> when prompted. Choose whether Gemini can use your project's code as context, and read the data and privacy page for your tier.</li>
+  <li><strong>Add an <code>.aiexclude</code> file</strong> for anything that must never be shared, such as credentials, keystores and proprietary algorithms. See <a href="#privacy">Privacy and data control</a> below.</li>
+</ol>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Tier</th><th>What you get (per Google's overview)</th></tr></thead>
+  <tbody>
+    <tr><td>Individual (no cost)</td><td>A lightweight Gemini model with a smaller context window, suitable for most tasks. Optionally add your own Gemini API key to use other models and pay per token.</td></tr>
+    <tr><td>Individual with Google One</td><td>Google One subscribers get added capabilities and higher limits at no extra cost.</td></tr>
+    <tr><td>Business</td><td>Via Gemini Enterprise or the Google Developer Program: higher quota, central admin controls, data residency and security options such as VPC Service Controls, and code customisation.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="features">The features that save the most time</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-ide-cap">
+  <svg viewBox="0 0 720 210" role="img" aria-labelledby="fig-ide-title fig-ide-desc">
+    <title id="fig-ide-title">Where Gemini helps across the Android development loop</title>
+    <desc id="fig-ide-desc">A loop of five stages: Understand (chat, explain code), Write (code completion, transformations, Compose previews), Test (generate unit tests, Journeys), Debug (Logcat and App Quality Insights crash analysis), and Ship (commit messages, dependency updates). Agent Mode can span several stages.</desc>
+    <defs><marker id="i1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M136 70 H158 M276 70 H298 M416 70 H438 M556 70 H578" marker-end="url(#i1)"/>
+    <path class="d-dash" d="M640 100 V140 H76 V104" marker-end="url(#i1)"/>
+    <g class="d-step" style="--i:0"><rect class="d-blue" x="16" y="40" width="120" height="60" rx="12"/><text class="d-t" x="76" y="64" text-anchor="middle">Understand</text><text class="d-s" x="76" y="84" text-anchor="middle">chat, explain</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-violet" x="162" y="40" width="114" height="60" rx="12"/><text class="d-t" x="219" y="64" text-anchor="middle">Write</text><text class="d-s" x="219" y="84" text-anchor="middle">complete, transform</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-green" x="302" y="40" width="114" height="60" rx="12"/><text class="d-t" x="359" y="64" text-anchor="middle">Test</text><text class="d-s" x="359" y="84" text-anchor="middle">unit tests, Journeys</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="442" y="40" width="114" height="60" rx="12"/><text class="d-t" x="499" y="64" text-anchor="middle">Debug</text><text class="d-s" x="499" y="84" text-anchor="middle">Logcat, crashes</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-box" x="582" y="40" width="120" height="60" rx="12"/><text class="d-t" x="642" y="64" text-anchor="middle">Ship</text><text class="d-s" x="642" y="84" text-anchor="middle">commits, deps</text></g>
+    <g class="d-step" style="--i:5"><rect class="d-dark" x="200" y="160" width="320" height="40" rx="12"/><text class="d-w" x="360" y="185" text-anchor="middle">Agent Mode: multi-step tasks across stages</text></g>
+  </svg>
+  <figcaption id="fig-ide-cap">Gemini is most useful when it is woven into each stage of the loop, with you reviewing every output, rather than used as a one-shot code generator.</figcaption>
+</figure>
+
+<h3 id="chat">1. Chat: explain, plan and ask</h3>
+<p>The chat panel is best for <em>understanding</em>: explaining unfamiliar code, comparing approaches, or planning a change before you write it. You can attach files and images for context. Select code in the editor and ask about it directly.</p>
+<code-block lang="text" file="Prompts that work well in chat">
+Explain what this ViewModel does, step by step, and point out any coroutine
+cancellation or lifecycle problems. Don't rewrite it yet.
+
+I get "Unresolved reference: collectAsStateWithLifecycle". Which dependency
+provides it, and where does it go in libs.versions.toml and build.gradle.kts?
+
+Compare Room and DataStore for storing a list of 50 favourite article IDs.
+Recommend one and explain the trade-off in 5 bullet points.
+</code-block>
+
+<h3 id="completion">2. Code completion and transformations</h3>
+<p>Inline completion suggests the next lines as you type. It's most accurate for repetitive or pattern-following code such as mappers, DAO methods and test cases that resemble the ones above them. <strong>Code transformations</strong> let you select code and describe a change ("convert to a sealed interface", "add KDoc", "make this function main-safe with withContext"), then review a diff before accepting.</p>
+
+<h3 id="agent">3. Agent Mode: multi-step changes</h3>
+<p>Agent Mode takes a goal, plans steps, reads and edits multiple files, and can run tools such as builds. It asks for your approval according to the permissions you configure. It suits well-scoped tasks with a clear definition of done:</p>
+<code-block lang="text" file="Good Agent Mode tasks">
+Add a "Sort by price" option to ProductListScreen. Store the choice in the
+existing SettingsRepository (DataStore). Update ProductListViewModel and its
+unit tests. Follow the patterns already used for "Sort by name".
+Build the app and run the unit tests for the product module when done.
+
+Update all Compose-related dependencies to their latest stable versions using
+the version catalog, build the project, and fix compilation errors you
+introduce. List every version change in your final summary.
+</code-block>
+<div class="warn"><b>Scope agent tasks tightly</b>
+<p>"Refactor the app to Clean Architecture" is a bad agent task: too big to review, with an unclear finish line. Break large changes into small, reviewable steps, commit before each one, and read every diff.</p></div>
+
+<h3 id="rules">4. Project rules with AGENTS.md</h3>
+<p>Android Studio supports an <code>AGENTS.md</code> file and rules that give Gemini persistent instructions about your project, so you don't repeat conventions in every prompt. Keep it short, specific and checked into Git:</p>
+<code-block lang="text" file="AGENTS.md (project root)">
+# Project conventions for AI agents
+
+## Stack
+- Kotlin only, Jetpack Compose UI, Material 3. No new XML layouts.
+- Architecture: ViewModel exposes a single StateFlow<UiState>; UI is stateless where possible.
+- DI: Hilt. Networking: Retrofit + kotlinx.serialization. Local data: Room, DataStore.
+
+## Rules
+- Add dependencies only through gradle/libs.versions.toml.
+- Never put API keys or secrets in source code or BuildConfig.
+- Use viewModelScope; never GlobalScope. Inject dispatchers.
+- Every new ViewModel needs unit tests in src/test using MainDispatcherRule and fakes (no mocks for repositories).
+- User-facing strings go in res/values/strings.xml.
+
+## Verification
+- Run ./gradlew :app:testDebugUnitTest before finishing a task.
+- Summarise every file changed and why.
+</code-block>
+
+<h3 id="tests">5. Generate unit tests</h3>
+<p>Gemini can generate unit-test scaffolding for a class. Treat the output as a <em>first draft</em>. Check that the tests assert meaningful behaviour, not just that code runs, and that they use your project's fakes and coroutine test rules. A useful prompt is to ask for the edge cases first, then the tests:</p>
+<code-block lang="text" file="Test prompt">
+List the edge cases for CartViewModel.applyCoupon(): expired coupon, network
+failure, empty cart, coupon already applied, double tap. Then write JUnit tests
+for each using FakeCouponRepository and MainDispatcherRule from our test utils.
+</code-block>
+
+<h3 id="compose">6. Compose previews and UI from images</h3>
+<p>Gemini can <strong>generate Compose previews</strong> for a composable with realistic sample data, and <strong>generate UI from an attached image</strong> such as a design mockup. The result is a starting point: check spacing against your design system, replace hard-coded strings with resources, and verify accessibility (content descriptions, touch target sizes, contrast).</p>
+
+<h3 id="debugging">7. Debugging: Logcat and App Quality Insights</h3>
+<p>From Logcat you can ask Gemini to explain a crash or error. In <strong>App Quality Insights</strong>, which shows Firebase Crashlytics and Android vitals data in the IDE, Gemini can analyse a crash cluster together with your source code and suggest causes. This is often the highest-value feature for maintaining real apps, because it shortens the path from "top crash on the dashboard" to "likely line of code".</p>
+
+<h3 id="commits">8. Commit messages and housekeeping</h3>
+<p>Gemini can draft commit messages from your staged diff, and Agent Mode can automate dependency updates. Edit generated commit messages so they explain the <em>why</em>, which a diff alone can't tell the model.</p>
+
+<h2 id="prompting">Prompting habits that improve results</h2>
+<div class="cards">
+  <div class="card pros"><h4>Do</h4><ul><li>Give context: files, error text, versions</li><li>State constraints ("no new dependencies", "keep the public API")</li><li>Ask for a plan or explanation before code</li><li>Ask for tests together with the change</li><li>Iterate in small steps</li></ul></div>
+  <div class="card cons"><h4>Avoid</h4><ul><li>Vague asks ("make it better")</li><li>Huge multi-feature requests</li><li>Accepting code you can't explain</li><li>Pasting secrets or customer data into prompts</li><li>Trusting version numbers without checking release pages</li></ul></div>
+</div>
+
+<h2 id="privacy">Privacy and data control</h2>
+<p>Before using AI tools on company code, check your organisation's policy and the tier's data terms. Android Studio gives you two important controls:</p>
+<ul>
+  <li><strong>Project-level context sharing settings</strong> decide whether Gemini can use your codebase as context at all.</li>
+  <li><strong><code>.aiexclude</code> files</strong> exclude specific files or directories from being sent as context, using patterns similar to <code>.gitignore</code>.</li>
+</ul>
+<code-block lang="text" file=".aiexclude (project root)">
+# Never share secrets or signing material
+*.jks
+*.keystore
+local.properties
+secrets.properties
+google-services.json
+
+# Proprietary or regulated code
+app/src/main/java/com/example/pricing/engine/
+docs/customer-data/
+</code-block>
+<div class="warn"><b>Exclusion is not a security boundary for secrets</b>
+<p><code>.aiexclude</code> controls what is sent as context. Secrets should still never be committed to source control in the first place. Use environment variables, a secrets manager, or Gradle properties outside the repository.</p></div>
+
+<h2 id="verify">A verification habit for AI-written code</h2>
+<ol class="steps">
+  <li><strong>Read the diff line by line.</strong> If you can't explain a line, don't merge it.</li>
+  <li><strong>Check APIs and versions</strong> against official docs and release pages. Models sometimes suggest deprecated or non-existent APIs.</li>
+  <li><strong>Build and run the tests.</strong> Add a test for the behaviour you asked for, if the AI didn't.</li>
+  <li><strong>Check Android specifics</strong> that models often miss: lifecycle and configuration changes, main-thread safety, permissions, accessibility, and process death.</li>
+  <li><strong>Look for security issues</strong>: hard-coded keys, logging personal data, disabled TLS checks, exported components.</li>
+</ol>
+
+<h2 id="use-cases">Real-world use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Joining a legacy codebase</h3><p>Use chat to explain unfamiliar modules and Java classes before changing them. Ask for a sequence of how data flows from API to screen. Verify the explanation by stepping through with the debugger.</p></div>
+  <div class="card usecase"><h3>Fixing a top crash</h3><p>Open the crash in App Quality Insights, ask Gemini for likely causes using the stack trace and source, write a failing test that reproduces it, then fix it and confirm the test passes.</p></div>
+  <div class="card usecase"><h3>Routine dependency upgrades</h3><p>Let Agent Mode bump versions in the catalog and fix compile errors, then review the summary and diff and run the full test suite before merging.</p></div>
+</div>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is Gemini in Android Studio free?</summary><div><p>There is a no-cost individual tier with a lightweight model. You can add a Gemini API key to pay per token for more capable models, and Google offers a business tier with additional controls. Check the overview page for current details.</p></div></details>
+  <details><summary>Does Gemini see my whole project?</summary><div><p>Only if you allow code context sharing, and never the files excluded by <code>.aiexclude</code>. Review the data and privacy documentation for your tier.</p></div></details>
+  <details><summary>Should beginners use AI coding tools?</summary><div><p>Yes, mainly to <em>explain</em> concepts, errors and code. Writing code yourself first builds the judgement you need to review AI output later.</p></div></details>
+  <details><summary>Can I use other AI assistants in Android Studio?</summary><div><p>Android Studio supports other plugins and tools, and Gemini in Android Studio can use MCP servers to extend Agent Mode. The verification habit in this article applies to every tool.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Gemini in Android Studio is most valuable as a <strong>context-aware collaborator</strong>: explaining code and errors, drafting tests and previews, analysing crashes, and handling well-scoped multi-step changes in Agent Mode. Set it up with <strong><code>AGENTS.md</code> for your conventions and <code>.aiexclude</code> for sensitive files</strong>, keep tasks small, and verify everything before it ships.</p>
+<p>Next step: add an <code>AGENTS.md</code> to your current project and ask Agent Mode to write unit tests for one ViewModel. Review them critically. If you want to build AI features <em>into</em> your app rather than use AI to write it, start with <a href="../ai-in-android-development/index.html">What Is AI in Android Development?</a></p>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteRT and LiteRT-LM on Android (Kotlin Guide) | Yunok Tech</title>
+  <meta name="description" content="Run your own ML models and open LLMs on Android with LiteRT (formerly TensorFlow Lite) and LiteRT-LM: model formats, CPU/GPU/NPU acceleration, loading, streaming LLM responses with Flow, model size and delivery.">
+  <meta name="keywords" content="litert android, litert-lm android, tensorflow lite successor, on device llm kotlin, gemma on android, litert gpu npu delegate, run llm offline android">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/litert-litert-lm-android/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/litert-litert-lm-android/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="LiteRT and LiteRT-LM on Android (Kotlin Guide)">
+  <meta property="og:description" content="Run your own ML models and open LLMs on Android with LiteRT (formerly TensorFlow Lite) and LiteRT-LM: model formats, CPU/GPU/NPU acceleration, loading, streaming LLM responses with Flow, model size and delivery.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android AI Projects and Production">
+  <meta name="twitter:title" content="LiteRT and LiteRT-LM on Android (Kotlin Guide)">
+  <meta name="twitter:description" content="Run your own ML models and open LLMs on Android with LiteRT (formerly TensorFlow Lite) and LiteRT-LM: model formats, CPU/GPU/NPU acceleration, loading, streaming LLM responses with Flow, model size and delivery.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "LiteRT and LiteRT-LM on Android", "description": "Run your own ML models and open LLMs on Android with LiteRT (formerly TensorFlow Lite) and LiteRT-LM: model formats, CPU/GPU/NPU acceleration, loading, streaming LLM responses with Flow, model size and delivery.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Advanced", "articleSection": "Android AI Projects and Production", "keywords": "litert-lm android, tensorflow lite successor, on device llm kotlin, gemma on android, litert gpu npu delegate, run llm offline android", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/litert-litert-lm-android/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "LiteRT and LiteRT-LM on Android", "item": "https://yunoktech.com/android/litert-litert-lm-android/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#ai-production">Android AI Projects and Production</a></nav>
+    <span class="ad-chip">🧠 Android AI Projects and Production</span>
+    <h1 id="article-title">LiteRT and LiteRT-LM on Android</h1>
+    <p class="ad-lede">ML Kit and Gemini Nano cover common tasks, but sometimes you need your own model, a custom classifier or an open LLM like Gemma that runs on any capable device. LiteRT (the successor to TensorFlow Lite) runs custom models; LiteRT-LM is its runtime for language models.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Advanced</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#stack">Where LiteRT fits</a></li><li><a href="#litert">LiteRT for custom models</a></li><li><a href="#litert-lm">LiteRT-LM for language models</a></li><li><a href="#models">Choosing and delivering a model</a></li><li><a href="#performance">Performance and devices</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">LiteRT is Google's on-device inference runtime for <code>.tflite</code> models, the evolution of TensorFlow Lite. LiteRT-LM builds on it to run language models efficiently, with conversation handling, streaming, and GPU or NPU acceleration.</p>
+
+<div class="callout note"><b>APIs evolve quickly</b><p>The code below follows the LiteRT-LM Kotlin documentation at the time of writing. Check the dependency coordinates, versions and class names on the official pages before you build.</p></div>
+
+<h2 id="stack">Where LiteRT fits</h2>
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-lrt-cap">
+  <svg viewBox="0 0 720 220" role="img" aria-labelledby="fig-lrt-t fig-lrt-d">
+    <title id="fig-lrt-t">On-device AI options on Android</title>
+    <desc id="fig-lrt-d">At the top level, ML Kit offers ready-made tasks and ML Kit GenAI uses Gemini Nano. For custom models, LiteRT runs tflite models, and LiteRT-LM runs language models such as Gemma. All run on CPU, GPU or NPU hardware.</desc>
+    <g class="d-step" style="--i:0"><rect class="d-green" x="20" y="20" width="330" height="56" rx="12"/><text class="d-t" x="185" y="44" text-anchor="middle">ML Kit / ML Kit GenAI</text><text class="d-s" x="185" y="62" text-anchor="middle">ready-made tasks, Gemini Nano</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="370" y="20" width="160" height="56" rx="12"/><text class="d-t" x="450" y="44" text-anchor="middle">LiteRT</text><text class="d-s" x="450" y="62" text-anchor="middle">your .tflite models</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="545" y="20" width="155" height="56" rx="12"/><text class="d-t" x="622" y="44" text-anchor="middle">LiteRT-LM</text><text class="d-s" x="622" y="62" text-anchor="middle">open LLMs (Gemma)</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-amber" x="20" y="100" width="680" height="50" rx="12"/><text class="d-t" x="360" y="130" text-anchor="middle">Acceleration: CPU · GPU · NPU</text></g>
+    <g class="d-step" style="--i:4"><text class="d-s" x="360" y="190" text-anchor="middle">More control and device reach than Gemini Nano, but you ship and manage the model.</text></g>
+  </svg>
+  <figcaption id="fig-lrt-cap">Use ML Kit first; reach for LiteRT when you need a custom or open model.</figcaption>
+</figure>
+
+<h2 id="litert">LiteRT for custom models</h2>
+<p>Typical uses are image classifiers, audio models or custom detectors exported to <code>.tflite</code>. The flow is: load the model, prepare input tensors in the exact shape and normalisation used in training, run inference, and post-process outputs.</p>
+<figure class="code"><figcaption><span class="file">Classic LiteRT Interpreter usage (shape of the API)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">Classifier</span>(context: <span class="tk-t">Context</span>) : <span class="tk-t">AutoCloseable</span> {
+    <span class="tk-k">private</span> <span class="tk-k">val</span> interpreter = <span class="tk-t">Interpreter</span>(
+        <span class="tk-t">FileUtil</span>.loadMappedFile(context, <span class="tk-s">"classifier.tflite"</span>),
+        <span class="tk-t">Interpreter</span>.<span class="tk-t">Options</span>().setNumThreads(<span class="tk-n">4</span>),
+    )
+
+    <span class="tk-k">fun</span> classify(input: <span class="tk-t">FloatArray</span>): <span class="tk-t">FloatArray</span> {
+        <span class="tk-k">val</span> output = <span class="tk-t">Array</span>(<span class="tk-n">1</span>) { <span class="tk-t">FloatArray</span>(<span class="tk-t">NUM_CLASSES</span>) }
+        interpreter.run(arrayOf(input), output)          <span class="tk-c">// input must match the model's shape</span>
+        <span class="tk-k">return</span> output[<span class="tk-n">0</span>]
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> close() = interpreter.close()
+}</code></pre></figure>
+<p>LiteRT also offers a newer <code>CompiledModel</code> API with improved GPU and NPU acceleration. Check the docs for the version you use.</p>
+
+<h2 id="litert-lm">LiteRT-LM for language models</h2>
+<p>LiteRT-LM's Kotlin API follows this pattern: configure an <code>Engine</code> with a model file and a backend, initialise it off the main thread (loading can take several seconds), open a conversation, and stream responses as a Flow.</p>
+<figure class="code"><figcaption><span class="file">LocalLlm.kt (based on the LiteRT-LM Android docs)</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">LocalLlm</span>(<span class="tk-k">private</span> <span class="tk-k">val</span> modelPath: <span class="tk-t">String</span>, <span class="tk-k">private</span> <span class="tk-k">val</span> cacheDir: <span class="tk-t">String</span>) : <span class="tk-t">AutoCloseable</span> {
+    <span class="tk-k">private</span> <span class="tk-k">var</span> engine: <span class="tk-t">Engine</span>? = <span class="tk-k">null</span>
+
+    <span class="tk-c">/** Slow: loads the model. Call from a background coroutine. */</span>
+    <span class="tk-k">suspend</span> <span class="tk-k">fun</span> load() = withContext(<span class="tk-t">Dispatchers</span>.<span class="tk-t">Default</span>) {
+        <span class="tk-k">val</span> config = <span class="tk-t">EngineConfig</span>(
+            modelPath = modelPath,
+            backend = <span class="tk-t">Backend</span>.<span class="tk-t">GPU</span>(),          <span class="tk-c">// or CPU / NPU depending on device</span>
+            cacheDir = cacheDir,              <span class="tk-c">// speeds up subsequent loads</span>
+        )
+        engine = <span class="tk-t">Engine</span>(config).also { it.initialize() }
+    }
+
+    <span class="tk-c">/** Streams the reply; collect in a ViewModel and append chunks to UI state. */</span>
+    <span class="tk-k">fun</span> ask(prompt: <span class="tk-t">String</span>): <span class="tk-t">Flow</span>&lt;<span class="tk-t">String</span>&gt; {
+        <span class="tk-k">val</span> conversation = checkNotNull(engine) { <span class="tk-s">"Call load() first"</span> }.createConversation()
+        <span class="tk-k">return</span> conversation.sendMessageAsync(<span class="tk-t">Message</span>.of(prompt))
+            .map { it.toString() }
+            .onCompletion { conversation.close() }
+    }
+
+    <span class="tk-k">override</span> <span class="tk-k">fun</span> close() { engine?.close(); engine = <span class="tk-k">null</span> }
+}</code></pre></figure>
+
+<h2 id="models">Choosing and delivering a model</h2>
+<ul>
+  <li><strong>Models:</strong> open models such as Gemma variants converted for LiteRT-LM. Smaller (around 1B parameters or less, quantised) models suit more devices.</li>
+  <li><strong>Size:</strong> LLM files are often hundreds of MB to several GB. Don't bundle them in the base APK.</li>
+  <li><strong>Delivery:</strong> download on demand over Wi-Fi with progress and checksums, or use Play for On-device AI for model delivery through Play.</li>
+  <li><strong>Licences:</strong> check each model's licence and usage terms.</li>
+</ul>
+
+<h2 id="performance">Performance and devices</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Concern</th><th>Guidance</th></tr></thead>
+  <tbody>
+    <tr><td>Memory</td><td>Check available RAM before loading; low-RAM devices may fail or be killed</td></tr>
+    <tr><td>Backend</td><td>GPU or NPU is faster where supported; fall back to CPU</td></tr>
+    <tr><td>Thermal</td><td>Long generations heat devices; cap output length</td></tr>
+    <tr><td>Load time</td><td>Load once and reuse; use a cache directory; show progress</td></tr>
+  </tbody>
+</table>
+</div>
+<p>See <a href="../offline-ai-device-compatibility/index.html">Offline AI and Device Compatibility</a> for gating features by device capability.</p>
+
+<h2 id="use-cases">Use cases</h2>
+<div class="cards">
+  <div class="card usecase"><h3>Custom classifier</h3><p>Plant disease or product defect detection with a LiteRT model.</p></div>
+  <div class="card usecase"><h3>Offline assistant</h3><p>A small Gemma model for private, offline Q&amp;A on capable devices.</p></div>
+  <div class="card usecase"><h3>Field apps</h3><p>AI that must work without connectivity.</p></div>
+</div>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+  <li><strong>Wrong outputs from a custom model:</strong> input preprocessing (size, normalisation, channel order) doesn't match training.</li>
+  <li><strong>OOM or crash when loading an LLM:</strong> the model is too large for the device; use a smaller or more quantised model.</li>
+  <li><strong>UI freezes:</strong> initialisation or inference on the main thread.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Is TensorFlow Lite deprecated?</summary><div><p>TensorFlow Lite has been renamed and continued as LiteRT. Existing .tflite models work with LiteRT.</p></div></details>
+  <details><summary>LiteRT-LM or Gemini Nano?</summary><div><p>Gemini Nano needs no model shipping but only runs on supported devices. LiteRT-LM lets you choose and ship your own model, at the cost of size and management.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>LiteRT</strong> runs your custom models; <strong>LiteRT-LM</strong> runs open LLMs on device with streaming and hardware acceleration. Load off the main thread, deliver models on demand, gate by device capability, and check model licences.</p>
+<p>Next step: process images and text on device with <a href="../on-device-image-text-processing/index.html">On-Device Image and Text Processing</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://ai.google.dev/edge/litert" target="_blank" rel="noopener">LiteRT overview</a></li><li><a href="https://ai.google.dev/edge/litert-lm/android" target="_blank" rel="noopener">Get started with LiteRT-LM on Android</a></li><li><a href="https://developers.google.com/edge/litert-lm/api_overview" target="_blank" rel="noopener">LiteRT-LM API overview</a></li><li><a href="https://developer.android.com/google/play/on-device-ai" target="_blank" rel="noopener">Play for On-device AI</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dlitert-litert-lm-android-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dlitert-litert-lm-android-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Every AI feature still runs inside an Android app that has to be fast, reliable and well structured. Strengthen the Kotlin, Jetpack Compose and architecture skills that AI integrations depend on, then apply these AI concepts with confidence.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/llms-vs-traditional-machine-learning/index.html"><small>Android AI Projects and Production</small>LLMs vs Traditional Machine Learning</a></li><li><a href="../../android/gemini-nano-vs-cloud-gemini/index.html"><small>Android AI Projects and Production</small>Gemini Nano vs Cloud-Based Gemini Models</a></li><li><a href="../../android/offline-ai-device-compatibility/index.html"><small>Android AI Projects and Production</small>Offline AI Features and Device Compatibility</a></li><li><a href="../../android/on-device-image-text-processing/index.html"><small>Android AI Projects and Production</small>On-Device Image and Text Processing on Android</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/litert-litert-lm-android/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/litert-litert-lm-android/&amp;text=LiteRT and LiteRT-LM on Android" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/litert-litert-lm-android/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#stack">Where LiteRT fits</a></li><li><a href="#litert">LiteRT for custom models</a></li><li><a href="#litert-lm">LiteRT-LM for language models</a></li><li><a href="#models">Choosing and delivering a model</a></li><li><a href="#performance">Performance and devices</a></li><li><a href="#use-cases">Use cases</a></li><li><a href="#troubleshooting">Troubleshooting</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dlitert-litert-lm-android-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Dlitert-litert-lm-android-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>

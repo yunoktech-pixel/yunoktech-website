@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java to Kotlin Migration Interview Questions | Yunok Tech</title>
+  <meta name="description" content="Interview questions on migrating Android apps from Java to Kotlin: interop, platform types, annotations, migration strategy, converting idiomatically, testing, build impact and team practices.">
+  <meta name="keywords" content="java to kotlin migration interview questions, kotlin java interop interview, platform types kotlin, jvmstatic jvmoverloads, migrate android java to kotlin, kotlin converter android studio, mixed codebase kotlin java">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://yunoktech.com/android/java-to-kotlin-migration-interview/">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://yunoktech.com/android/java-to-kotlin-migration-interview/">
+  <meta property="og:site_name" content="Yunok Tech">
+  <meta property="og:image" content="https://yunoktech.com/assets/logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#050b18">
+  <meta property="og:title" content="Java to Kotlin Migration Interview Questions">
+  <meta property="og:description" content="Interview questions on migrating Android apps from Java to Kotlin: interop, platform types, annotations, migration strategy, converting idiomatically, testing, build impact and team practices.">
+  <meta property="og:image:alt" content="Yunok Tech logo">
+  <meta property="article:published_time" content="2026-10-15">
+  <meta property="article:modified_time" content="2026-10-15">
+  <meta property="article:section" content="Android Interview Preparation and Career">
+  <meta name="twitter:title" content="Java to Kotlin Migration Interview Questions">
+  <meta name="twitter:description" content="Interview questions on migrating Android apps from Java to Kotlin: interop, platform types, annotations, migration strategy, converting idiomatically, testing, build impact and team practices.">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Java to Kotlin Migration Interview Questions", "description": "Interview questions on migrating Android apps from Java to Kotlin: interop, platform types, annotations, migration strategy, converting idiomatically, testing, build impact and team practices.", "datePublished": "2026-10-15", "dateModified": "2026-10-15", "inLanguage": "en", "proficiencyLevel": "Intermediate", "articleSection": "Android Interview Preparation and Career", "keywords": "kotlin java interop interview, platform types kotlin, jvmstatic jvmoverloads, migrate android java to kotlin, kotlin converter android studio, mixed codebase kotlin java", "image": "https://yunoktech.com/assets/logo.png", "author": {"@type": "Organization", "name": "Yunok Tech", "url": "https://yunoktech.com/"}, "publisher": {"@type": "Organization", "name": "Yunok Tech", "logo": {"@type": "ImageObject", "url": "https://yunoktech.com/assets/logo.png"}}, "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yunoktech.com/android/java-to-kotlin-migration-interview/"}}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yunoktech.com/"}, {"@type": "ListItem", "position": 2, "name": "Android", "item": "https://yunoktech.com/android/"}, {"@type": "ListItem", "position": 3, "name": "Java to Kotlin Migration Interview Questions", "item": "https://yunoktech.com/android/java-to-kotlin-migration-interview/"}]}</script>
+  <link rel="icon" type="image/png" href="../../assets/logo.png">
+  <link rel="apple-touch-icon" href="../../assets/logo.png">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/android-blog.css">
+</head>
+<body class="ad-page">
+<nav id="navbar" role="navigation" aria-label="Main Navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="../../index.html" class="nav-logo" aria-label="Yunok Tech Home">
+        <img src="../../assets/logo.png" alt="Yunok Tech Logo" width="40" height="40">
+        <span class="nav-logo-text">Yunok<span>Tech</span></span>
+      </a>
+      <ul class="nav-links" role="list"><li><a href="../../index.html">Home</a></li><li><a href="../../apps.html">Apps</a></li><li><a href="../../services.html">Services</a></li><li><a href="../../course.html">Course</a></li><li><a href="../../android/index.html" class="active" aria-current="page">Android</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../contact.html">Contact</a></li></ul>
+      <div class="nav-cta"><a href="../../course.html" class="btn btn-primary btn-sm">Android Course</a></div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile Navigation">
+  <a href="../../index.html">🏠 Home</a><a href="../../apps.html">📱 Apps</a><a href="../../services.html">💼 App for Your Business</a><a href="../../course.html">🎓 Android Course</a><a href="../../android/index.html">🤖 Android Dev Blog</a><a href="../../blog.html">📝 Blog</a><a href="../../contact.html">✉️ Contact</a>
+</nav>
+
+<header class="ad-hero">
+  <div class="ad-hero-in">
+    <nav class="ad-crumbs" aria-label="Breadcrumb"><a href="../../index.html">Home</a><span aria-hidden="true">/</span><a href="../../android/index.html">Android</a><span aria-hidden="true">/</span><a href="../../android/index.html#career">Android Interview Preparation and Career</a></nav>
+    <span class="ad-chip">🎯 Android Interview Preparation and Career</span>
+    <h1 id="article-title">Java to Kotlin Migration Interview Questions</h1>
+    <p class="ad-lede">Many companies still run large Java Android codebases and want developers who can migrate them safely. These interview questions cover interop, migration strategy and the subtle bugs that appear in mixed codebases.</p>
+    <div class="ad-meta">
+      <span>✍️ <b>Yunok Tech</b></span>
+      <span>📅 Updated <b><time datetime="2026-10-15">Oct 15, 2026</time></b></span>
+      <span>⏱ <b>3 min</b> read</span>
+      <span>🎯 <b>Intermediate</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="ad-main" id="main">
+  <div class="ad-layout">
+    <article class="ad-article" aria-labelledby="article-title">
+      <details class="ad-toc-inline"><summary>On this page</summary><ol><li><a href="#interop">Interop questions</a></li><li><a href="#strategy">Strategy questions</a></li><li><a href="#pitfalls">Subtle bugs</a></li><li><a href="#build">Build and team questions</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></details>
+      <div class="ad-body">
+<p class="ad-lead">"How would you migrate our 300k-line Java app to Kotlin?" is a common senior question. The best answers show you understand interop deeply, migrate incrementally with safety nets, and focus effort where it delivers value.</p>
+
+<figure class="diagram" data-animate role="group" aria-labelledby="fig-jk-cap">
+  <svg viewBox="0 0 720 180" role="img" aria-labelledby="fig-jk-t fig-jk-d">
+    <title id="fig-jk-t">Incremental Java to Kotlin migration</title>
+    <desc id="fig-jk-d">Enable Kotlin in the build; write new code and tests in Kotlin; add nullability annotations to Java APIs; convert files when touched, with behaviour-preserving commits; then refactor to idiomatic Kotlin with tests; finally remove Java-specific patterns.</desc>
+    <defs><marker id="jkm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0ea5e9"/></marker></defs>
+    <path class="d-flow" d="M130 70 H150 M270 70 H290 M410 70 H430 M560 70 H580" marker-end="url(#jkm)"/>
+    <g class="d-step" style="--i:0"><rect class="d-amber" x="10" y="40" width="120" height="60" rx="12"/><text class="d-t" x="70" y="66" text-anchor="middle">Enable</text><text class="d-s" x="70" y="84" text-anchor="middle">Kotlin in build</text></g>
+    <g class="d-step" style="--i:1"><rect class="d-blue" x="154" y="40" width="116" height="60" rx="12"/><text class="d-t" x="212" y="66" text-anchor="middle">New code</text><text class="d-s" x="212" y="84" text-anchor="middle">+ tests in Kotlin</text></g>
+    <g class="d-step" style="--i:2"><rect class="d-violet" x="294" y="40" width="116" height="60" rx="12"/><text class="d-t" x="352" y="66" text-anchor="middle">Annotate</text><text class="d-s" x="352" y="84" text-anchor="middle">Java nullability</text></g>
+    <g class="d-step" style="--i:3"><rect class="d-green" x="434" y="40" width="126" height="60" rx="12"/><text class="d-t" x="497" y="66" text-anchor="middle">Convert</text><text class="d-s" x="497" y="84" text-anchor="middle">when touched</text></g>
+    <g class="d-step" style="--i:4"><rect class="d-dark" x="584" y="40" width="126" height="60" rx="12"/><text class="d-w" x="647" y="66" text-anchor="middle">Idiomatic</text><text class="d-w" x="647" y="84" text-anchor="middle">refactor</text></g>
+  </svg>
+  <figcaption id="fig-jk-cap">No big bang: each step ships, and tests protect behaviour throughout.</figcaption>
+</figure>
+
+<h2 id="interop">Interop questions</h2>
+<h3>What are platform types?</h3>
+<p>Types from Java without nullability information (shown as <code>String!</code>). Kotlin lets you treat them as nullable or non-null, and a wrong assumption causes an NPE at runtime. Fix it with <code>@Nullable</code>/<code>@NonNull</code> annotations on the Java side.</p>
+<h3>How do you make Kotlin APIs pleasant to call from Java?</h3>
+<figure class="code"><figcaption><span class="file">Interop annotations</span><span class="lang">Kotlin</span><button class="copy" type="button" aria-label="Copy code">Copy</button></figcaption><pre tabindex="0"><code class="lang-kotlin"><span class="tk-k">class</span> <span class="tk-t">Prices</span> {
+    <span class="tk-k">companion</span> <span class="tk-k">object</span> {
+        <span class="tk-a">@JvmStatic</span> <span class="tk-k">fun</span> format(amount: <span class="tk-t">Double</span>): <span class="tk-t">String</span> = <span class="tk-s">"₹%.2f"</span>.format(amount)   <span class="tk-c">// Prices.format(...) in Java</span>
+        <span class="tk-k">const</span> <span class="tk-k">val</span> <span class="tk-t">CURRENCY</span> = <span class="tk-s">"INR"</span>                                               <span class="tk-c">// a true Java constant</span>
+    }
+}
+
+<span class="tk-a">@JvmOverloads</span> <span class="tk-k">fun</span> toast(context: <span class="tk-t">Context</span>, text: <span class="tk-t">String</span>, long: <span class="tk-t">Boolean</span> = <span class="tk-k">false</span>) { <span class="tk-c">/* ... */</span> }  <span class="tk-c">// overloads for Java</span>
+
+<span class="tk-c">// In a separate file, as its very first line (before the package statement):</span>
+<span class="tk-c">// @file:JvmName("StringUtils")   → top-level functions appear as StringUtils.xxx() in Java</span></code></pre></figure>
+<h3>How do Kotlin properties appear in Java?</h3>
+<p>As getters and setters (<code>getName()</code>/<code>setName()</code>), with <code>isX()</code> for properties starting with "is". Use <code>@JvmField</code> to expose a field directly.</p>
+<h3>Checked exceptions?</h3>
+<p>Kotlin has none. If Java callers must catch an exception, declare it with <code>@Throws(IOException::class)</code>.</p>
+<h3>Suspend functions from Java?</h3>
+<p>They're awkward (an extra Continuation parameter). Provide Java-friendly wrappers, such as callbacks or futures, at the boundary.</p>
+
+<h2 id="strategy">Strategy questions</h2>
+<h3>How would you prioritise what to convert?</h3>
+<p>Convert files you're actively changing, plus high-value areas such as frequently changed features, crash hotspots and code that would benefit from coroutines or Compose. Leave stable, rarely touched Java alone until there's a reason.</p>
+<h3>How do you keep behaviour unchanged?</h3>
+<p>Write characterization tests before converting, keep conversion commits separate from refactors and features, and review converted code for semantics changes (equals/hashCode, nullability, static initialisation).</p>
+<h3>What does the automatic converter get wrong?</h3>
+<p>It produces working but non-idiomatic code: <code>!!</code> and <code>lateinit</code> overuse, Java-style getters, mutable collections, missed data classes and sealed types. It needs a manual idiomatic pass.</p>
+
+<h2 id="pitfalls">Subtle bugs</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Pitfall</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Nullability assumptions</td><td>Converted field declared non-null but Java callers pass null → crash</td></tr>
+    <tr><td>Equality changes</td><td>Converting a class to a data class changes <code>equals</code> semantics (maps, sets, DiffUtil)</td></tr>
+    <tr><td>Static initialisation</td><td><code>companion object</code> initialisation timing differs from Java static blocks in edge cases</td></tr>
+    <tr><td>SAM conversions</td><td>Kotlin lambdas vs Java functional interfaces; <code>fun interface</code> for Kotlin-declared SAMs</td></tr>
+    <tr><td>Annotation processing</td><td>kapt vs KSP migration effects on build time and generated code</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="build">Build and team questions</h2>
+<ul>
+  <li><strong>Build time:</strong> mixed projects compile both languages. Kotlin's K2 compiler and KSP (instead of kapt) help.</li>
+  <li><strong>Team:</strong> agree on Kotlin style (official conventions plus a linter), review idioms, and pair on early conversions.</li>
+  <li><strong>Measure progress:</strong> the percentage of Kotlin files is a vanity metric. Track crash rate, delivery speed and test coverage in converted areas.</li>
+</ul>
+
+<h2 id="faq">Frequently asked questions</h2>
+<div class="faq">
+  <details><summary>Should we convert everything?</summary><div><p>Not necessarily. Kotlin and Java interoperate well. Convert where it pays off, and let stable Java code be.</p></div></details>
+  <details><summary>Can AI tools help migrate?</summary><div><p>Yes, for drafting conversions and explanations, with careful review and tests. See <a href="../ai-understand-legacy-java-code/index.html">AI for Legacy Java</a>.</p></div></details>
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Strong migration answers combine <strong>interop knowledge</strong> (platform types, Jvm annotations, exceptions), an <strong>incremental strategy</strong> with tests and separate commits, awareness of <strong>subtle semantic changes</strong>, and <strong>team practices</strong> that keep the codebase consistent.</p>
+<p>Next step: think about the future of the role in <a href="../ai-changing-android-developer-work/index.html">How AI Is Changing the Work of Android Developers</a>.</p>
+      </div>
+      <section class="ad-refs" aria-labelledby="references"><h2 id="references">Official references</h2><ul><li><a href="https://kotlinlang.org/docs/java-interop.html" target="_blank" rel="noopener">Calling Java from Kotlin</a></li><li><a href="https://kotlinlang.org/docs/java-to-kotlin-interop.html" target="_blank" rel="noopener">Calling Kotlin from Java</a></li><li><a href="https://developer.android.com/kotlin/add-kotlin" target="_blank" rel="noopener">Add Kotlin to an existing app</a></li><li><a href="https://developer.android.com/kotlin/interop" target="_blank" rel="noopener">Kotlin interop guide (Android)</a></li></ul></section>
+      <section class="ad-apps ad-apps-inline" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djava-to-kotlin-migration-interview-inline" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djava-to-kotlin-migration-interview-inline" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+      <section class="ad-cta" aria-labelledby="course-cta">
+  <h2 id="course-cta">Ready to build real Android applications?</h2>
+  <p>Kotlin fluency makes everything else in Android easier, from coroutines and Flow to Compose and clean architecture. The fastest way to build that fluency is to write real Kotlin every day and get feedback on it.</p>
+  <p>Move beyond theory and strengthen your Android development skills with Yunoktech's Android course. Learn core concepts, practical implementation, modern Android development techniques, and the reasoning behind building maintainable applications.</p>
+  <p>Explore the Android course and take your next step as an Android developer.</p>
+  <div class="btn-row"><a class="ad-btn primary" href="../../course.html">Explore Android Course →</a><a class="ad-btn ghost" href="../../android/index.html">Browse all Android topics</a></div>
+</section>
+      <nav class="ad-related" aria-labelledby="related-heading"><h2 id="related-heading">Keep learning</h2><ul><li><a href="../../android/kotlin-vs-java-android/index.html"><small>Kotlin Programming</small>Kotlin vs Java for Android Development</a></li><li><a href="../../android/refactor-legacy-android-apps/index.html"><small>Android Architecture and Clean Code</small>How to Refactor Legacy Android Applications</a></li><li><a href="../../android/ai-understand-legacy-java-code/index.html"><small>AI Tools for Android Developers</small>Using AI to Understand Legacy Java Code</a></li><li><a href="../../android/kotlin-null-safety/index.html"><small>Kotlin Programming</small>Kotlin Null Safety Explained with Examples</a></li></ul></nav>
+      <div class="ad-share" aria-label="Share this article"><span>Share:</span>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://yunoktech.com/android/java-to-kotlin-migration-interview/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://twitter.com/intent/tweet?url=https://yunoktech.com/android/java-to-kotlin-migration-interview/&amp;text=Java to Kotlin Migration Interview Questions" target="_blank" rel="noopener">X / Twitter</a>
+        <a href="https://wa.me/?text=https://yunoktech.com/android/java-to-kotlin-migration-interview/" target="_blank" rel="noopener">WhatsApp</a>
+        <button type="button" data-share="copy">Copy link</button>
+      </div>
+    </article>
+    <aside class="ad-aside" aria-label="Table of contents">
+      <nav class="ad-toc"><h2>On this page</h2><ol><li><a href="#interop">Interop questions</a></li><li><a href="#strategy">Strategy questions</a></li><li><a href="#pitfalls">Subtle bugs</a></li><li><a href="#build">Build and team questions</a></li><li><a href="#faq">Frequently asked questions</a></li><li><a href="#conclusion">Conclusion</a></li></ol></nav>
+      <section class="ad-apps ad-apps-side" aria-label="Apps built by Yunok Tech"><h2>📱 Apps built by Yunok Tech</h2><p>Real Android apps on Google Play, free to download.</p><ul><li><a class="app-info" href="../../apps/walzi.html"><img src="../../assets/walzi-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>Walzi</b><small>4K wallpapers for lock and home screen</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunok.walzi&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djava-to-kotlin-migration-interview-side" target="_blank" rel="noopener" aria-label="Get Walzi on Google Play">Get it ▸</a></li><li><a class="app-info" href="../../apps/notivault.html"><img src="../../assets/notivault-icon.jpg" alt="" width="44" height="44" loading="lazy"><span><b>NotiVault</b><small>Notification history: recover dismissed notifications</small></span></a><a class="app-get" href="https://play.google.com/store/apps/details?id=com.yunoktech.notificationhistory&amp;referrer=utm_source%3Dyunoktech%26utm_medium%3Dandroid-blog%26utm_content%3Djava-to-kotlin-migration-interview-side" target="_blank" rel="noopener" aria-label="Get NotiVault on Google Play">Get it ▸</a></li></ul><a class="ad-apps-all" href="../../apps.html">See all our apps →</a></section>
+    </aside>
+  </div>
+</main>
+
+<footer id="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Yunok Tech" width="40" height="40" loading="lazy"><span class="nav-logo-text">Yunok<span>Tech</span></span></a>
+        <p>Innovating Today, Inspiring Tomorrow. Android apps, custom websites &amp; Jetpack Compose training from Mohali, India.</p>
+        <div class="footer-social" aria-label="Social Links">
+          <a href="https://www.linkedin.com/in/kamal-kakkar-13ab2773/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://medium.com/@kamaldeepkakkar" target="_blank" rel="noopener" aria-label="Medium">M</a>
+          <a href="https://wa.me/919988200178" target="_blank" rel="noopener" aria-label="WhatsApp">✆</a>
+          <a href="https://play.google.com/store/apps/dev?id=5044394667021493760" target="_blank" rel="noopener" aria-label="Google Play">▶</a>
+          <a href="mailto:yunoktech@gmail.com" aria-label="Email">✉</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Android Blog</h4><ul><li><a href="../../android/index.html">All Android Topics</a></li><li><a href="../../android/index.html#beginners">Beginners</a></li><li><a href="../../android/index.html#compose">Jetpack Compose</a></li><li><a href="../../android/index.html#ai">Android AI</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="../../services.html">App for Your Business</a></li><li><a href="../../course.html">Android Course</a></li><li><a href="../../android-training-chandigarh-mohali.html">Android Training Chandigarh</a></li><li><a href="../../blog.html">Blog</a></li><li><a href="../../privacy-policy.html">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><ul><li><a href="tel:+919988200178">+91 99882 00178</a></li><li><a href="mailto:yunoktech@gmail.com">yunoktech@gmail.com</a></li><li><a href="https://maps.google.com/?q=Anand+Villas+Kharar+Mohali" target="_blank" rel="noopener">#28 Anand Villas, Kharar, Mohali</a></li><li><a href="../../contact.html">Submit a Request</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Yunok Tech. All rights reserved.</span>
+      <span>Made with ❤️ in India · <a href="../../privacy-policy.html">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+<button id="back-top" aria-label="Back to top">↑</button>
+<script src="../../js/main.js" defer></script>
+<script src="../../js/android-blog.js" defer></script>
+</body>
+</html>
