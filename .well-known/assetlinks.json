@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.yunok.hanuman.app",
+      "sha256_cert_fingerprints": [
+        "9D:51:44:43:CE:AA:1D:71:51:DE:C8:08:1E:E3:D3:7F:6E:9B:48:33:DE:20:67:3E:1A:C3:6D:2F:B2:10:62:52"
+      ]
+    }
+  }
+]
