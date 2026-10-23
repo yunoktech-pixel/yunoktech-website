@@ -140,6 +140,30 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Shiv Dham: Shiv Dham App & Hub -->
+  <url>
+    <loc>https://yunoktech.com/shiv-dham/</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Shiv Dham: Shiv Aarti Lyrics -->
+  <url>
+    <loc>https://yunoktech.com/shiv-dham/shiv-aarti-lyrics.html</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Shiv Dham: Shiv Chalisa Lyrics -->
+  <url>
+    <loc>https://yunoktech.com/shiv-dham/shiv-chalisa-lyrics.html</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- App & Website Development Services -->
   <url>
     <loc>https://yunoktech.com/services.html</loc>

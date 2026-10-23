@@ -533,3 +533,9 @@ body.yt-page-apps { --a1: #6366f1; --a2: #22d3ee; --a3: #f59e0b; }
   .yt-marquee-track { animation: none !important; }
   .yt-build-screen > *, .yt-b-row i { background: var(--bc) !important; opacity: 1 !important; }
 }
+
+/* Home apps grid with four apps: 4 across on wide screens, 2 on tablets, 1 on phones */
+.yt-apps.four { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.yt-apps.four .yt-app-body { padding: 20px; }
+@media (max-width: 1200px) { .yt-apps.four { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .yt-apps.four { grid-template-columns: 1fr; } }

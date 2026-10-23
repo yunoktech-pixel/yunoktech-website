@@ -1,6 +1,6 @@
 # Yunok Tech
 
-> Yunok Tech is an Android app studio and training centre in Kharar, Mohali (Punjab, India), serving the Chandigarh Tricity (Chandigarh, Mohali, Panchkula, Kharar, Zirakpur). It has published 13 Android apps on Google Play (https://play.google.com/store/apps/dev?id=5044394667021493760), including Walzi, NotiVault and Hanuman Dham, builds custom Android apps and websites for businesses, and teaches Android development with Kotlin and Jetpack Compose.
+> Yunok Tech is an Android app studio and training centre in Kharar, Mohali (Punjab, India), serving the Chandigarh Tricity (Chandigarh, Mohali, Panchkula, Kharar, Zirakpur). It has published 13 Android apps on Google Play (https://play.google.com/store/apps/dev?id=5044394667021493760), including Walzi, NotiVault, Hanuman Dham and Shiv Dham, builds custom Android apps and websites for businesses, and teaches Android development with Kotlin and Jetpack Compose.
 
 Founder: Kamal Kakkar, Senior Android Developer with 10+ years of experience at Nagarro and KareXpert, working in the healthcare and banking domains.
 Address: #28 Anand Villas, Kharar, Mohali, Punjab 140301, India
@@ -25,6 +25,9 @@ Medium: https://medium.com/@kamaldeepkakkar
 - [NotiVault](https://yunoktech.com/apps/notivault.html): Notification history app. Recover deleted notifications, global search, auto clean. All data stays on the device.
 - [Hanuman Dham](https://yunoktech.com/apps/hanuman-chalisa.html): Hanuman Chalisa with Hindi meaning, Aarti, Bajrang Baan, Sankat Mochan, Sundarkand, Mantra Jaap counter, bhajans and wallpapers. Works offline.
 - [Hanuman Dham lyrics hub](https://yunoktech.com/hanuman-dham/index.html): Hanuman Chalisa, Aarti, Bajrang Baan, Sankat Mochan, Sundarkand and Hanuman Katha lyrics online.
+- [Shiv Dham](https://yunoktech.com/shiv-dham/): Lord Shiva bhakti app (Shiv Dham - Bhakti & Mantra, https://play.google.com/store/apps/details?id=com.yunok.shiv). Shiv Aarti with reminders, Shiv Chalisa in Hindi & Hinglish, Om Namah Shivaya / Mahamrityunjaya mantra jaap counter, virtual Shiv mandir darshan, 12 Jyotirlinga, daily rashifal, Mahadev bhajans & shorts, HD wallpapers and Shiv quotes.
+- [Shiv Aarti lyrics](https://yunoktech.com/shiv-dham/shiv-aarti-lyrics.html): "Om Jai Shiv Omkara" in Hindi and English with the meaning of every stanza.
+- [Shiv Chalisa lyrics](https://yunoktech.com/shiv-dham/shiv-chalisa-lyrics.html): Complete Shiv Chalisa ("Jai Girija Pati Deen Dayala") in Hindi and English with Hindi & English meaning of every doha and chaupai.
 
 ## Blog
 

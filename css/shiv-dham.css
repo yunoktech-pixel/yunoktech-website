@@ -1,0 +1,225 @@
+/* =============================================
+   SHIV DHAM — Kailash night theme
+   Loaded after style.css + hanuman-dham.css on /shiv-dham/* pages.
+   Reuses the .hd components (verses, toolbar, cards, FAQ) and re-skins them:
+   midnight indigo, moonlight gold, ash and a touch of tilak vermilion.
+   Dark ("night at Kailash") is the default; the 🌙 button switches to light.
+   ============================================= */
+
+body.hd.sd {
+  --hd-bg:        #070b1d;
+  --hd-surface:   #0e1431;
+  --hd-card:      #10173a;
+  --hd-ink:       #eeedff;
+  --hd-ink-soft:  #cbcaeb;
+  --hd-muted:     #9c9ec6;
+  --hd-line:      rgba(246,200,106,.17);
+  --hd-saffron:   #f6c86a;   /* accent: moonlight gold */
+  --hd-saffron-2: #e9a93b;
+  --hd-maroon:    #f6c86a;   /* headings */
+  --hd-deep:      #050816;
+  --hd-gold:      #f6c86a;
+  --hd-tint:      #161e45;
+  --hd-verse:     #10173a;
+  --hd-shadow:    0 12px 34px rgba(0,0,0,.38);
+  --sd-on-accent: #1a1204;
+  --sd-blue:      #6d8cff;
+  --sd-tilak:     #e4572e;
+  background: var(--hd-bg);
+  color: var(--hd-ink);
+}
+body.hd.sd[data-theme="light"] {
+  --hd-bg:        #f5f3fb;
+  --hd-surface:   #ffffff;
+  --hd-card:      #fdfcff;
+  --hd-ink:       #17153a;
+  --hd-ink-soft:  #45426e;
+  --hd-muted:     #6c6992;
+  --hd-line:      #e1dcf1;
+  --hd-saffron:   #94560a;
+  --hd-saffron-2: #d29a2e;
+  --hd-maroon:    #1f2b63;
+  --hd-tint:      #eeeafb;
+  --hd-verse:     #faf8ff;
+  --hd-shadow:    0 10px 30px rgba(31,43,99,.08);
+  --sd-on-accent: #ffffff;
+}
+body.hd.sd[data-theme="light"] .hd-section h2 { color: var(--hd-maroon); }
+body.hd.sd[data-theme="light"] .hd-meaning summary { color: var(--hd-maroon); }
+
+/* ---- Navbar / chrome ---- */
+.sd #navbar, .sd #navbar.scrolled { background: rgba(7,11,29,.9); border-bottom: 1px solid rgba(246,200,106,.15); }
+.sd .nav-links a { color: #cbcaeb; }
+.sd .nav-links a:hover, .sd .nav-links a.active { background: rgba(246,200,106,.12); color: #fff; }
+.sd .nav-logo-text span { color: #f6c86a; }
+.sd .mobile-nav { background: #070b1d; }
+.sd .mobile-nav a { color: #eeedff; }
+.sd #back-top { background: #e9a93b; color: #1a1204; }
+.sd #footer { background: #04060f; border-top: 1px solid rgba(246,200,106,.12); }
+.sd .footer-brand p, .sd .footer-col ul li a, .sd .footer-bottom { color: #9c9ec6; }
+.sd .footer-col ul li a:hover, .sd .footer-bottom a { color: #f6c86a; }
+.sd .footer-social a:hover { background: #e9a93b; border-color: #e9a93b; }
+
+/* ---- Buttons & chips ---- */
+.sd .hd-btn-primary { background: linear-gradient(135deg, #ffd98a, #e9a93b); color: #1a1204 !important; box-shadow: 0 8px 26px rgba(233,169,59,.32); }
+.sd .hd-btn-ghost { border-color: rgba(246,200,106,.38); }
+.sd .hd-paths a[aria-current="page"],
+.sd .hd-seg button[aria-pressed="true"] { background: var(--hd-saffron); border-color: var(--hd-saffron); color: var(--sd-on-accent); }
+.sd .hd-video-note, .sd .hd-card p { color: var(--hd-muted); }
+
+/* ---- Starfield (shared by both hero styles) ---- */
+.sd-stars {
+  position: absolute; inset: 0; pointer-events: none; opacity: .8;
+  background-image:
+    radial-gradient(1.4px 1.4px at 8% 22%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 18% 64%, #dfe4ff, transparent 60%),
+    radial-gradient(1.6px 1.6px at 27% 12%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 36% 42%, #cfd6ff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 47% 8%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 55% 30%, #e7ebff, transparent 60%),
+    radial-gradient(1.5px 1.5px at 66% 18%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 74% 52%, #dfe4ff, transparent 60%),
+    radial-gradient(1.3px 1.3px at 86% 10%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 93% 38%, #cfd6ff, transparent 60%),
+    radial-gradient(1px 1px at 12% 88%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 41% 76%, #e7ebff, transparent 60%);
+  animation: sd-twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes sd-twinkle { from { opacity: .45; } to { opacity: .95; } }
+
+/* ---- Lyric-page hero: moon over Kailash ---- */
+.sd .hd-hero {
+  background:
+    radial-gradient(circle at 78% 22%, rgba(255,226,160,.28), transparent 18%),
+    linear-gradient(180deg, rgba(7,11,29,.25), rgba(7,11,29,.92) 92%),
+    url('../assets/shiv-dham/kailash-night.jpg') center bottom / cover no-repeat,
+    linear-gradient(170deg, #050816 0%, #0e1640 60%, #1c2a66 100%);
+}
+.sd .hd-hero .container { position: relative; z-index: 1; }
+.sd .hd-hero .breadcrumb a { color: #f6c86a; }
+.sd .hd-hero .breadcrumb { color: rgba(222,224,255,.7); }
+.sd .hd-hero .lead { color: rgba(230,232,255,.9); }
+.sd .hd-hero h1 .hi { color: #f6c86a; }
+.sd .hd-facts span { color: #e6e8ff; border-color: rgba(246,200,106,.3); background: rgba(255,255,255,.06); }
+.sd .hd-om {
+  color: #f6c86a; text-shadow: 0 0 28px rgba(246,200,106,.65), 0 0 60px rgba(109,140,255,.35);
+  animation: sd-glow 4s ease-in-out infinite;
+}
+@keyframes sd-glow { 50% { text-shadow: 0 0 40px rgba(246,200,106,.95), 0 0 90px rgba(109,140,255,.5); } }
+
+/* ---- Hub hero: Mahadev artwork, text on the left ---- */
+.sd-hero {
+  position: relative; overflow: hidden; color: #fff;
+  padding: 128px 0 76px;
+  background: #070b1d url('../assets/shiv-dham/shiv-hero.jpg') right center / cover no-repeat;
+}
+.sd-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, #070b1d 0%, rgba(7,11,29,.92) 34%, rgba(7,11,29,.45) 62%, rgba(7,11,29,.05) 100%);
+}
+.sd-hero::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 28px;
+  background: var(--hd-bg); border-radius: 28px 28px 0 0;
+}
+.sd-hero .container { position: relative; z-index: 1; }
+.sd-hero-in { max-width: 580px; }
+.sd-hero .breadcrumb { color: rgba(222,224,255,.7); flex-wrap: wrap; justify-content: flex-start; }
+.sd-hero .breadcrumb a { color: #f6c86a; }
+.sd-mantra-line {
+  display: inline-flex; align-items: center; gap: 10px; margin: 8px 0 14px;
+  font-family: var(--hd-font-dev); font-size: 1.15rem; color: #f6c86a;
+  text-shadow: 0 0 22px rgba(246,200,106,.55);
+}
+.sd-mantra-line::before, .sd-mantra-line::after { content: ''; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, #f6c86a); }
+.sd-mantra-line::after { transform: scaleX(-1); }
+.sd-hero h1 {
+  font-family: var(--font-head); font-weight: 800; line-height: 1.08;
+  font-size: clamp(2.3rem, 6vw, 3.8rem); letter-spacing: -.01em; margin-bottom: 8px;
+}
+.sd-hero h1 .hi {
+  display: block; font-family: var(--hd-font-dev); font-weight: 400; font-size: .6em; margin-top: 10px;
+  background: linear-gradient(90deg, #ffe2a0, #f6c86a 50%, #e9a93b); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.sd-hero .lead { color: rgba(230,232,255,.9); font-size: 1.08rem; line-height: 1.75; margin: 14px 0 20px; }
+.sd-hero .hd-facts, .sd-hero .hd-hero-actions { justify-content: flex-start; }
+.sd-pillars { display: flex; gap: 16px; margin-top: 22px; font-size: .74rem; letter-spacing: .32em; text-transform: uppercase; color: rgba(230,232,255,.6); }
+.sd-pillars span + span::before { content: '·'; margin-right: 16px; color: #f6c86a; }
+
+/* ---- Mantra cards ---- */
+.sd-mantras { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.sd-mantras .hd-verse { text-align: center; }
+.sd-mantras .hd-verse-label { justify-content: center; width: 100%; }
+.sd-mantras .count { margin-top: 10px; font-size: .82rem; font-weight: 700; color: var(--hd-muted); }
+
+/* ---- App screen gallery ---- */
+.sd-shots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.sd-shots figure { margin: 0; }
+.sd-shots img {
+  width: 100%; border-radius: 20px; border: 1px solid var(--hd-line);
+  box-shadow: 0 18px 46px rgba(0,0,0,.4); transition: transform .4s;
+}
+.sd-shots figure:hover img { transform: translateY(-6px); }
+.sd-shots figcaption { text-align: center; font-size: .86rem; font-weight: 700; color: var(--hd-ink-soft); margin-top: 10px; }
+
+/* ---- Feature blocks / mini grid ---- */
+.sd .hd-feature-shot img { box-shadow: 0 18px 44px rgba(0,0,0,.4); }
+.sd .hd-mini .ico, .sd .hd-card .ico { filter: drop-shadow(0 0 12px rgba(246,200,106,.35)); }
+
+/* ---- 12 Jyotirlinga ---- */
+.sd-jl { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; counter-reset: jl; }
+.sd-jl li {
+  list-style: none; position: relative; padding: 14px 14px 14px 52px;
+  background: var(--hd-surface); border: 1px solid var(--hd-line); border-radius: 14px;
+}
+.sd-jl li::before {
+  counter-increment: jl; content: counter(jl);
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 800; font-size: .82rem; color: var(--sd-on-accent);
+  background: linear-gradient(135deg, #ffd98a, #e9a93b);
+}
+body.hd.sd[data-theme="light"] .sd-jl li::before { color: #1a1204; }
+.sd-jl b { display: block; color: var(--hd-ink); font-size: .95rem; line-height: 1.3; }
+.sd-jl .hi { display: block; font-family: var(--hd-font-dev); color: var(--hd-saffron); font-size: .9rem; }
+.sd-jl small { display: block; color: var(--hd-muted); font-size: .78rem; margin-top: 2px; }
+.sd .hd-section .sd-jl li { line-height: 1.4; }
+
+/* ---- App promo: trishul on Kailash ---- */
+.sd .hd-app {
+  background:
+    linear-gradient(100deg, rgba(7,11,29,.97) 0%, rgba(14,22,64,.9) 55%, rgba(14,22,64,.55) 100%),
+    url('../assets/shiv-dham/kailash-trishul.jpg') right center / cover no-repeat;
+  border: 1px solid rgba(246,200,106,.22);
+}
+.sd .hd-app::before { background: radial-gradient(circle, rgba(246,200,106,.22), transparent 65%); }
+.sd .hd-app .tag { color: #f6c86a; }
+.sd .hd-app p { color: rgba(230,232,255,.9) !important; }
+.sd .hd-app li { color: #e6e8ff !important; }
+.sd .hd-app li::before { content: '🔱 '; }
+.sd .hd-app-shot img { border-color: rgba(246,200,106,.32); }
+
+/* ---- Refrain note ---- */
+.sd .hd-note { border-left-color: var(--hd-saffron-2); }
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .sd-shots { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .sd-hero { padding: 96px 0 56px; background-position: 72% top; background-size: auto 100%; text-align: center; }
+  .sd-hero::before { background: linear-gradient(180deg, rgba(7,11,29,.35) 0%, rgba(7,11,29,.85) 45%, #070b1d 80%); }
+  .sd-hero-in { max-width: none; padding-top: 140px; }
+  .sd-hero .breadcrumb, .sd-hero .hd-facts, .sd-hero .hd-hero-actions, .sd-pillars { justify-content: center; }
+  .sd-mantras { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .sd-pillars { letter-spacing: .2em; gap: 10px; }
+  .sd-pillars span + span::before { margin-right: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sd-stars, .sd .hd-om { animation: none; }
+}
+@media print {
+  .sd-hero, .sd-stars { display: none !important; }
+  body.hd.sd { background: #fff; color: #000; }
+}

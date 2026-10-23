@@ -1,7 +1,8 @@
-/* Hanuman Dham pages — reading preferences, lite YouTube embed, daily chaupai */
+/* Hanuman Dham + Shiv Dham pages — reading preferences, lite YouTube embed, daily chaupai */
 (function () {
   var body = document.body;
-  var KEY = 'hd-reading-prefs';
+  // Each devotional section (Hanuman Dham, Shiv Dham) keeps its own reading prefs
+  var KEY = body.getAttribute('data-prefs-key') || 'hd-reading-prefs';
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
@@ -93,7 +94,7 @@
       daily.querySelector('.hd-lyric').textContent = c.h;
       daily.querySelector('.hd-roman').textContent = c.r;
       var link = daily.querySelector('a[data-daily-link]');
-      if (link) link.href = 'hanuman-chalisa-lyrics.html#' + c.id;
+      if (link) link.href = link.getAttribute('href').split('#')[0] + '#' + c.id;
     } catch (e) { /* keep server-rendered fallback */ }
   }
 })();
