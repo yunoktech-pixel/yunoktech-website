@@ -168,7 +168,7 @@
   // ---- Home hero: show one app at a time, switching every couple of seconds ----
   const show = $('.yt-show');
   if (show) {
-    const MS = 2400;
+    const MS = 3400; // store graphics carry a headline, so give people time to read it
     show.style.setProperty('--yt-show-ms', `${MS}ms`);
     const screens = $$('.yt-show-screen', show);
     const items = $$('.yt-show-item', show);

@@ -247,9 +247,10 @@
       const r = fan.getBoundingClientRect();
       const p = reduceMotion ? 1 : Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.8)));
       const mid = (fanImgs.length - 1) / 2;
+      const step = Math.min(215, (fan.clientWidth - 250) / Math.max(1, fanImgs.length - 1));
       fanImgs.forEach((img, i) => {
         const d = i - mid;
-        img.style.transform = `translateX(${d * p * 215}px) translateY(${Math.abs(d) * p * 34}px) rotate(${d * p * 7}deg)`;
+        img.style.transform = `translateX(${d * p * step}px) translateY(${Math.abs(d) * p * 34}px) rotate(${d * p * 7}deg)`;
         img.style.zIndex = String(10 - Math.abs(d));
       });
     }

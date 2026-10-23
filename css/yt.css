@@ -539,3 +539,31 @@ body.yt-page-apps { --a1: #6366f1; --a2: #22d3ee; --a3: #f59e0b; }
 .yt-apps.four .yt-app-body { padding: 20px; }
 @media (max-width: 1200px) { .yt-apps.four { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .yt-apps.four { grid-template-columns: 1fr; } }
+
+/* Home hero: card deck of Play Store graphics (replaces the phone frame) */
+.yt-deck { position: relative; width: 300px; aspect-ratio: 9 / 16; animation: yt-trio 6s ease-in-out infinite; perspective: 1200px; }
+.yt-deck::before, .yt-deck::after {
+  content: ''; position: absolute; inset: 0; border-radius: 26px; pointer-events: none;
+  border: 1px solid rgba(255,255,255,.1); transition: background .9s;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--ac) 45%, #0c1224), #0a0f1f 70%);
+}
+.yt-deck::before { transform: translate(-34px, 18px) rotate(-8deg) scale(.92); opacity: .55; }
+.yt-deck::after { transform: translate(34px, 22px) rotate(7deg) scale(.9); opacity: .35; }
+.yt-deck .yt-show-screen {
+  inset: 0; z-index: 1; border-radius: 26px; background: #0b1020;
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 70px color-mix(in srgb, var(--ac) 38%, transparent);
+  transform: translateX(70px) rotate(8deg) scale(.92);
+}
+.yt-deck .yt-show-screen.on { transform: none; }
+.yt-deck .yt-show-screen.out { transform: translateX(-80px) rotate(-10deg) scale(.9); }
+.yt-deck .yt-show-screen img { object-fit: cover; object-position: top center; }
+.yt-deck .yt-show-screen::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(125deg, rgba(255,255,255,.14), transparent 32%); }
+.yt-deck .yt-show-screen.on:hover { transform: translateY(-6px) scale(1.015); transition-duration: .4s; }
+@media (max-width: 640px) {
+  .yt-deck { width: 236px; }
+  .yt-deck .yt-show-screen, .yt-deck::before, .yt-deck::after { border-radius: 22px; }
+  .yt-deck::before { transform: translate(-22px, 14px) rotate(-7deg) scale(.92); }
+  .yt-deck::after { transform: translate(22px, 18px) rotate(6deg) scale(.9); }
+}
+@media (prefers-reduced-motion: reduce) { .yt-deck { animation: none; } }
