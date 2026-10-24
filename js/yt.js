@@ -61,7 +61,7 @@
         stage.style.transform = `rotateY(${x * 14}deg) rotateX(${y * -10}deg)`;
       }, { passive: true });
     }
-    $$('.yt-card, .yt-path, .yt-app').forEach((el) => {
+    if (!document.body.classList.contains('yt-home')) $$('.yt-card, .yt-path, .yt-app').forEach((el) => {
       el.addEventListener('pointermove', (e) => {
         const r = el.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;

@@ -567,3 +567,12 @@ body.yt-page-apps { --a1: #6366f1; --a2: #22d3ee; --a3: #f59e0b; }
   .yt-deck::after { transform: translate(22px, 18px) rotate(6deg) scale(.9); }
 }
 @media (prefers-reduced-motion: reduce) { .yt-deck { animation: none; } }
+
+/* Homepage: lightweight mode — no endless decorative animations or heavy blur */
+.yt-home .yt-grad, .yt-home .yt-btn.primary::before, .yt-home .yt-badge i,
+.yt-home .yt-avatar::before, .yt-home .yt-deck, .yt-home .yt-live::before,
+.yt-home .yt-caret, .yt-home .yt-build, .yt-home .yt-build-screen > *, .yt-home .yt-b-row i { animation: none; }
+.yt-home .yt-stat, .yt-home .yt-show-item, .yt-home .yt-chip-float, .yt-home .yt-live, .yt-home .yt-sticky { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.yt-home .yt-show-glow { filter: none; background: radial-gradient(circle, color-mix(in srgb, var(--ac) 45%, transparent), transparent 65%); }
+.yt-home .yt-showcase::before { filter: none; background: radial-gradient(circle, var(--glow), transparent 65%); }
+.yt-home .yt-hero { background: radial-gradient(60% 50% at 15% 10%, color-mix(in srgb, var(--a1) 22%, transparent), transparent 70%), radial-gradient(50% 45% at 90% 45%, color-mix(in srgb, var(--a3) 16%, transparent), transparent 70%); }
