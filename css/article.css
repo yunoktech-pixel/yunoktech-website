@@ -8,6 +8,19 @@ body.yt-article { --a1: #0ea5e9; --a2: #22d3ee; --a3: #8b5cf6; }
 body.art-walzi { --a1: #7c5cff; --a2: #c34cff; --a3: #ff5c9e; }
 body.art-notivault { --a1: #4f7cff; --a2: #5ad1ff; --a3: #8b5cf6; }
 body.art-hanuman { --a1: #ea580c; --a2: #f6c453; --a3: #f59e0b; }
+body.art-shiv { --a1: #4f6bff; --a2: #f6c86a; --a3: #8b5cf6; }
+body.art-popcut { --a1: #6d5bff; --a2: #ff5ca8; --a3: #22d3ee; }
+body.art-qrbee { --a1: #0fb985; --a2: #0af5b0; --a3: #ffc72c; }
+body.art-sudoku { --a1: #3b6dff; --a2: #8b5cf6; --a3: #ffb020; }
+body.art-snake { --a1: #22c55e; --a2: #a3e635; --a3: #facc15; }
+body.art-ludo { --a1: #3b82f6; --a2: #f43f5e; --a3: #facc15; }
+body.art-words { --a1: #f59e0b; --a2: #22c55e; --a3: #38bdf8; }
+/* "Quick answer" summary + key facts at the top of an article (easy for readers and AI search to quote) */
+.art-quick { margin-top: 0 !important; }
+.art-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; margin: 12px 0 30px; padding: 0; }
+.art-facts li { list-style: none; padding: 11px 14px; border-radius: 12px; font-size: .9rem; line-height: 1.5; color: #c3cee4; background: var(--yt-panel, rgba(16,26,50,.62)); border: 1px solid var(--yt-line, rgba(120,170,255,.16)); }
+/* Store screenshots are 9:16, so don't crop them to the taller default */
+.article-shots.s916 img { aspect-ratio: 9 / 16; }
 
 /* ---- Hero ---- */
 .article-hero-section { position: relative; padding: 130px 0 0; overflow: hidden; text-align: center; }

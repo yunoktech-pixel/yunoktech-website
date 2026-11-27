@@ -38,6 +38,13 @@ Medium: https://medium.com/@kamaldeepkakkar
 
 ## Blog
 
+- [How to Play Ludo: Rules, Snakes & Ladders Rules and Winning Tips](https://yunoktech.com/blog/how-to-play-ludo-rules-tips/): Standard Ludo rules (roll a 6 to start, safe start and star squares, extra roll for a 6, capture or reaching home, three 6s end the turn, exact roll to finish), Snakes and Ladders rules and 8 winning tips.
+- [Snake Game Tips: How to Get a High Score in the Classic Snake Game](https://yunoktech.com/blog/snake-game-tips-high-score/): Strategy for the classic snake game: plan ahead, use the edges, move in loops, leave an exit; Snake Retro special apples and worlds.
+- [Word Puzzle Tips: How to Solve Word Games Faster (and Learn New Words)](https://yunoktech.com/blog/word-puzzle-game-tips/): 9 tips to solve word connect puzzles faster and learn new words; Word Game Hills tools.
+- [How to Play Sudoku: A Beginner's Guide with Easy Techniques](https://yunoktech.com/blog/how-to-play-sudoku-beginners-guide/): Sudoku rules and techniques: scanning, naked and hidden singles, pencil notes, naked pairs, pointing, X-Wing.
+- [How to Scan a QR Code on Android (Even from a Screenshot) — and Stay Safe](https://yunoktech.com/blog/how-to-scan-qr-code-android/): Scan QR codes and barcodes on Android, scan from a screenshot, share Wi-Fi by QR code, QR and UPI scam safety rules.
+- [How to Remove the Background from a Photo on Android (Free, in One Tap)](https://yunoktech.com/blog/remove-background-from-photo-android/): Remove a photo background on Android, save transparent PNGs, make 35 × 45 mm passport photos; PopCut steps.
+- [Om Namah Shivaya Mantra: Meaning, How to Chant 108 Times & Jaap Vidhi](https://yunoktech.com/blog/om-namah-shivaya-mantra-jaap-108/): Meaning of Om Namah Shivaya (Panchakshari mantra), 108-bead mala jaap vidhi at home, best days for Shiv jaap.
 - [How to Recover Deleted Notifications on Android](https://yunoktech.com/blog/how-to-recover-deleted-notifications-android/)
 - [See Deleted Chat Messages Using Notification History](https://yunoktech.com/blog/see-deleted-messages-notification-history-android/)
 - [Best Notification History App for Android in 2026](https://yunoktech.com/blog/best-notification-history-app-android-2026/)
