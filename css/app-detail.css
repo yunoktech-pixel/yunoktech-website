@@ -1,11 +1,15 @@
 /* ==========================================================================
-   App detail pages (PopCut, Sudoku Play, QRBee).
+   App detail pages (PopCut, Sudoku Play, QRBee, Snake Retro, Ludo Tokens, Word Game Hills).
    Loaded after style.css + yt.css. Each page picks its colours by body class.
    ========================================================================== */
 
 body.ad-popcut { --a1: #6d5bff; --a2: #ff5ca8; --a3: #22d3ee; }
 body.ad-sudoku { --a1: #3b6dff; --a2: #8b5cf6; --a3: #ffb020; }
 body.ad-qrbee  { --a1: #0fb985; --a2: #0af5b0; --a3: #ffc72c; }
+body.ad-snake  { --a1: #22c55e; --a2: #a3e635; --a3: #facc15; }
+body.ad-snake .ad-play { color: #04140a; }
+body.ad-ludo   { --a1: #3b82f6; --a2: #f43f5e; --a3: #facc15; }
+body.ad-words  { --a1: #f59e0b; --a2: #22c55e; --a3: #38bdf8; }
 body.ad-qrbee { --yt-bg: #030807; --yt-bg-2: #07120f; --yt-panel: rgba(12,28,24,.66); --yt-line: rgba(10,245,176,.16); }
 
 /* ---- Hero ---- */
